@@ -1,0 +1,355 @@
+{
+  "asOf": "2026-08-18",
+  "lastUpdated": "2026-08-18T00:00:00-04:00",
+  "projects": [
+    {
+      "id": "webnext",
+      "name": "WebNext",
+      "owner": "Jeet Savani",
+      "status": "green",
+      "progress": 80,
+      "phase": "Requirements Finalization",
+      "nextMilestone": { "name": "Requirements Finalization", "date": "2026-08-21" },
+      "goLive": null,
+      "delayDays": 0,
+      "delayNote": "No delay reported",
+      "dependencies": [
+        "No dependency"
+      ],
+      "sprintStatus": {
+        "completed": [],
+        "inProgress": [
+          "Hypercare — Country level workflow | QA — on track for Hypercare"
+        ],
+        "nextPlan": [
+          "Requirements workshop initiated with CM Swami; project plan ETA 21-Aug"
+        ]
+      },
+      "risks": []
+    },
+    {
+      "id": "pledge",
+      "name": "Pledge",
+      "owner": "Jeet Savani",
+      "status": "amber",
+      "progress": 90,
+      "phase": "Production Release",
+      "nextMilestone": { "name": "Production", "date": "2026-08-19" },
+      "goLive": "2026-08-19",
+      "delayDays": 0,
+      "delayNote": "No delay reported",
+      "dependencies": [
+        "Integrate ASM-based permissions in Pledge module — UAT (RIP)",
+        "New permission — AssignedView & Campaign — REQ (RIP)"
+      ],
+      "sprintStatus": {
+        "completed": [
+          "UAT — 13-Aug-2026",
+          "Setup in ASM production"
+        ],
+        "inProgress": [
+          "Phase 1.x requirements complete and finalized; estimation in progress — ETA 20-Aug"
+        ],
+        "nextPlan": [
+          "Production go-live — 19-Aug-2026",
+          "Release note submitted to Swamiji"
+        ]
+      },
+      "risks": []
+    },
+    {
+      "id": "emm",
+      "name": "EMM",
+      "owner": "",
+      "status": "amber",
+      "progress": 85,
+      "phase": "Sprint 26.16 (08/03 – 08/07)",
+      "nextMilestone": { "name": "UAT", "date": "2026-08-10" },
+      "goLive": "2026-08-25",
+      "delayDays": 0,
+      "delayNote": "No impact on go-live",
+      "dependencies": [
+        "EMM pre-go-live requests status",
+        "Internal: Python replacement library in .NET (with Bhaveshbhai) — WIP"
+      ],
+      "sprintStatus": {
+        "completed": [
+          "QA sign-off completed — on track"
+        ],
+        "inProgress": [
+          "1.29.0 in UAT, planned for production next week"
+        ],
+        "nextPlan": [
+          "Performance and security enhancements as identified",
+          "Python upgrade to .NET development",
+          "Post go-live: Canada taxation REQ sign-off pending",
+          "Post go-live: full expense report view/share (PDF alt) REQ sign-off pending",
+          "Post go-live: Events functionality REQ documentation — WIP"
+        ]
+      },
+      "risks": [
+        "EMM performance — unsatisfactory load testing results"
+      ]
+    },
+    {
+      "id": "mybky-phase1",
+      "name": "MyBKY (Phase 1)",
+      "owner": "",
+      "status": "amber",
+      "progress": 55,
+      "phase": "Regression / Perf / Security / UAT",
+      "nextMilestone": { "name": "UAT", "date": "2026-09-09" },
+      "goLive": "2026-09-25",
+      "delayDays": 4,
+      "delayNote": "Mobile dev delayed — may impact regression testing",
+      "dependencies": [
+        "Kishor/Kishori participants without SSO accounts",
+        "MIS BK department split production deployment",
+        "GMS performance improvement (15k emails + 15k push) — ETA 24-Aug",
+        "Provisioning of the SFS bucket for UAT environment"
+      ],
+      "sprintStatus": {
+        "completed": [
+          "QA signed off — all sprints"
+        ],
+        "inProgress": [
+          "Regression testing — WIP, targeted completion 20-Aug-2026",
+          "Perf./security testing — perf initiation delayed 4 days, security delayed 1 day",
+          "UAT — initiation delayed by 1 day"
+        ],
+        "nextPlan": []
+      },
+      "risks": [
+        "Multiple iterations of edit-registration functionality/feature",
+        "Addition of 1 user story for refund transaction",
+        "GMS-related issues — API timeout & stuck campaign"
+      ]
+    },
+    {
+      "id": "mybky-phase2",
+      "name": "MyBKY (Phase 2)",
+      "owner": "",
+      "status": "amber",
+      "progress": 25,
+      "phase": "Requirement Solidification",
+      "nextMilestone": { "name": "TDD", "date": "2026-09-07" },
+      "goLive": "2026-12-31",
+      "delayDays": 11,
+      "delayNote": "Requirement phase delayed",
+      "dependencies": [
+        "New scenarios identified during UI/UX not covered in signed-off FRD — rework in progress",
+        "GMS package is UI-only; backend dev/customization owned by MyBKY team",
+        "Pending business review — review calls restarted",
+        "Stage-gate vs. sprint-by-sprint tracking approach not yet decided"
+      ],
+      "sprintStatus": {
+        "completed": [
+          "TDD completed — Transportation Web",
+          "UI/UX completed — Transportation and Accommodation"
+        ],
+        "inProgress": [
+          "Awaiting business approval — Transportation Web & Mobile UI/UX",
+          "Awaiting business approval — Accommodation Web & Mobile UI/UX",
+          "Under business review — Group Lead & Chaperon FRD, GMS FRD",
+          "Under FRD creation — Sprint 1 leftover items, Medical & Dietary"
+        ],
+        "nextPlan": [
+          "Requirement + TDD to run simultaneously",
+          "Phase 2A go-live expected end of Dec 2026 (possibly 4 dev sprints + 1 buffer)"
+        ]
+      },
+      "risks": [
+        "If Type 2 / stage-gate approach is required and RGC approves, timeline will further delay"
+      ]
+    },
+    {
+      "id": "mymandir",
+      "name": "myMandir App Improvements",
+      "owner": "Aniket Udgaonkar",
+      "status": "red",
+      "progress": 20,
+      "phase": "High-level Estimation / REQ Sign-off",
+      "nextMilestone": { "name": "REQ sign-off", "date": "2026-08-30" },
+      "goLive": null,
+      "delayDays": 12,
+      "delayNote": "12 days delayed",
+      "dependencies": [
+        "Dependency on Sameep for REQ doc review — he is on vacation leave"
+      ],
+      "sprintStatus": {
+        "completed": [
+          "Call with Sameep (13–14 Aug), shared updated REQ doc",
+          "Dev, QA and design teams onboarded",
+          "High-level estimate done from both developers"
+        ],
+        "inProgress": [
+          "QA onboarded 17-Aug, taking KT",
+          "Design team creating pending UI screens"
+        ],
+        "nextPlan": [
+          "Follow up with Sameep + high-level estimate from QA, then release resources"
+        ]
+      },
+      "risks": [
+        "Sameep unavailable (vacation) — blocking REQ doc review"
+      ]
+    },
+    {
+      "id": "gms",
+      "name": "GMS",
+      "owner": "",
+      "status": "amber",
+      "progress": 80,
+      "phase": "Sprint 26.16",
+      "nextMilestone": { "name": "Production", "date": "2026-08-25" },
+      "goLive": "2026-08-25",
+      "delayDays": 19,
+      "delayNote": "19 days delayed",
+      "dependencies": [
+        "None"
+      ],
+      "sprintStatus": {
+        "completed": [
+          "VAPT — all issues resolved & QA verification done",
+          "Prod readiness (infra side) — done",
+          "SharePoint site updating — done"
+        ],
+        "inProgress": [
+          "Load testing for TM logs — ETA 20-Aug",
+          "VAPT re-verification from security team — ETA 22-Aug",
+          "High DB utilization found under concurrent load — tuning/remediation underway, ETA 22-Aug"
+        ],
+        "nextPlan": [
+          "Prod deployment — 25-Aug"
+        ]
+      },
+      "risks": [
+        "myBKY informed of high DB usage issue — may continue load testing without invoking GMS until 24-Aug",
+        "SPM production deployment not blocked by GMS activities (communicated to relevant teams)"
+      ]
+    },
+    {
+      "id": "baps-sso",
+      "name": "BAPS SSO",
+      "owner": "Aniket Udgaonkar",
+      "status": "amber",
+      "progress": 65,
+      "phase": "Sprint 26.16",
+      "nextMilestone": { "name": "UAT Deploy", "date": "2026-08-25" },
+      "goLive": null,
+      "delayDays": 0,
+      "delayNote": "No delay reported",
+      "dependencies": [
+        "None"
+      ],
+      "sprintStatus": {
+        "completed": [
+          "Karyakar flow completed, internal demo done",
+          "Satsangi flow gaps identified and resolved"
+        ],
+        "inProgress": [
+          "Karyakar flow deploy from local to UAT",
+          "Satsangi flow demo — 19-Aug-2026",
+          "SID app deployment",
+          "Demo app"
+        ],
+        "nextPlan": [
+          "Start QA testing for Karyakar flow",
+          "Satsangi demo plan — 19-Aug-2026",
+          "Deployment demo + SID app — 25/26-Aug-2026"
+        ]
+      },
+      "risks": [
+        "Yogesh temporarily moved to EMM project (regression + load testing) — needed back next week"
+      ]
+    },
+    {
+      "id": "spm",
+      "name": "SPM",
+      "owner": "",
+      "status": "green",
+      "progress": 75,
+      "phase": "UAT / VAPT / Load Testing",
+      "nextMilestone": { "name": "UAT / VAPT / Load Testing", "date": "2026-08-23" },
+      "goLive": "2026-08-31",
+      "delayDays": 2,
+      "delayNote": "2 days delay in UAT deployment — timeline revised",
+      "dependencies": [
+        "DEVOPS-1082 — SPM production environment setup and configuration",
+        "DEVOPS-1078 — SPM UAT DB read-only access for QA"
+      ],
+      "sprintStatus": {
+        "completed": [
+          "Web & mobile QA sign-off completed",
+          "Web & mobile deployed to UAT",
+          "SPM UAT release → UAT deployment completed — 13-Aug-2026",
+          "1 of 3 UAT defect/support sync calls completed"
+        ],
+        "inProgress": [
+          "Basic Dashboard TDD preparation"
+        ],
+        "nextPlan": []
+      },
+      "risks": [
+        "No major bug/blocker — only minor UI/UX changes on template screen"
+      ]
+    },
+    {
+      "id": "bkms",
+      "name": "BKMS",
+      "owner": "",
+      "status": "green",
+      "progress": 70,
+      "phase": "Sprint 26.17",
+      "nextMilestone": { "name": "UAT", "date": "2026-08-20" },
+      "goLive": null,
+      "delayDays": 0,
+      "delayNote": "No delay reported",
+      "dependencies": [
+        "DEVOPS-1029 — SMTP credentials/config for DEV/QA/UAT; emails not received post-config, under resolution with DevOps"
+      ],
+      "sprintStatus": {
+        "completed": [
+          "Mobile: BST post-session summary tab",
+          "Web: BST reports — restrict attendance/quiz data entry",
+          "Release 1.0.24 → production deployment completed — 18-Aug-2026"
+        ],
+        "inProgress": [
+          "Mobile: BST session dashboard — QA testing",
+          "Mobile: BST quiz tab — QA testing"
+        ],
+        "nextPlan": []
+      },
+      "risks": []
+    },
+    {
+      "id": "mis",
+      "name": "MIS",
+      "owner": "",
+      "status": "green",
+      "progress": 75,
+      "phase": "Sprint 26.17",
+      "nextMilestone": { "name": "UAT", "date": "2026-08-26" },
+      "goLive": null,
+      "delayDays": 0,
+      "delayNote": "No delay reported",
+      "dependencies": [
+        "MIS – BKY & iBKY production deployment approach still pending"
+      ],
+      "sprintStatus": {
+        "completed": [
+          "System: BKY sub-department creation & Gunbhavi mailing category split",
+          "Search person: show application source in results",
+          "Release 1.0.23C → production deployment completed — 18-Aug-2026",
+          "Category change: Gunbhavi Mailing → Visitor and Unknown deployed to production"
+        ],
+        "inProgress": [
+          "Report: add person status column — QA in progress",
+          "Signup QR: frontend consent, validation & address UI — QA in progress"
+        ],
+        "nextPlan": []
+      },
+      "risks": []
+    }
+  ]
+}
