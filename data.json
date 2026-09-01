@@ -94,7 +94,7 @@
     {
       "id": "mybky-phase1",
       "name": "MyBKY (Phase 1)",
-      "owner": "",
+      "owner": "Satish Buddhadev",
       "status": "amber",
       "progress": 55,
       "phase": "Regression / Perf / Security / UAT",
@@ -128,7 +128,7 @@
     {
       "id": "mybky-phase2",
       "name": "MyBKY (Phase 2)",
-      "owner": "",
+      "owner": "Satish Buddhadev",
       "status": "amber",
       "progress": 25,
       "phase": "Requirement Solidification",
