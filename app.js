@@ -188,6 +188,20 @@
     return items.length ? items.map((d) => el("li", null, [d])) : [el("li", null, ["—"])];
   }
 
+  function pairedList(items, mitigations, label) {
+    if (!items.length) return [el("li", null, ["—"])];
+    return items.map((text, i) => {
+      const mitigation = (mitigations && mitigations[i]) || "";
+      return el("li", { class: "paired-item" }, [
+        el("div", { class: "paired-item-text" }, [text]),
+        el("div", { class: "paired-item-mitigation" + (mitigation ? "" : " is-missing") }, [
+          el("span", { class: "mitigation-label" }, [label + ": "]),
+          mitigation || "Not yet documented",
+        ]),
+      ]);
+    });
+  }
+
   function renderCards() {
     const box = document.getElementById("cards");
     box.innerHTML = "";
@@ -425,6 +439,14 @@
         el("dd", { class: "delay-flag " + (isLate ? "is-late" : "is-ontime") }, [
           isLate ? "+" + p.delayDays + " days" : "On schedule",
         ]),
+        ...(isLate
+          ? [
+              el("dt", null, ["Impact of delay"]),
+              el("dd", { class: p.delayImpact ? "" : "is-missing" }, [
+                p.delayImpact || "Not yet documented",
+              ]),
+            ]
+          : []),
       ])
     );
 
@@ -473,7 +495,11 @@
 
     // Current details
     root.appendChild(el("h3", { class: "weekly-subhead" }, ["Dependencies"]));
-    root.appendChild(el("div", { class: "detail-block deps" }, [el("ul", null, listOrDash(p.dependencies || []))]));
+    root.appendChild(
+      el("div", { class: "detail-block deps" }, [
+        el("ul", { class: "paired-list" }, pairedList(p.dependencies || [], p.dependencyMitigations || [], "Mitigation / impact")),
+      ])
+    );
 
     root.appendChild(el("h3", { class: "weekly-subhead" }, ["Sprint status"]));
     root.appendChild(
@@ -496,7 +522,9 @@
     root.appendChild(el("h3", { class: "weekly-subhead" }, ["Risks / blockers"]));
     root.appendChild(
       el("div", { class: "detail-block risks" }, [
-        el("ul", null, p.risks && p.risks.length ? p.risks.map((d) => el("li", null, [d])) : [el("li", null, ["None reported"])]),
+        p.risks && p.risks.length
+          ? el("ul", { class: "paired-list" }, pairedList(p.risks, p.riskMitigations || [], "Mitigation plan"))
+          : el("ul", null, [el("li", null, ["None reported"])]),
       ])
     );
 
@@ -514,6 +542,9 @@
             el("div", { class: "note-row " + (n.status === "open" ? "is-open" : "is-resolved") }, [
               el("span", { class: "note-status" }, [n.status === "open" ? "OPEN" : "RESOLVED"]),
               el("span", { class: "note-text" }, [n.text]),
+              ...(n.mitigationImpact
+                ? [el("span", { class: "note-mitigation" }, ["Mitigation / impact: " + n.mitigationImpact])]
+                : []),
               el("span", { class: "note-meta" }, [
                 (n.raisedBy ? n.raisedBy + " · " : "") + fmtDate((n.createdAt || "").slice(0, 10)),
               ]),
@@ -557,15 +588,22 @@
     document.getElementById("fbSubmit").addEventListener("click", () => {
       const project = projectSelect.value;
       const note = document.getElementById("fbNote").value.trim();
+      const mitigationImpact = document.getElementById("fbMitigation").value.trim();
       const raisedBy = document.getElementById("fbRaisedBy").value.trim();
       if (!note) {
         document.getElementById("fbNote").focus();
         return;
       }
-      const url = issueUrl("meeting-feedback.yml", { project, note, raised_by: raisedBy });
+      const url = issueUrl("meeting-feedback.yml", {
+        project,
+        note,
+        mitigation_impact: mitigationImpact,
+        raised_by: raisedBy,
+      });
       window.open(url, "_blank", "noopener");
       modal.hidden = true;
       document.getElementById("fbNote").value = "";
+      document.getElementById("fbMitigation").value = "";
       document.getElementById("fbRaisedBy").value = "";
     });
   }

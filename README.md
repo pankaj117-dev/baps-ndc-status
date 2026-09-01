@@ -26,7 +26,10 @@ to scan instead of a 15-slide deck.
   Click any row to open that project's full detail view.
 - **Project cards** — one per project: status, progress bar, phase, next
   milestone, go-live date, delay, and expandable dependencies / sprint status
-  (completed, in progress, next plan) / risks.
+  (completed, in progress, next plan) / risks. Every risk and dependency in
+  the detail view is paired with its mitigation plan / impact, and any delay
+  requires a stated impact — items missing one are flagged in amber so it's
+  obvious what still needs to be filled in.
 - Filter chips to narrow the card grid to on-track / at-risk / critical, plus
   a **PM filter dropdown** to show only one person's projects.
 
@@ -114,15 +117,27 @@ Everything lives in three files:
                                    // slips so the go-live tracker can show the delta
   "delayDays": 0,              // 0 if on schedule, positive integer if late
   "delayNote": "No delay reported",
+  "delayImpact": "",           // required in the form whenever delayDays > 0
   "dependencies": ["..."],
+  "dependencyMitigations": ["..."], // same length/order as dependencies — plan + impact for each
   "sprintStatus": {
     "completed": ["..."],
     "inProgress": ["..."],
     "nextPlan": ["..."]
   },
-  "risks": ["..."]
+  "risks": ["..."],
+  "riskMitigations": ["..."]   // same length/order as risks — mitigation plan + impact for each
 }
 ```
+
+Risks and dependencies are tracked as **parallel arrays**: `risks[i]` pairs
+with `riskMitigations[i]`, `dependencies[i]` pairs with
+`dependencyMitigations[i]`. The weekly-update issue form asks for both lists
+in the same order so PMs can just add a matching line. The dashboard flags
+any risk, dependency, or delay that's missing its mitigation/impact in amber
+so it's visible at a glance who still needs to fill it in. Meeting feedback
+issues also carry an optional `mitigationImpact` field for when leadership
+flags a risk/dependency live in the meeting.
 
 `originalGoLive` is system-managed: `scripts/ingest.py` sets it the first time
 a PM submits a go-live date for a project and never overwrites it after that,

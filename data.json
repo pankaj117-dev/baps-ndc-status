@@ -9,7 +9,10 @@
       "status": "green",
       "progress": 80,
       "phase": "Requirements Finalization",
-      "nextMilestone": { "name": "Requirements Finalization", "date": "2026-08-21" },
+      "nextMilestone": {
+        "name": "Requirements Finalization",
+        "date": "2026-08-21"
+      },
       "goLive": null,
       "originalGoLive": null,
       "delayDays": 0,
@@ -26,7 +29,12 @@
           "Requirements workshop initiated with CM Swami; project plan ETA 21-Aug"
         ]
       },
-      "risks": []
+      "risks": [],
+      "delayImpact": "",
+      "riskMitigations": [],
+      "dependencyMitigations": [
+        ""
+      ]
     },
     {
       "id": "pledge",
@@ -35,7 +43,10 @@
       "status": "amber",
       "progress": 90,
       "phase": "Production Release",
-      "nextMilestone": { "name": "Production", "date": "2026-08-19" },
+      "nextMilestone": {
+        "name": "Production",
+        "date": "2026-08-19"
+      },
       "goLive": "2026-08-19",
       "originalGoLive": "2026-08-19",
       "delayDays": 0,
@@ -57,7 +68,13 @@
           "Release note submitted to Swamiji"
         ]
       },
-      "risks": []
+      "risks": [],
+      "delayImpact": "",
+      "riskMitigations": [],
+      "dependencyMitigations": [
+        "",
+        ""
+      ]
     },
     {
       "id": "emm",
@@ -66,7 +83,10 @@
       "status": "amber",
       "progress": 85,
       "phase": "Sprint 26.16 (08/03 – 08/07)",
-      "nextMilestone": { "name": "UAT", "date": "2026-08-10" },
+      "nextMilestone": {
+        "name": "UAT",
+        "date": "2026-08-10"
+      },
       "goLive": "2026-08-25",
       "originalGoLive": "2026-08-25",
       "delayDays": 0,
@@ -92,6 +112,14 @@
       },
       "risks": [
         "EMM performance — unsatisfactory load testing results"
+      ],
+      "delayImpact": "",
+      "riskMitigations": [
+        ""
+      ],
+      "dependencyMitigations": [
+        "",
+        ""
       ]
     },
     {
@@ -101,7 +129,10 @@
       "status": "amber",
       "progress": 55,
       "phase": "Regression / Perf / Security / UAT",
-      "nextMilestone": { "name": "UAT", "date": "2026-09-09" },
+      "nextMilestone": {
+        "name": "UAT",
+        "date": "2026-09-09"
+      },
       "goLive": "2026-09-25",
       "originalGoLive": "2026-09-21",
       "delayDays": 4,
@@ -127,6 +158,18 @@
         "Multiple iterations of edit-registration functionality/feature",
         "Addition of 1 user story for refund transaction",
         "GMS-related issues — API timeout & stuck campaign"
+      ],
+      "delayImpact": "",
+      "riskMitigations": [
+        "",
+        "",
+        ""
+      ],
+      "dependencyMitigations": [
+        "",
+        "",
+        "",
+        ""
       ]
     },
     {
@@ -136,7 +179,10 @@
       "status": "amber",
       "progress": 25,
       "phase": "Requirement Solidification",
-      "nextMilestone": { "name": "TDD", "date": "2026-09-07" },
+      "nextMilestone": {
+        "name": "TDD",
+        "date": "2026-09-07"
+      },
       "goLive": "2026-12-31",
       "originalGoLive": "2026-12-20",
       "delayDays": 11,
@@ -165,6 +211,16 @@
       },
       "risks": [
         "If Type 2 / stage-gate approach is required and RGC approves, timeline will further delay"
+      ],
+      "delayImpact": "",
+      "riskMitigations": [
+        ""
+      ],
+      "dependencyMitigations": [
+        "",
+        "",
+        "",
+        ""
       ]
     },
     {
@@ -174,7 +230,10 @@
       "status": "red",
       "progress": 20,
       "phase": "High-level Estimation / REQ Sign-off",
-      "nextMilestone": { "name": "REQ sign-off", "date": "2026-08-30" },
+      "nextMilestone": {
+        "name": "REQ sign-off",
+        "date": "2026-08-30"
+      },
       "goLive": null,
       "originalGoLive": null,
       "delayDays": 12,
@@ -198,6 +257,13 @@
       },
       "risks": [
         "Sameep unavailable (vacation) — blocking REQ doc review"
+      ],
+      "delayImpact": "",
+      "riskMitigations": [
+        ""
+      ],
+      "dependencyMitigations": [
+        ""
       ]
     },
     {
@@ -207,7 +273,10 @@
       "status": "amber",
       "progress": 80,
       "phase": "Sprint 26.16",
-      "nextMilestone": { "name": "Production", "date": "2026-08-25" },
+      "nextMilestone": {
+        "name": "Production",
+        "date": "2026-08-25"
+      },
       "goLive": "2026-08-25",
       "originalGoLive": "2026-08-06",
       "delayDays": 19,
@@ -233,6 +302,14 @@
       "risks": [
         "myBKY informed of high DB usage issue — may continue load testing without invoking GMS until 24-Aug",
         "SPM production deployment not blocked by GMS activities (communicated to relevant teams)"
+      ],
+      "delayImpact": "",
+      "riskMitigations": [
+        "",
+        ""
+      ],
+      "dependencyMitigations": [
+        ""
       ]
     },
     {
@@ -242,7 +319,10 @@
       "status": "amber",
       "progress": 65,
       "phase": "Sprint 26.16",
-      "nextMilestone": { "name": "UAT Deploy", "date": "2026-08-25" },
+      "nextMilestone": {
+        "name": "UAT Deploy",
+        "date": "2026-08-25"
+      },
       "goLive": null,
       "originalGoLive": null,
       "delayDays": 0,
@@ -269,6 +349,13 @@
       },
       "risks": [
         "Yogesh temporarily moved to EMM project (regression + load testing) — needed back next week"
+      ],
+      "delayImpact": "",
+      "riskMitigations": [
+        ""
+      ],
+      "dependencyMitigations": [
+        ""
       ]
     },
     {
@@ -278,7 +365,10 @@
       "status": "green",
       "progress": 75,
       "phase": "UAT / VAPT / Load Testing",
-      "nextMilestone": { "name": "UAT / VAPT / Load Testing", "date": "2026-08-23" },
+      "nextMilestone": {
+        "name": "UAT / VAPT / Load Testing",
+        "date": "2026-08-23"
+      },
       "goLive": "2026-08-31",
       "originalGoLive": "2026-08-29",
       "delayDays": 2,
@@ -301,6 +391,14 @@
       },
       "risks": [
         "No major bug/blocker — only minor UI/UX changes on template screen"
+      ],
+      "delayImpact": "",
+      "riskMitigations": [
+        ""
+      ],
+      "dependencyMitigations": [
+        "",
+        ""
       ]
     },
     {
@@ -310,7 +408,10 @@
       "status": "green",
       "progress": 70,
       "phase": "Sprint 26.17",
-      "nextMilestone": { "name": "UAT", "date": "2026-08-20" },
+      "nextMilestone": {
+        "name": "UAT",
+        "date": "2026-08-20"
+      },
       "goLive": null,
       "originalGoLive": null,
       "delayDays": 0,
@@ -330,7 +431,12 @@
         ],
         "nextPlan": []
       },
-      "risks": []
+      "risks": [],
+      "delayImpact": "",
+      "riskMitigations": [],
+      "dependencyMitigations": [
+        ""
+      ]
     },
     {
       "id": "mis",
@@ -339,7 +445,10 @@
       "status": "green",
       "progress": 75,
       "phase": "Sprint 26.17",
-      "nextMilestone": { "name": "UAT", "date": "2026-08-26" },
+      "nextMilestone": {
+        "name": "UAT",
+        "date": "2026-08-26"
+      },
       "goLive": null,
       "originalGoLive": null,
       "delayDays": 0,
@@ -360,7 +469,12 @@
         ],
         "nextPlan": []
       },
-      "risks": []
+      "risks": [],
+      "delayImpact": "",
+      "riskMitigations": [],
+      "dependencyMitigations": [
+        ""
+      ]
     }
   ]
 }

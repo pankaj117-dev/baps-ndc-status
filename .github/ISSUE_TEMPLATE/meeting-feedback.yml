@@ -36,6 +36,12 @@ body:
       placeholder: "Where are the tickets for the hypercare workstream? Please share ticket links next update."
     validations:
       required: true
+  - type: textarea
+    id: mitigation_impact
+    attributes:
+      label: Mitigation plan / impact (if this is a risk or dependency)
+      description: "If this feedback flags a risk or dependency, capture the mitigation plan and/or impact discussed in the meeting so it's tracked here too — not just as a note to the PM."
+      placeholder: "Risk: security re-verification delay. Mitigation: escalated to security lead for priority slot. Impact: no change to go-live if resolved by Friday."
   - type: input
     id: raised_by
     attributes:

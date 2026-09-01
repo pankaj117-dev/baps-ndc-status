@@ -48,6 +48,7 @@ def apply_weekly_update(project, fields):
     set_if_present("owner", "PM name")
     set_if_present("phase", "Current phase")
     set_if_present("delayNote", "Delay note")
+    set_if_present("delayImpact", "Impact of delay")
 
     status = fields.get("Overall status", "")
     if status:
@@ -84,6 +85,10 @@ def apply_weekly_update(project, fields):
     if deps:
         project["dependencies"] = lines(deps)
 
+    dep_mitigation = fields.get("Dependency mitigation plan / impact", "")
+    if dep_mitigation:
+        project["dependencyMitigations"] = lines(dep_mitigation)
+
     sprint = project.get("sprintStatus") or {"completed": [], "inProgress": [], "nextPlan": []}
     completed = fields.get("Completed this week", "")
     in_progress = fields.get("In progress", "")
@@ -99,6 +104,10 @@ def apply_weekly_update(project, fields):
     risks = fields.get("Risks / blockers", "")
     if risks:
         project["risks"] = lines(risks)
+
+    risk_mitigation = fields.get("Risk mitigation plan", "")
+    if risk_mitigation:
+        project["riskMitigations"] = lines(risk_mitigation)
 
 
 def ingest_weekly_updates(data):
@@ -150,6 +159,7 @@ def ingest_feedback(notes):
         project_name = fields.get("Project", "").strip()
         project_id = PROJECT_NAME_TO_ID.get(project_name)
         note_text = fields.get("Feedback / ask", "").strip()
+        mitigation_impact = fields.get("Mitigation plan / impact (if this is a risk or dependency)", "").strip()
         raised_by = fields.get("Raised by", "").strip() or (issue.get("author") or {}).get("login", "unknown")
 
         if not project_id or not note_text:
@@ -162,6 +172,7 @@ def ingest_feedback(notes):
             "id": note_id,
             "projectId": project_id,
             "text": note_text,
+            "mitigationImpact": mitigation_impact,
             "raisedBy": raised_by,
             "createdAt": issue.get("createdAt"),
             "sourceIssue": issue.get("url"),
@@ -199,6 +210,11 @@ def snapshot_history(data, history):
                 "nextMilestone": p.get("nextMilestone"),
                 "goLive": p.get("goLive"),
                 "originalGoLive": p.get("originalGoLive"),
+                "delayImpact": p.get("delayImpact", ""),
+                "risks": p.get("risks", []),
+                "riskMitigations": p.get("riskMitigations", []),
+                "dependencies": p.get("dependencies", []),
+                "dependencyMitigations": p.get("dependencyMitigations", []),
             }
             for p in data["projects"]
         ],

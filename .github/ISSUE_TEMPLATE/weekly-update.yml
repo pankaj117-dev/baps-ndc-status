@@ -92,6 +92,12 @@ body:
     attributes:
       label: Delay note
       placeholder: "Mobile dev delayed — may impact regression testing"
+  - type: input
+    id: delay_impact
+    attributes:
+      label: Impact of delay
+      description: "If delay days > 0, what's the actual impact? (go-live slip, other teams/projects blocked, etc.) Required whenever there's a delay."
+      placeholder: "Pushes go-live by 4 days; blocks MyBKY Phase 2 regression start"
   - type: textarea
     id: dependencies
     attributes:
@@ -100,6 +106,14 @@ body:
       placeholder: |
         DEVOPS-1082 — SPM production environment setup
         Waiting on Sameep for REQ doc review
+  - type: textarea
+    id: dependency_mitigation
+    attributes:
+      label: Dependency mitigation plan / impact
+      description: "One per line, in the SAME ORDER as the dependencies above — what's the plan to unblock each one, and what happens if it isn't resolved in time? Required for any dependency listed above."
+      placeholder: |
+        Escalated to DevOps lead, ETA 22-Aug — if missed, UAT start slips by same amount
+        Following up with Sameep directly — no fallback reviewer identified yet
   - type: textarea
     id: completed
     attributes:
@@ -120,3 +134,11 @@ body:
     attributes:
       label: Risks / blockers
       description: "One per line"
+  - type: textarea
+    id: risk_mitigation
+    attributes:
+      label: Risk mitigation plan
+      description: "One per line, in the SAME ORDER as the risks above — what's being done about each, and what's the impact if it isn't mitigated? Required for any risk listed above."
+      placeholder: |
+        Adding load-balancing config before next test cycle — if unresolved, go-live may slip 1 week
+        Escalated to security team for re-verification — no impact to current timeline yet

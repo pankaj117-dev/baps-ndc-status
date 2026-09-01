@@ -14,7 +14,16 @@
           "date": "2026-08-21"
         },
         "goLive": null,
-        "originalGoLive": null
+        "originalGoLive": null,
+        "delayImpact": "",
+        "risks": [],
+        "riskMitigations": [],
+        "dependencies": [
+          "No dependency"
+        ],
+        "dependencyMitigations": [
+          ""
+        ]
       },
       {
         "id": "pledge",
@@ -28,7 +37,18 @@
           "date": "2026-08-19"
         },
         "goLive": "2026-08-19",
-        "originalGoLive": "2026-08-19"
+        "originalGoLive": "2026-08-19",
+        "delayImpact": "",
+        "risks": [],
+        "riskMitigations": [],
+        "dependencies": [
+          "Integrate ASM-based permissions in Pledge module — UAT (RIP)",
+          "New permission — AssignedView & Campaign — REQ (RIP)"
+        ],
+        "dependencyMitigations": [
+          "",
+          ""
+        ]
       },
       {
         "id": "emm",
@@ -36,13 +56,28 @@
         "status": "amber",
         "progress": 85,
         "delayDays": 0,
-        "phase": "Sprint 26.16 (08/03 \u2013 08/07)",
+        "phase": "Sprint 26.16 (08/03 – 08/07)",
         "nextMilestone": {
           "name": "UAT",
           "date": "2026-08-10"
         },
         "goLive": "2026-08-25",
-        "originalGoLive": "2026-08-25"
+        "originalGoLive": "2026-08-25",
+        "delayImpact": "",
+        "risks": [
+          "EMM performance — unsatisfactory load testing results"
+        ],
+        "riskMitigations": [
+          ""
+        ],
+        "dependencies": [
+          "EMM pre-go-live requests status",
+          "Internal: Python replacement library in .NET (with Bhaveshbhai) — WIP"
+        ],
+        "dependencyMitigations": [
+          "",
+          ""
+        ]
       },
       {
         "id": "mybky-phase1",
@@ -56,7 +91,30 @@
           "date": "2026-09-09"
         },
         "goLive": "2026-09-25",
-        "originalGoLive": "2026-09-21"
+        "originalGoLive": "2026-09-21",
+        "delayImpact": "",
+        "risks": [
+          "Multiple iterations of edit-registration functionality/feature",
+          "Addition of 1 user story for refund transaction",
+          "GMS-related issues — API timeout & stuck campaign"
+        ],
+        "riskMitigations": [
+          "",
+          "",
+          ""
+        ],
+        "dependencies": [
+          "Kishor/Kishori participants without SSO accounts",
+          "MIS BK department split production deployment",
+          "GMS performance improvement (15k emails + 15k push) — ETA 24-Aug",
+          "Provisioning of the SFS bucket for UAT environment"
+        ],
+        "dependencyMitigations": [
+          "",
+          "",
+          "",
+          ""
+        ]
       },
       {
         "id": "mybky-phase2",
@@ -70,7 +128,26 @@
           "date": "2026-09-07"
         },
         "goLive": "2026-12-31",
-        "originalGoLive": "2026-12-20"
+        "originalGoLive": "2026-12-20",
+        "delayImpact": "",
+        "risks": [
+          "If Type 2 / stage-gate approach is required and RGC approves, timeline will further delay"
+        ],
+        "riskMitigations": [
+          ""
+        ],
+        "dependencies": [
+          "New scenarios identified during UI/UX not covered in signed-off FRD — rework in progress",
+          "GMS package is UI-only; backend dev/customization owned by MyBKY team",
+          "Pending business review — review calls restarted",
+          "Stage-gate vs. sprint-by-sprint tracking approach not yet decided"
+        ],
+        "dependencyMitigations": [
+          "",
+          "",
+          "",
+          ""
+        ]
       },
       {
         "id": "mymandir",
@@ -84,7 +161,20 @@
           "date": "2026-08-30"
         },
         "goLive": null,
-        "originalGoLive": null
+        "originalGoLive": null,
+        "delayImpact": "",
+        "risks": [
+          "Sameep unavailable (vacation) — blocking REQ doc review"
+        ],
+        "riskMitigations": [
+          ""
+        ],
+        "dependencies": [
+          "Dependency on Sameep for REQ doc review — he is on vacation leave"
+        ],
+        "dependencyMitigations": [
+          ""
+        ]
       },
       {
         "id": "gms",
@@ -98,7 +188,22 @@
           "date": "2026-08-25"
         },
         "goLive": "2026-08-25",
-        "originalGoLive": "2026-08-06"
+        "originalGoLive": "2026-08-06",
+        "delayImpact": "",
+        "risks": [
+          "myBKY informed of high DB usage issue — may continue load testing without invoking GMS until 24-Aug",
+          "SPM production deployment not blocked by GMS activities (communicated to relevant teams)"
+        ],
+        "riskMitigations": [
+          "",
+          ""
+        ],
+        "dependencies": [
+          "None"
+        ],
+        "dependencyMitigations": [
+          ""
+        ]
       },
       {
         "id": "baps-sso",
@@ -112,7 +217,20 @@
           "date": "2026-08-25"
         },
         "goLive": null,
-        "originalGoLive": null
+        "originalGoLive": null,
+        "delayImpact": "",
+        "risks": [
+          "Yogesh temporarily moved to EMM project (regression + load testing) — needed back next week"
+        ],
+        "riskMitigations": [
+          ""
+        ],
+        "dependencies": [
+          "None"
+        ],
+        "dependencyMitigations": [
+          ""
+        ]
       },
       {
         "id": "spm",
@@ -126,7 +244,22 @@
           "date": "2026-08-23"
         },
         "goLive": "2026-08-31",
-        "originalGoLive": "2026-08-29"
+        "originalGoLive": "2026-08-29",
+        "delayImpact": "",
+        "risks": [
+          "No major bug/blocker — only minor UI/UX changes on template screen"
+        ],
+        "riskMitigations": [
+          ""
+        ],
+        "dependencies": [
+          "DEVOPS-1082 — SPM production environment setup and configuration",
+          "DEVOPS-1078 — SPM UAT DB read-only access for QA"
+        ],
+        "dependencyMitigations": [
+          "",
+          ""
+        ]
       },
       {
         "id": "bkms",
@@ -140,7 +273,16 @@
           "date": "2026-08-20"
         },
         "goLive": null,
-        "originalGoLive": null
+        "originalGoLive": null,
+        "delayImpact": "",
+        "risks": [],
+        "riskMitigations": [],
+        "dependencies": [
+          "DEVOPS-1029 — SMTP credentials/config for DEV/QA/UAT; emails not received post-config, under resolution with DevOps"
+        ],
+        "dependencyMitigations": [
+          ""
+        ]
       },
       {
         "id": "mis",
@@ -154,7 +296,16 @@
           "date": "2026-08-26"
         },
         "goLive": null,
-        "originalGoLive": null
+        "originalGoLive": null,
+        "delayImpact": "",
+        "risks": [],
+        "riskMitigations": [],
+        "dependencies": [
+          "MIS – BKY & iBKY production deployment approach still pending"
+        ],
+        "dependencyMitigations": [
+          ""
+        ]
       }
     ]
   }

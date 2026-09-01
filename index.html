@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=6">
+<link rel="stylesheet" href="styles.css?v=7">
 </head>
 <body>
   <div class="wrap">
@@ -110,6 +110,8 @@
       <select id="fbProject"></select>
       <label for="fbNote">Feedback / ask</label>
       <textarea id="fbNote" rows="4" placeholder="Where are the tickets for the hypercare workstream?"></textarea>
+      <label for="fbMitigation">Mitigation plan / impact (if this is a risk or dependency)</label>
+      <textarea id="fbMitigation" rows="3" placeholder="Risk: security re-verification delay. Mitigation: escalated to security lead. Impact: no change to go-live if resolved by Friday."></textarea>
       <label for="fbRaisedBy">Raised by (optional)</label>
       <input id="fbRaisedBy" type="text" placeholder="Swami">
       <div class="modal-actions">
@@ -119,6 +121,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>

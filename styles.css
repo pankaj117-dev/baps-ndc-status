@@ -951,6 +951,64 @@ body.no-scroll { overflow: hidden; }
   white-space: nowrap;
 }
 
+.note-mitigation {
+  grid-column: 1 / -1;
+  font-size: 12px;
+  color: var(--ink-soft);
+  background: var(--bg);
+  border-radius: 6px;
+  padding: 6px 9px;
+}
+
+/* ---------- Risk / dependency mitigation pairs ---------- */
+
+.detail-block .paired-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.paired-item {
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.paired-item-text {
+  font-size: 13.5px;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.paired-item-mitigation {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.paired-item-mitigation .mitigation-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+}
+
+.paired-item-mitigation.is-missing {
+  color: var(--amber);
+}
+
+.paired-item-mitigation.is-missing .mitigation-label {
+  color: var(--amber);
+}
+
+dd.is-missing {
+  color: var(--amber);
+}
+
 .empty-note {
   color: var(--ink-soft);
   font-size: 13.5px;
