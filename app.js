@@ -8,6 +8,7 @@
   let HISTORY = {};
   let NOTES = [];
   let activeFilter = "all";
+  let activeOwner = "all";
 
   function fmtDate(iso) {
     if (!iso) return "—";
@@ -120,7 +121,17 @@
   function renderCards() {
     const box = document.getElementById("cards");
     box.innerHTML = "";
-    const projects = DATA.projects.filter((p) => activeFilter === "all" || p.status === activeFilter);
+    const projects = DATA.projects.filter((p) => {
+      const statusOk = activeFilter === "all" || p.status === activeFilter;
+      const owner = p.owner || "Unassigned";
+      const ownerOk = activeOwner === "all" || owner === activeOwner;
+      return statusOk && ownerOk;
+    });
+
+    if (!projects.length) {
+      box.appendChild(el("div", { class: "empty-note" }, ["No projects match this filter."]));
+      return;
+    }
 
     projects.forEach((p) => {
       const isLate = p.delayDays > 0;
@@ -180,6 +191,26 @@
         chip.classList.add("is-on");
         renderCards();
       });
+    });
+  }
+
+  function wireOwnerFilter() {
+    const select = document.getElementById("ownerFilter");
+    const owners = Array.from(
+      new Set(DATA.projects.map((p) => p.owner || "Unassigned"))
+    ).sort((a, b) => {
+      if (a === "Unassigned") return 1;
+      if (b === "Unassigned") return -1;
+      return a.localeCompare(b);
+    });
+
+    owners.forEach((owner) => {
+      select.appendChild(el("option", { value: owner }, [owner]));
+    });
+
+    select.addEventListener("change", () => {
+      activeOwner = select.value;
+      renderCards();
     });
   }
 
@@ -494,6 +525,7 @@
     renderTimeline();
     renderCards();
     wireFilters();
+    wireOwnerFilter();
 
     wireProjectDetail();
     wireFeedbackModal();
