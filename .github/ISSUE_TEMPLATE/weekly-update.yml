@@ -1,0 +1,122 @@
+name: "Weekly Project Update"
+description: "Submit your project's status for this week's NDC review. This gets pulled into the dashboard automatically."
+title: "[Weekly Update] "
+labels: ["weekly-update"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fill in what's changed this week. Leave a field blank to keep last week's value.
+        Check the dashboard first — https://pankaj117-dev.github.io/baps-ndc-status/ — for any
+        open follow-ups on your project before you submit; a bot will also remind you below once
+        you open this issue.
+  - type: dropdown
+    id: project
+    attributes:
+      label: Project
+      options:
+        - WebNext
+        - Pledge
+        - EMM
+        - MyBKY (Phase 1)
+        - MyBKY (Phase 2)
+        - myMandir App Improvements
+        - GMS
+        - BAPS SSO
+        - SPM
+        - BKMS
+        - MIS
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: PM name
+      placeholder: "Jeet Savani"
+  - type: input
+    id: as_of
+    attributes:
+      label: As of date
+      description: "Format: YYYY-MM-DD. This is the meeting date this update belongs to."
+      placeholder: "2026-08-25"
+    validations:
+      required: true
+  - type: dropdown
+    id: status
+    attributes:
+      label: Overall status
+      options:
+        - Green
+        - Amber
+        - Red
+    validations:
+      required: true
+  - type: input
+    id: progress
+    attributes:
+      label: "Progress (0-100)"
+      description: "Your best call on % complete toward go-live."
+      placeholder: "65"
+    validations:
+      required: true
+  - type: input
+    id: phase
+    attributes:
+      label: Current phase
+      placeholder: "Regression / Perf / UAT"
+  - type: input
+    id: next_milestone_name
+    attributes:
+      label: Next milestone name
+      placeholder: "UAT"
+  - type: input
+    id: next_milestone_date
+    attributes:
+      label: Next milestone date
+      description: "Format: YYYY-MM-DD"
+      placeholder: "2026-09-09"
+  - type: input
+    id: go_live
+    attributes:
+      label: Go-live date
+      description: "Format: YYYY-MM-DD, leave blank if not set"
+      placeholder: "2026-09-25"
+  - type: input
+    id: delay_days
+    attributes:
+      label: Delay (days)
+      description: "0 if on schedule, positive number if late"
+      placeholder: "0"
+  - type: input
+    id: delay_note
+    attributes:
+      label: Delay note
+      placeholder: "Mobile dev delayed — may impact regression testing"
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: "One per line. Include ticket links where you can — that's usually what leadership asks for."
+      placeholder: |
+        DEVOPS-1082 — SPM production environment setup
+        Waiting on Sameep for REQ doc review
+  - type: textarea
+    id: completed
+    attributes:
+      label: Completed this week
+      description: "One per line"
+  - type: textarea
+    id: in_progress
+    attributes:
+      label: In progress
+      description: "One per line"
+  - type: textarea
+    id: next_plan
+    attributes:
+      label: Next plan
+      description: "One per line"
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks / blockers
+      description: "One per line"

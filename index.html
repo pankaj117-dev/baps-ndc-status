@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=1">
+<link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
   <div class="wrap">
@@ -19,11 +19,15 @@
       <div class="masthead-meta">
         <strong id="asOf">As of —</strong>
         <span id="lastUpdated">Data last updated —</span>
+        <div class="masthead-actions">
+          <button id="openFeedbackBtn" class="btn-ghost">📝 Add feedback</button>
+        </div>
       </div>
     </header>
 
     <nav class="tabbar" role="tablist">
       <button class="tab-btn is-active" data-tab="status" role="tab" aria-selected="true">Program Status</button>
+      <button class="tab-btn" data-tab="weekly" role="tab" aria-selected="false">Week over Week</button>
       <button class="tab-btn" data-tab="team" role="tab" aria-selected="false">Team Performance</button>
     </nav>
 
@@ -41,6 +45,15 @@
         <button class="chip" data-filter="red">Critical</button>
       </div>
       <div id="cards" class="cards"></div>
+    </section>
+
+    <section id="panel-weekly" class="tab-panel">
+      <h2 class="section-heading">Deep dive by project</h2>
+      <div class="weekly-toolbar">
+        <label for="weeklyProjectSelect">Project</label>
+        <select id="weeklyProjectSelect"></select>
+      </div>
+      <div id="weeklyContent"></div>
     </section>
 
     <section id="panel-team" class="tab-panel">
@@ -75,11 +88,31 @@
     </section>
 
     <footer class="foot">
-      Data is a manual weekly snapshot from <code>data.json</code> — not a live feed.
-      Source: NDC Weekly Meeting deck.
+      Data is ingested from <a href="https://github.com/pankaj117-dev/baps-ndc-status/issues" target="_blank" rel="noopener">GitHub Issues</a> — not a live feed.
+      Source: NDC Weekly Meeting.
     </footer>
   </div>
 
-  <script src="app.js?v=1"></script>
+  <div id="feedbackModal" class="modal-overlay" hidden>
+    <div class="modal">
+      <h3>Log feedback / a follow-up</h3>
+      <p class="modal-sub">
+        This opens a pre-filled GitHub issue for you to submit — no typing twice, and it'll show
+        up here as an open follow-up until the PM addresses it.
+      </p>
+      <label for="fbProject">Project</label>
+      <select id="fbProject"></select>
+      <label for="fbNote">Feedback / ask</label>
+      <textarea id="fbNote" rows="4" placeholder="Where are the tickets for the hypercare workstream?"></textarea>
+      <label for="fbRaisedBy">Raised by (optional)</label>
+      <input id="fbRaisedBy" type="text" placeholder="Swami">
+      <div class="modal-actions">
+        <button id="fbCancel" class="btn-ghost">Cancel</button>
+        <button id="fbSubmit" class="btn-primary">Open in GitHub to submit →</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=2"></script>
 </body>
 </html>

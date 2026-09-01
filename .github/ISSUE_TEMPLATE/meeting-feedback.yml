@@ -1,0 +1,43 @@
+name: "Meeting Feedback / Takeaway"
+description: "Log a question, ask, or piece of feedback raised about a project during the review — it'll show up as an open follow-up until the PM addresses it in their next update."
+title: "[Feedback] "
+labels: ["feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for anything raised live in the meeting that the PM should follow up on —
+        e.g. "Swami asked where are the tickets for the hypercare project." It'll appear on the
+        dashboard as an open follow-up, and the PM gets reminded automatically when they open
+        their next weekly update for this project.
+  - type: dropdown
+    id: project
+    attributes:
+      label: Project
+      options:
+        - WebNext
+        - Pledge
+        - EMM
+        - MyBKY (Phase 1)
+        - MyBKY (Phase 2)
+        - myMandir App Improvements
+        - GMS
+        - BAPS SSO
+        - SPM
+        - BKMS
+        - MIS
+    validations:
+      required: true
+  - type: textarea
+    id: note
+    attributes:
+      label: Feedback / ask
+      description: "What was raised, and what do you want the PM to do about it?"
+      placeholder: "Where are the tickets for the hypercare workstream? Please share ticket links next update."
+    validations:
+      required: true
+  - type: input
+    id: raised_by
+    attributes:
+      label: Raised by
+      placeholder: "Swami"

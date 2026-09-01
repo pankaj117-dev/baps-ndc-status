@@ -1,0 +1,150 @@
+{
+  "2026-08-18": {
+    "capturedAt": "2026-08-18T00:00:00-04:00",
+    "projects": [
+      {
+        "id": "webnext",
+        "name": "WebNext",
+        "status": "green",
+        "progress": 80,
+        "delayDays": 0,
+        "phase": "Requirements Finalization",
+        "nextMilestone": {
+          "name": "Requirements Finalization",
+          "date": "2026-08-21"
+        },
+        "goLive": null
+      },
+      {
+        "id": "pledge",
+        "name": "Pledge",
+        "status": "amber",
+        "progress": 90,
+        "delayDays": 0,
+        "phase": "Production Release",
+        "nextMilestone": {
+          "name": "Production",
+          "date": "2026-08-19"
+        },
+        "goLive": "2026-08-19"
+      },
+      {
+        "id": "emm",
+        "name": "EMM",
+        "status": "amber",
+        "progress": 85,
+        "delayDays": 0,
+        "phase": "Sprint 26.16 (08/03 \u2013 08/07)",
+        "nextMilestone": {
+          "name": "UAT",
+          "date": "2026-08-10"
+        },
+        "goLive": "2026-08-25"
+      },
+      {
+        "id": "mybky-phase1",
+        "name": "MyBKY (Phase 1)",
+        "status": "amber",
+        "progress": 55,
+        "delayDays": 4,
+        "phase": "Regression / Perf / Security / UAT",
+        "nextMilestone": {
+          "name": "UAT",
+          "date": "2026-09-09"
+        },
+        "goLive": "2026-09-25"
+      },
+      {
+        "id": "mybky-phase2",
+        "name": "MyBKY (Phase 2)",
+        "status": "amber",
+        "progress": 25,
+        "delayDays": 11,
+        "phase": "Requirement Solidification",
+        "nextMilestone": {
+          "name": "TDD",
+          "date": "2026-09-07"
+        },
+        "goLive": "2026-12-31"
+      },
+      {
+        "id": "mymandir",
+        "name": "myMandir App Improvements",
+        "status": "red",
+        "progress": 20,
+        "delayDays": 12,
+        "phase": "High-level Estimation / REQ Sign-off",
+        "nextMilestone": {
+          "name": "REQ sign-off",
+          "date": "2026-08-30"
+        },
+        "goLive": null
+      },
+      {
+        "id": "gms",
+        "name": "GMS",
+        "status": "amber",
+        "progress": 80,
+        "delayDays": 19,
+        "phase": "Sprint 26.16",
+        "nextMilestone": {
+          "name": "Production",
+          "date": "2026-08-25"
+        },
+        "goLive": "2026-08-25"
+      },
+      {
+        "id": "baps-sso",
+        "name": "BAPS SSO",
+        "status": "amber",
+        "progress": 65,
+        "delayDays": 0,
+        "phase": "Sprint 26.16",
+        "nextMilestone": {
+          "name": "UAT Deploy",
+          "date": "2026-08-25"
+        },
+        "goLive": null
+      },
+      {
+        "id": "spm",
+        "name": "SPM",
+        "status": "green",
+        "progress": 75,
+        "delayDays": 2,
+        "phase": "UAT / VAPT / Load Testing",
+        "nextMilestone": {
+          "name": "UAT / VAPT / Load Testing",
+          "date": "2026-08-23"
+        },
+        "goLive": "2026-08-31"
+      },
+      {
+        "id": "bkms",
+        "name": "BKMS",
+        "status": "green",
+        "progress": 70,
+        "delayDays": 0,
+        "phase": "Sprint 26.17",
+        "nextMilestone": {
+          "name": "UAT",
+          "date": "2026-08-20"
+        },
+        "goLive": null
+      },
+      {
+        "id": "mis",
+        "name": "MIS",
+        "status": "green",
+        "progress": 75,
+        "delayDays": 0,
+        "phase": "Sprint 26.17",
+        "nextMilestone": {
+          "name": "UAT",
+          "date": "2026-08-26"
+        },
+        "goLive": null
+      }
+    ]
+  }
+}

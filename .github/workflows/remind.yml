@@ -1,0 +1,21 @@
+name: Remind PM of open follow-ups
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  remind:
+    if: contains(github.event.issue.labels.*.name, 'weekly-update')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Comment with open follow-ups for this project
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/remind.py "${{ github.event.issue.number }}"

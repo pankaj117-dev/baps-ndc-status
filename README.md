@@ -24,17 +24,75 @@ to scan instead of a 15-slide deck.
   (completed, in progress, next plan) / risks.
 - Filter chips to narrow the card grid to on-track / at-risk / critical.
 
-## Tab 2 — Team Performance (skeleton only)
+## Tab 2 — Week over Week (live)
+
+Pick a project and see how it's actually moved: a progress-over-time bar
+chart, a plain-English change log between consecutive weekly snapshots
+(status/progress/delay/phase deltas), and the full feedback history for that
+project (open + resolved). Snapshots come from `history.json`, one entry per
+`asOf` date — re-ingesting the same week's issues updates that week's
+snapshot rather than creating a duplicate.
+
+## Tab 3 — Team Performance (skeleton only)
 
 Placeholder tab for engineering execution metrics (PR velocity, review
 turnaround, commit activity, deploy cadence) once we wire up GitHub data per
 project repo. Nothing is connected yet — it's there so the layout and nav
 don't need to change when that's ready.
 
-## How PMs update this weekly
+## How PMs submit their weekly update
 
-Everything lives in **`data.json`**. Each project is one object in the
-`projects` array:
+No more editing JSON by hand. Each PM opens a **GitHub Issue** using the
+"Weekly Project Update" template — either from the repo's Issues tab, or by
+clicking **"Submit weekly update"** on their project's card in the dashboard
+(it opens the form pre-filled with the project name and today's `asOf`
+date). Leave any field blank to keep last week's value for that field.
+
+The moment the issue is opened, a bot comments with any **open follow-ups**
+for that project from previous meetings (see below) — so the PM sees "hey,
+Swami asked about hypercare tickets last week" before they even finish
+filling out the form.
+
+A scheduled GitHub Action (`.github/workflows/ingest.yml`, weekdays at noon
+UTC — adjust the cron to your meeting cadence, or just run it manually from
+the Actions tab) reads all open "weekly-update" issues, merges them into
+`data.json`, snapshots the result into `history.json`, and **closes each
+issue** with a confirmation comment. You can also trigger it on demand via
+`workflow_dispatch` right before a meeting if someone submitted late.
+
+## How live meeting feedback works
+
+Click **"📝 Add feedback"** in the header (or "Add feedback" on a specific
+project's card) to log something raised in the meeting — e.g. "Swami asked
+where are the tickets for the hypercare project." That opens a small
+in-dashboard form; submitting it opens a pre-filled GitHub issue
+("Meeting Feedback / Takeaway" template) for you to send — no backend, no
+login for the dashboard itself, just a one-click handoff to GitHub.
+
+The same scheduled Action ingests open "feedback" issues into `notes.json`
+as **open follow-ups**, tied to a project. They show up as a badge on that
+project's card, in the Week-over-Week feedback history, and — most
+importantly — as a reminder comment the next time that PM opens a weekly
+update issue for the same project. Once ingested, the follow-up issue is
+closed automatically; it stays "open" in `notes.json` until someone flips
+it to `"status": "resolved"` (currently a manual edit — see Roadmap).
+
+**Note:** this means every PM (and anyone logging feedback) needs a GitHub
+account with access to open issues on this repo. That's the trade-off for
+zero custom backend/hosting.
+
+## Data model
+
+Everything lives in three files:
+
+- **`data.json`** — current live state, one object per project in the
+  `projects` array.
+- **`history.json`** — one snapshot per `asOf` date, keyed by date, used by
+  the Week-over-Week tab.
+- **`notes.json`** — flat array of feedback/follow-up entries, each tied to
+  a `projectId`, with `status: "open" | "resolved"`.
+
+`data.json` project shape:
 
 ```json
 {
@@ -58,17 +116,12 @@ Everything lives in **`data.json`**. Each project is one object in the
 }
 ```
 
-Weekly update flow:
-
-1. Edit your project's block in `data.json` (and bump `asOf` /
-   `lastUpdated` at the top of the file).
-2. Commit and push to `main` — GitHub Pages redeploys automatically in
-   under a minute.
-3. Add a new project object to the array to onboard a new project; delete
-   the object (or set `status`/notes) to retire one — no code changes needed.
-
-To avoid PMs stepping on each other's edits in the same file, keep your diffs
-scoped to your own project's object, and pull before you edit.
+Adding a brand-new project: add a matching option to the `project` dropdown
+in both `.github/ISSUE_TEMPLATE/*.yml` files, add the id/name mapping in
+`scripts/lib.py`'s `PROJECT_NAME_TO_ID`, and add the initial project object
+to `data.json`. Retiring one: reverse of the above (or just leave it in
+`data.json` with no further updates — it'll simply stop moving in the
+Week-over-Week view).
 
 ## Local preview
 
@@ -85,7 +138,9 @@ the app code.
 
 ## Roadmap
 
-- [ ] Wire Tab 2 up to real GitHub data (PRs, reviews, commits, deploys) per
+- [ ] Wire Tab 3 up to real GitHub data (PRs, reviews, commits, deploys) per
       project repo.
-- [ ] Optional: swap manual `data.json` edits for a lightweight form that
-      writes the JSON via a GitHub Action, once the team outgrows direct edits.
+- [ ] Add a "resolve" action for follow-ups (currently a manual edit to
+      `notes.json` — flip `"status": "open"` to `"resolved"`).
+- [ ] Consider a GitHub Action that auto-resolves a follow-up when the next
+      weekly update for that project explicitly references it.
