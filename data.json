@@ -62,7 +62,7 @@
     {
       "id": "emm",
       "name": "EMM",
-      "owner": "",
+      "owner": "Nitin Chaudhary",
       "status": "amber",
       "progress": 85,
       "phase": "Sprint 26.16 (08/03 – 08/07)",
@@ -203,7 +203,7 @@
     {
       "id": "gms",
       "name": "GMS",
-      "owner": "",
+      "owner": "Vasubhai",
       "status": "amber",
       "progress": 80,
       "phase": "Sprint 26.16",
