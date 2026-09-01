@@ -8,7 +8,6 @@
   let HISTORY = {};
   let NOTES = [];
   let activeFilter = "all";
-  let weeklySelectedId = null;
 
   function fmtDate(iso) {
     if (!iso) return "—";
@@ -125,10 +124,9 @@
 
     projects.forEach((p) => {
       const isLate = p.delayDays > 0;
-      const detailId = "detail-" + p.id;
       const notes = openNotesFor(p.id);
 
-      const card = el("div", { class: "card status-" + p.status }, [
+      const card = el("div", { class: "card status-" + p.status, "data-project-id": p.id, tabindex: "0", role: "button" }, [
         el("div", { class: "card-head" }, [
           el("h3", null, [p.name]),
           el("span", { class: "pill pill-" + p.status }, [STATUS_LABEL[p.status]]),
@@ -157,59 +155,19 @@
           el("span", { class: "badge" + ((p.risks || []).length ? " has-risk" : "") }, [(p.risks || []).length + " risks"]),
           el("span", { class: "badge" + (notes.length ? " has-followup" : "") }, [notes.length + " follow-ups"]),
         ]),
-        el("button", { class: "card-toggle", "data-target": detailId }, ["Show details ▾"]),
-        el("div", { class: "card-detail", id: detailId }, [
-          notes.length
-            ? el("div", { class: "detail-block followups" }, [
-                el("h4", null, ["Open follow-ups"]),
-                el("ul", null, notes.map((n) => el("li", null, [n.text + (n.raisedBy ? ` — ${n.raisedBy}` : "")]))),
-              ])
-            : null,
-          el("div", { class: "detail-block deps" }, [
-            el("h4", null, ["Dependencies"]),
-            el("ul", null, listOrDash(p.dependencies || [])),
-          ]),
-          el("div", { class: "detail-block" }, [
-            el("h4", null, ["Completed"]),
-            el("ul", null, listOrDash(p.sprintStatus.completed || [])),
-          ]),
-          el("div", { class: "detail-block" }, [
-            el("h4", null, ["In progress"]),
-            el("ul", null, listOrDash(p.sprintStatus.inProgress || [])),
-          ]),
-          el("div", { class: "detail-block" }, [
-            el("h4", null, ["Next plan"]),
-            el("ul", null, listOrDash(p.sprintStatus.nextPlan || [])),
-          ]),
-          el("div", { class: "detail-block risks" }, [
-            el("h4", null, ["Risks / blockers"]),
-            el("ul", null, p.risks && p.risks.length ? p.risks.map((d) => el("li", null, [d])) : [el("li", null, ["None reported"])]),
-          ]),
-          el("div", { class: "card-action-row" }, [
-            el("a", {
-              class: "btn-ghost btn-small",
-              target: "_blank",
-              rel: "noopener",
-              href: issueUrl("weekly-update.yml", { project: p.name, as_of: DATA.asOf, owner: p.owner || "" }),
-            }, ["Submit weekly update ↗"]),
-            el("a", {
-              class: "btn-ghost btn-small",
-              target: "_blank",
-              rel: "noopener",
-              href: issueUrl("meeting-feedback.yml", { project: p.name }),
-            }, ["Add feedback ↗"]),
-          ]),
-        ]),
+        el("button", { class: "card-expand" }, ["View full details →"]),
       ]);
 
       box.appendChild(card);
     });
 
-    box.querySelectorAll(".card-toggle").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const target = document.getElementById(btn.getAttribute("data-target"));
-        const open = target.classList.toggle("is-open");
-        btn.textContent = open ? "Hide details ▴" : "Show details ▾";
+    box.querySelectorAll(".card").forEach((card) => {
+      card.addEventListener("click", () => openProjectDetail(card.getAttribute("data-project-id")));
+      card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openProjectDetail(card.getAttribute("data-project-id"));
+        }
       });
     });
   }
@@ -225,21 +183,7 @@
     });
   }
 
-  /* ---------------- Tab 2: Week over Week ---------------- */
-
-  function populateWeeklySelect() {
-    const select = document.getElementById("weeklyProjectSelect");
-    select.innerHTML = "";
-    DATA.projects.forEach((p) => {
-      select.appendChild(el("option", { value: p.id }, [p.name]));
-    });
-    if (!weeklySelectedId) weeklySelectedId = DATA.projects[0] && DATA.projects[0].id;
-    select.value = weeklySelectedId;
-    select.addEventListener("change", () => {
-      weeklySelectedId = select.value;
-      renderWeekOverWeek();
-    });
-  }
+  /* ---------------- Project detail overlay ---------------- */
 
   function historyForProject(projectId) {
     return Object.keys(HISTORY)
@@ -251,65 +195,169 @@
       .filter(Boolean);
   }
 
-  function renderWeekOverWeek() {
-    const box = document.getElementById("weeklyContent");
-    box.innerHTML = "";
-    if (!weeklySelectedId) return;
+  function openProjectDetail(projectId) {
+    const project = DATA.projects.find((p) => p.id === projectId);
+    if (!project) return;
 
-    const weeks = historyForProject(weeklySelectedId);
-    const project = DATA.projects.find((p) => p.id === weeklySelectedId);
-    const notes = NOTES.filter((n) => n.projectId === weeklySelectedId);
+    const overlay = document.getElementById("projectDetail");
+    const content = document.getElementById("detailContent");
+    content.innerHTML = "";
+    content.appendChild(buildProjectDetail(project));
+    overlay.hidden = false;
+    document.body.classList.add("no-scroll");
+  }
 
+  function closeProjectDetail() {
+    document.getElementById("projectDetail").hidden = true;
+    document.body.classList.remove("no-scroll");
+  }
+
+  function buildProjectDetail(p) {
+    const isLate = p.delayDays > 0;
+    const openFollowUps = openNotesFor(p.id);
+    const allNotes = NOTES.filter((n) => n.projectId === p.id);
+    const weeks = historyForProject(p.id);
+
+    const root = el("div", { class: "detail-root" });
+
+    // Header
+    root.appendChild(
+      el("div", { class: "detail-head" }, [
+        el("div", null, [
+          el("span", { class: "pill pill-" + p.status }, [STATUS_LABEL[p.status]]),
+          el("h1", null, [p.name]),
+          el("div", { class: "card-owner" }, [p.owner ? "PM: " + p.owner : "PM: unassigned"]),
+        ]),
+        el("div", { class: "detail-action-row" }, [
+          el("a", {
+            class: "btn-primary btn-small",
+            target: "_blank",
+            rel: "noopener",
+            href: issueUrl("weekly-update.yml", { project: p.name, as_of: DATA.asOf, owner: p.owner || "" }),
+          }, ["Submit weekly update ↗"]),
+          el("a", {
+            class: "btn-ghost btn-small",
+            target: "_blank",
+            rel: "noopener",
+            href: issueUrl("meeting-feedback.yml", { project: p.name }),
+          }, ["Add feedback ↗"]),
+        ]),
+      ])
+    );
+
+    root.appendChild(
+      el("div", { class: "progress-row detail-progress" }, [
+        el("div", { class: "progress-track" }, [
+          el("div", { class: "progress-fill status-" + p.status, style: "width:" + p.progress + "%" }),
+        ]),
+        el("div", { class: "progress-pct" }, [p.progress + "%"]),
+      ])
+    );
+
+    root.appendChild(
+      el("dl", { class: "card-facts detail-facts" }, [
+        el("dt", null, ["Phase"]),
+        el("dd", null, [p.phase || "—"]),
+        el("dt", null, ["Next milestone"]),
+        el("dd", null, [(p.nextMilestone && p.nextMilestone.name || "—") + (p.nextMilestone && p.nextMilestone.date ? " · " + fmtDateShort(p.nextMilestone.date) : "")]),
+        el("dt", null, ["Go-live"]),
+        el("dd", null, [fmtDate(p.goLive)]),
+        el("dt", null, ["Delay"]),
+        el("dd", { class: "delay-flag " + (isLate ? "is-late" : "is-ontime") }, [
+          isLate ? "+" + p.delayDays + " days" : "On schedule",
+        ]),
+      ])
+    );
+
+    if (openFollowUps.length) {
+      root.appendChild(el("h3", { class: "weekly-subhead" }, ["Open follow-ups"]));
+      root.appendChild(
+        el("div", { class: "detail-block followups" }, [
+          el("ul", null, openFollowUps.map((n) => el("li", null, [n.text + (n.raisedBy ? ` — ${n.raisedBy}` : "")]))),
+        ])
+      );
+    }
+
+    // Progress trend chart
+    root.appendChild(el("h3", { class: "weekly-subhead" }, ["Progress over time"]));
     if (!weeks.length) {
-      box.appendChild(el("p", { class: "empty-note" }, ["No history yet for this project — it'll build up week over week as updates get ingested."]));
-      return;
+      root.appendChild(el("p", { class: "empty-note" }, ["No history yet — it'll build up week over week as updates get ingested."]));
+    } else {
+      const chart = el("div", { class: "trend-chart" });
+      weeks.forEach((w) => {
+        chart.appendChild(
+          el("div", { class: "trend-bar-wrap" }, [
+            el("div", { class: "trend-bar status-" + w.status, style: `height:${Math.max(4, w.progress)}%` }),
+            el("div", { class: "trend-pct" }, [w.progress + "%"]),
+            el("div", { class: "trend-label" }, [fmtDateShort(w.asOf)]),
+          ])
+        );
+      });
+      root.appendChild(chart);
     }
 
-    // Progress trend as simple bar chart.
-    const chart = el("div", { class: "trend-chart" });
-    weeks.forEach((w) => {
-      chart.appendChild(
-        el("div", { class: "trend-bar-wrap" }, [
-          el("div", { class: "trend-bar status-" + w.status, style: `height:${Math.max(4, w.progress)}%` }),
-          el("div", { class: "trend-pct" }, [w.progress + "%"]),
-          el("div", { class: "trend-label" }, [fmtDateShort(w.asOf)]),
-        ])
-      );
-    });
-    box.appendChild(el("h3", { class: "weekly-subhead" }, ["Progress over time — " + (project ? project.name : "")]));
-    box.appendChild(chart);
-
-    // Change log between consecutive snapshots.
-    const changeLog = el("div", { class: "changelog" });
-    for (let i = weeks.length - 1; i >= 0; i--) {
-      const cur = weeks[i];
-      const prev = weeks[i - 1];
-      const changes = [];
-      if (prev) {
-        if (prev.progress !== cur.progress) changes.push(`Progress ${prev.progress}% → ${cur.progress}%`);
-        if (prev.status !== cur.status) changes.push(`Status ${STATUS_LABEL[prev.status]} → ${STATUS_LABEL[cur.status]}`);
-        if (prev.delayDays !== cur.delayDays) changes.push(`Delay ${prev.delayDays}d → ${cur.delayDays}d`);
-        if ((prev.phase || "") !== (cur.phase || "")) changes.push(`Phase → ${cur.phase || "—"}`);
-      } else {
-        changes.push("First recorded snapshot");
+    // Change log
+    if (weeks.length) {
+      root.appendChild(el("h3", { class: "weekly-subhead" }, ["Week-over-week changes"]));
+      const changeLog = el("div", { class: "changelog" });
+      for (let i = weeks.length - 1; i >= 0; i--) {
+        const cur = weeks[i];
+        const prev = weeks[i - 1];
+        const changes = [];
+        if (prev) {
+          if (prev.progress !== cur.progress) changes.push(`Progress ${prev.progress}% → ${cur.progress}%`);
+          if (prev.status !== cur.status) changes.push(`Status ${STATUS_LABEL[prev.status]} → ${STATUS_LABEL[cur.status]}`);
+          if (prev.delayDays !== cur.delayDays) changes.push(`Delay ${prev.delayDays}d → ${cur.delayDays}d`);
+          if ((prev.phase || "") !== (cur.phase || "")) changes.push(`Phase → ${cur.phase || "—"}`);
+        } else {
+          changes.push("First recorded snapshot");
+        }
+        changeLog.appendChild(
+          el("div", { class: "changelog-row" }, [
+            el("div", { class: "changelog-date" }, [fmtDate(cur.asOf)]),
+            el("div", { class: "changelog-body" }, [changes.join(" · ")]),
+          ])
+        );
       }
-      changeLog.appendChild(
-        el("div", { class: "changelog-row" }, [
-          el("div", { class: "changelog-date" }, [fmtDate(cur.asOf)]),
-          el("div", { class: "changelog-body" }, [changes.join(" · ")]),
-        ])
-      );
+      root.appendChild(changeLog);
     }
-    box.appendChild(el("h3", { class: "weekly-subhead" }, ["Week-over-week changes"]));
-    box.appendChild(changeLog);
 
-    // Notes / follow-ups history for this project.
-    box.appendChild(el("h3", { class: "weekly-subhead" }, ["Feedback history"]));
-    if (!notes.length) {
-      box.appendChild(el("p", { class: "empty-note" }, ["No feedback logged for this project yet."]));
+    // Current details
+    root.appendChild(el("h3", { class: "weekly-subhead" }, ["Dependencies"]));
+    root.appendChild(el("div", { class: "detail-block deps" }, [el("ul", null, listOrDash(p.dependencies || []))]));
+
+    root.appendChild(el("h3", { class: "weekly-subhead" }, ["Sprint status"]));
+    root.appendChild(
+      el("div", { class: "sprint-grid" }, [
+        el("div", { class: "detail-block" }, [
+          el("h4", null, ["Completed"]),
+          el("ul", null, listOrDash(p.sprintStatus.completed || [])),
+        ]),
+        el("div", { class: "detail-block" }, [
+          el("h4", null, ["In progress"]),
+          el("ul", null, listOrDash(p.sprintStatus.inProgress || [])),
+        ]),
+        el("div", { class: "detail-block" }, [
+          el("h4", null, ["Next plan"]),
+          el("ul", null, listOrDash(p.sprintStatus.nextPlan || [])),
+        ]),
+      ])
+    );
+
+    root.appendChild(el("h3", { class: "weekly-subhead" }, ["Risks / blockers"]));
+    root.appendChild(
+      el("div", { class: "detail-block risks" }, [
+        el("ul", null, p.risks && p.risks.length ? p.risks.map((d) => el("li", null, [d])) : [el("li", null, ["None reported"])]),
+      ])
+    );
+
+    // Full feedback history
+    root.appendChild(el("h3", { class: "weekly-subhead" }, ["Feedback history"]));
+    if (!allNotes.length) {
+      root.appendChild(el("p", { class: "empty-note" }, ["No feedback logged for this project yet."]));
     } else {
       const notesList = el("div", { class: "notes-list" });
-      notes
+      allNotes
         .slice()
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .forEach((n) => {
@@ -323,8 +371,20 @@
             ])
           );
         });
-      box.appendChild(notesList);
+      root.appendChild(notesList);
     }
+
+    return root;
+  }
+
+  function wireProjectDetail() {
+    document.getElementById("detailClose").addEventListener("click", closeProjectDetail);
+    document.getElementById("projectDetail").addEventListener("click", (e) => {
+      if (e.target.id === "projectDetail") closeProjectDetail();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !document.getElementById("projectDetail").hidden) closeProjectDetail();
+    });
   }
 
   /* ---------------- Feedback modal ---------------- */
@@ -391,9 +451,7 @@
     renderCards();
     wireFilters();
 
-    populateWeeklySelect();
-    renderWeekOverWeek();
-
+    wireProjectDetail();
     wireFeedbackModal();
     wireTabs();
   }

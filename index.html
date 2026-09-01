@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=2">
+<link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
   <div class="wrap">
@@ -27,7 +27,6 @@
 
     <nav class="tabbar" role="tablist">
       <button class="tab-btn is-active" data-tab="status" role="tab" aria-selected="true">Program Status</button>
-      <button class="tab-btn" data-tab="weekly" role="tab" aria-selected="false">Week over Week</button>
       <button class="tab-btn" data-tab="team" role="tab" aria-selected="false">Team Performance</button>
     </nav>
 
@@ -45,15 +44,6 @@
         <button class="chip" data-filter="red">Critical</button>
       </div>
       <div id="cards" class="cards"></div>
-    </section>
-
-    <section id="panel-weekly" class="tab-panel">
-      <h2 class="section-heading">Deep dive by project</h2>
-      <div class="weekly-toolbar">
-        <label for="weeklyProjectSelect">Project</label>
-        <select id="weeklyProjectSelect"></select>
-      </div>
-      <div id="weeklyContent"></div>
     </section>
 
     <section id="panel-team" class="tab-panel">
@@ -93,6 +83,13 @@
     </footer>
   </div>
 
+  <div id="projectDetail" class="detail-overlay" hidden>
+    <div class="detail-panel">
+      <button id="detailClose" class="detail-close" aria-label="Close">✕ Close</button>
+      <div id="detailContent"></div>
+    </div>
+  </div>
+
   <div id="feedbackModal" class="modal-overlay" hidden>
     <div class="modal">
       <h3>Log feedback / a follow-up</h3>
@@ -113,6 +110,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=2"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>
