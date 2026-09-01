@@ -195,6 +195,60 @@
       .filter(Boolean);
   }
 
+  const STATUS_COLOR = { green: "#2f6b4f", amber: "#a6650f", red: "#b5342a" };
+
+  function buildTrendGraph(weeks) {
+    const width = 700;
+    const height = 200;
+    const padL = 34;
+    const padR = 16;
+    const padT = 18;
+    const padB = 30;
+    const plotW = width - padL - padR;
+    const plotH = height - padT - padB;
+
+    const xFor = (i) => (weeks.length === 1 ? padL + plotW / 2 : padL + (i / (weeks.length - 1)) * plotW);
+    const yFor = (pct) => padT + plotH - (pct / 100) * plotH;
+
+    const points = weeks.map((w, i) => ({ x: xFor(i), y: yFor(w.progress), w }));
+    const lineD = points.map((p, i) => (i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`)).join(" ");
+    const areaD = `${lineD} L ${points[points.length - 1].x} ${padT + plotH} L ${points[0].x} ${padT + plotH} Z`;
+
+    const gridLines = [0, 25, 50, 75, 100].map((pct) => {
+      const y = yFor(pct);
+      return `<line x1="${padL}" y1="${y}" x2="${width - padR}" y2="${y}" stroke="var(--line)" stroke-width="1" />` +
+        `<text x="${padL - 8}" y="${y}" text-anchor="end" dominant-baseline="middle" class="graph-axis-label">${pct}</text>`;
+    }).join("");
+
+    const xLabels = points.map((p, i) =>
+      `<text x="${p.x}" y="${height - 8}" text-anchor="middle" class="graph-axis-label">${fmtDateShort(p.w.asOf)}</text>`
+    ).join("");
+
+    const latestColor = STATUS_COLOR[weeks[weeks.length - 1].status] || "var(--accent)";
+
+    const dots = points.map((p) =>
+      `<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="${STATUS_COLOR[p.w.status] || latestColor}" stroke="#fff" stroke-width="2" />` +
+      `<text x="${p.x}" y="${p.y - 12}" text-anchor="middle" class="graph-point-label">${p.w.progress}%</text>`
+    ).join("");
+
+    const svg = `
+      <svg viewBox="0 0 ${width} ${height}" class="trend-graph" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${latestColor}" stop-opacity="0.16" />
+            <stop offset="100%" stop-color="${latestColor}" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        ${gridLines}
+        <path d="${areaD}" fill="url(#trendFill)" stroke="none" />
+        <path d="${lineD}" fill="none" stroke="${latestColor}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+        ${dots}
+        ${xLabels}
+      </svg>`;
+
+    return el("div", { class: "trend-graph-wrap", html: svg });
+  }
+
   function openProjectDetail(projectId) {
     const project = DATA.projects.find((p) => p.id === projectId);
     if (!project) return;
@@ -283,17 +337,7 @@
     if (!weeks.length) {
       root.appendChild(el("p", { class: "empty-note" }, ["No history yet — it'll build up week over week as updates get ingested."]));
     } else {
-      const chart = el("div", { class: "trend-chart" });
-      weeks.forEach((w) => {
-        chart.appendChild(
-          el("div", { class: "trend-bar-wrap" }, [
-            el("div", { class: "trend-bar status-" + w.status, style: `height:${Math.max(4, w.progress)}%` }),
-            el("div", { class: "trend-pct" }, [w.progress + "%"]),
-            el("div", { class: "trend-label" }, [fmtDateShort(w.asOf)]),
-          ])
-        );
-      });
-      root.appendChild(chart);
+      root.appendChild(buildTrendGraph(weeks));
     }
 
     // Change log
