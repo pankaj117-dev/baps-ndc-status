@@ -266,7 +266,7 @@
     {
       "id": "spm",
       "name": "SPM",
-      "owner": "",
+      "owner": "Sandeep Pistolwala",
       "status": "green",
       "progress": 75,
       "phase": "UAT / VAPT / Load Testing",
@@ -297,7 +297,7 @@
     {
       "id": "bkms",
       "name": "BKMS",
-      "owner": "",
+      "owner": "Sandeep Pistolwala",
       "status": "green",
       "progress": 70,
       "phase": "Sprint 26.17",
@@ -325,7 +325,7 @@
     {
       "id": "mis",
       "name": "MIS",
-      "owner": "",
+      "owner": "Sandeep Pistolwala",
       "status": "green",
       "progress": 75,
       "phase": "Sprint 26.17",
