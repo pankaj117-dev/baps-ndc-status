@@ -13,7 +13,8 @@
           "name": "Requirements Finalization",
           "date": "2026-08-21"
         },
-        "goLive": null
+        "goLive": null,
+        "originalGoLive": null
       },
       {
         "id": "pledge",
@@ -26,7 +27,8 @@
           "name": "Production",
           "date": "2026-08-19"
         },
-        "goLive": "2026-08-19"
+        "goLive": "2026-08-19",
+        "originalGoLive": "2026-08-19"
       },
       {
         "id": "emm",
@@ -39,7 +41,8 @@
           "name": "UAT",
           "date": "2026-08-10"
         },
-        "goLive": "2026-08-25"
+        "goLive": "2026-08-25",
+        "originalGoLive": "2026-08-25"
       },
       {
         "id": "mybky-phase1",
@@ -52,7 +55,8 @@
           "name": "UAT",
           "date": "2026-09-09"
         },
-        "goLive": "2026-09-25"
+        "goLive": "2026-09-25",
+        "originalGoLive": "2026-09-21"
       },
       {
         "id": "mybky-phase2",
@@ -65,7 +69,8 @@
           "name": "TDD",
           "date": "2026-09-07"
         },
-        "goLive": "2026-12-31"
+        "goLive": "2026-12-31",
+        "originalGoLive": "2026-12-20"
       },
       {
         "id": "mymandir",
@@ -78,7 +83,8 @@
           "name": "REQ sign-off",
           "date": "2026-08-30"
         },
-        "goLive": null
+        "goLive": null,
+        "originalGoLive": null
       },
       {
         "id": "gms",
@@ -91,7 +97,8 @@
           "name": "Production",
           "date": "2026-08-25"
         },
-        "goLive": "2026-08-25"
+        "goLive": "2026-08-25",
+        "originalGoLive": "2026-08-06"
       },
       {
         "id": "baps-sso",
@@ -104,7 +111,8 @@
           "name": "UAT Deploy",
           "date": "2026-08-25"
         },
-        "goLive": null
+        "goLive": null,
+        "originalGoLive": null
       },
       {
         "id": "spm",
@@ -117,7 +125,8 @@
           "name": "UAT / VAPT / Load Testing",
           "date": "2026-08-23"
         },
-        "goLive": "2026-08-31"
+        "goLive": "2026-08-31",
+        "originalGoLive": "2026-08-29"
       },
       {
         "id": "bkms",
@@ -130,7 +139,8 @@
           "name": "UAT",
           "date": "2026-08-20"
         },
-        "goLive": null
+        "goLive": null,
+        "originalGoLive": null
       },
       {
         "id": "mis",
@@ -143,7 +153,8 @@
           "name": "UAT",
           "date": "2026-08-26"
         },
-        "goLive": null
+        "goLive": null,
+        "originalGoLive": null
       }
     ]
   }

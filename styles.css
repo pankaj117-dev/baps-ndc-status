@@ -243,6 +243,12 @@ body {
   background: var(--line-strong);
 }
 
+.section-subhead {
+  font-size: 13px;
+  color: var(--ink-faint);
+  margin: -8px 0 16px;
+}
+
 /* ---------- Filter chips ---------- */
 
 .filter-row {
@@ -303,6 +309,89 @@ body {
 
 .owner-filter:hover { border-color: var(--accent); color: var(--ink); }
 .owner-filter:focus { outline: none; border-color: var(--accent); }
+
+/* ---------- Go-live tracker ---------- */
+
+.golive-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 36px;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.golive-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 20px;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.golive-row:last-child { border-bottom: none; }
+.golive-row:hover { background: var(--bg); }
+.golive-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+.golive-project {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.golive-dates {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  white-space: nowrap;
+  color: var(--ink-soft);
+}
+
+.golive-date-original {
+  text-decoration: line-through;
+  color: var(--ink-faint);
+}
+
+.golive-arrow {
+  margin: 0 6px;
+  color: var(--ink-faint);
+}
+
+.golive-date-current {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.golive-delay-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  padding: 4px 11px;
+  border-radius: 999px;
+  white-space: nowrap;
+  justify-self: end;
+}
+
+.golive-unscheduled {
+  padding: 12px 18px;
+  font-size: 12.5px;
+  color: var(--ink-faint);
+  background: var(--bg);
+}
+
+@media (max-width: 720px) {
+  .golive-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .golive-delay-pill { justify-self: start; }
+}
 
 /* ---------- Timeline ---------- */
 

@@ -19,10 +19,16 @@ to scan instead of a 15-slide deck.
 - **Metrics row** — auto-computed rollup: on-track / at-risk / critical counts,
   average delay, total open risks.
 - **Upcoming milestones** — every project's next milestone, sorted by date.
+- **Go-live tracker** — every project with a scheduled go-live, sorted by
+  date, showing the original planned date struck through next to the current
+  date whenever it's slipped, plus a delay pill (green/amber/red by severity).
+  Projects without a go-live yet are listed underneath as "not yet scheduled."
+  Click any row to open that project's full detail view.
 - **Project cards** — one per project: status, progress bar, phase, next
   milestone, go-live date, delay, and expandable dependencies / sprint status
   (completed, in progress, next plan) / risks.
-- Filter chips to narrow the card grid to on-track / at-risk / critical.
+- Filter chips to narrow the card grid to on-track / at-risk / critical, plus
+  a **PM filter dropdown** to show only one person's projects.
 
 ## Tab 2 — Week over Week (live)
 
@@ -103,7 +109,9 @@ Everything lives in three files:
   "progress": 80,             // 0-100, your best call on % complete
   "phase": "Requirements Finalization",
   "nextMilestone": { "name": "Requirements Finalization", "date": "2026-08-21" },
-  "goLive": "2026-09-25",     // or null if not yet set
+  "goLive": "2026-09-25",     // current planned go-live, or null if not yet set
+  "originalGoLive": "2026-09-21", // baseline date, set once and preserved across
+                                   // slips so the go-live tracker can show the delta
   "delayDays": 0,              // 0 if on schedule, positive integer if late
   "delayNote": "No delay reported",
   "dependencies": ["..."],
@@ -115,6 +123,10 @@ Everything lives in three files:
   "risks": ["..."]
 }
 ```
+
+`originalGoLive` is system-managed: `scripts/ingest.py` sets it the first time
+a PM submits a go-live date for a project and never overwrites it after that,
+so it always reflects the original baseline even as `goLive` moves.
 
 Adding a brand-new project: add a matching option to the `project` dropdown
 in both `.github/ISSUE_TEMPLATE/*.yml` files, add the id/name mapping in

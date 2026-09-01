@@ -11,6 +11,7 @@
       "phase": "Requirements Finalization",
       "nextMilestone": { "name": "Requirements Finalization", "date": "2026-08-21" },
       "goLive": null,
+      "originalGoLive": null,
       "delayDays": 0,
       "delayNote": "No delay reported",
       "dependencies": [
@@ -36,6 +37,7 @@
       "phase": "Production Release",
       "nextMilestone": { "name": "Production", "date": "2026-08-19" },
       "goLive": "2026-08-19",
+      "originalGoLive": "2026-08-19",
       "delayDays": 0,
       "delayNote": "No delay reported",
       "dependencies": [
@@ -66,6 +68,7 @@
       "phase": "Sprint 26.16 (08/03 – 08/07)",
       "nextMilestone": { "name": "UAT", "date": "2026-08-10" },
       "goLive": "2026-08-25",
+      "originalGoLive": "2026-08-25",
       "delayDays": 0,
       "delayNote": "No impact on go-live",
       "dependencies": [
@@ -100,6 +103,7 @@
       "phase": "Regression / Perf / Security / UAT",
       "nextMilestone": { "name": "UAT", "date": "2026-09-09" },
       "goLive": "2026-09-25",
+      "originalGoLive": "2026-09-21",
       "delayDays": 4,
       "delayNote": "Mobile dev delayed — may impact regression testing",
       "dependencies": [
@@ -134,6 +138,7 @@
       "phase": "Requirement Solidification",
       "nextMilestone": { "name": "TDD", "date": "2026-09-07" },
       "goLive": "2026-12-31",
+      "originalGoLive": "2026-12-20",
       "delayDays": 11,
       "delayNote": "Requirement phase delayed",
       "dependencies": [
@@ -171,6 +176,7 @@
       "phase": "High-level Estimation / REQ Sign-off",
       "nextMilestone": { "name": "REQ sign-off", "date": "2026-08-30" },
       "goLive": null,
+      "originalGoLive": null,
       "delayDays": 12,
       "delayNote": "12 days delayed",
       "dependencies": [
@@ -203,6 +209,7 @@
       "phase": "Sprint 26.16",
       "nextMilestone": { "name": "Production", "date": "2026-08-25" },
       "goLive": "2026-08-25",
+      "originalGoLive": "2026-08-06",
       "delayDays": 19,
       "delayNote": "19 days delayed",
       "dependencies": [
@@ -237,6 +244,7 @@
       "phase": "Sprint 26.16",
       "nextMilestone": { "name": "UAT Deploy", "date": "2026-08-25" },
       "goLive": null,
+      "originalGoLive": null,
       "delayDays": 0,
       "delayNote": "No delay reported",
       "dependencies": [
@@ -272,6 +280,7 @@
       "phase": "UAT / VAPT / Load Testing",
       "nextMilestone": { "name": "UAT / VAPT / Load Testing", "date": "2026-08-23" },
       "goLive": "2026-08-31",
+      "originalGoLive": "2026-08-29",
       "delayDays": 2,
       "delayNote": "2 days delay in UAT deployment — timeline revised",
       "dependencies": [
@@ -303,6 +312,7 @@
       "phase": "Sprint 26.17",
       "nextMilestone": { "name": "UAT", "date": "2026-08-20" },
       "goLive": null,
+      "originalGoLive": null,
       "delayDays": 0,
       "delayNote": "No delay reported",
       "dependencies": [
@@ -331,6 +341,7 @@
       "phase": "Sprint 26.17",
       "nextMilestone": { "name": "UAT", "date": "2026-08-26" },
       "goLive": null,
+      "originalGoLive": null,
       "delayDays": 0,
       "delayNote": "No delay reported",
       "dependencies": [

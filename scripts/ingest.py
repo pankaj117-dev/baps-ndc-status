@@ -73,6 +73,11 @@ def apply_weekly_update(project, fields):
 
     go_live = fields.get("Go-live date", "")
     if go_live:
+        # First time a go-live date is recorded for this project, lock it in as
+        # the baseline. Later updates move `goLive` but `originalGoLive` stays
+        # put so the dashboard can show how far the date has slipped.
+        if not project.get("originalGoLive"):
+            project["originalGoLive"] = go_live
         project["goLive"] = go_live
 
     deps = fields.get("Dependencies", "")
@@ -193,6 +198,7 @@ def snapshot_history(data, history):
                 "phase": p.get("phase", ""),
                 "nextMilestone": p.get("nextMilestone"),
                 "goLive": p.get("goLive"),
+                "originalGoLive": p.get("originalGoLive"),
             }
             for p in data["projects"]
         ],

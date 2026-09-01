@@ -114,6 +114,76 @@
     });
   }
 
+  function delaySeverity(days) {
+    if (!days || days <= 0) return "green";
+    if (days <= 7) return "amber";
+    return "red";
+  }
+
+  function renderGoLiveTracker() {
+    const box = document.getElementById("goliveTracker");
+    box.innerHTML = "";
+
+    const scheduled = DATA.projects
+      .filter((p) => p.goLive)
+      .slice()
+      .sort((a, b) => new Date(a.goLive) - new Date(b.goLive));
+    const unscheduled = DATA.projects.filter((p) => !p.goLive);
+
+    if (!scheduled.length) {
+      box.appendChild(el("p", { class: "empty-note" }, ["No go-live dates scheduled yet."]));
+      return;
+    }
+
+    scheduled.forEach((p) => {
+      const hasSlip = p.originalGoLive && p.originalGoLive !== p.goLive;
+      const slipDays = p.delayDays || 0;
+      const severity = delaySeverity(slipDays);
+
+      const dateBlock = hasSlip
+        ? el("div", { class: "golive-dates" }, [
+            el("span", { class: "golive-date-original" }, [fmtDateShort(p.originalGoLive)]),
+            el("span", { class: "golive-arrow" }, ["→"]),
+            el("span", { class: "golive-date-current" }, [fmtDate(p.goLive)]),
+          ])
+        : el("div", { class: "golive-dates" }, [
+            el("span", { class: "golive-date-current" }, [fmtDate(p.goLive)]),
+          ]);
+
+      const row = el("div", { class: "golive-row", "data-project-id": p.id, tabindex: "0", role: "button" }, [
+        el("div", { class: "golive-project" }, [
+          el("span", { class: "timeline-dot", style: `background:var(--${p.status === "amber" ? "amber" : p.status})` }),
+          el("strong", null, [p.name]),
+        ]),
+        dateBlock,
+        el("span", { class: "golive-delay-pill pill-" + severity }, [
+          slipDays > 0 ? "+" + slipDays + " days" : "On schedule",
+        ]),
+      ]);
+
+      box.appendChild(row);
+    });
+
+    box.querySelectorAll(".golive-row").forEach((row) => {
+      row.addEventListener("click", () => openProjectDetail(row.getAttribute("data-project-id")));
+      row.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openProjectDetail(row.getAttribute("data-project-id"));
+        }
+      });
+    });
+
+    if (unscheduled.length) {
+      box.appendChild(
+        el("div", { class: "golive-unscheduled" }, [
+          el("strong", null, ["Not yet scheduled: "]),
+          unscheduled.map((p) => p.name).join(", "),
+        ])
+      );
+    }
+  }
+
   function listOrDash(items) {
     return items.length ? items.map((d) => el("li", null, [d])) : [el("li", null, ["—"])];
   }
@@ -346,7 +416,11 @@
         el("dt", null, ["Next milestone"]),
         el("dd", null, [(p.nextMilestone && p.nextMilestone.name || "—") + (p.nextMilestone && p.nextMilestone.date ? " · " + fmtDateShort(p.nextMilestone.date) : "")]),
         el("dt", null, ["Go-live"]),
-        el("dd", null, [fmtDate(p.goLive)]),
+        el("dd", null, [
+          p.originalGoLive && p.originalGoLive !== p.goLive
+            ? `${fmtDate(p.originalGoLive)} → ${fmtDate(p.goLive)}`
+            : fmtDate(p.goLive),
+        ]),
         el("dt", null, ["Delay"]),
         el("dd", { class: "delay-flag " + (isLate ? "is-late" : "is-ontime") }, [
           isLate ? "+" + p.delayDays + " days" : "On schedule",
@@ -523,6 +597,7 @@
     renderHeader();
     renderMetrics();
     renderTimeline();
+    renderGoLiveTracker();
     renderCards();
     wireFilters();
     wireOwnerFilter();
