@@ -16,13 +16,15 @@ body:
       label: Project
       options:
         - WebNext
-        - Pledge
+        - WebNext 2.0
+        - Pledge – 1.0
+        - Pledge - 1A
         - EMM
         - MyBKY (Phase 1)
-        - MyBKY (Phase 2)
+        - MyBKY Phase 2A
         - myMandir App Improvements
         - GMS
-        - BAPS SSO
+        - SSO V2 WSO2
         - SPM
         - BKMS
         - MIS

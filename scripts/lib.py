@@ -5,13 +5,15 @@ import subprocess
 
 PROJECT_NAME_TO_ID = {
     "WebNext": "webnext",
-    "Pledge": "pledge",
+    "WebNext 2.0": "webnext-2",
+    "Pledge – 1.0": "pledge",
+    "Pledge - 1A": "pledge-1a",
     "EMM": "emm",
     "MyBKY (Phase 1)": "mybky-phase1",
-    "MyBKY (Phase 2)": "mybky-phase2",
+    "MyBKY Phase 2A": "mybky-phase2",
     "myMandir App Improvements": "mymandir",
     "GMS": "gms",
-    "BAPS SSO": "baps-sso",
+    "SSO V2 WSO2": "baps-sso",
     "SPM": "spm",
     "BKMS": "bkms",
     "MIS": "mis",
