@@ -18,26 +18,26 @@ to scan instead of a 15-slide deck.
 
 - **Metrics row** — auto-computed rollup: on-track / at-risk / critical counts,
   average delay, total open risks.
-- **Upcoming milestones** — every project's next milestone, sorted by date.
-- **Pipeline stages** — a Kanban-style board grouping every project by its
-  canonical delivery stage (Requirements → Design/Estimation → Development →
-  QA/UAT → Production Release → Hypercare/Post-Launch), so you can see at a
-  glance where the whole portfolio actually sits without opening each card.
-  Click any card to jump into its full detail view. Inspired by the stage
-  board on Intuit's internal PDLC dashboard.
+- **Project cards** — the primary view, front and center: one card per
+  project with status, progress bar, phase, next milestone (name + date),
+  go-live date, delay, and expandable dependencies / sprint status
+  (completed, in progress, next plan) / risks. Every risk and dependency in
+  the detail view is paired with its mitigation plan / impact, and any delay
+  requires a stated impact — items missing one are flagged in amber so it's
+  obvious what still needs to be filled in. Filter chips narrow the grid to
+  on-track / at-risk / critical, plus a **PM filter dropdown** to show only
+  one person's projects.
+- **Pipeline stages** — below the cards, a Kanban-style board grouping every
+  project by its canonical delivery stage (Requirements → Design/Estimation →
+  Development → QA/UAT → Production Release → Hypercare/Post-Launch), so you
+  can see at a glance where the whole portfolio actually sits. Click any card
+  to jump into its full detail view. Inspired by the stage board on Intuit's
+  internal PDLC dashboard.
 - **Go-live tracker** — every project with a scheduled go-live, sorted by
   date, showing the original planned date struck through next to the current
   date whenever it's slipped, plus a delay pill (green/amber/red by severity).
   Projects without a go-live yet are listed underneath as "not yet scheduled."
   Click any row to open that project's full detail view.
-- **Project cards** — one per project: status, progress bar, phase, next
-  milestone, go-live date, delay, and expandable dependencies / sprint status
-  (completed, in progress, next plan) / risks. Every risk and dependency in
-  the detail view is paired with its mitigation plan / impact, and any delay
-  requires a stated impact — items missing one are flagged in amber so it's
-  obvious what still needs to be filled in.
-- Filter chips to narrow the card grid to on-track / at-risk / critical, plus
-  a **PM filter dropdown** to show only one person's projects.
 
 ## Tab 2 — Dependencies (live)
 

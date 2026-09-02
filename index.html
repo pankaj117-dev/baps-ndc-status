@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=12">
+<link rel="stylesheet" href="styles.css?v=13">
 </head>
 <body>
   <div class="wrap">
@@ -34,17 +34,6 @@
     <section id="panel-status" class="tab-panel is-active">
       <div id="metricsRow" class="metrics-row"></div>
 
-      <h2 class="section-heading">Upcoming milestones</h2>
-      <div id="timeline" class="timeline"></div>
-
-      <h2 class="section-heading">Pipeline stages</h2>
-      <p class="section-subhead">Every project, grouped by where it actually sits in the delivery pipeline right now — click a card to open the full detail view.</p>
-      <div id="stageBoard" class="stage-board"></div>
-
-      <h2 class="section-heading">Go-live tracker</h2>
-      <p class="section-subhead">Original target vs. current date for every project with a go-live scheduled — click a row for the full slip history.</p>
-      <div id="goliveTracker" class="golive-table"></div>
-
       <h2 class="section-heading">Projects</h2>
       <div class="filter-row" id="filterRow">
         <button class="chip is-on" data-filter="all">All</button>
@@ -58,6 +47,14 @@
         </select>
       </div>
       <div id="cards" class="cards"></div>
+
+      <h2 class="section-heading">Pipeline stages</h2>
+      <p class="section-subhead">Every project, grouped by where it actually sits in the delivery pipeline right now — click a card to open the full detail view.</p>
+      <div id="stageBoard" class="stage-board"></div>
+
+      <h2 class="section-heading">Go-live tracker</h2>
+      <p class="section-subhead">Original target vs. current date for every project with a go-live scheduled — click a row for the full slip history.</p>
+      <div id="goliveTracker" class="golive-table"></div>
     </section>
 
     <section id="panel-deps" class="tab-panel">
@@ -146,6 +143,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=12"></script>
+  <script src="app.js?v=13"></script>
 </body>
 </html>

@@ -99,39 +99,6 @@
     });
   }
 
-  function renderTimeline() {
-    const withDates = DATA.projects
-      .filter((p) => p.nextMilestone && p.nextMilestone.date)
-      .slice()
-      .sort((a, b) => new Date(a.nextMilestone.date) - new Date(b.nextMilestone.date));
-
-    const box = document.getElementById("timeline");
-    box.innerHTML = "";
-    withDates.forEach((p) => {
-      box.appendChild(
-        el("div", { class: "timeline-row", "data-project-id": p.id, tabindex: "0", role: "button" }, [
-          el("div", { class: "timeline-date" }, [fmtDateShort(p.nextMilestone.date)]),
-          el("div", { class: "timeline-dot", style: `background:var(--${p.status === "amber" ? "amber" : p.status})` }),
-          el("div", { class: "timeline-what" }, [
-            el("strong", null, [p.name + " — "]),
-            el("span", null, [p.nextMilestone.name]),
-          ]),
-          el("div", { class: "timeline-status pill-" + p.status }, [STATUS_LABEL[p.status]]),
-        ])
-      );
-    });
-
-    box.querySelectorAll(".timeline-row").forEach((row) => {
-      row.addEventListener("click", () => openProjectDetail(row.getAttribute("data-project-id")));
-      row.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          openProjectDetail(row.getAttribute("data-project-id"));
-        }
-      });
-    });
-  }
-
   const PIPELINE_STAGES = [
     "Requirements",
     "Design / Estimation",
@@ -898,7 +865,6 @@
 
     renderHeader();
     renderMetrics();
-    renderTimeline();
     renderStageBoard();
     renderGoLiveTracker();
     renderCards();

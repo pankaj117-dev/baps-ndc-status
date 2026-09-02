@@ -577,59 +577,13 @@ body {
   font-size: 13px;
 }
 
-/* ---------- Timeline ---------- */
-
-.timeline {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  margin-bottom: 36px;
-  background: var(--bg-panel);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-}
-
-.timeline-row {
-  display: grid;
-  grid-template-columns: 108px 22px 1fr auto;
-  align-items: center;
-  gap: 14px;
-  padding: 15px 18px;
-  border-bottom: 1px solid var(--line);
-  font-size: 15px;
-  cursor: pointer;
-  transition: background 0.12s ease;
-}
-
-.timeline-row:last-child { border-bottom: none; }
-.timeline-row:hover { background: var(--bg); }
-.timeline-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-
-.timeline-date {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--ink-soft);
-}
+/* ---------- Shared status dot (used on cards, stage board, go-live tracker) ---------- */
 
 .timeline-dot {
   width: 9px;
   height: 9px;
   border-radius: 50%;
   justify-self: center;
-}
-
-.timeline-what strong { font-weight: 600; }
-.timeline-what span { color: var(--ink-soft); }
-
-.timeline-status {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 4px 10px;
-  border-radius: 999px;
 }
 
 /* ---------- Project cards ---------- */
@@ -1245,8 +1199,6 @@ dd.is-missing {
   .metrics-row { grid-template-columns: repeat(3, 1fr); }
   .cards { grid-template-columns: 1fr; }
   .stub-grid { grid-template-columns: repeat(2, 1fr); }
-  .timeline-row { grid-template-columns: 88px 16px 1fr; }
-  .timeline-status { display: none; }
 }
 
 @media (max-width: 560px) {
