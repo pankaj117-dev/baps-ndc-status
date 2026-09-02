@@ -41,6 +41,14 @@
     return NOTES.filter((n) => n.projectId === projectId && n.status === "open");
   }
 
+  function todayISO() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
+
   function issueUrl(template, params) {
     const base = `https://github.com/${REPO}/issues/new`;
     const search = new URLSearchParams({ template, ...params });
@@ -402,7 +410,7 @@
             class: "btn-primary btn-small",
             target: "_blank",
             rel: "noopener",
-            href: issueUrl("weekly-update.yml", { project: p.name, as_of: DATA.asOf, owner: p.owner || "" }),
+            href: issueUrl("weekly-update.yml", { project: p.name, as_of: todayISO(), owner: p.owner || "" }),
           }, ["Submit weekly update ↗"]),
           el("a", {
             class: "btn-ghost btn-small",
