@@ -25,7 +25,10 @@
           ""
         ],
         "delayMitigation": [],
-        "delayTradeoffs": ""
+        "delayTradeoffs": "",
+        "dependencyTeams": [
+          ""
+        ]
       },
       {
         "id": "pledge",
@@ -52,7 +55,11 @@
           ""
         ],
         "delayMitigation": [],
-        "delayTradeoffs": ""
+        "delayTradeoffs": "",
+        "dependencyTeams": [
+          "ASM Team",
+          "ASM Team"
+        ]
       },
       {
         "id": "emm",
@@ -83,7 +90,11 @@
           ""
         ],
         "delayMitigation": [],
-        "delayTradeoffs": ""
+        "delayTradeoffs": "",
+        "dependencyTeams": [
+          "",
+          ""
+        ]
       },
       {
         "id": "mybky-phase1",
@@ -122,7 +133,13 @@
           ""
         ],
         "delayMitigation": [],
-        "delayTradeoffs": ""
+        "delayTradeoffs": "",
+        "dependencyTeams": [
+          "BAPS SSO Team",
+          "MIS Team",
+          "GMS Team",
+          "DevOps"
+        ]
       },
       {
         "id": "mybky-phase2",
@@ -157,7 +174,13 @@
           ""
         ],
         "delayMitigation": [],
-        "delayTradeoffs": ""
+        "delayTradeoffs": "",
+        "dependencyTeams": [
+          "",
+          "",
+          "Business/Stakeholder",
+          "Business/Stakeholder"
+        ]
       },
       {
         "id": "mymandir",
@@ -186,7 +209,10 @@
           ""
         ],
         "delayMitigation": [],
-        "delayTradeoffs": ""
+        "delayTradeoffs": "",
+        "dependencyTeams": [
+          "Business/Stakeholder (Sameep)"
+        ]
       },
       {
         "id": "gms",
@@ -217,7 +243,10 @@
           ""
         ],
         "delayMitigation": [],
-        "delayTradeoffs": ""
+        "delayTradeoffs": "",
+        "dependencyTeams": [
+          ""
+        ]
       },
       {
         "id": "baps-sso",
@@ -246,7 +275,10 @@
           ""
         ],
         "delayMitigation": [],
-        "delayTradeoffs": ""
+        "delayTradeoffs": "",
+        "dependencyTeams": [
+          ""
+        ]
       },
       {
         "id": "spm",
@@ -277,7 +309,11 @@
           ""
         ],
         "delayMitigation": [],
-        "delayTradeoffs": ""
+        "delayTradeoffs": "",
+        "dependencyTeams": [
+          "DevOps",
+          "DevOps"
+        ]
       },
       {
         "id": "bkms",
@@ -302,7 +338,10 @@
           ""
         ],
         "delayMitigation": [],
-        "delayTradeoffs": ""
+        "delayTradeoffs": "",
+        "dependencyTeams": [
+          "DevOps"
+        ]
       },
       {
         "id": "mis",
@@ -327,7 +366,10 @@
           ""
         ],
         "delayMitigation": [],
-        "delayTradeoffs": ""
+        "delayTradeoffs": "",
+        "dependencyTeams": [
+          ""
+        ]
       }
     ]
   }

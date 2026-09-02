@@ -93,6 +93,10 @@ def apply_weekly_update(project, fields):
     if deps:
         project["dependencies"] = lines(deps)
 
+    dep_team = fields.get("Dependency owning team(s)", "")
+    if dep_team:
+        project["dependencyTeams"] = lines(dep_team)
+
     dep_mitigation = fields.get("Dependency mitigation plan / impact", "")
     if dep_mitigation:
         project["dependencyMitigations"] = lines(dep_mitigation)
@@ -224,6 +228,7 @@ def snapshot_history(data, history):
                 "risks": p.get("risks", []),
                 "riskMitigations": p.get("riskMitigations", []),
                 "dependencies": p.get("dependencies", []),
+                "dependencyTeams": p.get("dependencyTeams", []),
                 "dependencyMitigations": p.get("dependencyMitigations", []),
             }
             for p in data["projects"]

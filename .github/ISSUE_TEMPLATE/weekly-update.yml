@@ -121,6 +121,14 @@ body:
         DEVOPS-1082 — SPM production environment setup
         Waiting on Sameep for REQ doc review
   - type: textarea
+    id: dependency_team
+    attributes:
+      label: Dependency owning team(s)
+      description: "One per line, in the SAME ORDER as the dependencies above — which team or person owns unblocking this? (e.g. DevOps, Security, GMS Team, Business/Stakeholder). Required for any dependency listed above — this feeds the cross-project Dependencies tab."
+      placeholder: |
+        DevOps
+        Business/Stakeholder (Sameep)
+  - type: textarea
     id: dependency_mitigation
     attributes:
       label: Dependency mitigation plan / impact

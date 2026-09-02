@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=9">
+<link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
   <div class="wrap">
@@ -27,6 +27,7 @@
 
     <nav class="tabbar" role="tablist">
       <button class="tab-btn is-active" data-tab="status" role="tab" aria-selected="true">Program Status</button>
+      <button class="tab-btn" data-tab="deps" role="tab" aria-selected="false">Dependencies</button>
       <button class="tab-btn" data-tab="team" role="tab" aria-selected="false">Team Performance</button>
     </nav>
 
@@ -53,6 +54,26 @@
         </select>
       </div>
       <div id="cards" class="cards"></div>
+    </section>
+
+    <section id="panel-deps" class="tab-panel">
+      <div id="depsMetricsRow" class="metrics-row"></div>
+
+      <div class="filter-row" id="depsTeamFilterRow">
+        <label class="owner-filter-label" for="depsTeamFilter">Team</label>
+        <select id="depsTeamFilter" class="owner-filter">
+          <option value="all">All teams</option>
+        </select>
+        <span class="filter-sep"></span>
+        <label class="owner-filter-label" for="depsStatusFilter">Status</label>
+        <select id="depsStatusFilter" class="owner-filter">
+          <option value="all">All</option>
+          <option value="missing-team">Missing team label</option>
+          <option value="missing-mitigation">Missing mitigation</option>
+        </select>
+      </div>
+
+      <div id="depsBoard" class="deps-board"></div>
     </section>
 
     <section id="panel-team" class="tab-panel">
@@ -121,6 +142,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=9"></script>
+  <script src="app.js?v=10"></script>
 </body>
 </html>

@@ -393,6 +393,88 @@ body {
   .golive-delay-pill { justify-self: start; }
 }
 
+/* ---------- Dependencies tab ---------- */
+
+.deps-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.deps-group {
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.deps-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.deps-group-head h3 {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  margin: 0;
+}
+
+.deps-group-count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+.deps-card {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.deps-card:last-child { border-bottom: none; }
+
+.deps-card-project {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+
+.deps-card-project:hover { color: var(--accent); }
+
+.deps-card-text {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-bottom: 4px;
+}
+
+.deps-card-mitigation {
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+
+.deps-card-mitigation.is-missing {
+  color: var(--amber);
+}
+
+.deps-empty-group {
+  padding: 24px;
+  text-align: center;
+  color: var(--ink-faint);
+  font-size: 13px;
+}
+
 /* ---------- Timeline ---------- */
 
 .timeline {
@@ -1002,6 +1084,25 @@ body.no-scroll { overflow: hidden; }
 }
 
 .paired-item-mitigation.is-missing .mitigation-label {
+  color: var(--amber);
+}
+
+.team-tag {
+  display: inline-block;
+  margin-left: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  vertical-align: middle;
+}
+
+.team-tag.is-missing {
+  background: var(--amber-bg);
   color: var(--amber);
 }
 

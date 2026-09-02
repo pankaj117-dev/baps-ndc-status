@@ -196,12 +196,18 @@
     return items.length ? items.map((d) => el("li", null, [d])) : [el("li", null, ["—"])];
   }
 
-  function pairedList(items, mitigations, label) {
+  function pairedList(items, mitigations, label, teams) {
     if (!items.length) return [el("li", null, ["—"])];
     return items.map((text, i) => {
       const mitigation = (mitigations && mitigations[i]) || "";
+      const team = (teams && teams[i]) || "";
       return el("li", { class: "paired-item" }, [
-        el("div", { class: "paired-item-text" }, [text]),
+        el("div", { class: "paired-item-text" }, [
+          text,
+          ...(teams
+            ? [el("span", { class: "team-tag" + (team ? "" : " is-missing") }, [team || "No team labeled"])]
+            : []),
+        ]),
         el("div", { class: "paired-item-mitigation" + (mitigation ? "" : " is-missing") }, [
           el("span", { class: "mitigation-label" }, [label + ": "]),
           mitigation || "Not yet documented",
@@ -303,6 +309,144 @@
     select.addEventListener("change", () => {
       activeOwner = select.value;
       renderCards();
+    });
+  }
+
+  /* ---------------- Tab: Dependencies ---------------- */
+
+  let depsTeamFilter = "all";
+  let depsStatusFilter = "all";
+
+  function collectDependencies() {
+    const rows = [];
+    DATA.projects.forEach((p) => {
+      (p.dependencies || []).forEach((text, i) => {
+        if (!text || /^(none|no dependency)$/i.test(text.trim())) return;
+        rows.push({
+          projectId: p.id,
+          projectName: p.name,
+          status: p.status,
+          text,
+          team: (p.dependencyTeams && p.dependencyTeams[i]) || "",
+          mitigation: (p.dependencyMitigations && p.dependencyMitigations[i]) || "",
+        });
+      });
+    });
+    return rows;
+  }
+
+  function renderDependenciesMetrics(rows) {
+    const teams = new Set(rows.map((r) => r.team).filter(Boolean));
+    const missingTeam = rows.filter((r) => !r.team).length;
+    const missingMitigation = rows.filter((r) => !r.mitigation).length;
+
+    const metrics = [
+      { label: "Total Dependencies", num: rows.length, tone: "" },
+      { label: "Teams Involved", num: teams.size, tone: "tone-accent" },
+      { label: "Missing Team Label", num: missingTeam, tone: missingTeam ? "tone-amber" : "tone-green" },
+      { label: "Missing Mitigation", num: missingMitigation, tone: missingMitigation ? "tone-amber" : "tone-green" },
+    ];
+
+    const row = document.getElementById("depsMetricsRow");
+    row.innerHTML = "";
+    metrics.forEach((m) => {
+      row.appendChild(
+        el("div", { class: "metric-card " + m.tone }, [
+          el("div", { class: "num" }, [String(m.num)]),
+          el("div", { class: "label" }, [m.label]),
+        ])
+      );
+    });
+  }
+
+  function populateDepsTeamFilter(rows) {
+    const select = document.getElementById("depsTeamFilter");
+    const existing = new Set(Array.from(select.options).map((o) => o.value));
+    const teams = Array.from(new Set(rows.map((r) => r.team || "Unlabeled"))).sort((a, b) => {
+      if (a === "Unlabeled") return 1;
+      if (b === "Unlabeled") return -1;
+      return a.localeCompare(b);
+    });
+    teams.forEach((team) => {
+      if (!existing.has(team)) select.appendChild(el("option", { value: team }, [team]));
+    });
+  }
+
+  function renderDependenciesBoard(rows) {
+    const board = document.getElementById("depsBoard");
+    board.innerHTML = "";
+
+    const filtered = rows.filter((r) => {
+      const teamKey = r.team || "Unlabeled";
+      const teamOk = depsTeamFilter === "all" || teamKey === depsTeamFilter;
+      const statusOk =
+        depsStatusFilter === "all" ||
+        (depsStatusFilter === "missing-team" && !r.team) ||
+        (depsStatusFilter === "missing-mitigation" && !r.mitigation);
+      return teamOk && statusOk;
+    });
+
+    if (!filtered.length) {
+      board.appendChild(el("div", { class: "deps-empty-group" }, ["No dependencies match this filter."]));
+      return;
+    }
+
+    const groups = {};
+    filtered.forEach((r) => {
+      const key = r.team || "Unlabeled";
+      (groups[key] = groups[key] || []).push(r);
+    });
+
+    const groupNames = Object.keys(groups).sort((a, b) => {
+      if (a === "Unlabeled") return 1;
+      if (b === "Unlabeled") return -1;
+      return groups[b].length - groups[a].length || a.localeCompare(b);
+    });
+
+    groupNames.forEach((team) => {
+      const entries = groups[team];
+      const group = el("div", { class: "deps-group" }, [
+        el("div", { class: "deps-group-head" }, [
+          el("h3", null, [team]),
+          el("span", { class: "deps-group-count" }, [entries.length + (entries.length === 1 ? " dependency" : " dependencies")]),
+        ]),
+      ]);
+      entries.forEach((r) => {
+        const card = el("div", { class: "deps-card" }, [
+          el("div", { class: "deps-card-project", "data-project-id": r.projectId }, [
+            el("span", { class: "timeline-dot", style: `background:var(--${r.status === "amber" ? "amber" : r.status})` }),
+            r.projectName,
+          ]),
+          el("div", { class: "deps-card-text" }, [r.text]),
+          el("div", { class: "deps-card-mitigation" + (r.mitigation ? "" : " is-missing") }, [
+            r.mitigation || "Mitigation / impact not yet documented",
+          ]),
+        ]);
+        group.appendChild(card);
+      });
+      board.appendChild(group);
+    });
+
+    board.querySelectorAll(".deps-card-project").forEach((node) => {
+      node.addEventListener("click", () => openProjectDetail(node.getAttribute("data-project-id")));
+    });
+  }
+
+  function renderDependenciesTab() {
+    const rows = collectDependencies();
+    renderDependenciesMetrics(rows);
+    populateDepsTeamFilter(rows);
+    renderDependenciesBoard(rows);
+  }
+
+  function wireDependenciesFilters() {
+    document.getElementById("depsTeamFilter").addEventListener("change", (e) => {
+      depsTeamFilter = e.target.value;
+      renderDependenciesBoard(collectDependencies());
+    });
+    document.getElementById("depsStatusFilter").addEventListener("change", (e) => {
+      depsStatusFilter = e.target.value;
+      renderDependenciesBoard(collectDependencies());
     });
   }
 
@@ -521,7 +665,7 @@
     root.appendChild(el("h3", { class: "weekly-subhead" }, ["Dependencies"]));
     root.appendChild(
       el("div", { class: "detail-block deps" }, [
-        el("ul", { class: "paired-list" }, pairedList(p.dependencies || [], p.dependencyMitigations || [], "Mitigation / impact")),
+        el("ul", { class: "paired-list" }, pairedList(p.dependencies || [], p.dependencyMitigations || [], "Mitigation / impact", p.dependencyTeams || [])),
       ])
     );
 
@@ -663,6 +807,9 @@
     renderCards();
     wireFilters();
     wireOwnerFilter();
+
+    renderDependenciesTab();
+    wireDependenciesFilters();
 
     wireProjectDetail();
     wireFeedbackModal();

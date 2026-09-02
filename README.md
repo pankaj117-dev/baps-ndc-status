@@ -33,14 +33,21 @@ to scan instead of a 15-slide deck.
 - Filter chips to narrow the card grid to on-track / at-risk / critical, plus
   a **PM filter dropdown** to show only one person's projects.
 
-## Tab 2 — Week over Week (live)
+## Tab 2 — Dependencies (live)
 
-Pick a project and see how it's actually moved: a progress-over-time bar
-chart, a plain-English change log between consecutive weekly snapshots
-(status/progress/delay/phase deltas), and the full feedback history for that
-project (open + resolved). Snapshots come from `history.json`, one entry per
-`asOf` date — re-ingesting the same week's issues updates that week's
-snapshot rather than creating a duplicate.
+Every dependency across every project, flattened into one cross-project
+board and grouped by the **owning team** (DevOps, Security, GMS Team,
+Business/Stakeholder, etc. — whatever the PM labels it as in their weekly
+update). Each card shows which project it's blocking, the dependency text,
+and its mitigation plan / impact — with anything missing a team label or a
+mitigation plan flagged in amber so it's obvious what to chase down. Filter
+by team or by "missing info" status; click a project name to jump straight
+into its full detail view. This is the fastest way to answer "what's DevOps
+blocking us on this week?" without reading every project card individually.
+
+Week-over-week history for an individual project (progress-over-time chart,
+plain-English change log, full feedback history) lives inside that
+project's full detail view — click any project card to open it.
 
 ## Tab 3 — Team Performance (skeleton only)
 
@@ -121,6 +128,7 @@ Everything lives in three files:
   "delayMitigation": ["..."],  // one per line — what's being done to recover the delay
   "delayTradeoffs": "",        // any scope/resource/date trade-offs made because of the delay
   "dependencies": ["..."],
+  "dependencyTeams": ["..."],       // same length/order as dependencies — which team owns unblocking it
   "dependencyMitigations": ["..."], // same length/order as dependencies — plan + impact for each
   "sprintStatus": {
     "completed": ["..."],
@@ -133,13 +141,15 @@ Everything lives in three files:
 ```
 
 Risks and dependencies are tracked as **parallel arrays**: `risks[i]` pairs
-with `riskMitigations[i]`, `dependencies[i]` pairs with
-`dependencyMitigations[i]`. The weekly-update issue form asks for both lists
-in the same order so PMs can just add a matching line. The dashboard flags
-any risk, dependency, or delay that's missing its mitigation/impact in amber
-so it's visible at a glance who still needs to fill it in. Meeting feedback
-issues also carry an optional `mitigationImpact` field for when leadership
-flags a risk/dependency live in the meeting.
+with `riskMitigations[i]`, `dependencies[i]` pairs with `dependencyTeams[i]`
+and `dependencyMitigations[i]`. The weekly-update issue form asks for all of
+these in the same order so PMs can just add a matching line. The dashboard
+flags any risk, dependency, or delay that's missing its team label / mitigation
+/ impact in amber so it's visible at a glance who still needs to fill it in.
+The Dependencies tab uses `dependencyTeams` to group every project's
+dependencies into one cross-project board. Meeting feedback issues also
+carry an optional `mitigationImpact` field for when leadership flags a
+risk/dependency live in the meeting.
 
 `originalGoLive` is system-managed: `scripts/ingest.py` sets it the first time
 a PM submits a go-live date for a project and never overwrites it after that,
