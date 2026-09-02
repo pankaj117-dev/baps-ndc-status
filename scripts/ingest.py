@@ -50,6 +50,14 @@ def apply_weekly_update(project, fields):
     set_if_present("delayNote", "Delay note")
     set_if_present("delayImpact", "Impact of delay")
 
+    delay_mitigation = fields.get("Mitigation steps taken", "")
+    if delay_mitigation:
+        project["delayMitigation"] = lines(delay_mitigation)
+
+    delay_tradeoffs = fields.get("Trade-off conversations", "")
+    if delay_tradeoffs:
+        project["delayTradeoffs"] = delay_tradeoffs.strip()
+
     status = fields.get("Overall status", "")
     if status:
         project["status"] = status.strip().lower()
@@ -211,6 +219,8 @@ def snapshot_history(data, history):
                 "goLive": p.get("goLive"),
                 "originalGoLive": p.get("originalGoLive"),
                 "delayImpact": p.get("delayImpact", ""),
+                "delayMitigation": p.get("delayMitigation", []),
+                "delayTradeoffs": p.get("delayTradeoffs", ""),
                 "risks": p.get("risks", []),
                 "riskMitigations": p.get("riskMitigations", []),
                 "dependencies": p.get("dependencies", []),

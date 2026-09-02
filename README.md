@@ -118,6 +118,8 @@ Everything lives in three files:
   "delayDays": 0,              // 0 if on schedule, positive integer if late
   "delayNote": "No delay reported",
   "delayImpact": "",           // required in the form whenever delayDays > 0
+  "delayMitigation": ["..."],  // one per line — what's being done to recover the delay
+  "delayTradeoffs": "",        // any scope/resource/date trade-offs made because of the delay
   "dependencies": ["..."],
   "dependencyMitigations": ["..."], // same length/order as dependencies — plan + impact for each
   "sprintStatus": {

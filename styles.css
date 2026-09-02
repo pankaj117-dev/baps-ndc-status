@@ -1009,6 +1009,14 @@ dd.is-missing {
   color: var(--amber);
 }
 
+.delay-recovery h4:not(:first-child) {
+  margin-top: 12px;
+}
+
+.delay-recovery .empty-note.is-missing {
+  color: var(--amber);
+}
+
 .empty-note {
   color: var(--ink-soft);
   font-size: 13.5px;

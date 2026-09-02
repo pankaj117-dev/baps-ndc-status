@@ -458,6 +458,22 @@
       ])
     );
 
+    if (isLate) {
+      root.appendChild(el("h3", { class: "weekly-subhead" }, ["Delay recovery"]));
+      root.appendChild(
+        el("div", { class: "detail-block delay-recovery" }, [
+          el("h4", null, ["Mitigation steps taken"]),
+          p.delayMitigation && p.delayMitigation.length
+            ? el("ul", null, listOrDash(p.delayMitigation))
+            : el("p", { class: "empty-note is-missing" }, ["Not yet documented"]),
+          el("h4", null, ["Trade-off conversations"]),
+          el("p", { class: p.delayTradeoffs ? "" : "empty-note" }, [
+            p.delayTradeoffs || "None recorded — assumed no scope/resource trade-offs made yet.",
+          ]),
+        ])
+      );
+    }
+
     if (openFollowUps.length) {
       root.appendChild(el("h3", { class: "weekly-subhead" }, ["Open follow-ups"]));
       root.appendChild(

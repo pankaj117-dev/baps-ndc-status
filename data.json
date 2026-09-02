@@ -34,7 +34,9 @@
       "riskMitigations": [],
       "dependencyMitigations": [
         ""
-      ]
+      ],
+      "delayMitigation": [],
+      "delayTradeoffs": ""
     },
     {
       "id": "pledge",
@@ -74,7 +76,9 @@
       "dependencyMitigations": [
         "",
         ""
-      ]
+      ],
+      "delayMitigation": [],
+      "delayTradeoffs": ""
     },
     {
       "id": "emm",
@@ -120,7 +124,9 @@
       "dependencyMitigations": [
         "",
         ""
-      ]
+      ],
+      "delayMitigation": [],
+      "delayTradeoffs": ""
     },
     {
       "id": "mybky-phase1",
@@ -170,7 +176,9 @@
         "",
         "",
         ""
-      ]
+      ],
+      "delayMitigation": [],
+      "delayTradeoffs": ""
     },
     {
       "id": "mybky-phase2",
@@ -221,7 +229,9 @@
         "",
         "",
         ""
-      ]
+      ],
+      "delayMitigation": [],
+      "delayTradeoffs": ""
     },
     {
       "id": "mymandir",
@@ -264,7 +274,9 @@
       ],
       "dependencyMitigations": [
         ""
-      ]
+      ],
+      "delayMitigation": [],
+      "delayTradeoffs": ""
     },
     {
       "id": "gms",
@@ -310,7 +322,9 @@
       ],
       "dependencyMitigations": [
         ""
-      ]
+      ],
+      "delayMitigation": [],
+      "delayTradeoffs": ""
     },
     {
       "id": "baps-sso",
@@ -356,7 +370,9 @@
       ],
       "dependencyMitigations": [
         ""
-      ]
+      ],
+      "delayMitigation": [],
+      "delayTradeoffs": ""
     },
     {
       "id": "spm",
@@ -399,7 +415,9 @@
       "dependencyMitigations": [
         "",
         ""
-      ]
+      ],
+      "delayMitigation": [],
+      "delayTradeoffs": ""
     },
     {
       "id": "bkms",
@@ -436,7 +454,9 @@
       "riskMitigations": [],
       "dependencyMitigations": [
         ""
-      ]
+      ],
+      "delayMitigation": [],
+      "delayTradeoffs": ""
     },
     {
       "id": "mis",
@@ -474,7 +494,9 @@
       "riskMitigations": [],
       "dependencyMitigations": [
         ""
-      ]
+      ],
+      "delayMitigation": [],
+      "delayTradeoffs": ""
     }
   ]
 }

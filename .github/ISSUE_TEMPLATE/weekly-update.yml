@@ -99,6 +99,20 @@ body:
       description: "If delay days > 0, what's the actual impact? (go-live slip, other teams/projects blocked, etc.) Required whenever there's a delay."
       placeholder: "Pushes go-live by 4 days; blocks MyBKY Phase 2 regression start"
   - type: textarea
+    id: delay_mitigation
+    attributes:
+      label: Mitigation steps taken
+      description: "If delay days > 0, what's already been done (or is being done) to reduce or recover the delay? One per line. Required whenever there's a delay."
+      placeholder: |
+        Added a second QA resource to parallelize regression testing
+        Escalated security re-verification slot with the infra team
+  - type: textarea
+    id: delay_tradeoffs
+    attributes:
+      label: Trade-off conversations
+      description: "Any trade-offs discussed or decided because of this delay — cutting scope, shifting resources, accepting risk, revising the date, etc. Leave blank if none."
+      placeholder: "Agreed with leadership to drop the PDF export feature from this release to hold the go-live date"
+  - type: textarea
     id: dependencies
     attributes:
       label: Dependencies
