@@ -26,6 +26,7 @@ body:
         - SPM
         - BKMS
         - MIS
+        - mySatsang – BAPS ID Integration
     validations:
       required: true
   - type: textarea

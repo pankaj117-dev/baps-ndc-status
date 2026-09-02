@@ -15,6 +15,7 @@ PROJECT_NAME_TO_ID = {
     "SPM": "spm",
     "BKMS": "bkms",
     "MIS": "mis",
+    "mySatsang – BAPS ID Integration": "mysatsang-bapsid",
 }
 
 # GitHub renders each issue-form field as "### <label>\n\n<value>\n\n"

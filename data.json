@@ -539,6 +539,59 @@
       "dependencyTeams": [
         ""
       ]
+    },
+    {
+      "id": "mysatsang-bapsid",
+      "name": "mySatsang – BAPS ID Integration",
+      "owner": "",
+      "status": "amber",
+      "progress": 0,
+      "phase": "Estimation — no committed start/due dates yet",
+      "nextMilestone": null,
+      "goLive": null,
+      "originalGoLive": null,
+      "delayDays": 0,
+      "delayNote": "Not yet scheduled — start/due dates not set in the integration plan",
+      "delayImpact": "",
+      "delayMitigation": [],
+      "delayTradeoffs": "",
+      "dependencies": [
+        "BAPS ID — add new parameters to the Get Profile API",
+        "BAPS ID — clean up inconsistencies in the database",
+        "India SSO — confirm SSO v2 login flow requirements (est. 2 weeks to implement once clear)",
+        "SSO v2 — implement new login flow (80 hrs estimated)",
+        "India — calendar module is built for North America; needs review for India rollout"
+      ],
+      "dependencyTeams": [
+        "BAPS ID Team",
+        "BAPS ID Team",
+        "SSO Team (India)",
+        "SSO Team",
+        "India Team"
+      ],
+      "dependencyMitigations": ["", "", "", "", ""],
+      "sprintStatus": {
+        "completed": [],
+        "inProgress": [
+          "SID — upgrade to support BAPS ID (bapspid)"
+        ],
+        "nextPlan": [
+          "SID — integrate with SSO v2",
+          "MST-api — integrate BAPS ID APIs for profile",
+          "MST-api — integrate with SSO v2",
+          "MST-UI — update profile page based on new API response",
+          "MST-UI — integrate with SSO v2",
+          "MST-UI — investigate which modules should be hidden from users without a MIS ID",
+          "MST-UI — add flag in dynamic module to restrict to MIS ID users",
+          "MST-UI — implement UI for non-MIS users accessing a MIS-ID-only module",
+          "MST-UI — use POST me/devices to register the user's device"
+        ]
+      },
+      "risks": [
+        "No committed start/due dates yet — full timeline depends on SSO v2 requirements clarity from the India SSO team",
+        "Calendar module currently assumes North America timezone/locale — open item for India rollout"
+      ],
+      "riskMitigations": ["", ""]
     }
   ]
 }
