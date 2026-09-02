@@ -27,19 +27,22 @@ to scan instead of a 15-slide deck.
   obvious what still needs to be filled in. Filter chips narrow the grid to
   on-track / at-risk / critical, plus a **PM filter dropdown** to show only
   one person's projects.
-- **Pipeline stages** — below the cards, a Kanban-style board grouping every
-  project by its canonical delivery stage (Requirements → Design/Estimation →
-  Development → QA/UAT → Production Release → Hypercare/Post-Launch), so you
-  can see at a glance where the whole portfolio actually sits. Click any card
-  to jump into its full detail view. Inspired by the stage board on Intuit's
-  internal PDLC dashboard.
 - **Go-live tracker** — every project with a scheduled go-live, sorted by
   date, showing the original planned date struck through next to the current
   date whenever it's slipped, plus a delay pill (green/amber/red by severity).
   Projects without a go-live yet are listed underneath as "not yet scheduled."
   Click any row to open that project's full detail view.
 
-## Tab 2 — Dependencies (live)
+## Tab 2 — Pipeline Stages (live)
+
+A Kanban-style board grouping every project by its canonical delivery stage
+(Requirements → Design/Estimation → Development → QA/UAT → Production
+Release → Hypercare/Post-Launch), so you can see at a glance where the whole
+portfolio actually sits without opening each card. Click any card to jump
+into its full detail view. Inspired by the stage board on Intuit's internal
+PDLC dashboard.
+
+## Tab 3 — Dependencies (live)
 
 Every dependency across every project, flattened into one cross-project
 board and grouped by the **owning team** (DevOps, Security, GMS Team,
@@ -55,7 +58,7 @@ Week-over-week history for an individual project (progress-over-time chart,
 plain-English change log, full feedback history) lives inside that
 project's full detail view — click any project card to open it.
 
-## Tab 3 — Team Performance (skeleton only)
+## Tab 4 — Team Performance (skeleton only)
 
 Placeholder tab for engineering execution metrics (PR velocity, review
 turnaround, commit activity, deploy cadence) once we wire up GitHub data per

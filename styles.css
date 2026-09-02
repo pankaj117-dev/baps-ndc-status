@@ -412,6 +412,51 @@ body {
 .stage-card-progress .progress-track { height: 4px; }
 .stage-card-progress .progress-pct { font-size: 10px; }
 
+/* Full-tab, roomier variant of the stage board */
+.stage-board-expanded {
+  gap: 18px;
+}
+
+.stage-board-expanded .stage-col {
+  flex: 1 0 230px;
+  min-width: 230px;
+  padding: 14px;
+  gap: 12px;
+}
+
+.stage-board-expanded .stage-col-head {
+  padding: 4px 4px 12px;
+  margin-bottom: 4px;
+}
+
+.stage-board-expanded .stage-col-head h3 {
+  font-size: 13px;
+}
+
+.stage-board-expanded .stage-col-count {
+  font-size: 12px;
+  padding: 2px 9px;
+}
+
+.stage-board-expanded .stage-card {
+  padding: 14px 16px;
+  border-radius: 12px;
+}
+
+.stage-board-expanded .stage-card-top {
+  font-size: 15px;
+  gap: 9px;
+  margin-bottom: 5px;
+}
+
+.stage-board-expanded .stage-card-owner {
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.stage-board-expanded .stage-card-progress .progress-track { height: 6px; }
+.stage-board-expanded .stage-card-progress .progress-pct { font-size: 12px; }
+
 /* ---------- Go-live tracker ---------- */
 
 .golive-table {

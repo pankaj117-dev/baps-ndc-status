@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=13">
+<link rel="stylesheet" href="styles.css?v=14">
 </head>
 <body>
   <div class="wrap">
@@ -27,6 +27,7 @@
 
     <nav class="tabbar" role="tablist">
       <button class="tab-btn is-active" data-tab="status" role="tab" aria-selected="true">Program Status</button>
+      <button class="tab-btn" data-tab="stages" role="tab" aria-selected="false">Pipeline Stages</button>
       <button class="tab-btn" data-tab="deps" role="tab" aria-selected="false">Dependencies</button>
       <button class="tab-btn" data-tab="team" role="tab" aria-selected="false">Team Performance</button>
     </nav>
@@ -48,13 +49,15 @@
       </div>
       <div id="cards" class="cards"></div>
 
-      <h2 class="section-heading">Pipeline stages</h2>
-      <p class="section-subhead">Every project, grouped by where it actually sits in the delivery pipeline right now — click a card to open the full detail view.</p>
-      <div id="stageBoard" class="stage-board"></div>
-
       <h2 class="section-heading">Go-live tracker</h2>
       <p class="section-subhead">Original target vs. current date for every project with a go-live scheduled — click a row for the full slip history.</p>
       <div id="goliveTracker" class="golive-table"></div>
+    </section>
+
+    <section id="panel-stages" class="tab-panel">
+      <h2 class="section-heading">Pipeline stages</h2>
+      <p class="section-subhead">Every project, grouped by where it actually sits in the delivery pipeline right now — click a card to open the full detail view.</p>
+      <div id="stageBoard" class="stage-board stage-board-expanded"></div>
     </section>
 
     <section id="panel-deps" class="tab-panel">
