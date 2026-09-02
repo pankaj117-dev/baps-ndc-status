@@ -19,6 +19,12 @@ to scan instead of a 15-slide deck.
 - **Metrics row** — auto-computed rollup: on-track / at-risk / critical counts,
   average delay, total open risks.
 - **Upcoming milestones** — every project's next milestone, sorted by date.
+- **Pipeline stages** — a Kanban-style board grouping every project by its
+  canonical delivery stage (Requirements → Design/Estimation → Development →
+  QA/UAT → Production Release → Hypercare/Post-Launch), so you can see at a
+  glance where the whole portfolio actually sits without opening each card.
+  Click any card to jump into its full detail view. Inspired by the stage
+  board on Intuit's internal PDLC dashboard.
 - **Go-live tracker** — every project with a scheduled go-live, sorted by
   date, showing the original planned date struck through next to the current
   date whenever it's slipped, plus a delay pill (green/amber/red by severity).
@@ -117,6 +123,10 @@ Everything lives in three files:
   "owner": "Jeet Savani",
   "status": "green",        // "green" | "amber" | "red"
   "progress": 80,             // 0-100, your best call on % complete
+  "stage": "Requirements",    // canonical pipeline stage — drives the Pipeline stages
+                               // board; one of Requirements | Design / Estimation |
+                               // Development | QA / UAT | Production Release |
+                               // Hypercare / Post-Launch
   "phase": "Requirements Finalization",
   "nextMilestone": { "name": "Requirements Finalization", "date": "2026-08-21" },
   "goLive": "2026-09-25",     // current planned go-live, or null if not yet set

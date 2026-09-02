@@ -46,6 +46,7 @@ def apply_weekly_update(project, fields):
             project[key] = transform(value)
 
     set_if_present("owner", "PM name")
+    set_if_present("stage", "Pipeline stage")
     set_if_present("phase", "Current phase")
     set_if_present("delayNote", "Delay note")
     set_if_present("delayImpact", "Impact of delay")
@@ -217,6 +218,7 @@ def snapshot_history(data, history):
                 "name": p["name"],
                 "status": p["status"],
                 "progress": p["progress"],
+                "stage": p.get("stage", ""),
                 "delayDays": p.get("delayDays", 0),
                 "phase": p.get("phase", ""),
                 "nextMilestone": p.get("nextMilestone"),

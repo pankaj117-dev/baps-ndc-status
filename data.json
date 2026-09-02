@@ -39,7 +39,8 @@
       "delayTradeoffs": "",
       "dependencyTeams": [
         ""
-      ]
+      ],
+      "stage": "Requirements"
     },
     {
       "id": "pledge",
@@ -85,7 +86,8 @@
       "dependencyTeams": [
         "ASM Team",
         "ASM Team"
-      ]
+      ],
+      "stage": "Production Release"
     },
     {
       "id": "emm",
@@ -137,7 +139,8 @@
       "dependencyTeams": [
         "",
         ""
-      ]
+      ],
+      "stage": "QA / UAT"
     },
     {
       "id": "mybky-phase1",
@@ -195,7 +198,8 @@
         "MIS Team",
         "GMS Team",
         "DevOps"
-      ]
+      ],
+      "stage": "QA / UAT"
     },
     {
       "id": "mybky-phase2",
@@ -254,7 +258,8 @@
         "",
         "Business/Stakeholder",
         "Business/Stakeholder"
-      ]
+      ],
+      "stage": "Requirements"
     },
     {
       "id": "mymandir",
@@ -302,7 +307,8 @@
       "delayTradeoffs": "",
       "dependencyTeams": [
         "Business/Stakeholder (Sameep)"
-      ]
+      ],
+      "stage": "Design / Estimation"
     },
     {
       "id": "gms",
@@ -353,7 +359,8 @@
       "delayTradeoffs": "",
       "dependencyTeams": [
         ""
-      ]
+      ],
+      "stage": "QA / UAT"
     },
     {
       "id": "baps-sso",
@@ -404,7 +411,8 @@
       "delayTradeoffs": "",
       "dependencyTeams": [
         ""
-      ]
+      ],
+      "stage": "Development"
     },
     {
       "id": "spm",
@@ -453,7 +461,8 @@
       "dependencyTeams": [
         "DevOps",
         "DevOps"
-      ]
+      ],
+      "stage": "QA / UAT"
     },
     {
       "id": "bkms",
@@ -495,7 +504,8 @@
       "delayTradeoffs": "",
       "dependencyTeams": [
         "DevOps"
-      ]
+      ],
+      "stage": "Development"
     },
     {
       "id": "mis",
@@ -538,7 +548,8 @@
       "delayTradeoffs": "",
       "dependencyTeams": [
         ""
-      ]
+      ],
+      "stage": "Development"
     },
     {
       "id": "mysatsang-bapsid",
@@ -569,7 +580,13 @@
         "SSO Team",
         "India Team"
       ],
-      "dependencyMitigations": ["", "", "", "", ""],
+      "dependencyMitigations": [
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
       "sprintStatus": {
         "completed": [],
         "inProgress": [
@@ -591,7 +608,11 @@
         "No committed start/due dates yet — full timeline depends on SSO v2 requirements clarity from the India SSO team",
         "Calendar module currently assumes North America timezone/locale — open item for India rollout"
       ],
-      "riskMitigations": ["", ""]
+      "riskMitigations": [
+        "",
+        ""
+      ],
+      "stage": "Design / Estimation"
     }
   ]
 }

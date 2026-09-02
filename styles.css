@@ -310,6 +310,108 @@ body {
 .owner-filter:hover { border-color: var(--accent); color: var(--ink); }
 .owner-filter:focus { outline: none; border-color: var(--accent); }
 
+/* ---------- Pipeline stage board ---------- */
+
+.stage-board {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 36px;
+}
+
+.stage-col {
+  flex: 1 0 200px;
+  min-width: 200px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+}
+
+.stage-col-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 4px 8px;
+  border-bottom: 1px solid var(--line-strong);
+  margin-bottom: 2px;
+}
+
+.stage-col-head h3 {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.stage-col-count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+
+.stage-col-empty {
+  text-align: center;
+  color: var(--ink-faint);
+  font-size: 12px;
+  padding: 14px 0;
+}
+
+.stage-col.stage-col-unstaged {
+  background: var(--amber-bg);
+  border-color: var(--amber);
+}
+
+.stage-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.stage-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow);
+}
+
+.stage-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.stage-card-top {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  margin-bottom: 3px;
+}
+
+.stage-card-owner {
+  font-size: 11px;
+  color: var(--ink-faint);
+  margin-bottom: 6px;
+}
+
+.stage-card-progress {
+  margin: 0;
+}
+
+.stage-card-progress .progress-track { height: 4px; }
+.stage-card-progress .progress-pct { font-size: 10px; }
+
 /* ---------- Go-live tracker ---------- */
 
 .golive-table {
@@ -494,16 +596,20 @@ body {
   grid-template-columns: 108px 22px 1fr auto;
   align-items: center;
   gap: 14px;
-  padding: 11px 18px;
+  padding: 15px 18px;
   border-bottom: 1px solid var(--line);
-  font-size: 13.5px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.12s ease;
 }
 
 .timeline-row:last-child { border-bottom: none; }
+.timeline-row:hover { background: var(--bg); }
+.timeline-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 
 .timeline-date {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 13px;
   color: var(--ink-soft);
 }
 
@@ -519,10 +625,10 @@ body {
 
 .timeline-status {
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  padding: 3px 9px;
+  padding: 4px 10px;
   border-radius: 999px;
 }
 

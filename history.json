@@ -28,7 +28,8 @@
         "delayTradeoffs": "",
         "dependencyTeams": [
           ""
-        ]
+        ],
+        "stage": "Requirements"
       },
       {
         "id": "pledge",
@@ -59,7 +60,8 @@
         "dependencyTeams": [
           "ASM Team",
           "ASM Team"
-        ]
+        ],
+        "stage": "Production Release"
       },
       {
         "id": "emm",
@@ -94,7 +96,8 @@
         "dependencyTeams": [
           "",
           ""
-        ]
+        ],
+        "stage": "QA / UAT"
       },
       {
         "id": "mybky-phase1",
@@ -139,7 +142,8 @@
           "MIS Team",
           "GMS Team",
           "DevOps"
-        ]
+        ],
+        "stage": "QA / UAT"
       },
       {
         "id": "mybky-phase2",
@@ -180,7 +184,8 @@
           "",
           "Business/Stakeholder",
           "Business/Stakeholder"
-        ]
+        ],
+        "stage": "Requirements"
       },
       {
         "id": "mymandir",
@@ -212,7 +217,8 @@
         "delayTradeoffs": "",
         "dependencyTeams": [
           "Business/Stakeholder (Sameep)"
-        ]
+        ],
+        "stage": "Design / Estimation"
       },
       {
         "id": "gms",
@@ -246,7 +252,8 @@
         "delayTradeoffs": "",
         "dependencyTeams": [
           ""
-        ]
+        ],
+        "stage": "QA / UAT"
       },
       {
         "id": "baps-sso",
@@ -278,7 +285,8 @@
         "delayTradeoffs": "",
         "dependencyTeams": [
           ""
-        ]
+        ],
+        "stage": "Development"
       },
       {
         "id": "spm",
@@ -313,7 +321,8 @@
         "dependencyTeams": [
           "DevOps",
           "DevOps"
-        ]
+        ],
+        "stage": "QA / UAT"
       },
       {
         "id": "bkms",
@@ -341,7 +350,8 @@
         "delayTradeoffs": "",
         "dependencyTeams": [
           "DevOps"
-        ]
+        ],
+        "stage": "Development"
       },
       {
         "id": "mis",
@@ -369,7 +379,8 @@
         "delayTradeoffs": "",
         "dependencyTeams": [
           ""
-        ]
+        ],
+        "stage": "Development"
       }
     ]
   }

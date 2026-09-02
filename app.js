@@ -109,7 +109,7 @@
     box.innerHTML = "";
     withDates.forEach((p) => {
       box.appendChild(
-        el("div", { class: "timeline-row" }, [
+        el("div", { class: "timeline-row", "data-project-id": p.id, tabindex: "0", role: "button" }, [
           el("div", { class: "timeline-date" }, [fmtDateShort(p.nextMilestone.date)]),
           el("div", { class: "timeline-dot", style: `background:var(--${p.status === "amber" ? "amber" : p.status})` }),
           el("div", { class: "timeline-what" }, [
@@ -119,6 +119,101 @@
           el("div", { class: "timeline-status pill-" + p.status }, [STATUS_LABEL[p.status]]),
         ])
       );
+    });
+
+    box.querySelectorAll(".timeline-row").forEach((row) => {
+      row.addEventListener("click", () => openProjectDetail(row.getAttribute("data-project-id")));
+      row.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openProjectDetail(row.getAttribute("data-project-id"));
+        }
+      });
+    });
+  }
+
+  const PIPELINE_STAGES = [
+    "Requirements",
+    "Design / Estimation",
+    "Development",
+    "QA / UAT",
+    "Production Release",
+    "Hypercare / Post-Launch",
+  ];
+
+  function renderStageBoard() {
+    const board = document.getElementById("stageBoard");
+    board.innerHTML = "";
+
+    const byStage = {};
+    PIPELINE_STAGES.forEach((s) => (byStage[s] = []));
+    const unstaged = [];
+    DATA.projects.forEach((p) => {
+      if (p.stage && byStage[p.stage]) byStage[p.stage].push(p);
+      else unstaged.push(p);
+    });
+
+    PIPELINE_STAGES.forEach((stage) => {
+      const projects = byStage[stage];
+      const col = el("div", { class: "stage-col" }, [
+        el("div", { class: "stage-col-head" }, [
+          el("h3", null, [stage]),
+          el("span", { class: "stage-col-count" }, [String(projects.length)]),
+        ]),
+      ]);
+      if (!projects.length) {
+        col.appendChild(el("div", { class: "stage-col-empty" }, ["—"]));
+      } else {
+        projects.forEach((p) => {
+          col.appendChild(
+            el("div", { class: "stage-card", "data-project-id": p.id, tabindex: "0", role: "button" }, [
+              el("div", { class: "stage-card-top" }, [
+                el("span", { class: "timeline-dot", style: `background:var(--${p.status === "amber" ? "amber" : p.status})` }),
+                el("strong", null, [p.name]),
+              ]),
+              el("div", { class: "stage-card-owner" }, [p.owner || "Unassigned"]),
+              el("div", { class: "progress-row stage-card-progress" }, [
+                el("div", { class: "progress-track" }, [
+                  el("div", { class: "progress-fill status-" + p.status, style: "width:" + p.progress + "%" }),
+                ]),
+                el("div", { class: "progress-pct" }, [p.progress + "%"]),
+              ]),
+            ])
+          );
+        });
+      }
+      board.appendChild(col);
+    });
+
+    if (unstaged.length) {
+      const col = el("div", { class: "stage-col stage-col-unstaged" }, [
+        el("div", { class: "stage-col-head" }, [
+          el("h3", null, ["Unstaged"]),
+          el("span", { class: "stage-col-count" }, [String(unstaged.length)]),
+        ]),
+      ]);
+      unstaged.forEach((p) => {
+        col.appendChild(
+          el("div", { class: "stage-card", "data-project-id": p.id, tabindex: "0", role: "button" }, [
+            el("div", { class: "stage-card-top" }, [
+              el("span", { class: "timeline-dot", style: `background:var(--${p.status === "amber" ? "amber" : p.status})` }),
+              el("strong", null, [p.name]),
+            ]),
+            el("div", { class: "stage-card-owner" }, [p.owner || "Unassigned"]),
+          ])
+        );
+      });
+      board.appendChild(col);
+    }
+
+    board.querySelectorAll(".stage-card").forEach((card) => {
+      card.addEventListener("click", () => openProjectDetail(card.getAttribute("data-project-id")));
+      card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openProjectDetail(card.getAttribute("data-project-id"));
+        }
+      });
     });
   }
 
@@ -648,6 +743,7 @@
           if (prev.status !== cur.status) changes.push(`Status ${STATUS_LABEL[prev.status]} → ${STATUS_LABEL[cur.status]}`);
           if (prev.delayDays !== cur.delayDays) changes.push(`Delay ${prev.delayDays}d → ${cur.delayDays}d`);
           if ((prev.phase || "") !== (cur.phase || "")) changes.push(`Phase → ${cur.phase || "—"}`);
+          if ((prev.stage || "") !== (cur.stage || "")) changes.push(`Stage → ${cur.stage || "—"}`);
         } else {
           changes.push("First recorded snapshot");
         }
@@ -803,6 +899,7 @@
     renderHeader();
     renderMetrics();
     renderTimeline();
+    renderStageBoard();
     renderGoLiveTracker();
     renderCards();
     wireFilters();

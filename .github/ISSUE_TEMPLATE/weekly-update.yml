@@ -60,6 +60,18 @@ body:
       placeholder: "65"
     validations:
       required: true
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Pipeline stage
+      description: "Which canonical stage is this project in right now? Drives the Pipeline stages board on the dashboard. Leave as-is if unchanged."
+      options:
+        - Requirements
+        - Design / Estimation
+        - Development
+        - QA / UAT
+        - Production Release
+        - Hypercare / Post-Launch
   - type: input
     id: phase
     attributes:
