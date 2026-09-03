@@ -528,10 +528,10 @@
 
   function buildTrendGraph(weeks) {
     const width = 700;
-    const height = 200;
-    const padL = 34;
+    const height = 210;
+    const padL = 38;
     const padR = 16;
-    const padT = 18;
+    const padT = 30;
     const padB = 30;
     const plotW = width - padL - padR;
     const plotH = height - padT - padB;
@@ -555,10 +555,14 @@
 
     const latestColor = STATUS_COLOR[weeks[weeks.length - 1].status] || "var(--accent)";
 
-    const dots = points.map((p) =>
-      `<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="${STATUS_COLOR[p.w.status] || latestColor}" stroke="#fff" stroke-width="2" />` +
-      `<text x="${p.x}" y="${p.y - 12}" text-anchor="middle" class="graph-point-label">${p.w.progress}%</text>`
-    ).join("");
+    const dots = points.map((p) => {
+      // Flip the label below the dot when it's too close to the top edge
+      // (and thus the "100" axis label) to avoid the two overlapping.
+      const tooHigh = p.y - 12 < padT + 10;
+      const labelY = tooHigh ? p.y + 18 : p.y - 12;
+      return `<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="${STATUS_COLOR[p.w.status] || latestColor}" stroke="#fff" stroke-width="2" />` +
+        `<text x="${p.x}" y="${labelY}" text-anchor="middle" class="graph-point-label">${p.w.progress}%</text>`;
+    }).join("");
 
     const svg = `
       <svg viewBox="0 0 ${width} ${height}" class="trend-graph" preserveAspectRatio="none">
