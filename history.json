@@ -29,7 +29,8 @@
         "dependencyTeams": [
           ""
         ],
-        "stage": "Requirements"
+        "stage": "Requirements",
+        "delayNote": "No delay reported"
       },
       {
         "id": "pledge",
@@ -61,7 +62,8 @@
           "ASM Team",
           "ASM Team"
         ],
-        "stage": "Production Release"
+        "stage": "Production Release",
+        "delayNote": "No delay reported"
       },
       {
         "id": "emm",
@@ -97,7 +99,8 @@
           "",
           ""
         ],
-        "stage": "QA / UAT"
+        "stage": "QA / UAT",
+        "delayNote": "No impact on go-live"
       },
       {
         "id": "mybky-phase1",
@@ -143,7 +146,8 @@
           "GMS Team",
           "DevOps"
         ],
-        "stage": "QA / UAT"
+        "stage": "QA / UAT",
+        "delayNote": "Mobile dev delayed — may impact regression testing"
       },
       {
         "id": "mybky-phase2",
@@ -185,7 +189,8 @@
           "Business/Stakeholder",
           "Business/Stakeholder"
         ],
-        "stage": "Requirements"
+        "stage": "Requirements",
+        "delayNote": "Requirement phase delayed"
       },
       {
         "id": "mymandir",
@@ -218,7 +223,8 @@
         "dependencyTeams": [
           "Business/Stakeholder (Sameep)"
         ],
-        "stage": "Design / Estimation"
+        "stage": "Design / Estimation",
+        "delayNote": "12 days delayed"
       },
       {
         "id": "gms",
@@ -253,7 +259,8 @@
         "dependencyTeams": [
           ""
         ],
-        "stage": "QA / UAT"
+        "stage": "QA / UAT",
+        "delayNote": "19 days delayed"
       },
       {
         "id": "baps-sso",
@@ -286,7 +293,8 @@
         "dependencyTeams": [
           ""
         ],
-        "stage": "Development"
+        "stage": "Development",
+        "delayNote": "No delay reported"
       },
       {
         "id": "spm",
@@ -322,7 +330,8 @@
           "DevOps",
           "DevOps"
         ],
-        "stage": "QA / UAT"
+        "stage": "QA / UAT",
+        "delayNote": "2 days delay in UAT deployment — timeline revised"
       },
       {
         "id": "bkms",
@@ -351,7 +360,8 @@
         "dependencyTeams": [
           "DevOps"
         ],
-        "stage": "Development"
+        "stage": "Development",
+        "delayNote": "No delay reported"
       },
       {
         "id": "mis",
@@ -380,7 +390,8 @@
         "dependencyTeams": [
           ""
         ],
-        "stage": "Development"
+        "stage": "Development",
+        "delayNote": "No delay reported"
       }
     ]
   },
@@ -408,7 +419,8 @@
         "riskMitigations": [],
         "dependencies": [],
         "dependencyTeams": [],
-        "dependencyMitigations": []
+        "dependencyMitigations": [],
+        "delayNote": "In hypercare through 15-Sep-2026 — infinite caching rollout ETA 3-Sep-2026"
       },
       {
         "id": "webnext-2",
@@ -437,7 +449,8 @@
         ],
         "dependencyMitigations": [
           ""
-        ]
+        ],
+        "delayNote": "No delay reported — new project just starting requirements"
       },
       {
         "id": "pledge",
@@ -460,7 +473,8 @@
         "riskMitigations": [],
         "dependencies": [],
         "dependencyTeams": [],
-        "dependencyMitigations": []
+        "dependencyMitigations": [],
+        "delayNote": "Live in production; in hypercare through 15-Sep-2026"
       },
       {
         "id": "pledge-1a",
@@ -484,7 +498,8 @@
         ],
         "dependencies": [],
         "dependencyTeams": [],
-        "dependencyMitigations": []
+        "dependencyMitigations": [],
+        "delayNote": "No delay reported — new project just starting TDD phase"
       },
       {
         "id": "emm",
@@ -519,7 +534,8 @@
         ],
         "dependencyMitigations": [
           ""
-        ]
+        ],
+        "delayNote": "Go-live slipped 3 days to 28-Aug-2026 due to performance risk in check printing and workflow approval"
       },
       {
         "id": "mybky-phase1",
@@ -564,7 +580,8 @@
         "dependencyMitigations": [
           "Initial discussion completed, responsibility identification call planned for next week",
           ""
-        ]
+        ],
+        "delayNote": "Regression delayed 10 days; 2 CRs pushed go-live by 6 days (business requested to prioritize CRs); UAT sign-off for Event config/registration delayed to 4-Sep-2026"
       },
       {
         "id": "mybky-phase2",
@@ -609,7 +626,8 @@
           "",
           "",
           ""
-        ]
+        ],
+        "delayNote": "Requirement phase delayed — GMS FRD review delayed 8 days, Guest Registration FRD creation delayed 12 days"
       },
       {
         "id": "mymandir",
@@ -648,7 +666,8 @@
         "dependencyMitigations": [
           "",
           ""
-        ]
+        ],
+        "delayNote": "Stakeholder sign-off on requirements delayed — Sameep on vacation leave, review pending with Amar Mehta as backup"
       },
       {
         "id": "gms",
@@ -671,7 +690,8 @@
         "riskMitigations": [],
         "dependencies": [],
         "dependencyTeams": [],
-        "dependencyMitigations": []
+        "dependencyMitigations": [],
+        "delayNote": "Production deployment ongoing, targeting 2-Sep-2026"
       },
       {
         "id": "baps-sso",
@@ -701,7 +721,8 @@
         ],
         "dependencyMitigations": [
           ""
-        ]
+        ],
+        "delayNote": "Go-live date TBD — dependent on other application owners integrating the SSO API"
       },
       {
         "id": "spm",
@@ -748,7 +769,8 @@
           "",
           "",
           ""
-        ]
+        ],
+        "delayNote": "Go-live slipped to 7-Sep-2026 — pending VAPT re-verification, load testing, and production server readiness"
       },
       {
         "id": "bkms",
@@ -777,7 +799,8 @@
         ],
         "dependencyMitigations": [
           ""
-        ]
+        ],
+        "delayNote": "No delay reported"
       },
       {
         "id": "mis",
@@ -806,7 +829,8 @@
         ],
         "dependencyMitigations": [
           ""
-        ]
+        ],
+        "delayNote": "No delay reported"
       },
       {
         "id": "mysatsang-bapsid",
@@ -850,7 +874,8 @@
           "",
           "",
           ""
-        ]
+        ],
+        "delayNote": "Not yet scheduled — start/due dates not set in the integration plan"
       }
     ]
   }

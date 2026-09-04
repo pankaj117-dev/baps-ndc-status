@@ -42,7 +42,21 @@ portfolio actually sits without opening each card. Click any card to jump
 into its full detail view. Inspired by the stage board on Intuit's internal
 PDLC dashboard.
 
-## Tab 3 — Dependencies (live)
+## Tab 3 — Status History (live)
+
+A flat, chronological feed of every time a project moved between
+**On Track → At Risk / Delay → Critical** (in either direction), across the
+whole portfolio, newest first. Each row shows the date, the from → to status
+pills, the project name (click to jump into its full detail view), and
+whatever context was captured at that moment — the delay note, days delayed,
+or current phase. Filter to a single project with the dropdown. This answers
+"when did SPM go red, and why?" without digging through every project's
+individual change log. Built from `history.json` snapshots, so it fills in
+automatically as weekly updates get ingested; the same status-change is also
+highlighted (as colored pills) inside each project's own week-over-week
+change log in its detail view.
+
+## Tab 4 — Dependencies (live)
 
 Every dependency across every project, flattened into one cross-project
 board and grouped by the **owning team** (DevOps, Security, GMS Team,
@@ -58,7 +72,7 @@ Week-over-week history for an individual project (progress-over-time chart,
 plain-English change log, full feedback history) lives inside that
 project's full detail view — click any project card to open it.
 
-## Tab 4 — Team Performance (skeleton only)
+## Tab 5 — Team Performance (skeleton only)
 
 Placeholder tab for engineering execution metrics (PR velocity, review
 turnaround, commit activity, deploy cadence) once we wire up GitHub data per
@@ -190,7 +204,7 @@ the app code.
 
 ## Roadmap
 
-- [ ] Wire Tab 3 up to real GitHub data (PRs, reviews, commits, deploys) per
+- [ ] Wire Tab 5 up to real GitHub data (PRs, reviews, commits, deploys) per
       project repo.
 - [ ] Add a "resolve" action for follow-ups (currently a manual edit to
       `notes.json` — flip `"status": "open"` to `"resolved"`).

@@ -3,6 +3,7 @@
 
   const REPO = "pankaj117-dev/baps-ndc-status";
   const STATUS_LABEL = { green: "On Track", amber: "At Risk", red: "Critical" };
+  const STATUS_RANK = { green: 0, amber: 1, red: 2 };
 
   let DATA = null;
   let HISTORY = {};
@@ -494,6 +495,111 @@
     });
   }
 
+  /* ---------------- Status History ---------------- */
+
+  let statusHistoryFilter = "all";
+
+  function computeStatusTransitions() {
+    const dates = Object.keys(HISTORY).sort();
+    const nameById = {};
+    DATA.projects.forEach((p) => (nameById[p.id] = p.name));
+
+    const prevStatus = {};
+    const transitions = [];
+
+    dates.forEach((asOf) => {
+      (HISTORY[asOf].projects || []).forEach((snap) => {
+        nameById[snap.id] = nameById[snap.id] || snap.name;
+        const prev = prevStatus[snap.id];
+        if (prev !== undefined && prev !== snap.status) {
+          transitions.push({
+            projectId: snap.id,
+            projectName: nameById[snap.id] || snap.id,
+            date: asOf,
+            from: prev,
+            to: snap.status,
+            phase: snap.phase || "",
+            delayNote: snap.delayNote || "",
+            delayDays: snap.delayDays || 0,
+          });
+        }
+        prevStatus[snap.id] = snap.status;
+      });
+    });
+
+    return transitions.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : a.projectName.localeCompare(b.projectName)));
+  }
+
+  function populateStatusHistoryFilter(transitions) {
+    const select = document.getElementById("statusHistoryFilter");
+    const existing = new Set(Array.from(select.options).map((o) => o.value));
+    const names = Array.from(new Set(transitions.map((t) => t.projectName))).sort((a, b) => a.localeCompare(b));
+    names.forEach((name) => {
+      if (!existing.has(name)) select.appendChild(el("option", { value: name }, [name]));
+    });
+  }
+
+  function renderStatusHistory() {
+    const transitions = computeStatusTransitions();
+    populateStatusHistoryFilter(transitions);
+
+    const list = document.getElementById("statusHistoryList");
+    list.innerHTML = "";
+
+    const filtered = transitions.filter(
+      (t) => statusHistoryFilter === "all" || t.projectName === statusHistoryFilter
+    );
+
+    if (!filtered.length) {
+      list.appendChild(
+        el("div", { class: "deps-empty-group" }, [
+          transitions.length
+            ? "No status changes match this filter."
+            : "No status changes recorded yet — once weekly updates move a project between On Track, At Risk, and Critical, they'll show up here with dates.",
+        ])
+      );
+      return;
+    }
+
+    filtered.forEach((t) => {
+      const worsened = STATUS_RANK[t.to] > STATUS_RANK[t.from];
+      const row = el("div", { class: "status-history-row" + (worsened ? " is-worse" : " is-better") }, [
+        el("div", { class: "status-history-date" }, [fmtDate(t.date)]),
+        el("div", { class: "status-history-main" }, [
+          el("div", { class: "status-history-transition" }, [
+            el("span", { class: "pill pill-" + t.from }, [STATUS_LABEL[t.from]]),
+            el("span", { class: "status-history-arrow" }, ["→"]),
+            el("span", { class: "pill pill-" + t.to }, [STATUS_LABEL[t.to]]),
+            el("button", { class: "status-history-project", "data-project-id": t.projectId }, [t.projectName]),
+          ]),
+        ]),
+      ]);
+
+      const contextBits = [];
+      if (t.delayDays > 0) contextBits.push(`${t.delayDays} day${t.delayDays === 1 ? "" : "s"} delayed`);
+      if (t.delayNote) contextBits.push(t.delayNote);
+      else if (t.phase) contextBits.push(t.phase);
+      if (contextBits.length) {
+        row.querySelector(".status-history-main").appendChild(
+          el("div", { class: "status-history-context" }, [contextBits.join(" — ")])
+        );
+      }
+
+      list.appendChild(row);
+    });
+
+    list.querySelectorAll(".status-history-project").forEach((btn) => {
+      btn.addEventListener("click", () => openProjectDetail(btn.getAttribute("data-project-id")));
+    });
+  }
+
+  function wireStatusHistoryFilter() {
+    document.getElementById("statusHistoryFilter").addEventListener("change", (e) => {
+      statusHistoryFilter = e.target.value;
+      renderStatusHistory();
+    });
+  }
+
   function renderDependenciesTab() {
     const rows = collectDependencies();
     renderDependenciesMetrics(rows);
@@ -709,19 +815,30 @@
         const cur = weeks[i];
         const prev = weeks[i - 1];
         const changes = [];
+        const statusChanged = !!(prev && prev.status !== cur.status);
         if (prev) {
           if (prev.progress !== cur.progress) changes.push(`Progress ${prev.progress}% → ${cur.progress}%`);
-          if (prev.status !== cur.status) changes.push(`Status ${STATUS_LABEL[prev.status]} → ${STATUS_LABEL[cur.status]}`);
           if (prev.delayDays !== cur.delayDays) changes.push(`Delay ${prev.delayDays}d → ${cur.delayDays}d`);
           if ((prev.phase || "") !== (cur.phase || "")) changes.push(`Phase → ${cur.phase || "—"}`);
           if ((prev.stage || "") !== (cur.stage || "")) changes.push(`Stage → ${cur.stage || "—"}`);
         } else {
           changes.push("First recorded snapshot");
         }
+        const bodyChildren = [];
+        if (statusChanged) {
+          bodyChildren.push(
+            el("div", { class: "changelog-status-change" }, [
+              el("span", { class: "pill pill-" + prev.status }, [STATUS_LABEL[prev.status]]),
+              el("span", { class: "status-history-arrow" }, ["→"]),
+              el("span", { class: "pill pill-" + cur.status }, [STATUS_LABEL[cur.status]]),
+            ])
+          );
+        }
+        if (changes.length) bodyChildren.push(el("div", null, [changes.join(" · ")]));
         changeLog.appendChild(
-          el("div", { class: "changelog-row" }, [
+          el("div", { class: "changelog-row" + (statusChanged ? " has-status-change" : "") }, [
             el("div", { class: "changelog-date" }, [fmtDate(cur.asOf)]),
-            el("div", { class: "changelog-body" }, [changes.join(" · ")]),
+            el("div", { class: "changelog-body" }, bodyChildren),
           ])
         );
       }
@@ -877,6 +994,9 @@
 
     renderDependenciesTab();
     wireDependenciesFilters();
+
+    renderStatusHistory();
+    wireStatusHistoryFilter();
 
     wireProjectDetail();
     wireFeedbackModal();

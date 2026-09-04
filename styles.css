@@ -664,6 +664,88 @@ body {
   font-size: 13px;
 }
 
+/* ---------- Status history ---------- */
+
+.status-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.status-history-row {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 16px;
+  align-items: start;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--line-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px 18px;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.status-history-row:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
+}
+
+.status-history-row.is-worse { border-left-color: var(--red); }
+.status-history-row.is-better { border-left-color: var(--green); }
+
+.status-history-date {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  padding-top: 4px;
+}
+
+.status-history-transition {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.status-history-arrow {
+  color: var(--ink-faint);
+  font-size: 13px;
+}
+
+.status-history-project {
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--ink);
+  background: none;
+  border: none;
+  padding: 0 0 0 4px;
+  margin-left: auto;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.status-history-project:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.status-history-context {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
+@media (max-width: 640px) {
+  .status-history-row {
+    grid-template-columns: 1fr;
+  }
+  .status-history-project { margin-left: 0; }
+}
+
 /* ---------- Shared status dot (used on cards, stage board, go-live tracker) ---------- */
 
 .timeline-dot {
@@ -1205,6 +1287,15 @@ body.no-scroll { overflow: hidden; }
 
 .changelog-row:hover { background: var(--bg); }
 .changelog-row:last-child { border-bottom: none; }
+
+.changelog-row.has-status-change { background: var(--bg); }
+
+.changelog-status-change {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
 
 .changelog-date {
   font-family: var(--font-mono);

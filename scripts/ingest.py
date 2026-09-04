@@ -220,6 +220,7 @@ def snapshot_history(data, history):
                 "progress": p["progress"],
                 "stage": p.get("stage", ""),
                 "delayDays": p.get("delayDays", 0),
+                "delayNote": p.get("delayNote", ""),
                 "phase": p.get("phase", ""),
                 "nextMilestone": p.get("nextMilestone"),
                 "goLive": p.get("goLive"),

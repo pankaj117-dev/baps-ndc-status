@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=16">
+<link rel="stylesheet" href="styles.css?v=17">
 </head>
 <body>
   <div class="wrap">
@@ -28,6 +28,7 @@
     <nav class="tabbar" role="tablist">
       <button class="tab-btn is-active" data-tab="status" role="tab" aria-selected="true">Program Status</button>
       <button class="tab-btn" data-tab="stages" role="tab" aria-selected="false">Pipeline Stages</button>
+      <button class="tab-btn" data-tab="statushistory" role="tab" aria-selected="false">Status History</button>
       <button class="tab-btn" data-tab="deps" role="tab" aria-selected="false">Dependencies</button>
       <button class="tab-btn" data-tab="team" role="tab" aria-selected="false">Team Performance</button>
     </nav>
@@ -58,6 +59,18 @@
       <h2 class="section-heading">Pipeline stages</h2>
       <p class="section-subhead">Every project, grouped by where it actually sits in the delivery pipeline right now — click a card to open the full detail view.</p>
       <div id="stageBoard" class="stage-board stage-board-expanded"></div>
+    </section>
+
+    <section id="panel-statushistory" class="tab-panel">
+      <h2 class="section-heading">Status history</h2>
+      <p class="section-subhead">Every time a project moved between On Track, At Risk / Delay, and Critical — with the date and the context at that moment. Click a project name to open its full detail view.</p>
+      <div class="filter-row" id="statusHistoryFilterRow">
+        <label class="owner-filter-label" for="statusHistoryFilter">Project</label>
+        <select id="statusHistoryFilter" class="owner-filter">
+          <option value="all">All projects</option>
+        </select>
+      </div>
+      <div id="statusHistoryList" class="status-history-list"></div>
     </section>
 
     <section id="panel-deps" class="tab-panel">
@@ -146,6 +159,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=14"></script>
+  <script src="app.js?v=15"></script>
 </body>
 </html>
