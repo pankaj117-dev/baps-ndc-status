@@ -112,6 +112,13 @@ detail view — click any project card to open it. If the project is live/in
 production but not fully closed out, a **"Fast-follow items to close"**
 block also shows up there listing what's left.
 
+Each row in the **"Week-over-week changes"** log is clickable — expand it to
+see what that week's snapshot actually looked like: phase/stage/progress at
+the time, the sprint's **Completed / In progress / Next plan** items, and
+any risks/blockers open that week. (Sprint detail is captured going forward
+from each weekly update; older snapshots recorded before this existed will
+say so and just show phase/stage/risks.)
+
 ## Tab 6 — Team Performance (skeleton only)
 
 Placeholder tab for engineering execution metrics (PR velocity, review

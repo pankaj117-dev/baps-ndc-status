@@ -286,6 +286,7 @@ def snapshot_history(data, history):
                 "dependencies": p.get("dependencies", []),
                 "dependencyTeams": p.get("dependencyTeams", []),
                 "dependencyMitigations": p.get("dependencyMitigations", []),
+                "sprintStatus": p.get("sprintStatus", {"completed": [], "inProgress": [], "nextPlan": []}),
             }
             for p in data["projects"]
         ],

@@ -906,7 +906,15 @@
         "fastFollowItems": [],
         "dependencies": [],
         "dependencyTeams": [],
-        "dependencyMitigations": []
+        "dependencyMitigations": [],
+        "sprintStatus": {
+          "completed": [],
+          "inProgress": [
+            "Hypercare monitoring",
+            "Infinite caching rollout — ETA 3-Sep-2026"
+          ],
+          "nextPlan": []
+        }
       },
       {
         "id": "webnext-2",
@@ -938,7 +946,16 @@
         ],
         "dependencyMitigations": [
           ""
-        ]
+        ],
+        "sprintStatus": {
+          "completed": [],
+          "inProgress": [
+            "Requirements finalization & approval"
+          ],
+          "nextPlan": [
+            "New QA to be fully involved in project from the start — build test cases and test plan"
+          ]
+        }
       },
       {
         "id": "pledge",
@@ -964,7 +981,16 @@
         "fastFollowItems": [],
         "dependencies": [],
         "dependencyTeams": [],
-        "dependencyMitigations": []
+        "dependencyMitigations": [],
+        "sprintStatus": {
+          "completed": [
+            "ASM Integration moved to production"
+          ],
+          "inProgress": [
+            "Hypercare monitoring"
+          ],
+          "nextPlan": []
+        }
       },
       {
         "id": "pledge-1a",
@@ -991,7 +1017,16 @@
         "fastFollowItems": [],
         "dependencies": [],
         "dependencyTeams": [],
-        "dependencyMitigations": []
+        "dependencyMitigations": [],
+        "sprintStatus": {
+          "completed": [],
+          "inProgress": [
+            "TDD phase — 20% complete"
+          ],
+          "nextPlan": [
+            "15 user stories total — 4 achievable with 1 backend developer, 9 with 2 backend developers, by end of October"
+          ]
+        }
       },
       {
         "id": "emm",
@@ -1026,7 +1061,14 @@
         ],
         "dependencies": [],
         "dependencyTeams": [],
-        "dependencyMitigations": []
+        "dependencyMitigations": [],
+        "sprintStatus": {
+          "completed": [],
+          "inProgress": [
+            "Business decision on full expense reports feature — in progress"
+          ],
+          "nextPlan": []
+        }
       },
       {
         "id": "mybky-phase1",
@@ -1074,7 +1116,18 @@
         "dependencyMitigations": [
           "Initial discussion completed, responsibility identification call planned for next week",
           ""
-        ]
+        ],
+        "sprintStatus": {
+          "completed": [
+            "Web Application development"
+          ],
+          "inProgress": [
+            "Mobile Development completion — delayed",
+            "QA sign-off — pending",
+            "Regression sign-off — pending, delayed 10 days"
+          ],
+          "nextPlan": []
+        }
       },
       {
         "id": "mybky-phase2",
@@ -1122,7 +1175,20 @@
           "",
           "",
           ""
-        ]
+        ],
+        "sprintStatus": {
+          "completed": [
+            "Sprint 1 Dev started"
+          ],
+          "inProgress": [
+            "Requirement completion",
+            "Sprint 1 TDD submission & approval",
+            "Web Transportation TDD review",
+            "GMS FRD review",
+            "Guest Registration FRD creation"
+          ],
+          "nextPlan": []
+        }
       },
       {
         "id": "mymandir",
@@ -1164,7 +1230,20 @@
         "dependencyMitigations": [
           "",
           ""
-        ]
+        ],
+        "sprintStatus": {
+          "completed": [
+            "Requirements gathering completed",
+            "Draft requirements document prepared and shared with stakeholder",
+            "UI/UX screens shared"
+          ],
+          "inProgress": [
+            "Stakeholder sign-off on requirements — delayed"
+          ],
+          "nextPlan": [
+            "Developers onboarded onto bug-fixing tasks immediately (per Swami's direction) until design approvals received"
+          ]
+        }
       },
       {
         "id": "gms",
@@ -1190,7 +1269,16 @@
         "fastFollowItems": [],
         "dependencies": [],
         "dependencyTeams": [],
-        "dependencyMitigations": []
+        "dependencyMitigations": [],
+        "sprintStatus": {
+          "completed": [],
+          "inProgress": [
+            "GMS production deployment ongoing"
+          ],
+          "nextPlan": [
+            "Go-live — 2-Sep-2026"
+          ]
+        }
       },
       {
         "id": "baps-sso",
@@ -1223,7 +1311,21 @@
         ],
         "dependencyMitigations": [
           ""
-        ]
+        ],
+        "sprintStatus": {
+          "completed": [
+            "Team capacity: Megh (Developer), Harikrishna (BA), Dharmketu Swami (FPO)",
+            "Karyakar flow — UAT deploy",
+            "SID API changes",
+            "Communication email shared with other application owners"
+          ],
+          "inProgress": [
+            "QA testing on UAT of Karyakar flow",
+            "Sessions with other app owners about SSO",
+            "SID deploy on UAT"
+          ],
+          "nextPlan": []
+        }
       },
       {
         "id": "spm",
@@ -1273,7 +1375,20 @@
           "",
           "",
           ""
-        ]
+        ],
+        "sprintStatus": {
+          "completed": [
+            "UAT sign-off received"
+          ],
+          "inProgress": [
+            "VAPT re-verification (MySeva Sampark module + Web app report)",
+            "Load testing — performance tuning in progress, ETA 2-Sep-2026",
+            "Production server setup & configuration — ETA 2-Sep-2026"
+          ],
+          "nextPlan": [
+            "Support needed from DevOps, VAPT and Performance Testing teams to complete pending activities on priority"
+          ]
+        }
       },
       {
         "id": "bkms",
@@ -1305,7 +1420,19 @@
         ],
         "dependencyMitigations": [
           ""
-        ]
+        ],
+        "sprintStatus": {
+          "completed": [
+            "Mobile: BST post-session summary tab",
+            "Web: BST reports — restrict attendance/quiz data entry",
+            "Release 1.0.24 → production deployment completed — 18-Aug-2026"
+          ],
+          "inProgress": [
+            "Mobile: BST session dashboard — QA testing",
+            "Mobile: BST quiz tab — QA testing"
+          ],
+          "nextPlan": []
+        }
       },
       {
         "id": "mis",
@@ -1337,7 +1464,20 @@
         ],
         "dependencyMitigations": [
           ""
-        ]
+        ],
+        "sprintStatus": {
+          "completed": [
+            "System: BKY sub-department creation & Gunbhavi mailing category split",
+            "Search person: show application source in results",
+            "Release 1.0.23C → production deployment completed — 18-Aug-2026",
+            "Category change: Gunbhavi Mailing → Visitor and Unknown deployed to production"
+          ],
+          "inProgress": [
+            "Report: add person status column — QA in progress",
+            "Signup QR: frontend consent, validation & address UI — QA in progress"
+          ],
+          "nextPlan": []
+        }
       },
       {
         "id": "mysatsang-bapsid",
@@ -1384,7 +1524,24 @@
           "",
           "",
           ""
-        ]
+        ],
+        "sprintStatus": {
+          "completed": [],
+          "inProgress": [
+            "SID — upgrade to support BAPS ID (bapspid)"
+          ],
+          "nextPlan": [
+            "SID — integrate with SSO v2",
+            "MST-api — integrate BAPS ID APIs for profile",
+            "MST-api — integrate with SSO v2",
+            "MST-UI — update profile page based on new API response",
+            "MST-UI — integrate with SSO v2",
+            "MST-UI — investigate which modules should be hidden from users without a MIS ID",
+            "MST-UI — add flag in dynamic module to restrict to MIS ID users",
+            "MST-UI — implement UI for non-MIS users accessing a MIS-ID-only module",
+            "MST-UI — use POST me/devices to register the user's device"
+          ]
+        }
       }
     ]
   }
