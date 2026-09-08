@@ -356,6 +356,34 @@ body {
 .owner-filter:hover { border-color: var(--accent); color: var(--ink); }
 .owner-filter:focus { outline: none; border-color: var(--accent); }
 
+/* ---------- Global project filter (applies to every tab) ---------- */
+
+.global-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+  padding: 8px 16px;
+  margin-bottom: 22px;
+  width: fit-content;
+}
+
+.global-filter-bar .owner-filter {
+  border-color: var(--accent);
+  color: var(--ink);
+  font-weight: 600;
+  background: var(--accent-soft);
+}
+
+.global-filter-hint {
+  font-size: 11px;
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
 /* ---------- Pipeline stage board ---------- */
 
 .stage-board {
@@ -821,6 +849,69 @@ body {
   font-weight: 600;
 }
 
+/* ---------- Per-project schedule timeline (CR / date-shift tracking) ---------- */
+
+.schedule-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.schedule-timeline-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 14px;
+  align-items: center;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+}
+
+.schedule-timeline-date {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.schedule-timeline-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+
+.schedule-timeline-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+  font-weight: 700;
+  background: var(--accent-soft);
+  border-radius: 999px;
+  padding: 2px 9px;
+}
+
+.schedule-timeline-delta {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+
+.schedule-timeline-delta.is-late { background: var(--red-bg); color: var(--red); }
+.schedule-timeline-delta.is-early { background: var(--green-bg); color: var(--green); }
+
+@media (max-width: 640px) {
+  .schedule-timeline-row { grid-template-columns: 1fr; }
+  .schedule-timeline-delta { margin-left: 0; }
+}
+
 @media (max-width: 640px) {
   .status-history-row {
     grid-template-columns: 1fr;
@@ -996,6 +1087,12 @@ body {
   color: var(--accent);
 }
 
+.badge.has-fastfollow {
+  background: var(--amber-bg);
+  border-color: transparent;
+  color: var(--amber);
+}
+
 .detail-block.followups li { color: var(--accent); font-weight: 500; }
 
 .detail-block.delay-recovery,
@@ -1009,6 +1106,23 @@ body {
 .detail-block.followups {
   background: var(--accent-soft);
   border-color: var(--line-strong);
+}
+
+.detail-block.fast-follow {
+  background: var(--amber-bg);
+  border: 1px solid #f3dcae;
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.detail-block.fast-follow .empty-note {
+  color: var(--ink-soft);
+  margin: 0 0 8px;
+}
+
+.detail-block.fast-follow li {
+  color: var(--ink);
+  font-weight: 500;
 }
 
 .card-expand {

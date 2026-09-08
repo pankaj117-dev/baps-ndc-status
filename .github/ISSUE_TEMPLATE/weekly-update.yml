@@ -190,3 +190,13 @@ body:
       placeholder: |
         Adding load-balancing config before next test cycle — if unresolved, go-live may slip 1 week
         Escalated to security team for re-verification — no impact to current timeline yet
+  - type: textarea
+    id: fast_follow
+    attributes:
+      label: Fast-follow items to close
+      description: >-
+        If this project is live/in production but not fully closed out, list what's still left to
+        deliver before it can be marked done. One per line. Leave blank once nothing remains.
+      placeholder: |
+        Add bulk-export button to admin console
+        Migrate legacy reports to new schema

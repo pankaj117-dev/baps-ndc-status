@@ -6,6 +6,16 @@ so any PM can update it by editing one JSON file and pushing.
 
 **Live site:** `https://pankaj117.github.io/baps-ndc-status/` (enabled via GitHub Pages on the `main` branch)
 
+## Global project filter
+
+A **"🔎 Project" dropdown** sits right under the tab bar, visible on every
+tab. Pick a project and Program Status, Pipeline Stages, Go-live Tracker,
+Status History, and Dependencies all narrow down to just that project (the
+metrics row recomputes for the filtered set too). Set it back to "All
+projects" to see everything again. This is separate from — and stacks
+with — the per-tab filters (PM, team, status-history project) already on
+some tabs.
+
 ## Why this exists
 
 The weekly 90-minute leadership review used a slide per project with wildly
@@ -24,9 +34,11 @@ to scan instead of a 15-slide deck.
   (completed, in progress, next plan) / risks. Every risk and dependency in
   the detail view is paired with its mitigation plan / impact, and any delay
   requires a stated impact — items missing one are flagged in amber so it's
-  obvious what still needs to be filled in. Filter chips narrow the grid to
-  on-track / at-risk / critical, plus a **PM filter dropdown** to show only
-  one person's projects.
+  obvious what still needs to be filled in. Cards also show a **fast-follow
+  badge** whenever a project is live/in-production but still has items left
+  to close it out (see below). Filter chips narrow the grid to on-track /
+  at-risk / critical / non-recoverable, plus a **PM filter dropdown** to
+  show only one person's projects.
 
 ## Tab 2 — Pipeline Stages (live)
 
@@ -74,8 +86,12 @@ into its full detail view. This is the fastest way to answer "what's DevOps
 blocking us on this week?" without reading every project card individually.
 
 Week-over-week history for an individual project (progress-over-time chart,
-plain-English change log, full feedback history) lives inside that
-project's full detail view — click any project card to open it.
+a **schedule timeline** tracking every time the go-live or next-milestone
+date moved — e.g. from a CR — with the date it happened, plain-English
+change log, and full feedback history) lives inside that project's full
+detail view — click any project card to open it. If the project is live/in
+production but not fully closed out, a **"Fast-follow items to close"**
+block also shows up there listing what's left.
 
 ## Tab 6 — Team Performance (skeleton only)
 
@@ -183,7 +199,9 @@ Everything lives in three files:
     "nextPlan": ["..."]
   },
   "risks": ["..."],
-  "riskMitigations": ["..."]   // same length/order as risks — mitigation plan + impact for each
+  "riskMitigations": ["..."],  // same length/order as risks — mitigation plan + impact for each
+  "fastFollowItems": ["..."]   // one per line — remaining work to fully close out a live/in-production
+                                // project; shows a badge on the card and a block in the detail view
 }
 ```
 

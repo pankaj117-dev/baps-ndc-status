@@ -134,6 +134,10 @@ def apply_weekly_update(project, fields):
     if risk_mitigation:
         project["riskMitigations"] = lines(risk_mitigation)
 
+    fast_follow = fields.get("Fast-follow items to close", "")
+    if fast_follow:
+        project["fastFollowItems"] = lines(fast_follow)
+
 
 def ingest_weekly_updates(data):
     issues = fetch_issues("weekly-update")
@@ -278,6 +282,7 @@ def snapshot_history(data, history):
                 "delayTradeoffs": p.get("delayTradeoffs", ""),
                 "risks": p.get("risks", []),
                 "riskMitigations": p.get("riskMitigations", []),
+                "fastFollowItems": p.get("fastFollowItems", []),
                 "dependencies": p.get("dependencies", []),
                 "dependencyTeams": p.get("dependencyTeams", []),
                 "dependencyMitigations": p.get("dependencyMitigations", []),

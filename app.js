@@ -10,6 +10,12 @@
   let NOTES = [];
   let activeFilter = "all";
   let activeOwner = "all";
+  let globalProjectFilter = "all";
+
+  function visibleProjects() {
+    if (globalProjectFilter === "all") return DATA.projects;
+    return DATA.projects.filter((p) => p.id === globalProjectFilter);
+  }
 
   function fmtDate(iso) {
     if (!iso) return "—";
@@ -68,7 +74,7 @@
   /* ---------------- Tab 1: Program Status ---------------- */
 
   function renderMetrics() {
-    const projects = DATA.projects;
+    const projects = visibleProjects();
     const counts = { green: 0, amber: 0, red: 0, black: 0 };
     let delaySum = 0;
     let riskCount = 0;
@@ -119,7 +125,7 @@
     const byStage = {};
     PIPELINE_STAGES.forEach((s) => (byStage[s] = []));
     const unstaged = [];
-    DATA.projects.forEach((p) => {
+    visibleProjects().forEach((p) => {
       if (p.stage && byStage[p.stage]) byStage[p.stage].push(p);
       else unstaged.push(p);
     });
@@ -202,11 +208,12 @@
     const box = document.getElementById("goliveTracker");
     box.innerHTML = "";
 
-    const scheduled = DATA.projects
+    const projects = visibleProjects();
+    const scheduled = projects
       .filter((p) => p.goLive)
       .slice()
       .sort((a, b) => new Date(a.goLive) - new Date(b.goLive));
-    const unscheduled = DATA.projects.filter((p) => !p.goLive);
+    const unscheduled = projects.filter((p) => !p.goLive);
 
     if (!scheduled.length) {
       box.appendChild(el("p", { class: "empty-note" }, ["No go-live dates scheduled yet."]));
@@ -289,7 +296,7 @@
   function renderCards() {
     const box = document.getElementById("cards");
     box.innerHTML = "";
-    const projects = DATA.projects.filter((p) => {
+    const projects = visibleProjects().filter((p) => {
       const statusOk = activeFilter === "all" || p.status === activeFilter;
       const owner = p.owner || "Unassigned";
       const ownerOk = activeOwner === "all" || owner === activeOwner;
@@ -333,6 +340,9 @@
           el("span", { class: "badge" }, [(p.dependencies || []).length + " dependencies"]),
           el("span", { class: "badge" + ((p.risks || []).length ? " has-risk" : "") }, [(p.risks || []).length + " risks"]),
           el("span", { class: "badge" + (notes.length ? " has-followup" : "") }, [notes.length + " follow-ups"]),
+          ...((p.fastFollowItems || []).length
+            ? [el("span", { class: "badge has-fastfollow" }, [(p.fastFollowItems || []).length + " fast-follow"])]
+            : []),
         ]),
         el("button", { class: "card-expand" }, ["View full details →"]),
       ]);
@@ -382,6 +392,32 @@
     });
   }
 
+  /* ---------------- Global project filter (applies to every tab) ---------------- */
+
+  function populateGlobalProjectFilter() {
+    const select = document.getElementById("globalProjectFilter");
+    const names = DATA.projects.slice().sort((a, b) => a.name.localeCompare(b.name));
+    names.forEach((p) => {
+      select.appendChild(el("option", { value: p.id }, [p.name]));
+    });
+  }
+
+  function renderAllTabs() {
+    renderMetrics();
+    renderStageBoard();
+    renderGoLiveTracker();
+    renderCards();
+    renderDependenciesTab();
+    renderStatusHistory();
+  }
+
+  function wireGlobalProjectFilter() {
+    document.getElementById("globalProjectFilter").addEventListener("change", (e) => {
+      globalProjectFilter = e.target.value;
+      renderAllTabs();
+    });
+  }
+
   /* ---------------- Tab: Dependencies ---------------- */
 
   let depsTeamFilter = "all";
@@ -389,7 +425,7 @@
 
   function collectDependencies() {
     const rows = [];
-    DATA.projects.forEach((p) => {
+    visibleProjects().forEach((p) => {
       (p.dependencies || []).forEach((text, i) => {
         if (!text || /^(none|no dependency)$/i.test(text.trim())) return;
         rows.push({
@@ -557,7 +593,9 @@
     list.innerHTML = "";
 
     const filtered = transitions.filter(
-      (t) => statusHistoryFilter === "all" || t.projectName === statusHistoryFilter
+      (t) =>
+        (statusHistoryFilter === "all" || t.projectName === statusHistoryFilter) &&
+        (globalProjectFilter === "all" || t.projectId === globalProjectFilter)
     );
 
     if (!filtered.length) {
@@ -727,6 +765,74 @@
     return el("div", { class: "trend-graph-wrap", html: svg });
   }
 
+  function buildScheduleTimeline(weeks) {
+    const events = [];
+    let prevGoLive = null;
+    let prevMilestoneName = null;
+    let prevMilestoneDate = null;
+
+    weeks.forEach((w) => {
+      const goLive = w.goLive || null;
+      const milestoneName = (w.nextMilestone && w.nextMilestone.name) || null;
+      const milestoneDate = (w.nextMilestone && w.nextMilestone.date) || null;
+
+      if (prevGoLive && goLive && goLive !== prevGoLive) {
+        events.push({ date: w.asOf, label: "Go-Live", from: prevGoLive, to: goLive });
+      }
+      if (
+        prevMilestoneDate &&
+        milestoneDate &&
+        (milestoneDate !== prevMilestoneDate || milestoneName !== prevMilestoneName)
+      ) {
+        events.push({
+          date: w.asOf,
+          label: milestoneName || prevMilestoneName || "Milestone",
+          from: prevMilestoneDate,
+          to: milestoneDate,
+        });
+      }
+
+      if (goLive) prevGoLive = goLive;
+      if (milestoneDate) {
+        prevMilestoneDate = milestoneDate;
+        prevMilestoneName = milestoneName;
+      }
+    });
+
+    return events.reverse(); // newest first
+  }
+
+  function renderScheduleTimeline(events) {
+    if (!events.length) {
+      return el("p", { class: "empty-note" }, [
+        "No schedule changes recorded yet — this fills in automatically whenever a go-live or " +
+          "milestone date moves (e.g. because of a CR), with the date it happened.",
+      ]);
+    }
+
+    const box = el("div", { class: "schedule-timeline" });
+    events.forEach((e) => {
+      const deltaDays = Math.round(
+        (new Date(e.to + "T00:00:00") - new Date(e.from + "T00:00:00")) / 86400000
+      );
+      box.appendChild(
+        el("div", { class: "schedule-timeline-row" }, [
+          el("div", { class: "schedule-timeline-date" }, [fmtDate(e.date)]),
+          el("div", { class: "schedule-timeline-main" }, [
+            el("span", { class: "schedule-timeline-label" }, [e.label]),
+            el("span", { class: "golive-date-original" }, [fmtDateShort(e.from)]),
+            el("span", { class: "golive-arrow" }, ["→"]),
+            el("span", { class: "golive-date-current" }, [fmtDate(e.to)]),
+            el("span", { class: "schedule-timeline-delta " + (deltaDays > 0 ? "is-late" : deltaDays < 0 ? "is-early" : "") }, [
+              deltaDays === 0 ? "No change in days" : (deltaDays > 0 ? "+" : "") + deltaDays + " days",
+            ]),
+          ]),
+        ])
+      );
+    });
+    return box;
+  }
+
   function openProjectDetail(projectId) {
     const project = DATA.projects.find((p) => p.id === projectId);
     if (!project) return;
@@ -838,6 +944,16 @@
       );
     }
 
+    if ((p.fastFollowItems || []).length) {
+      root.appendChild(el("h3", { class: "weekly-subhead" }, ["Fast-follow items to close"]));
+      root.appendChild(
+        el("div", { class: "detail-block fast-follow" }, [
+          el("p", { class: "empty-note" }, ["Live / in production, but not fully closed out until these ship:"]),
+          el("ul", null, listOrDash(p.fastFollowItems)),
+        ])
+      );
+    }
+
     // Progress trend chart
     root.appendChild(el("h3", { class: "weekly-subhead" }, ["Progress over time"]));
     if (!weeks.length) {
@@ -845,6 +961,15 @@
     } else {
       root.appendChild(buildTrendGraph(weeks));
     }
+
+    // Schedule timeline — tracks CR-driven / any date movement on go-live and next milestone
+    root.appendChild(el("h3", { class: "weekly-subhead" }, ["Schedule timeline"]));
+    root.appendChild(
+      el("p", { class: "section-subhead" }, [
+        "Every time the go-live or next-milestone date moved — e.g. a CR pushing the timeline — with the date it happened.",
+      ])
+    );
+    root.appendChild(renderScheduleTimeline(buildScheduleTimeline(weeks)));
 
     // Change log
     if (weeks.length) {
@@ -1024,6 +1149,8 @@
     NOTES = notes;
 
     renderHeader();
+    populateGlobalProjectFilter();
+    wireGlobalProjectFilter();
     renderMetrics();
     renderStageBoard();
     renderGoLiveTracker();
