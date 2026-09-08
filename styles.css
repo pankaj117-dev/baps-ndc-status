@@ -944,6 +944,144 @@ body {
   font-weight: 600;
 }
 
+/* ---------- Per-project detailed Gantt (inside the detail overlay) ---------- */
+
+.project-gantt {
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+
+.project-gantt-months {
+  position: relative;
+  height: 20px;
+  border-bottom: 1px solid var(--line-strong);
+  margin-bottom: 4px;
+  min-width: 560px;
+}
+
+.project-gantt-month-mark {
+  position: absolute;
+  top: 0;
+  transform: translateX(-2px);
+  border-left: 1px solid var(--line-strong);
+  padding-left: 5px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+.project-gantt-track {
+  position: relative;
+  min-height: 130px;
+  min-width: 560px;
+}
+
+.project-gantt-grid-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line);
+}
+
+.project-gantt-baseline {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--line-strong);
+}
+
+.project-gantt-today-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--accent);
+  z-index: 2;
+}
+
+.project-gantt-today-label {
+  position: absolute;
+  top: -2px;
+  left: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.project-gantt-slip-line {
+  position: absolute;
+  top: 50%;
+  height: 0;
+  border-top: 2px dashed var(--ink-faint);
+}
+
+.project-gantt-marker {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2.5px solid #fff;
+  box-shadow: 0 0 0 1px var(--line-strong), 0 2px 6px rgba(20, 28, 45, 0.15);
+  z-index: 1;
+}
+
+.project-gantt-marker.milestone {
+  border-radius: 4px;
+  width: 13px;
+  height: 13px;
+}
+
+.project-gantt-marker.ghost {
+  background: var(--ink-faint);
+  opacity: 0.55;
+  width: 11px;
+  height: 11px;
+}
+
+.project-gantt-marker.status-green { background: var(--green); }
+.project-gantt-marker.status-amber { background: var(--amber); }
+.project-gantt-marker.status-red { background: var(--red); }
+.project-gantt-marker.status-black { background: var(--black); }
+
+.project-gantt-marker-label {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  background: var(--bg-panel);
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
+.project-gantt-marker-label.above { bottom: 16px; }
+.project-gantt-marker-label.below { top: 16px; }
+
+.schedule-changelog-subhead {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  margin: 4px 0 8px;
+}
+
 /* ---------- Per-project schedule timeline (CR / date-shift tracking) ---------- */
 
 .schedule-timeline {

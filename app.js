@@ -538,11 +538,11 @@
     board.appendChild(rowsWrap);
 
     board.querySelectorAll(".hawkeye-row").forEach((row) => {
-      row.addEventListener("click", () => openProjectDetail(row.getAttribute("data-project-id")));
+      row.addEventListener("click", () => openProjectDetail(row.getAttribute("data-project-id"), "detailScheduleSection"));
       row.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-          openProjectDetail(row.getAttribute("data-project-id"));
+          openProjectDetail(row.getAttribute("data-project-id"), "detailScheduleSection");
         }
       });
     });
@@ -1007,7 +1007,129 @@
     return box;
   }
 
-  function openProjectDetail(projectId) {
+  function buildSingleProjectGantt(p) {
+    const DAY = 86400000;
+    const todayIso = todayISO();
+    const dates = [todayIso];
+    if (p.originalGoLive) dates.push(p.originalGoLive);
+    if (p.goLive) dates.push(p.goLive);
+    if (p.nextMilestone && p.nextMilestone.date) dates.push(p.nextMilestone.date);
+    (p.milestones || []).forEach((m) => {
+      if (m.date) dates.push(m.date);
+    });
+
+    if (dates.length < 2) {
+      return el("p", { class: "empty-note" }, ["No dates to plot yet for this project's timeline."]);
+    }
+
+    const times = dates.map((d) => new Date(d + "T00:00:00").getTime());
+    let minTime = Math.min(...times) - 10 * DAY;
+    let maxTime = Math.max(...times) + 14 * DAY;
+    if (maxTime - minTime < 30 * DAY) maxTime = minTime + 30 * DAY;
+
+    const xPct = (iso) => {
+      const t = new Date(iso + "T00:00:00").getTime();
+      return Math.max(0, Math.min(100, ((t - minTime) / (maxTime - minTime)) * 100));
+    };
+
+    const monthMarks = [];
+    const cursor = new Date(minTime);
+    cursor.setDate(1);
+    cursor.setHours(0, 0, 0, 0);
+    while (cursor.getTime() <= maxTime) {
+      if (cursor.getTime() >= minTime) {
+        monthMarks.push({
+          pct: ((cursor.getTime() - minTime) / (maxTime - minTime)) * 100,
+          label: cursor.toLocaleDateString("en-US", { month: "short", year: "numeric" }),
+        });
+      }
+      cursor.setMonth(cursor.getMonth() + 1);
+    }
+
+    const wrap = el("div", { class: "project-gantt" });
+
+    const header = el("div", { class: "project-gantt-months" });
+    monthMarks.forEach((m) => {
+      header.appendChild(el("div", { class: "project-gantt-month-mark", style: `left:${m.pct}%` }, [m.label]));
+    });
+    wrap.appendChild(header);
+
+    const track = el("div", { class: "project-gantt-track" });
+    monthMarks.forEach((m) => {
+      track.appendChild(el("div", { class: "project-gantt-grid-line", style: `left:${m.pct}%` }));
+    });
+    track.appendChild(
+      el("div", { class: "project-gantt-today-line", style: `left:${xPct(todayIso)}%` }, [
+        el("span", { class: "project-gantt-today-label" }, ["Today"]),
+      ])
+    );
+    track.appendChild(el("div", { class: "project-gantt-baseline" }));
+
+    if (p.originalGoLive && p.goLive && p.originalGoLive !== p.goLive) {
+      const a = xPct(p.originalGoLive);
+      const b = xPct(p.goLive);
+      track.appendChild(
+        el("div", { class: "project-gantt-slip-line", style: `left:${Math.min(a, b)}%;width:${Math.abs(b - a)}%` })
+      );
+      track.appendChild(
+        el(
+          "div",
+          {
+            class: "project-gantt-marker ghost",
+            style: `left:${a}%`,
+            title: `Original Go-Live · ${fmtDate(p.originalGoLive)}`,
+          },
+          [el("span", { class: "project-gantt-marker-label above" }, ["Original · " + fmtDateShort(p.originalGoLive)])]
+        )
+      );
+    }
+
+    const milestones =
+      p.milestones && p.milestones.length
+        ? p.milestones
+        : p.nextMilestone && p.nextMilestone.date
+        ? [{ name: p.nextMilestone.name || "Milestone", date: p.nextMilestone.date, status: p.status }]
+        : [];
+
+    milestones.forEach((m, i) => {
+      if (!m.date) return;
+      const above = i % 2 === 0;
+      track.appendChild(
+        el(
+          "div",
+          {
+            class: `project-gantt-marker milestone status-${m.status || p.status}`,
+            style: `left:${xPct(m.date)}%`,
+            title: `${m.name} · ${fmtDate(m.date)}`,
+          },
+          [
+            el("span", { class: "project-gantt-marker-label " + (above ? "above" : "below") }, [
+              m.name + " · " + fmtDateShort(m.date),
+            ]),
+          ]
+        )
+      );
+    });
+
+    if (p.goLive) {
+      track.appendChild(
+        el(
+          "div",
+          {
+            class: `project-gantt-marker golive status-${p.status}`,
+            style: `left:${xPct(p.goLive)}%`,
+            title: `Go-Live · ${fmtDate(p.goLive)}`,
+          },
+          [el("span", { class: "project-gantt-marker-label below" }, ["Go-Live · " + fmtDateShort(p.goLive)])]
+        )
+      );
+    }
+
+    wrap.appendChild(track);
+    return wrap;
+  }
+
+  function openProjectDetail(projectId, focusSectionId) {
     const project = DATA.projects.find((p) => p.id === projectId);
     if (!project) return;
 
@@ -1017,6 +1139,15 @@
     content.appendChild(buildProjectDetail(project));
     overlay.hidden = false;
     document.body.classList.add("no-scroll");
+
+    if (focusSectionId) {
+      requestAnimationFrame(() => {
+        const target = document.getElementById(focusSectionId);
+        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    } else {
+      overlay.scrollTop = 0;
+    }
   }
 
   function closeProjectDetail() {
@@ -1136,14 +1267,21 @@
       root.appendChild(buildTrendGraph(weeks));
     }
 
-    // Schedule timeline — tracks CR-driven / any date movement on go-live and next milestone
-    root.appendChild(el("h3", { class: "weekly-subhead" }, ["Schedule timeline"]));
-    root.appendChild(
+    // Schedule timeline — visual Gantt for this project, plus a log of every date move (e.g. a CR)
+    const scheduleSection = el("div", { id: "detailScheduleSection" });
+    scheduleSection.appendChild(el("h3", { class: "weekly-subhead" }, ["Schedule timeline"]));
+    scheduleSection.appendChild(
       el("p", { class: "section-subhead" }, [
-        "Every time the go-live or next-milestone date moved — e.g. a CR pushing the timeline — with the date it happened.",
+        "This project's milestones and go-live plotted on a calendar, plus a log of every time a date moved — e.g. a CR pushing the timeline.",
       ])
     );
-    root.appendChild(renderScheduleTimeline(buildScheduleTimeline(weeks)));
+    scheduleSection.appendChild(buildSingleProjectGantt(p));
+    const scheduleEvents = buildScheduleTimeline(weeks);
+    if (scheduleEvents.length) {
+      scheduleSection.appendChild(el("h4", { class: "schedule-changelog-subhead" }, ["Date change log"]));
+    }
+    scheduleSection.appendChild(renderScheduleTimeline(scheduleEvents));
+    root.appendChild(scheduleSection);
 
     // Change log
     if (weeks.length) {
