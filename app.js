@@ -687,28 +687,111 @@
     return transitions.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : a.projectName.localeCompare(b.projectName)));
   }
 
+  // Every time a go-live or milestone date moved (e.g. because of a CR),
+  // across every project — the same diffing logic as the per-project
+  // schedule timeline, just run over all projects at once.
+  function computeScheduleShifts() {
+    const dates = Object.keys(HISTORY).sort();
+    const nameById = {};
+    DATA.projects.forEach((p) => (nameById[p.id] = p.name));
+
+    const prevGoLive = {};
+    const prevMilestoneDate = {};
+    const prevMilestoneName = {};
+    const shifts = [];
+
+    dates.forEach((asOf) => {
+      (HISTORY[asOf].projects || []).forEach((snap) => {
+        nameById[snap.id] = nameById[snap.id] || snap.name;
+        const goLive = snap.goLive || null;
+        const milestoneName = (snap.nextMilestone && snap.nextMilestone.name) || null;
+        const milestoneDate = (snap.nextMilestone && snap.nextMilestone.date) || null;
+
+        const pg = prevGoLive[snap.id];
+        if (pg && goLive && goLive !== pg) {
+          shifts.push({
+            projectId: snap.id,
+            projectName: nameById[snap.id] || snap.id,
+            date: asOf,
+            label: "Go-Live",
+            from: pg,
+            to: goLive,
+            status: snap.status,
+          });
+        }
+
+        const pmd = prevMilestoneDate[snap.id];
+        const pmn = prevMilestoneName[snap.id];
+        if (pmd && milestoneDate && (milestoneDate !== pmd || milestoneName !== pmn)) {
+          shifts.push({
+            projectId: snap.id,
+            projectName: nameById[snap.id] || snap.id,
+            date: asOf,
+            label: milestoneName || pmn || "Milestone",
+            from: pmd,
+            to: milestoneDate,
+            status: snap.status,
+          });
+        }
+
+        if (goLive) prevGoLive[snap.id] = goLive;
+        if (milestoneDate) {
+          prevMilestoneDate[snap.id] = milestoneDate;
+          prevMilestoneName[snap.id] = milestoneName;
+        }
+      });
+    });
+
+    return shifts;
+  }
+
   function renderStatusHistory() {
-    const transitions = computeStatusTransitions();
+    const transitions = computeStatusTransitions().map((t) => Object.assign({ kind: "status" }, t));
+    const shifts = computeScheduleShifts().map((s) => Object.assign({ kind: "schedule" }, s));
+    const combined = transitions.concat(shifts).sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
 
     const list = document.getElementById("statusHistoryList");
     list.innerHTML = "";
 
-    const filtered = transitions.filter(
+    const filtered = combined.filter(
       (t) => globalProjectFilter === "all" || t.projectId === globalProjectFilter
     );
 
     if (!filtered.length) {
       list.appendChild(
         el("div", { class: "deps-empty-group" }, [
-          transitions.length
-            ? "No status changes match this filter."
-            : "No status changes recorded yet — once weekly updates move a project between On Track, At Risk, and Critical, they'll show up here with dates.",
+          combined.length
+            ? "Nothing to show for this project filter."
+            : "No status changes or date shifts recorded yet — once weekly updates move a project's status, go-live, or milestone dates, they'll show up here with dates and the why.",
         ])
       );
       return;
     }
 
     filtered.forEach((t) => {
+      if (t.kind === "schedule") {
+        const deltaDays = Math.round((new Date(t.to + "T00:00:00") - new Date(t.from + "T00:00:00")) / 86400000);
+        const row = el("div", { class: "status-history-row kind-schedule" }, [
+          el("div", { class: "status-history-date" }, [fmtDate(t.date)]),
+          el("div", { class: "status-history-main" }, [
+            el("div", { class: "status-history-transition" }, [
+              el("span", { class: "schedule-shift-badge" }, ["📅 " + t.label + " moved"]),
+              el("span", { class: "golive-date-original" }, [fmtDateShort(t.from)]),
+              el("span", { class: "status-history-arrow" }, ["→"]),
+              el("span", { class: "golive-date-current" }, [fmtDate(t.to)]),
+              el(
+                "span",
+                { class: "schedule-timeline-delta " + (deltaDays > 0 ? "is-late" : deltaDays < 0 ? "is-early" : "") },
+                [deltaDays === 0 ? "No change in days" : (deltaDays > 0 ? "+" : "") + deltaDays + " days"]
+              ),
+              el("button", { class: "status-history-project", "data-project-id": t.projectId }, [t.projectName]),
+            ]),
+          ]),
+        ]);
+        list.appendChild(row);
+        return;
+      }
+
       const worsened = STATUS_RANK[t.to] > STATUS_RANK[t.from];
       const missingReason = worsened && !t.statusChangeReason;
       const row = el("div", { class: "status-history-row" + (worsened ? " is-worse" : " is-better") }, [

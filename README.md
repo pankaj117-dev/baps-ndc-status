@@ -67,19 +67,29 @@ will plot its **full** schedule instead of just one milestone + go-live.
 
 ## Tab 4 — Status History (live)
 
-A flat, chronological feed of every time a project moved between
-**On Track → At Risk / Delay → Critical → Non-Recoverable** (in either
-direction), across the whole portfolio, newest first. Each row shows the
-date, the from → to status pills, the project name (click to jump into its
-full detail view), what stage/progress the project was tracking at when it
-happened, and whatever context was captured that moment — the reason for the
-change (required for any downgrade — see below), delay note, days delayed,
-or current phase. Filter to a single project with the global Project filter
-above the tabs. This answers "when did SPM go red, and why?" without digging through every project's
-individual change log. Built from `history.json` snapshots, so it fills in
-automatically as weekly updates get ingested; the same status-change is also
-highlighted (as colored pills) inside each project's own week-over-week
-change log in its detail view.
+A flat, chronological feed that merges **two kinds of events** across the
+whole portfolio, newest first:
+
+1. **Status changes** — every time a project moved between **On Track → At
+   Risk / Delay → Critical → Non-Recoverable** (in either direction). Each
+   row shows the date, the from → to status pills, the project name (click
+   to jump into its full detail view), what stage/progress the project was
+   tracking at when it happened, and whatever context was captured that
+   moment — the reason for the change (required for any downgrade — see
+   below), delay note, days delayed, or current phase.
+2. **Schedule shifts** — every time a go-live or milestone date moved (e.g.
+   because of a CR), shown as a "📅 \<label\> moved" row with the old date →
+   new date and the delta in days (late/early).
+
+Filter to a single project with the global Project filter above the tabs to
+get that project's full story in one place — every status change, every
+delay, every timeline shift, and the why, in order. This answers "when did
+SPM go red, and why?" and "how did this project's go-live end up slipping?"
+without digging through every project's individual change log. Built from
+`history.json` snapshots, so it fills in automatically as weekly updates get
+ingested; the same status-change is also highlighted (as colored pills)
+inside each project's own week-over-week change log in its detail view, and
+the same schedule shifts also drive the per-project schedule timeline there.
 
 ## Tab 5 — Dependencies (live)
 
