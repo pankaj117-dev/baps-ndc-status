@@ -13,6 +13,9 @@ import sys
 
 from lib import (
     PROJECT_NAME_TO_ID,
+    STATUS_LABEL,
+    STATUS_RANK,
+    STATUS_TEXT_TO_KEY,
     load_json,
     lines,
     parse_issue_form_body,
@@ -32,10 +35,17 @@ def fetch_issues(label):
         "issue", "list",
         "--label", label,
         "--state", "open",
-        "--json", "number,body,createdAt,author,url",
+        "--json", "number,body,createdAt,author,url,labels",
         "--limit", "100",
     ])
     return json.loads(out)
+
+
+NEEDS_REASON_LABEL = "needs-reason"
+
+
+def has_label(issue, name):
+    return any((l.get("name") or "").lower() == name.lower() for l in issue.get("labels", []))
 
 
 def apply_weekly_update(project, fields):
@@ -61,7 +71,9 @@ def apply_weekly_update(project, fields):
 
     status = fields.get("Overall status", "")
     if status:
-        project["status"] = status.strip().lower()
+        key = STATUS_TEXT_TO_KEY.get(status.strip().lower())
+        if key:
+            project["status"] = key
 
     progress = fields.get("Progress (0-100)", "")
     if progress:
@@ -126,10 +138,11 @@ def apply_weekly_update(project, fields):
 def ingest_weekly_updates(data):
     issues = fetch_issues("weekly-update")
     if not issues:
-        return [], None
+        return [], None, []
 
     by_id = {p["id"]: p for p in data["projects"]}
     ingested = []
+    blocked = []
     latest_as_of = data.get("asOf")
 
     for issue in issues:
@@ -145,7 +158,41 @@ def ingest_weekly_updates(data):
             print(f"issue #{issue['number']}: missing 'As of date', skipping")
             continue
 
-        apply_weekly_update(by_id[project_id], fields)
+        project = by_id[project_id]
+        prev_status = project.get("status")
+        status_text = fields.get("Overall status", "").strip().lower()
+        new_status = STATUS_TEXT_TO_KEY.get(status_text) if status_text else None
+        reason = fields.get("Reason for status change", "").strip()
+        status_changed = bool(new_status) and bool(prev_status) and new_status != prev_status
+        worsened = status_changed and STATUS_RANK.get(new_status, 0) > STATUS_RANK.get(prev_status, 0)
+
+        if worsened and not reason:
+            if not has_label(issue, NEEDS_REASON_LABEL):
+                comment = (
+                    f"⚠️ This update moves **{project['name']}** from **{STATUS_LABEL.get(prev_status, prev_status)}** "
+                    f"to **{STATUS_LABEL.get(new_status, new_status)}**, but the **'Reason for status change'** field "
+                    "is blank. Please edit this issue and add the reason (what changed / root cause) — that's required "
+                    "any time a project moves to a worse status, so leadership can see why along with the date. "
+                    "This issue will stay open and get picked up automatically on the next run once the reason is added."
+                )
+                try:
+                    run_gh(["issue", "comment", str(issue["number"]), "--body", comment])
+                    run_gh(["issue", "edit", str(issue["number"]), "--add-label", NEEDS_REASON_LABEL])
+                except RuntimeError as e:
+                    print(f"warning: could not flag issue #{issue['number']}: {e}", file=sys.stderr)
+            blocked.append(issue["number"])
+            print(f"issue #{issue['number']}: blocked — status worsened with no reason given, left open")
+            continue
+
+        apply_weekly_update(project, fields)
+        project["statusChangeReason"] = reason if status_changed else ""
+
+        if has_label(issue, NEEDS_REASON_LABEL):
+            try:
+                run_gh(["issue", "edit", str(issue["number"]), "--remove-label", NEEDS_REASON_LABEL])
+            except RuntimeError as e:
+                print(f"warning: could not unlabel issue #{issue['number']}: {e}", file=sys.stderr)
+
         if latest_as_of is None or as_of >= latest_as_of:
             latest_as_of = as_of
 
@@ -155,7 +202,7 @@ def ingest_weekly_updates(data):
     if latest_as_of and latest_as_of != data.get("asOf"):
         data["asOf"] = latest_as_of
 
-    return ingested, latest_as_of
+    return ingested, latest_as_of, blocked
 
 
 def ingest_feedback(notes):
@@ -221,6 +268,7 @@ def snapshot_history(data, history):
                 "stage": p.get("stage", ""),
                 "delayDays": p.get("delayDays", 0),
                 "delayNote": p.get("delayNote", ""),
+                "statusChangeReason": p.get("statusChangeReason", ""),
                 "phase": p.get("phase", ""),
                 "nextMilestone": p.get("nextMilestone"),
                 "goLive": p.get("goLive"),
@@ -244,8 +292,10 @@ def main():
     history = load_json(HISTORY_PATH, {})
     notes = load_json(NOTES_PATH, [])
 
-    update_issue_numbers, as_of_changed = ingest_weekly_updates(data)
+    update_issue_numbers, as_of_changed, blocked_issue_numbers = ingest_weekly_updates(data)
     feedback_issue_numbers = ingest_feedback(notes)
+    if blocked_issue_numbers:
+        print(f"note: {len(blocked_issue_numbers)} issue(s) left open pending a reason for status change: {blocked_issue_numbers}")
 
     if update_issue_numbers or feedback_issue_numbers:
         data["lastUpdated"] = datetime.datetime.utcnow().isoformat() + "Z"

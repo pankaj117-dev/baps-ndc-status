@@ -20,6 +20,23 @@ PROJECT_NAME_TO_ID = {
     "mySatsang – BAPS ID Integration": "mysatsang-bapsid",
 }
 
+# Maps the "Overall status" dropdown option text (lowercased) -> canonical status key.
+STATUS_TEXT_TO_KEY = {
+    "green": "green",
+    "amber": "amber",
+    "red": "red",
+    "non-recoverable": "black",
+}
+
+STATUS_RANK = {"green": 0, "amber": 1, "red": 2, "black": 3}
+
+STATUS_LABEL = {
+    "green": "On Track",
+    "amber": "At Risk",
+    "red": "Critical",
+    "black": "Non-Recoverable",
+}
+
 # GitHub renders each issue-form field as "### <label>\n\n<value>\n\n"
 _HEADING_RE = re.compile(r"^###\s+(.+?)\s*$", re.MULTILINE)
 

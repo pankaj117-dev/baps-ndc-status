@@ -52,8 +52,19 @@ body:
         - Green
         - Amber
         - Red
+        - Non-Recoverable
     validations:
       required: true
+  - type: textarea
+    id: status_change_reason
+    attributes:
+      label: Reason for status change
+      description: >-
+        REQUIRED if the status above got worse than last week (On Track → At Risk, At Risk → Critical,
+        anything → Non-Recoverable, etc). Explain what changed and why. If the status did not get worse
+        this week, leave this blank. Submissions with a worse status and no reason will be sent back for
+        more detail before they're merged into the dashboard.
+      placeholder: "VAPT re-verification failed a second time; infra team says earliest re-slot is 2 weeks out"
   - type: input
     id: progress
     attributes:

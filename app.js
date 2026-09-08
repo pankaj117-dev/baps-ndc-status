@@ -2,8 +2,8 @@
   "use strict";
 
   const REPO = "pankaj117-dev/baps-ndc-status";
-  const STATUS_LABEL = { green: "On Track", amber: "At Risk", red: "Critical" };
-  const STATUS_RANK = { green: 0, amber: 1, red: 2 };
+  const STATUS_LABEL = { green: "On Track", amber: "At Risk", red: "Critical", black: "Non-Recoverable" };
+  const STATUS_RANK = { green: 0, amber: 1, red: 2, black: 3 };
 
   let DATA = null;
   let HISTORY = {};
@@ -69,7 +69,7 @@
 
   function renderMetrics() {
     const projects = DATA.projects;
-    const counts = { green: 0, amber: 0, red: 0 };
+    const counts = { green: 0, amber: 0, red: 0, black: 0 };
     let delaySum = 0;
     let riskCount = 0;
     projects.forEach((p) => {
@@ -84,9 +84,12 @@
       { label: "On Track", num: counts.green, tone: "tone-green" },
       { label: "At Risk", num: counts.amber, tone: "tone-amber" },
       { label: "Critical", num: counts.red, tone: "tone-red" },
-      { label: "Avg Delay (days)", num: avgDelay, tone: "tone-accent" },
-      { label: "Open Follow-ups", num: NOTES.filter((n) => n.status === "open").length, tone: "tone-accent" },
     ];
+    if (counts.black) metrics.push({ label: "Non-Recoverable", num: counts.black, tone: "tone-black" });
+    metrics.push(
+      { label: "Avg Delay (days)", num: avgDelay, tone: "tone-accent" },
+      { label: "Open Follow-ups", num: NOTES.filter((n) => n.status === "open").length, tone: "tone-accent" }
+    );
 
     const row = document.getElementById("metricsRow");
     row.innerHTML = "";
@@ -523,8 +526,11 @@
             from: prev,
             to: snap.status,
             phase: snap.phase || "",
+            stage: snap.stage || "",
+            progress: typeof snap.progress === "number" ? snap.progress : null,
             delayNote: snap.delayNote || "",
             delayDays: snap.delayDays || 0,
+            statusChangeReason: snap.statusChangeReason || "",
           });
         }
         prevStatus[snap.id] = snap.status;
@@ -567,6 +573,7 @@
 
     filtered.forEach((t) => {
       const worsened = STATUS_RANK[t.to] > STATUS_RANK[t.from];
+      const missingReason = worsened && !t.statusChangeReason;
       const row = el("div", { class: "status-history-row" + (worsened ? " is-worse" : " is-better") }, [
         el("div", { class: "status-history-date" }, [fmtDate(t.date)]),
         el("div", { class: "status-history-main" }, [
@@ -579,13 +586,41 @@
         ]),
       ]);
 
+      const main = row.querySelector(".status-history-main");
+
+      // Project tracking at the time of this change: stage + progress
+      const trackingBits = [];
+      if (t.stage) trackingBits.push(t.stage);
+      if (t.progress !== null) trackingBits.push(t.progress + "% complete");
+      if (trackingBits.length) {
+        main.appendChild(
+          el("div", { class: "status-history-tracking" }, [
+            el("span", { class: "status-history-tracking-label" }, ["Tracking at the time:"]),
+            " " + trackingBits.join(" · "),
+          ])
+        );
+      }
+
       const contextBits = [];
       if (t.delayDays > 0) contextBits.push(`${t.delayDays} day${t.delayDays === 1 ? "" : "s"} delayed`);
       if (t.delayNote) contextBits.push(t.delayNote);
       else if (t.phase) contextBits.push(t.phase);
       if (contextBits.length) {
-        row.querySelector(".status-history-main").appendChild(
-          el("div", { class: "status-history-context" }, [contextBits.join(" — ")])
+        main.appendChild(el("div", { class: "status-history-context" }, [contextBits.join(" — ")]));
+      }
+
+      if (t.statusChangeReason) {
+        main.appendChild(
+          el("div", { class: "status-history-reason" }, [
+            el("span", { class: "status-history-reason-label" }, ["Reason for change:"]),
+            " " + t.statusChangeReason,
+          ])
+        );
+      } else if (missingReason) {
+        main.appendChild(
+          el("div", { class: "status-history-reason status-history-reason-missing" }, [
+            "⚠️ No reason was provided for this status change — please add one on the next weekly update.",
+          ])
         );
       }
 
@@ -634,7 +669,7 @@
       .filter(Boolean);
   }
 
-  const STATUS_COLOR = { green: "#2f6b4f", amber: "#a6650f", red: "#b5342a" };
+  const STATUS_COLOR = { green: "#2f6b4f", amber: "#a6650f", red: "#b5342a", black: "#1c1d24" };
 
   function buildTrendGraph(weeks) {
     const width = 700;

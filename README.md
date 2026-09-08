@@ -48,10 +48,12 @@ project's full detail view.
 ## Tab 4 — Status History (live)
 
 A flat, chronological feed of every time a project moved between
-**On Track → At Risk / Delay → Critical** (in either direction), across the
-whole portfolio, newest first. Each row shows the date, the from → to status
-pills, the project name (click to jump into its full detail view), and
-whatever context was captured at that moment — the delay note, days delayed,
+**On Track → At Risk / Delay → Critical → Non-Recoverable** (in either
+direction), across the whole portfolio, newest first. Each row shows the
+date, the from → to status pills, the project name (click to jump into its
+full detail view), what stage/progress the project was tracking at when it
+happened, and whatever context was captured that moment — the reason for the
+change (required for any downgrade — see below), delay note, days delayed,
 or current phase. Filter to a single project with the dropdown. This answers
 "when did SPM go red, and why?" without digging through every project's
 individual change log. Built from `history.json` snapshots, so it fills in
@@ -102,6 +104,18 @@ the Actions tab) reads all open "weekly-update" issues, merges them into
 issue** with a confirmation comment. You can also trigger it on demand via
 `workflow_dispatch` right before a meeting if someone submitted late.
 
+### Status downgrades require a reason
+
+If a submission moves a project to a **worse** status than last week
+(On Track → At Risk, At Risk → Critical, anything → Non-Recoverable — using
+the rank On Track < At Risk < Critical < Non-Recoverable) and the **"Reason
+for status change"** field is blank, `ingest.py` does **not** merge it. It
+instead leaves the issue open, labels it `needs-reason`, and comments asking
+the PM to edit the issue and add the reason. The next scheduled (or manual)
+run automatically picks it back up once the reason is filled in — no reason
+is ever silently dropped. Once merged, the reason shows up with its date on
+the **Status History** tab and is highlighted (amber) if it's ever missing.
+
 ## How live meeting feedback works
 
 Click **"📝 Add feedback"** in the header (or "Add feedback" on a specific
@@ -141,7 +155,10 @@ Everything lives in three files:
   "id": "webnext",
   "name": "WebNext",
   "owner": "Jeet Savani",
-  "status": "green",        // "green" | "amber" | "red"
+  "status": "green",        // "green" (On Track) | "amber" (At Risk) | "red" (Critical) | "black" (Non-Recoverable)
+  "statusChangeReason": "", // only set the week status actually got worse — required by ingest.py
+                             // for any On Track→At Risk / →Critical / →Non-Recoverable style downgrade;
+                             // shown on the Status History tab, cleared once the status stops changing
   "progress": 80,             // 0-100, your best call on % complete
   "stage": "Requirements",    // canonical pipeline stage — drives the Pipeline stages
                                // board; one of Requirements | Design / Estimation |
