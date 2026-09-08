@@ -1297,36 +1297,75 @@
     scheduleSection.appendChild(renderScheduleTimeline(scheduleEvents));
     root.appendChild(scheduleSection);
 
-    function buildChangelogWeekSprint(snap) {
+    // Renders the Dependencies / Sprint status / Risks blocks for a given
+    // week's data (either the live project `p` or a historical snapshot),
+    // into the shared container below the change log.
+    function renderSnapshotSections(container, snap, label, isLatest) {
+      container.innerHTML = "";
+
+      container.appendChild(
+        el("div", { class: "snapshot-sections-label" }, [
+          isLatest ? "Showing current data" : "Showing snapshot as of " + fmtDate(label),
+        ])
+      );
+
+      container.appendChild(el("h3", { class: "weekly-subhead" }, ["Dependencies"]));
+      container.appendChild(
+        el("div", { class: "detail-block deps" }, [
+          el(
+            "ul",
+            { class: "paired-list" },
+            pairedList(snap.dependencies || [], snap.dependencyMitigations || [], "Mitigation / impact", snap.dependencyTeams || [])
+          ),
+        ])
+      );
+
+      container.appendChild(el("h3", { class: "weekly-subhead" }, ["Sprint status"]));
       if (!snap.sprintStatus) {
-        return el("p", { class: "empty-note changelog-sprint-empty" }, [
-          "Sprint work detail wasn't captured for this week's snapshot yet.",
-        ]);
+        container.appendChild(
+          el("p", { class: "empty-note" }, ["Sprint work detail wasn't captured for this week's snapshot yet."])
+        );
+      } else {
+        container.appendChild(
+          el("div", { class: "sprint-grid" }, [
+            el("div", { class: "detail-block" }, [
+              el("h4", null, ["Completed"]),
+              el("ul", null, listOrDash(snap.sprintStatus.completed || [])),
+            ]),
+            el("div", { class: "detail-block" }, [
+              el("h4", null, ["In progress"]),
+              el("ul", null, listOrDash(snap.sprintStatus.inProgress || [])),
+            ]),
+            el("div", { class: "detail-block" }, [
+              el("h4", null, ["Next plan"]),
+              el("ul", null, listOrDash(snap.sprintStatus.nextPlan || [])),
+            ]),
+          ])
+        );
       }
-      return el("div", { class: "changelog-detail-sprint" }, [
-        el("div", null, [
-          el("h5", null, ["Completed"]),
-          el("ul", null, listOrDash(snap.sprintStatus.completed || [])),
-        ]),
-        el("div", null, [
-          el("h5", null, ["In progress"]),
-          el("ul", null, listOrDash(snap.sprintStatus.inProgress || [])),
-        ]),
-        el("div", null, [
-          el("h5", null, ["Next plan"]),
-          el("ul", null, listOrDash(snap.sprintStatus.nextPlan || [])),
-        ]),
-      ]);
+
+      container.appendChild(el("h3", { class: "weekly-subhead" }, ["Risks / blockers"]));
+      container.appendChild(
+        el("div", { class: "detail-block risks" }, [
+          snap.risks && snap.risks.length
+            ? el("ul", { class: "paired-list" }, pairedList(snap.risks, snap.riskMitigations || [], "Mitigation plan"))
+            : el("ul", null, [el("li", null, ["None reported"])]),
+        ])
+      );
     }
 
-    // Change log — one row per week with what changed, plus that week's
-    // sprint stories (completed / in progress / next) right underneath.
+    const snapshotSections = el("div", { class: "snapshot-sections" });
+
+    // Change log — click a week to load its Dependencies / Sprint status /
+    // Risks below as they were that week, instead of always showing current.
     if (weeks.length) {
       root.appendChild(el("h3", { class: "weekly-subhead" }, ["Week-over-week changes"]));
+      root.appendChild(el("p", { class: "section-subhead", style: "margin:-6px 0 12px;" }, ["Click a week to see dependencies, sprint status, and risks as they stood that week."]));
       const changeLog = el("div", { class: "changelog" });
       for (let i = weeks.length - 1; i >= 0; i--) {
         const cur = weeks[i];
         const prev = weeks[i - 1];
+        const isLatest = i === weeks.length - 1;
         const changes = [];
         const statusChanged = !!(prev && prev.status !== cur.status);
         if (prev) {
@@ -1348,52 +1387,45 @@
           );
         }
         if (changes.length) bodyChildren.push(el("div", null, [changes.join(" · ")]));
-        bodyChildren.push(buildChangelogWeekSprint(cur));
 
-        changeLog.appendChild(
-          el("div", { class: "changelog-row" + (statusChanged ? " has-status-change" : "") }, [
+        const rowEl = el(
+          "div",
+          {
+            class: "changelog-row" + (statusChanged ? " has-status-change" : "") + (isLatest ? " is-selected" : ""),
+            "data-week-index": String(i),
+            tabindex: "0",
+            role: "button",
+          },
+          [
             el("div", { class: "changelog-date" }, [fmtDate(cur.asOf)]),
             el("div", { class: "changelog-body" }, bodyChildren),
-          ])
+          ]
         );
+        changeLog.appendChild(rowEl);
       }
       root.appendChild(changeLog);
+
+      changeLog.querySelectorAll(".changelog-row").forEach((rowEl) => {
+        const selectWeek = () => {
+          const idx = Number(rowEl.getAttribute("data-week-index"));
+          const isLatest = idx === weeks.length - 1;
+          changeLog.querySelectorAll(".changelog-row").forEach((r) => r.classList.remove("is-selected"));
+          rowEl.classList.add("is-selected");
+          renderSnapshotSections(snapshotSections, isLatest ? p : weeks[idx], weeks[idx].asOf, isLatest);
+        };
+        rowEl.addEventListener("click", selectWeek);
+        rowEl.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            selectWeek();
+          }
+        });
+      });
     }
 
-    // Current details
-    root.appendChild(el("h3", { class: "weekly-subhead" }, ["Dependencies"]));
-    root.appendChild(
-      el("div", { class: "detail-block deps" }, [
-        el("ul", { class: "paired-list" }, pairedList(p.dependencies || [], p.dependencyMitigations || [], "Mitigation / impact", p.dependencyTeams || [])),
-      ])
-    );
-
-    root.appendChild(el("h3", { class: "weekly-subhead" }, ["Sprint status"]));
-    root.appendChild(
-      el("div", { class: "sprint-grid" }, [
-        el("div", { class: "detail-block" }, [
-          el("h4", null, ["Completed"]),
-          el("ul", null, listOrDash(p.sprintStatus.completed || [])),
-        ]),
-        el("div", { class: "detail-block" }, [
-          el("h4", null, ["In progress"]),
-          el("ul", null, listOrDash(p.sprintStatus.inProgress || [])),
-        ]),
-        el("div", { class: "detail-block" }, [
-          el("h4", null, ["Next plan"]),
-          el("ul", null, listOrDash(p.sprintStatus.nextPlan || [])),
-        ]),
-      ])
-    );
-
-    root.appendChild(el("h3", { class: "weekly-subhead" }, ["Risks / blockers"]));
-    root.appendChild(
-      el("div", { class: "detail-block risks" }, [
-        p.risks && p.risks.length
-          ? el("ul", { class: "paired-list" }, pairedList(p.risks, p.riskMitigations || [], "Mitigation plan"))
-          : el("ul", null, [el("li", null, ["None reported"])]),
-      ])
-    );
+    // Current details (defaults to the latest week; click a row above to change)
+    renderSnapshotSections(snapshotSections, p, weeks.length ? weeks[weeks.length - 1].asOf : null, true);
+    root.appendChild(snapshotSections);
 
     // Full feedback history
     root.appendChild(el("h3", { class: "weekly-subhead" }, ["Feedback history"]));

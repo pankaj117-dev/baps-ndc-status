@@ -1795,7 +1795,8 @@ body.no-scroll { overflow: hidden; }
   padding: 13px 18px;
   border-bottom: 1px solid var(--line);
   font-size: 13px;
-  transition: background 0.12s ease;
+  cursor: pointer;
+  transition: background 0.12s ease, box-shadow 0.12s ease;
 }
 
 .changelog-row:hover { background: var(--bg); }
@@ -1803,36 +1804,28 @@ body.no-scroll { overflow: hidden; }
 
 .changelog-row.has-status-change { background: var(--bg); }
 
-.changelog-detail-sprint {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+.changelog-row.is-selected {
+  background: var(--accent-soft);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.changelog-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+.snapshot-sections {
   margin-top: 8px;
 }
 
-.changelog-detail-sprint h5 {
+.snapshot-sections-label {
   font-family: var(--font-mono);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--ink-faint);
-  margin: 0 0 4px;
-}
-
-.changelog-detail-sprint ul {
-  margin: 0;
-  padding-left: 16px;
-  font-size: 12.5px;
-  color: var(--ink-soft);
-}
-
-.changelog-sprint-empty {
-  margin: 8px 0 0;
-  font-size: 12px;
-}
-
-@media (max-width: 640px) {
-  .changelog-detail-sprint { grid-template-columns: 1fr; }
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+  background: var(--accent-soft);
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: 16px;
 }
 
 .changelog-status-change {
