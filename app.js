@@ -123,17 +123,12 @@
 
     PIPELINE_STAGES.forEach((stage) => {
       const projects = byStage[stage];
-      const col = el("div", { class: "stage-col" }, [
-        el("div", { class: "stage-col-head" }, [
-          el("h3", null, [stage]),
-          el("span", { class: "stage-col-count" }, [String(projects.length)]),
-        ]),
-      ]);
+      const cardsWrap = el("div", { class: "stage-lane-cards" });
       if (!projects.length) {
-        col.appendChild(el("div", { class: "stage-col-empty" }, ["—"]));
+        cardsWrap.appendChild(el("div", { class: "stage-col-empty" }, ["No projects in this stage"]));
       } else {
         projects.forEach((p) => {
-          col.appendChild(
+          cardsWrap.appendChild(
             el("div", { class: "stage-card", "data-project-id": p.id, tabindex: "0", role: "button" }, [
               el("div", { class: "stage-card-top" }, [
                 el("span", { class: "timeline-dot", style: `background:var(--${p.status === "amber" ? "amber" : p.status})` }),
@@ -150,18 +145,20 @@
           );
         });
       }
-      board.appendChild(col);
+      const lane = el("div", { class: "stage-lane" }, [
+        el("div", { class: "stage-lane-label" }, [
+          el("h3", null, [stage]),
+          el("span", { class: "stage-col-count" }, [String(projects.length)]),
+        ]),
+        cardsWrap,
+      ]);
+      board.appendChild(lane);
     });
 
     if (unstaged.length) {
-      const col = el("div", { class: "stage-col stage-col-unstaged" }, [
-        el("div", { class: "stage-col-head" }, [
-          el("h3", null, ["Unstaged"]),
-          el("span", { class: "stage-col-count" }, [String(unstaged.length)]),
-        ]),
-      ]);
+      const cardsWrap = el("div", { class: "stage-lane-cards" });
       unstaged.forEach((p) => {
-        col.appendChild(
+        cardsWrap.appendChild(
           el("div", { class: "stage-card", "data-project-id": p.id, tabindex: "0", role: "button" }, [
             el("div", { class: "stage-card-top" }, [
               el("span", { class: "timeline-dot", style: `background:var(--${p.status === "amber" ? "amber" : p.status})` }),
@@ -171,7 +168,14 @@
           ])
         );
       });
-      board.appendChild(col);
+      const lane = el("div", { class: "stage-lane stage-lane-unstaged" }, [
+        el("div", { class: "stage-lane-label" }, [
+          el("h3", null, ["Unstaged"]),
+          el("span", { class: "stage-col-count" }, [String(unstaged.length)]),
+        ]),
+        cardsWrap,
+      ]);
+      board.appendChild(lane);
     }
 
     board.querySelectorAll(".stage-card").forEach((card) => {

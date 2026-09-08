@@ -356,40 +356,41 @@ body {
 
 .stage-board {
   display: flex;
+  flex-direction: column;
   gap: 14px;
-  overflow-x: auto;
-  padding-bottom: 8px;
   margin-bottom: 36px;
 }
 
-.stage-col {
-  flex: 1 0 200px;
-  min-width: 200px;
+.stage-lane {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
   background: var(--bg);
   border: 1px solid var(--line);
   border-radius: var(--radius);
+  padding: 12px 14px;
+}
+
+.stage-lane-label {
+  flex: 0 0 148px;
+  width: 148px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 10px;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 6px;
+  padding-right: 14px;
+  border-right: 1px solid var(--line-strong);
 }
 
-.stage-col-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 2px 4px 8px;
-  border-bottom: 1px solid var(--line-strong);
-  margin-bottom: 2px;
-}
-
-.stage-col-head h3 {
+.stage-lane-label h3 {
   font-family: var(--font-mono);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   color: var(--ink-soft);
   margin: 0;
+  line-height: 1.35;
 }
 
 .stage-col-count {
@@ -402,14 +403,23 @@ body {
   padding: 1px 7px;
 }
 
-.stage-col-empty {
-  text-align: center;
-  color: var(--ink-faint);
-  font-size: 12px;
-  padding: 14px 0;
+.stage-lane-cards {
+  flex: 1 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 10px;
+  min-width: 0;
 }
 
-.stage-col.stage-col-unstaged {
+.stage-col-empty {
+  align-self: center;
+  color: var(--ink-faint);
+  font-size: 12px;
+  padding: 8px 0;
+}
+
+.stage-lane.stage-lane-unstaged {
   background: var(--amber-bg);
   border-color: var(--amber);
 }
@@ -421,6 +431,9 @@ body {
   padding: 10px 12px;
   cursor: pointer;
   transition: all 0.12s ease;
+  flex: 1 1 200px;
+  min-width: 190px;
+  max-width: 260px;
 }
 
 .stage-card:hover {
@@ -456,22 +469,21 @@ body {
 
 /* Full-tab, roomier variant of the stage board */
 .stage-board-expanded {
-  gap: 18px;
+  gap: 20px;
 }
 
-.stage-board-expanded .stage-col {
-  flex: 1 0 230px;
-  min-width: 230px;
-  padding: 14px;
-  gap: 12px;
+.stage-board-expanded .stage-lane {
+  padding: 18px 20px;
+  gap: 22px;
 }
 
-.stage-board-expanded .stage-col-head {
-  padding: 4px 4px 12px;
-  margin-bottom: 4px;
+.stage-board-expanded .stage-lane-label {
+  flex-basis: 190px;
+  width: 190px;
+  padding-right: 20px;
 }
 
-.stage-board-expanded .stage-col-head h3 {
+.stage-board-expanded .stage-lane-label h3 {
   font-size: 13px;
 }
 
@@ -480,9 +492,16 @@ body {
   padding: 2px 9px;
 }
 
+.stage-board-expanded .stage-lane-cards {
+  gap: 14px;
+}
+
 .stage-board-expanded .stage-card {
   padding: 14px 16px;
   border-radius: 12px;
+  flex: 1 1 220px;
+  min-width: 210px;
+  max-width: 280px;
 }
 
 .stage-board-expanded .stage-card-top {
@@ -498,6 +517,25 @@ body {
 
 .stage-board-expanded .stage-card-progress .progress-track { height: 6px; }
 .stage-board-expanded .stage-card-progress .progress-pct { font-size: 12px; }
+
+@media (max-width: 720px) {
+  .stage-lane {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .stage-lane-label {
+    flex: none;
+    width: auto;
+    flex-direction: row;
+    justify-content: space-between;
+    border-right: none;
+    border-bottom: 1px solid var(--line-strong);
+    padding: 0 0 8px;
+  }
+  .stage-card {
+    max-width: none;
+  }
+}
 
 /* ---------- Go-live tracker ---------- */
 
