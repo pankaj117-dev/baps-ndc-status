@@ -1652,7 +1652,8 @@ body {
 body.no-scroll { overflow: hidden; }
 
 .detail-panel {
-  max-width: 780px;
+  max-width: 1040px;
+  width: 92vw;
   margin: 0 auto;
   background: var(--bg-panel);
   border-radius: var(--radius-lg);
