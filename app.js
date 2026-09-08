@@ -468,29 +468,31 @@
 
         milestones.forEach((m) => {
           if (!m.date) return;
+          const mPct = xPct(m.date);
           track.appendChild(
             el(
               "div",
               {
                 class: "hawkeye-marker hawkeye-marker-milestone status-" + (m.status || p.status),
-                style: `left:${xPct(m.date)}%`,
+                style: `left:${mPct}%`,
                 title: `${m.name} · ${fmtDate(m.date)}`,
               },
-              [el("span", { class: "hawkeye-marker-label" }, [m.name])]
+              [el("span", { class: "hawkeye-marker-label", style: ganttLabelEdgeStyle(mPct) }, [m.name])]
             )
           );
         });
 
         if (p.goLive) {
+          const golivePct = xPct(p.goLive);
           track.appendChild(
             el(
               "div",
               {
                 class: "hawkeye-marker hawkeye-marker-golive status-" + p.status,
-                style: `left:${xPct(p.goLive)}%`,
+                style: `left:${golivePct}%`,
                 title: `Go-Live · ${fmtDate(p.goLive)}`,
               },
-              [el("span", { class: "hawkeye-marker-label" }, ["Go-Live"])]
+              [el("span", { class: "hawkeye-marker-label", style: ganttLabelEdgeStyle(golivePct) }, ["Go-Live"])]
             )
           );
         }
@@ -970,6 +972,15 @@
     return box;
   }
 
+  // Keeps marker labels from spilling past the left/right edge of the Gantt
+  // track (which would otherwise get clipped since there's nothing to
+  // scroll to beyond the track boundaries).
+  function ganttLabelEdgeStyle(pct) {
+    if (pct < 14) return "left:0;transform:translateX(0);";
+    if (pct > 86) return "left:auto;right:0;transform:translateX(0);";
+    return "";
+  }
+
   function buildSingleProjectGantt(p) {
     const DAY = 86400000;
     const todayIso = todayISO();
@@ -1042,7 +1053,13 @@
             style: `left:${a}%`,
             title: `Original Go-Live · ${fmtDate(p.originalGoLive)}`,
           },
-          [el("span", { class: "project-gantt-marker-label above" }, ["Original · " + fmtDateShort(p.originalGoLive)])]
+          [
+            el(
+              "span",
+              { class: "project-gantt-marker-label above", style: ganttLabelEdgeStyle(a) },
+              ["Original · " + fmtDateShort(p.originalGoLive)]
+            ),
+          ]
         )
       );
     }
@@ -1057,33 +1074,43 @@
     milestones.forEach((m, i) => {
       if (!m.date) return;
       const above = i % 2 === 0;
+      const pct = xPct(m.date);
       track.appendChild(
         el(
           "div",
           {
             class: `project-gantt-marker milestone status-${m.status || p.status}`,
-            style: `left:${xPct(m.date)}%`,
+            style: `left:${pct}%`,
             title: `${m.name} · ${fmtDate(m.date)}`,
           },
           [
-            el("span", { class: "project-gantt-marker-label " + (above ? "above" : "below") }, [
-              m.name + " · " + fmtDateShort(m.date),
-            ]),
+            el(
+              "span",
+              { class: "project-gantt-marker-label " + (above ? "above" : "below"), style: ganttLabelEdgeStyle(pct) },
+              [m.name + " · " + fmtDateShort(m.date)]
+            ),
           ]
         )
       );
     });
 
     if (p.goLive) {
+      const golivePct = xPct(p.goLive);
       track.appendChild(
         el(
           "div",
           {
             class: `project-gantt-marker golive status-${p.status}`,
-            style: `left:${xPct(p.goLive)}%`,
+            style: `left:${golivePct}%`,
             title: `Go-Live · ${fmtDate(p.goLive)}`,
           },
-          [el("span", { class: "project-gantt-marker-label below" }, ["Go-Live · " + fmtDateShort(p.goLive)])]
+          [
+            el(
+              "span",
+              { class: "project-gantt-marker-label below", style: ganttLabelEdgeStyle(golivePct) },
+              ["Go-Live · " + fmtDateShort(p.goLive)]
+            ),
+          ]
         )
       );
     }
