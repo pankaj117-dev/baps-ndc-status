@@ -7,7 +7,7 @@ PROJECT_NAME_TO_ID = {
     "WebNext": "webnext",
     "WebNext 2.0": "webnext-2",
     "Pledge – 1.0": "pledge",
-    "Pledge - 1A": "pledge-1a",
+    "Pledge - 1.x": "pledge-1a",
     "EMM": "emm",
     "MyBKY (Phase 1)": "mybky-phase1",
     "MyBKY Phase 2A": "mybky-phase2",

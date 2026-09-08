@@ -478,7 +478,7 @@
       },
       {
         "id": "pledge-1a",
-        "name": "Pledge - 1A",
+        "name": "Pledge - 1.x",
         "status": "green",
         "progress": 20,
         "stage": "Design / Estimation",
