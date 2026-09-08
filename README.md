@@ -57,7 +57,23 @@ plus a delay pill (green/amber/red by severity). Projects without a go-live
 yet are listed underneath as "not yet scheduled." Click any row to open that
 project's full detail view.
 
-## Tab 4 — Status History (live)
+## Tab 4 — 🦅 Hawk-eye (live, rough until fuller schedule data lands)
+
+A cross-project Gantt: every project on one shared calendar timeline, one
+row each, sorted by go-live date. Shows the next milestone (small square),
+the go-live date (large circle, colored by status), and — whenever a
+project has slipped — a faint dashed line connecting the original go-live
+to the current one. A blue "Today" line runs through every row so you can
+see at a glance what's imminent vs. far out. Click any row to open the full
+detail view.
+
+This currently plots from `goLive` / `originalGoLive` / `nextMilestone` only,
+so it's a rough first pass. It's built to also read a richer, optional
+`"milestones": [{ "name": "...", "date": "...", "status": "..." }]` array per
+project (see data model below) — once that's populated, each project's row
+will plot its **full** schedule instead of just one milestone + go-live.
+
+## Tab 5 — Status History (live)
 
 A flat, chronological feed of every time a project moved between
 **On Track → At Risk / Delay → Critical → Non-Recoverable** (in either
@@ -73,7 +89,7 @@ automatically as weekly updates get ingested; the same status-change is also
 highlighted (as colored pills) inside each project's own week-over-week
 change log in its detail view.
 
-## Tab 5 — Dependencies (live)
+## Tab 6 — Dependencies (live)
 
 Every dependency across every project, flattened into one cross-project
 board and grouped by the **owning team** (DevOps, Security, GMS Team,
@@ -93,7 +109,7 @@ detail view — click any project card to open it. If the project is live/in
 production but not fully closed out, a **"Fast-follow items to close"**
 block also shows up there listing what's left.
 
-## Tab 6 — Team Performance (skeleton only)
+## Tab 7 — Team Performance (skeleton only)
 
 Placeholder tab for engineering execution metrics (PR velocity, review
 turnaround, commit activity, deploy cadence) once we wire up GitHub data per
@@ -200,8 +216,12 @@ Everything lives in three files:
   },
   "risks": ["..."],
   "riskMitigations": ["..."],  // same length/order as risks — mitigation plan + impact for each
-  "fastFollowItems": ["..."]   // one per line — remaining work to fully close out a live/in-production
+  "fastFollowItems": ["..."],  // one per line — remaining work to fully close out a live/in-production
                                 // project; shows a badge on the card and a block in the detail view
+  "milestones": [              // OPTIONAL — full schedule for the Hawk-eye Gantt (Tab 4). If omitted,
+                                // Hawk-eye falls back to plotting just `nextMilestone` + `goLive`.
+    { "name": "Requirements sign-off", "date": "2026-08-01", "status": "green" }
+  ]
 }
 ```
 
@@ -242,8 +262,11 @@ the app code.
 
 ## Roadmap
 
-- [ ] Wire Tab 6 up to real GitHub data (PRs, reviews, commits, deploys) per
+- [ ] Wire Tab 7 up to real GitHub data (PRs, reviews, commits, deploys) per
       project repo.
+- [ ] Once fuller project schedule data comes in, add a `milestones` array
+      per project (see Hawk-eye, Tab 4) so the Gantt plots the full timeline
+      instead of just next-milestone + go-live.
 - [ ] Add a "resolve" action for follow-ups (currently a manual edit to
       `notes.json` — flip `"status": "open"` to `"resolved"`).
 - [ ] Consider a GitHub Action that auto-resolves a follow-up when the next

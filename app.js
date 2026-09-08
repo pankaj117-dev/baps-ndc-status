@@ -392,6 +392,162 @@
     });
   }
 
+  /* ---------------- Hawk-eye (cross-project Gantt) ---------------- */
+
+  function renderHawkeye() {
+    const board = document.getElementById("hawkeyeGantt");
+    board.innerHTML = "";
+
+    const projects = visibleProjects();
+    const DAY = 86400000;
+    const todayIso = todayISO();
+
+    const allDates = [todayIso];
+    projects.forEach((p) => {
+      if (p.originalGoLive) allDates.push(p.originalGoLive);
+      if (p.goLive) allDates.push(p.goLive);
+      if (p.nextMilestone && p.nextMilestone.date) allDates.push(p.nextMilestone.date);
+      (p.milestones || []).forEach((m) => {
+        if (m.date) allDates.push(m.date);
+      });
+    });
+
+    if (!projects.length || allDates.length < 2) {
+      board.appendChild(el("p", { class: "empty-note" }, ["No dates to plot yet."]));
+      return;
+    }
+
+    const times = allDates.map((d) => new Date(d + "T00:00:00").getTime());
+    let minTime = Math.min(...times) - 10 * DAY;
+    let maxTime = Math.max(...times) + 14 * DAY;
+    if (maxTime - minTime < 30 * DAY) maxTime = minTime + 30 * DAY;
+
+    const xPct = (iso) => {
+      const t = new Date(iso + "T00:00:00").getTime();
+      return Math.max(0, Math.min(100, ((t - minTime) / (maxTime - minTime)) * 100));
+    };
+
+    // Month gridlines spanning the whole board
+    const monthMarks = [];
+    const cursor = new Date(minTime);
+    cursor.setDate(1);
+    cursor.setHours(0, 0, 0, 0);
+    while (cursor.getTime() <= maxTime) {
+      if (cursor.getTime() >= minTime) {
+        monthMarks.push({
+          pct: ((cursor.getTime() - minTime) / (maxTime - minTime)) * 100,
+          label: cursor.toLocaleDateString("en-US", { month: "short", year: "numeric" }),
+        });
+      }
+      cursor.setMonth(cursor.getMonth() + 1);
+    }
+
+    const header = el("div", { class: "hawkeye-months" });
+    monthMarks.forEach((m) => {
+      header.appendChild(el("div", { class: "hawkeye-month-mark", style: `left:${m.pct}%` }, [m.label]));
+    });
+    board.appendChild(header);
+
+    const rowsWrap = el("div", { class: "hawkeye-rows" });
+
+    monthMarks.forEach((m) => {
+      rowsWrap.appendChild(el("div", { class: "hawkeye-grid-line", style: `left:${m.pct}%` }));
+    });
+
+    rowsWrap.appendChild(
+      el("div", { class: "hawkeye-today-line", style: `left:${xPct(todayIso)}%` }, [
+        el("span", { class: "hawkeye-today-label" }, ["Today"]),
+      ])
+    );
+
+    projects
+      .slice()
+      .sort((a, b) => {
+        const ta = a.goLive ? new Date(a.goLive).getTime() : Infinity;
+        const tb = b.goLive ? new Date(b.goLive).getTime() : Infinity;
+        return ta - tb;
+      })
+      .forEach((p) => {
+        const row = el("div", { class: "hawkeye-row", "data-project-id": p.id, tabindex: "0", role: "button" }, [
+          el("div", { class: "hawkeye-row-label" }, [
+            el("span", { class: "timeline-dot", style: `background:var(--${p.status})` }),
+            el("div", null, [
+              el("strong", null, [p.name]),
+              el("div", { class: "hawkeye-row-sub" }, [p.owner || "Unassigned"]),
+            ]),
+          ]),
+        ]);
+
+        const track = el("div", { class: "hawkeye-row-track" });
+
+        if (p.originalGoLive && p.goLive && p.originalGoLive !== p.goLive) {
+          const a = xPct(p.originalGoLive);
+          const b = xPct(p.goLive);
+          const left = Math.min(a, b);
+          const width = Math.abs(b - a);
+          track.appendChild(el("div", { class: "hawkeye-slip-line", style: `left:${left}%;width:${width}%` }));
+          track.appendChild(
+            el("div", {
+              class: "hawkeye-marker hawkeye-marker-ghost",
+              style: `left:${a}%`,
+              title: `Original Go-Live · ${fmtDate(p.originalGoLive)}`,
+            })
+          );
+        }
+
+        const milestones =
+          p.milestones && p.milestones.length
+            ? p.milestones
+            : p.nextMilestone && p.nextMilestone.date
+            ? [{ name: p.nextMilestone.name || "Milestone", date: p.nextMilestone.date, status: p.status }]
+            : [];
+
+        milestones.forEach((m) => {
+          if (!m.date) return;
+          track.appendChild(
+            el(
+              "div",
+              {
+                class: "hawkeye-marker hawkeye-marker-milestone status-" + (m.status || p.status),
+                style: `left:${xPct(m.date)}%`,
+                title: `${m.name} · ${fmtDate(m.date)}`,
+              },
+              [el("span", { class: "hawkeye-marker-label" }, [m.name])]
+            )
+          );
+        });
+
+        if (p.goLive) {
+          track.appendChild(
+            el(
+              "div",
+              {
+                class: "hawkeye-marker hawkeye-marker-golive status-" + p.status,
+                style: `left:${xPct(p.goLive)}%`,
+                title: `Go-Live · ${fmtDate(p.goLive)}`,
+              },
+              [el("span", { class: "hawkeye-marker-label" }, ["Go-Live"])]
+            )
+          );
+        }
+
+        row.appendChild(track);
+        rowsWrap.appendChild(row);
+      });
+
+    board.appendChild(rowsWrap);
+
+    board.querySelectorAll(".hawkeye-row").forEach((row) => {
+      row.addEventListener("click", () => openProjectDetail(row.getAttribute("data-project-id")));
+      row.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openProjectDetail(row.getAttribute("data-project-id"));
+        }
+      });
+    });
+  }
+
   /* ---------------- Global project filter (applies to every tab) ---------------- */
 
   function populateGlobalProjectFilter() {
@@ -406,6 +562,7 @@
     renderMetrics();
     renderStageBoard();
     renderGoLiveTracker();
+    renderHawkeye();
     renderCards();
     renderDependenciesTab();
     renderStatusHistory();
@@ -1154,6 +1311,7 @@
     renderMetrics();
     renderStageBoard();
     renderGoLiveTracker();
+    renderHawkeye();
     renderCards();
     wireFilters();
     wireOwnerFilter();

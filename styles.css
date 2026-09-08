@@ -919,6 +919,174 @@ body {
   .status-history-project { margin-left: 0; }
 }
 
+/* ---------- Hawk-eye (cross-project Gantt) ---------- */
+
+.hawkeye-gantt {
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px 20px 8px;
+  overflow-x: auto;
+}
+
+.hawkeye-months {
+  position: relative;
+  height: 22px;
+  margin-left: 220px;
+  border-bottom: 1px solid var(--line-strong);
+  margin-bottom: 6px;
+  min-width: 600px;
+}
+
+.hawkeye-month-mark {
+  position: absolute;
+  top: 0;
+  transform: translateX(-2px);
+  border-left: 1px solid var(--line-strong);
+  padding-left: 5px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+.hawkeye-rows {
+  position: relative;
+  margin-left: 220px;
+  min-width: 600px;
+}
+
+.hawkeye-grid-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line);
+}
+
+.hawkeye-today-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--accent);
+  z-index: 2;
+}
+
+.hawkeye-today-label {
+  position: absolute;
+  top: -20px;
+  left: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.hawkeye-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 58px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.hawkeye-row:last-child { border-bottom: none; }
+.hawkeye-row:hover, .hawkeye-row:focus-visible { background: var(--bg); outline: none; }
+
+.hawkeye-row-label {
+  position: absolute;
+  left: -220px;
+  width: 210px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.hawkeye-row-label strong {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 175px;
+}
+
+.hawkeye-row-sub {
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+.hawkeye-row-track {
+  position: relative;
+  flex: 1 1 auto;
+  height: 58px;
+}
+
+.hawkeye-slip-line {
+  position: absolute;
+  top: 50%;
+  height: 0;
+  border-top: 2px dashed var(--ink-faint);
+}
+
+.hawkeye-marker {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px var(--line-strong);
+  z-index: 1;
+}
+
+.hawkeye-marker-ghost {
+  background: var(--ink-faint);
+  opacity: 0.6;
+  width: 9px;
+  height: 9px;
+}
+
+.hawkeye-marker-milestone {
+  border-radius: 3px;
+}
+
+.hawkeye-marker-golive {
+  width: 14px;
+  height: 14px;
+}
+
+.hawkeye-marker.status-green { background: var(--green); }
+.hawkeye-marker.status-amber { background: var(--amber); }
+.hawkeye-marker.status-red { background: var(--red); }
+.hawkeye-marker.status-black { background: var(--black); }
+
+.hawkeye-marker-label {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .hawkeye-months, .hawkeye-rows { margin-left: 130px; }
+  .hawkeye-row-label { left: -130px; width: 122px; }
+  .hawkeye-row-label strong { max-width: 100px; }
+}
+
 /* ---------- Shared status dot (used on cards, stage board, go-live tracker) ---------- */
 
 .timeline-dot {
