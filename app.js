@@ -1297,59 +1297,32 @@
     scheduleSection.appendChild(renderScheduleTimeline(scheduleEvents));
     root.appendChild(scheduleSection);
 
-    function buildChangelogWeekDetail(snap) {
-      const facts = [];
-      if (snap.stage) facts.push(["Stage", snap.stage]);
-      if (snap.phase) facts.push(["Phase", snap.phase]);
-      facts.push(["Progress", (typeof snap.progress === "number" ? snap.progress : "—") + "%"]);
-      if (snap.delayDays) facts.push(["Delay", snap.delayDays + " day" + (snap.delayDays === 1 ? "" : "s")]);
-      if (snap.delayNote) facts.push(["Delay note", snap.delayNote]);
-
-      const detail = el("div", { class: "changelog-detail" }, [
-        el(
-          "dl",
-          { class: "changelog-detail-facts" },
-          facts.flatMap(([k, v]) => [el("dt", null, [k]), el("dd", null, [v])])
-        ),
+    function buildChangelogWeekSprint(snap) {
+      if (!snap.sprintStatus) {
+        return el("p", { class: "empty-note changelog-sprint-empty" }, [
+          "Sprint work detail wasn't captured for this week's snapshot yet.",
+        ]);
+      }
+      return el("div", { class: "changelog-detail-sprint" }, [
+        el("div", null, [
+          el("h5", null, ["Completed"]),
+          el("ul", null, listOrDash(snap.sprintStatus.completed || [])),
+        ]),
+        el("div", null, [
+          el("h5", null, ["In progress"]),
+          el("ul", null, listOrDash(snap.sprintStatus.inProgress || [])),
+        ]),
+        el("div", null, [
+          el("h5", null, ["Next plan"]),
+          el("ul", null, listOrDash(snap.sprintStatus.nextPlan || [])),
+        ]),
       ]);
-
-      if (snap.sprintStatus) {
-        detail.appendChild(
-          el("div", { class: "changelog-detail-sprint" }, [
-            el("div", null, [
-              el("h5", null, ["Completed"]),
-              el("ul", null, listOrDash(snap.sprintStatus.completed || [])),
-            ]),
-            el("div", null, [
-              el("h5", null, ["In progress"]),
-              el("ul", null, listOrDash(snap.sprintStatus.inProgress || [])),
-            ]),
-            el("div", null, [
-              el("h5", null, ["Next plan"]),
-              el("ul", null, listOrDash(snap.sprintStatus.nextPlan || [])),
-            ]),
-          ])
-        );
-      } else {
-        detail.appendChild(
-          el("p", { class: "empty-note" }, ["Sprint work detail wasn't captured for this week's snapshot yet — it's included for weeks going forward."])
-        );
-      }
-
-      if (snap.risks && snap.risks.length) {
-        detail.appendChild(el("h5", { class: "changelog-detail-sub" }, ["Risks / blockers that week"]));
-        detail.appendChild(el("ul", { class: "paired-list" }, pairedList(snap.risks, snap.riskMitigations || [], "Mitigation plan")));
-      }
-
-      return detail;
     }
 
-    // Change log — click a row to expand what that week's snapshot actually
-    // looked like (phase/stage/progress, sprint work, risks) so you can see
-    // what was worked on that sprint, not just what changed.
+    // Change log — one row per week with what changed, plus that week's
+    // sprint stories (completed / in progress / next) right underneath.
     if (weeks.length) {
       root.appendChild(el("h3", { class: "weekly-subhead" }, ["Week-over-week changes"]));
-      root.appendChild(el("p", { class: "section-subhead", style: "margin:-6px 0 12px;" }, ["Click a week to see what was worked on."]));
       const changeLog = el("div", { class: "changelog" });
       for (let i = weeks.length - 1; i >= 0; i--) {
         const cur = weeks[i];
@@ -1375,25 +1348,16 @@
           );
         }
         if (changes.length) bodyChildren.push(el("div", null, [changes.join(" · ")]));
+        bodyChildren.push(buildChangelogWeekSprint(cur));
 
-        const entry = el("div", { class: "changelog-entry" });
-        entry.appendChild(
+        changeLog.appendChild(
           el("div", { class: "changelog-row" + (statusChanged ? " has-status-change" : "") }, [
             el("div", { class: "changelog-date" }, [fmtDate(cur.asOf)]),
             el("div", { class: "changelog-body" }, bodyChildren),
-            el("span", { class: "changelog-toggle" }, ["▾"]),
           ])
         );
-        entry.appendChild(buildChangelogWeekDetail(cur));
-        changeLog.appendChild(entry);
       }
       root.appendChild(changeLog);
-
-      changeLog.querySelectorAll(".changelog-row").forEach((rowEl) => {
-        rowEl.addEventListener("click", () => {
-          rowEl.parentElement.classList.toggle("is-open");
-        });
-      });
     }
 
     // Current details
