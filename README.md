@@ -27,11 +27,6 @@ to scan instead of a 15-slide deck.
   obvious what still needs to be filled in. Filter chips narrow the grid to
   on-track / at-risk / critical, plus a **PM filter dropdown** to show only
   one person's projects.
-- **Go-live tracker** — every project with a scheduled go-live, sorted by
-  date, showing the original planned date struck through next to the current
-  date whenever it's slipped, plus a delay pill (green/amber/red by severity).
-  Projects without a go-live yet are listed underneath as "not yet scheduled."
-  Click any row to open that project's full detail view.
 
 ## Tab 2 — Pipeline Stages (live)
 
@@ -42,7 +37,15 @@ portfolio actually sits without opening each card. Click any card to jump
 into its full detail view. Inspired by the stage board on Intuit's internal
 PDLC dashboard.
 
-## Tab 3 — Status History (live)
+## Tab 3 — Go-live Tracker (live)
+
+Every project with a scheduled go-live, sorted by date, showing the original
+planned date struck through next to the current date whenever it's slipped,
+plus a delay pill (green/amber/red by severity). Projects without a go-live
+yet are listed underneath as "not yet scheduled." Click any row to open that
+project's full detail view.
+
+## Tab 4 — Status History (live)
 
 A flat, chronological feed of every time a project moved between
 **On Track → At Risk / Delay → Critical** (in either direction), across the
@@ -56,7 +59,7 @@ automatically as weekly updates get ingested; the same status-change is also
 highlighted (as colored pills) inside each project's own week-over-week
 change log in its detail view.
 
-## Tab 4 — Dependencies (live)
+## Tab 5 — Dependencies (live)
 
 Every dependency across every project, flattened into one cross-project
 board and grouped by the **owning team** (DevOps, Security, GMS Team,
@@ -72,7 +75,7 @@ Week-over-week history for an individual project (progress-over-time chart,
 plain-English change log, full feedback history) lives inside that
 project's full detail view — click any project card to open it.
 
-## Tab 5 — Team Performance (skeleton only)
+## Tab 6 — Team Performance (skeleton only)
 
 Placeholder tab for engineering execution metrics (PR velocity, review
 turnaround, commit activity, deploy cadence) once we wire up GitHub data per
@@ -204,7 +207,7 @@ the app code.
 
 ## Roadmap
 
-- [ ] Wire Tab 5 up to real GitHub data (PRs, reviews, commits, deploys) per
+- [ ] Wire Tab 6 up to real GitHub data (PRs, reviews, commits, deploys) per
       project repo.
 - [ ] Add a "resolve" action for follow-ups (currently a manual edit to
       `notes.json` — flip `"status": "open"` to `"resolved"`).
