@@ -568,9 +568,26 @@
     renderStatusHistory();
   }
 
+  function updateGlobalFilterUI() {
+    const bar = document.getElementById("globalFilterBar");
+    const clearBtn = document.getElementById("globalFilterClear");
+    const isActive = globalProjectFilter !== "all";
+    bar.classList.toggle("is-active", isActive);
+    clearBtn.hidden = !isActive;
+  }
+
   function wireGlobalProjectFilter() {
-    document.getElementById("globalProjectFilter").addEventListener("change", (e) => {
+    const select = document.getElementById("globalProjectFilter");
+    select.addEventListener("change", (e) => {
       globalProjectFilter = e.target.value;
+      updateGlobalFilterUI();
+      renderAllTabs();
+    });
+
+    document.getElementById("globalFilterClear").addEventListener("click", () => {
+      globalProjectFilter = "all";
+      select.value = "all";
+      updateGlobalFilterUI();
       renderAllTabs();
     });
   }
