@@ -229,6 +229,25 @@ body {
   box-shadow: var(--shadow-hover);
 }
 
+.metric-card.is-clickable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.metric-card.is-clickable:hover {
+  border-color: var(--accent);
+}
+
+.metric-card.is-active {
+  box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.metric-card.is-active.tone-green { box-shadow: 0 0 0 3px rgba(46, 160, 92, 0.22), var(--shadow-hover); }
+.metric-card.is-active.tone-amber { box-shadow: 0 0 0 3px rgba(217, 143, 21, 0.22), var(--shadow-hover); }
+.metric-card.is-active.tone-red { box-shadow: 0 0 0 3px rgba(214, 62, 62, 0.22), var(--shadow-hover); }
+.metric-card.is-active.tone-black { box-shadow: 0 0 0 3px rgba(30, 30, 30, 0.18), var(--shadow-hover); }
+
 .metric-card.tone-green { border-top-color: var(--green); }
 .metric-card.tone-amber { border-top-color: var(--amber); }
 .metric-card.tone-red { border-top-color: var(--red); }
@@ -294,69 +313,7 @@ body {
   margin: -8px 0 16px;
 }
 
-/* ---------- Filter chips ---------- */
-
-.filter-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-
-.chip {
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.02em;
-  border: 1px solid var(--line-strong);
-  background: var(--bg-panel);
-  color: var(--ink-soft);
-  padding: 6px 13px;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: all 0.12s ease;
-}
-
-.chip:hover { border-color: var(--accent); color: var(--ink); transform: translateY(-1px); }
-
-.chip.is-on {
-  background: linear-gradient(120deg, var(--accent) 0%, var(--accent-2) 100%);
-  border-color: transparent;
-  color: #fff;
-  box-shadow: 0 4px 10px rgba(53, 98, 232, 0.24);
-}
-
-.filter-sep {
-  width: 1px;
-  align-self: stretch;
-  background: var(--line-strong);
-  margin: 2px 4px;
-}
-
-.owner-filter-label {
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.02em;
-  color: var(--ink-faint);
-  align-self: center;
-}
-
-.owner-filter {
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.02em;
-  border: 1px solid var(--line-strong);
-  background: var(--bg-panel);
-  color: var(--ink-soft);
-  padding: 6px 10px;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: all 0.12s ease;
-}
-
-.owner-filter:hover { border-color: var(--accent); color: var(--ink); }
-.owner-filter:focus { outline: none; border-color: var(--accent); }
-
-/* ---------- Global project filter (applies to every tab) ---------- */
+/* ---------- Global project + PM filter (applies to every tab) ---------- */
 
 .global-filter-bar {
   display: flex;
@@ -469,6 +426,13 @@ body {
   color: var(--ink-faint);
   font-style: italic;
   padding-right: 6px;
+}
+
+.global-filter-sep {
+  width: 1px;
+  align-self: stretch;
+  background: var(--line-strong);
+  margin: 4px 2px;
 }
 
 @media (max-width: 640px) {

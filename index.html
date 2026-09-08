@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=26">
+<link rel="stylesheet" href="styles.css?v=27">
 </head>
 <body>
   <div class="wrap">
@@ -43,6 +43,17 @@
         </select>
       </div>
       <button id="globalFilterClear" class="global-filter-clear" type="button" title="Clear filter" hidden>✕</button>
+
+      <span class="global-filter-sep"></span>
+
+      <label class="global-filter-label" for="globalOwnerFilter">PM</label>
+      <div class="global-filter-select-wrap">
+        <select id="globalOwnerFilter" class="global-filter-select">
+          <option value="all">All PMs</option>
+        </select>
+      </div>
+      <button id="globalOwnerClear" class="global-filter-clear" type="button" title="Clear PM filter" hidden>✕</button>
+
       <span class="global-filter-hint">Applies to every tab</span>
     </div>
 
@@ -50,18 +61,6 @@
       <div id="metricsRow" class="metrics-row"></div>
 
       <h2 class="section-heading">Projects</h2>
-      <div class="filter-row" id="filterRow">
-        <button class="chip is-on" data-filter="all">All</button>
-        <button class="chip" data-filter="green">On track</button>
-        <button class="chip" data-filter="amber">At risk</button>
-        <button class="chip" data-filter="red">Critical</button>
-        <button class="chip" data-filter="black">Non-recoverable</button>
-        <span class="filter-sep"></span>
-        <label class="owner-filter-label" for="ownerFilter">PM</label>
-        <select id="ownerFilter" class="owner-filter">
-          <option value="all">All PMs</option>
-        </select>
-      </div>
       <div id="cards" class="cards"></div>
     </section>
 
@@ -175,6 +174,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=22"></script>
+  <script src="app.js?v=23"></script>
 </body>
 </html>

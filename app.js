@@ -13,8 +13,14 @@
   let globalProjectFilter = "all";
 
   function visibleProjects() {
-    if (globalProjectFilter === "all") return DATA.projects;
-    return DATA.projects.filter((p) => p.id === globalProjectFilter);
+    let projects = DATA.projects;
+    if (globalProjectFilter !== "all") {
+      projects = projects.filter((p) => p.id === globalProjectFilter);
+    }
+    if (activeOwner !== "all") {
+      projects = projects.filter((p) => (p.owner || "Unassigned") === activeOwner);
+    }
+    return projects;
   }
 
   function fmtDate(iso) {
@@ -86,12 +92,12 @@
     const avgDelay = projects.length ? Math.round((delaySum / projects.length) * 10) / 10 : 0;
 
     const metrics = [
-      { label: "Total Projects", num: projects.length, tone: "" },
-      { label: "On Track", num: counts.green, tone: "tone-green" },
-      { label: "At Risk", num: counts.amber, tone: "tone-amber" },
-      { label: "Critical", num: counts.red, tone: "tone-red" },
+      { label: "Total Projects", num: projects.length, tone: "", filter: "all" },
+      { label: "On Track", num: counts.green, tone: "tone-green", filter: "green" },
+      { label: "At Risk", num: counts.amber, tone: "tone-amber", filter: "amber" },
+      { label: "Critical", num: counts.red, tone: "tone-red", filter: "red" },
     ];
-    if (counts.black) metrics.push({ label: "Non-Recoverable", num: counts.black, tone: "tone-black" });
+    if (counts.black) metrics.push({ label: "Non-Recoverable", num: counts.black, tone: "tone-black", filter: "black" });
     metrics.push(
       { label: "Avg Delay (days)", num: avgDelay, tone: "tone-accent" },
       { label: "Open Follow-ups", num: NOTES.filter((n) => n.status === "open").length, tone: "tone-accent" }
@@ -100,12 +106,41 @@
     const row = document.getElementById("metricsRow");
     row.innerHTML = "";
     metrics.forEach((m) => {
-      row.appendChild(
-        el("div", { class: "metric-card " + m.tone }, [
+      const isClickable = !!m.filter;
+      const classes = [
+        "metric-card",
+        m.tone,
+        isClickable ? "is-clickable" : "",
+        isClickable && activeFilter === m.filter ? "is-active" : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
+      const card = el(
+        "div",
+        isClickable
+          ? { class: classes, "data-filter": m.filter, tabindex: "0", role: "button", title: "Filter projects by " + m.label }
+          : { class: classes },
+        [
           el("div", { class: "num" }, [String(m.num)]),
           el("div", { class: "label" }, [m.label]),
-        ])
+        ]
       );
+      row.appendChild(card);
+    });
+
+    row.querySelectorAll(".metric-card.is-clickable").forEach((card) => {
+      const applyFilter = () => {
+        activeFilter = card.getAttribute("data-filter");
+        renderMetrics();
+        renderCards();
+      };
+      card.addEventListener("click", applyFilter);
+      card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          applyFilter();
+        }
+      });
     });
   }
 
@@ -225,12 +260,7 @@
   function renderCards() {
     const box = document.getElementById("cards");
     box.innerHTML = "";
-    const projects = visibleProjects().filter((p) => {
-      const statusOk = activeFilter === "all" || p.status === activeFilter;
-      const owner = p.owner || "Unassigned";
-      const ownerOk = activeOwner === "all" || owner === activeOwner;
-      return statusOk && ownerOk;
-    });
+    const projects = visibleProjects().filter((p) => activeFilter === "all" || p.status === activeFilter);
 
     if (!projects.length) {
       box.appendChild(el("div", { class: "empty-note" }, ["No projects match this filter."]));
@@ -290,19 +320,8 @@
     });
   }
 
-  function wireFilters() {
-    document.getElementById("filterRow").querySelectorAll(".chip").forEach((chip) => {
-      chip.addEventListener("click", () => {
-        activeFilter = chip.getAttribute("data-filter");
-        document.querySelectorAll("#filterRow .chip").forEach((c) => c.classList.remove("is-on"));
-        chip.classList.add("is-on");
-        renderCards();
-      });
-    });
-  }
-
-  function wireOwnerFilter() {
-    const select = document.getElementById("ownerFilter");
+  function populateGlobalOwnerFilter() {
+    const select = document.getElementById("globalOwnerFilter");
     const owners = Array.from(
       new Set(DATA.projects.map((p) => p.owner || "Unassigned"))
     ).sort((a, b) => {
@@ -314,10 +333,26 @@
     owners.forEach((owner) => {
       select.appendChild(el("option", { value: owner }, [owner]));
     });
+  }
 
+  function updateGlobalOwnerFilterUI() {
+    const clearBtn = document.getElementById("globalOwnerClear");
+    clearBtn.hidden = activeOwner === "all";
+  }
+
+  function wireGlobalOwnerFilter() {
+    const select = document.getElementById("globalOwnerFilter");
     select.addEventListener("change", () => {
       activeOwner = select.value;
-      renderCards();
+      updateGlobalOwnerFilterUI();
+      renderAllTabs();
+    });
+
+    document.getElementById("globalOwnerClear").addEventListener("click", () => {
+      activeOwner = "all";
+      select.value = "all";
+      updateGlobalOwnerFilterUI();
+      renderAllTabs();
     });
   }
 
@@ -1391,12 +1426,12 @@
     renderHeader();
     populateGlobalProjectFilter();
     wireGlobalProjectFilter();
+    populateGlobalOwnerFilter();
+    wireGlobalOwnerFilter();
     renderMetrics();
     renderStageBoard();
     renderHawkeye();
     renderCards();
-    wireFilters();
-    wireOwnerFilter();
 
     renderDependenciesTab();
     wireDependenciesFilters();
