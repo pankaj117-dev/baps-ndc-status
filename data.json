@@ -1,6 +1,6 @@
 {
-  "asOf": "2026-08-31",
-  "lastUpdated": "2026-08-31T00:00:00-04:00",
+  "asOf": "2026-09-08",
+  "lastUpdated": "2026-09-08T01:52:00-04:00",
   "projects": [
     {
       "id": "webnext",
@@ -148,20 +148,18 @@
       "id": "emm",
       "name": "EMM",
       "owner": "Nitin Chaudhary",
-      "status": "amber",
+      "status": "green",
       "progress": 90,
-      "phase": "Production",
+      "phase": "Live in production (pilot rollout) — monitoring check-printing & workflow-approval performance; tracking fast-follow items before full rollout",
       "nextMilestone": {
-        "name": "Go-Live",
-        "date": "2026-08-28"
+        "name": "Full rollout (post fast-follow closure)",
+        "date": null
       },
       "goLive": "2026-08-28",
       "originalGoLive": "2026-08-25",
       "delayDays": 3,
       "delayNote": "Go-live slipped 3 days to 28-Aug-2026 due to performance risk in check printing and workflow approval",
-      "dependencies": [
-        "Business decision on Post Go-Live REQ — HTML report vs PDF"
-      ],
+      "dependencies": [],
       "sprintStatus": {
         "completed": [],
         "inProgress": [
@@ -178,15 +176,15 @@
         "Team working on performance enhancements for check printing",
         "WALL-E team addressing approval endpoint performance"
       ],
-      "dependencyMitigations": [
-        ""
-      ],
+      "dependencyMitigations": [],
       "delayMitigation": [],
       "delayTradeoffs": "",
-      "dependencyTeams": [
-        "Business/Stakeholder"
-      ],
-      "stage": "Production Release"
+      "dependencyTeams": [],
+      "stage": "Hypercare / Post-Launch",
+      "fastFollowItems": [
+        "Business decision on Post Go-Live REQ — HTML report vs PDF",
+        "Full expense reports feature — in progress"
+      ]
     },
     {
       "id": "mybky-phase1",
