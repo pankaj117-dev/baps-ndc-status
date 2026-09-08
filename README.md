@@ -9,7 +9,7 @@ so any PM can update it by editing one JSON file and pushing.
 ## Global project filter
 
 A **"🔎 Project" dropdown** sits right under the tab bar, visible on every
-tab. Pick a project and Program Status, Pipeline Stages, Go-live Tracker,
+tab. Pick a project and Program Status, Pipeline Stages, Hawk-eye,
 Status History, and Dependencies all narrow down to just that project (the
 metrics row recomputes for the filtered set too). Set it back to "All
 projects" to see everything again. This is separate from — and stacks
@@ -49,15 +49,7 @@ portfolio actually sits without opening each card. Click any card to jump
 into its full detail view. Inspired by the stage board on Intuit's internal
 PDLC dashboard.
 
-## Tab 3 — Go-live Tracker (live)
-
-Every project with a scheduled go-live, sorted by date, showing the original
-planned date struck through next to the current date whenever it's slipped,
-plus a delay pill (green/amber/red by severity). Projects without a go-live
-yet are listed underneath as "not yet scheduled." Click any row to open that
-project's full detail view.
-
-## Tab 4 — 🦅 Hawk-eye (live, rough until fuller schedule data lands)
+## Tab 3 — 🦅 Hawk-eye (live, rough until fuller schedule data lands)
 
 A cross-project Gantt: every project on one shared calendar timeline, one
 row each, sorted by go-live date. Shows the next milestone (small square),
@@ -73,7 +65,7 @@ so it's a rough first pass. It's built to also read a richer, optional
 project (see data model below) — once that's populated, each project's row
 will plot its **full** schedule instead of just one milestone + go-live.
 
-## Tab 5 — Status History (live)
+## Tab 4 — Status History (live)
 
 A flat, chronological feed of every time a project moved between
 **On Track → At Risk / Delay → Critical → Non-Recoverable** (in either
@@ -89,7 +81,7 @@ automatically as weekly updates get ingested; the same status-change is also
 highlighted (as colored pills) inside each project's own week-over-week
 change log in its detail view.
 
-## Tab 6 — Dependencies (live)
+## Tab 5 — Dependencies (live)
 
 Every dependency across every project, flattened into one cross-project
 board and grouped by the **owning team** (DevOps, Security, GMS Team,
@@ -109,7 +101,7 @@ detail view — click any project card to open it. If the project is live/in
 production but not fully closed out, a **"Fast-follow items to close"**
 block also shows up there listing what's left.
 
-## Tab 7 — Team Performance (skeleton only)
+## Tab 6 — Team Performance (skeleton only)
 
 Placeholder tab for engineering execution metrics (PR velocity, review
 turnaround, commit activity, deploy cadence) once we wire up GitHub data per
@@ -200,7 +192,7 @@ Everything lives in three files:
   "nextMilestone": { "name": "Requirements Finalization", "date": "2026-08-21" },
   "goLive": "2026-09-25",     // current planned go-live, or null if not yet set
   "originalGoLive": "2026-09-21", // baseline date, set once and preserved across
-                                   // slips so the go-live tracker can show the delta
+                                   // slips so Hawk-eye and the changelog can show the delta
   "delayDays": 0,              // 0 if on schedule, positive integer if late
   "delayNote": "No delay reported",
   "delayImpact": "",           // required in the form whenever delayDays > 0
@@ -218,7 +210,7 @@ Everything lives in three files:
   "riskMitigations": ["..."],  // same length/order as risks — mitigation plan + impact for each
   "fastFollowItems": ["..."],  // one per line — remaining work to fully close out a live/in-production
                                 // project; shows a badge on the card and a block in the detail view
-  "milestones": [              // OPTIONAL — full schedule for the Hawk-eye Gantt (Tab 4). If omitted,
+  "milestones": [              // OPTIONAL — full schedule for the Hawk-eye Gantt (Tab 3). If omitted,
                                 // Hawk-eye falls back to plotting just `nextMilestone` + `goLive`.
     { "name": "Requirements sign-off", "date": "2026-08-01", "status": "green" }
   ]
@@ -262,10 +254,10 @@ the app code.
 
 ## Roadmap
 
-- [ ] Wire Tab 7 up to real GitHub data (PRs, reviews, commits, deploys) per
+- [ ] Wire Tab 6 up to real GitHub data (PRs, reviews, commits, deploys) per
       project repo.
 - [ ] Once fuller project schedule data comes in, add a `milestones` array
-      per project (see Hawk-eye, Tab 4) so the Gantt plots the full timeline
+      per project (see Hawk-eye, Tab 3) so the Gantt plots the full timeline
       instead of just next-milestone + go-live.
 - [ ] Add a "resolve" action for follow-ups (currently a manual edit to
       `notes.json` — flip `"status": "open"` to `"resolved"`).

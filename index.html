@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=24">
+<link rel="stylesheet" href="styles.css?v=25">
 </head>
 <body>
   <div class="wrap">
@@ -28,7 +28,6 @@
     <nav class="tabbar" role="tablist">
       <button class="tab-btn is-active" data-tab="status" role="tab" aria-selected="true">Program Status</button>
       <button class="tab-btn" data-tab="stages" role="tab" aria-selected="false">Pipeline Stages</button>
-      <button class="tab-btn" data-tab="golive" role="tab" aria-selected="false">Go-live Tracker</button>
       <button class="tab-btn" data-tab="hawkeye" role="tab" aria-selected="false">🦅 Hawk-eye</button>
       <button class="tab-btn" data-tab="statushistory" role="tab" aria-selected="false">Status History</button>
       <button class="tab-btn" data-tab="deps" role="tab" aria-selected="false">Dependencies</button>
@@ -70,12 +69,6 @@
       <h2 class="section-heading">Pipeline stages</h2>
       <p class="section-subhead">Every project, grouped by where it actually sits in the delivery pipeline right now — click a card to open the full detail view.</p>
       <div id="stageBoard" class="stage-board stage-board-expanded"></div>
-    </section>
-
-    <section id="panel-golive" class="tab-panel">
-      <h2 class="section-heading">Go-live tracker</h2>
-      <p class="section-subhead">Original target vs. current date for every project with a go-live scheduled — click a row for the full slip history.</p>
-      <div id="goliveTracker" class="golive-table"></div>
     </section>
 
     <section id="panel-hawkeye" class="tab-panel">
@@ -182,6 +175,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=21"></script>
+  <script src="app.js?v=22"></script>
 </body>
 </html>
