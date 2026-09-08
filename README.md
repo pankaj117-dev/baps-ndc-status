@@ -9,12 +9,12 @@ so any PM can update it by editing one JSON file and pushing.
 ## Global project filter
 
 A **"🔎 Project" dropdown** sits right under the tab bar, visible on every
-tab. Pick a project and Program Status, Pipeline Stages, Hawk-eye,
-Status History, and Dependencies all narrow down to just that project (the
-metrics row recomputes for the filtered set too). Set it back to "All
-projects" to see everything again. This is separate from — and stacks
-with — the per-tab filters (PM, team, status-history project) already on
-some tabs.
+tab, next to a **"PM" dropdown**. Pick a project and/or a PM and Program
+Status, Pipeline Stages, Hawk-eye, Status History, and Dependencies all
+narrow down to match (the metrics row recomputes for the filtered set too).
+Clear either with the ✕ button to see everything again. These two global
+filters replace the old per-tab Team/Status/PM filter rows — one filter bar,
+same effect everywhere.
 
 ## Why this exists
 
@@ -74,8 +74,8 @@ date, the from → to status pills, the project name (click to jump into its
 full detail view), what stage/progress the project was tracking at when it
 happened, and whatever context was captured that moment — the reason for the
 change (required for any downgrade — see below), delay note, days delayed,
-or current phase. Filter to a single project with the dropdown. This answers
-"when did SPM go red, and why?" without digging through every project's
+or current phase. Filter to a single project with the global Project filter
+above the tabs. This answers "when did SPM go red, and why?" without digging through every project's
 individual change log. Built from `history.json` snapshots, so it fills in
 automatically as weekly updates get ingested; the same status-change is also
 highlighted (as colored pills) inside each project's own week-over-week
@@ -88,9 +88,10 @@ board and grouped by the **owning team** (DevOps, Security, GMS Team,
 Business/Stakeholder, etc. — whatever the PM labels it as in their weekly
 update). Each card shows which project it's blocking, the dependency text,
 and its mitigation plan / impact — with anything missing a team label or a
-mitigation plan flagged in amber so it's obvious what to chase down. Filter
-by team or by "missing info" status; click a project name to jump straight
-into its full detail view. This is the fastest way to answer "what's DevOps
+mitigation plan flagged in amber so it's obvious what to chase down (see the
+metrics row at the top for the counts). Use the global Project/PM filter to
+narrow this to one project or PM; click a project name to jump straight into
+its full detail view. This is the fastest way to answer "what's DevOps
 blocking us on this week?" without reading every project card individually.
 
 Week-over-week history for an individual project (progress-over-time chart,

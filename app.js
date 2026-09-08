@@ -559,9 +559,6 @@
 
   /* ---------------- Tab: Dependencies ---------------- */
 
-  let depsTeamFilter = "all";
-  let depsStatusFilter = "all";
-
   function collectDependencies() {
     const rows = [];
     visibleProjects().forEach((p) => {
@@ -604,40 +601,17 @@
     });
   }
 
-  function populateDepsTeamFilter(rows) {
-    const select = document.getElementById("depsTeamFilter");
-    const existing = new Set(Array.from(select.options).map((o) => o.value));
-    const teams = Array.from(new Set(rows.map((r) => r.team || "Unlabeled"))).sort((a, b) => {
-      if (a === "Unlabeled") return 1;
-      if (b === "Unlabeled") return -1;
-      return a.localeCompare(b);
-    });
-    teams.forEach((team) => {
-      if (!existing.has(team)) select.appendChild(el("option", { value: team }, [team]));
-    });
-  }
-
   function renderDependenciesBoard(rows) {
     const board = document.getElementById("depsBoard");
     board.innerHTML = "";
 
-    const filtered = rows.filter((r) => {
-      const teamKey = r.team || "Unlabeled";
-      const teamOk = depsTeamFilter === "all" || teamKey === depsTeamFilter;
-      const statusOk =
-        depsStatusFilter === "all" ||
-        (depsStatusFilter === "missing-team" && !r.team) ||
-        (depsStatusFilter === "missing-mitigation" && !r.mitigation);
-      return teamOk && statusOk;
-    });
-
-    if (!filtered.length) {
-      board.appendChild(el("div", { class: "deps-empty-group" }, ["No dependencies match this filter."]));
+    if (!rows.length) {
+      board.appendChild(el("div", { class: "deps-empty-group" }, ["No dependencies recorded yet."]));
       return;
     }
 
     const groups = {};
-    filtered.forEach((r) => {
+    rows.forEach((r) => {
       const key = r.team || "Unlabeled";
       (groups[key] = groups[key] || []).push(r);
     });
@@ -679,8 +653,6 @@
 
   /* ---------------- Status History ---------------- */
 
-  let statusHistoryFilter = "all";
-
   function computeStatusTransitions() {
     const dates = Object.keys(HISTORY).sort();
     const nameById = {};
@@ -715,26 +687,14 @@
     return transitions.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : a.projectName.localeCompare(b.projectName)));
   }
 
-  function populateStatusHistoryFilter(transitions) {
-    const select = document.getElementById("statusHistoryFilter");
-    const existing = new Set(Array.from(select.options).map((o) => o.value));
-    const names = Array.from(new Set(transitions.map((t) => t.projectName))).sort((a, b) => a.localeCompare(b));
-    names.forEach((name) => {
-      if (!existing.has(name)) select.appendChild(el("option", { value: name }, [name]));
-    });
-  }
-
   function renderStatusHistory() {
     const transitions = computeStatusTransitions();
-    populateStatusHistoryFilter(transitions);
 
     const list = document.getElementById("statusHistoryList");
     list.innerHTML = "";
 
     const filtered = transitions.filter(
-      (t) =>
-        (statusHistoryFilter === "all" || t.projectName === statusHistoryFilter) &&
-        (globalProjectFilter === "all" || t.projectId === globalProjectFilter)
+      (t) => globalProjectFilter === "all" || t.projectId === globalProjectFilter
     );
 
     if (!filtered.length) {
@@ -809,29 +769,10 @@
     });
   }
 
-  function wireStatusHistoryFilter() {
-    document.getElementById("statusHistoryFilter").addEventListener("change", (e) => {
-      statusHistoryFilter = e.target.value;
-      renderStatusHistory();
-    });
-  }
-
   function renderDependenciesTab() {
     const rows = collectDependencies();
     renderDependenciesMetrics(rows);
-    populateDepsTeamFilter(rows);
     renderDependenciesBoard(rows);
-  }
-
-  function wireDependenciesFilters() {
-    document.getElementById("depsTeamFilter").addEventListener("change", (e) => {
-      depsTeamFilter = e.target.value;
-      renderDependenciesBoard(collectDependencies());
-    });
-    document.getElementById("depsStatusFilter").addEventListener("change", (e) => {
-      depsStatusFilter = e.target.value;
-      renderDependenciesBoard(collectDependencies());
-    });
   }
 
   /* ---------------- Project detail overlay ---------------- */
@@ -1461,10 +1402,8 @@
     renderCards();
 
     renderDependenciesTab();
-    wireDependenciesFilters();
 
     renderStatusHistory();
-    wireStatusHistoryFilter();
 
     wireProjectDetail();
     wireFeedbackModal();
