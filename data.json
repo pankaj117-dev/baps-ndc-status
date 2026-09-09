@@ -34,7 +34,10 @@
       "delayTradeoffs": "",
       "dependencyTeams": [],
       "stage": "Hypercare / Post-Launch",
-      "escalations": []
+      "escalations": [],
+      "timeSavedDays": 0,
+      "timeSavedNote": [],
+      "scopeReduced": false
     },
     {
       "id": "webnext-2",
@@ -75,7 +78,10 @@
       },
       "risks": [],
       "riskMitigations": [],
-      "escalations": []
+      "escalations": [],
+      "timeSavedDays": 0,
+      "timeSavedNote": [],
+      "scopeReduced": false
     },
     {
       "id": "pledge",
@@ -110,7 +116,10 @@
       "delayTradeoffs": "",
       "dependencyTeams": [],
       "stage": "Hypercare / Post-Launch",
-      "escalations": []
+      "escalations": [],
+      "timeSavedDays": 0,
+      "timeSavedNote": [],
+      "scopeReduced": false
     },
     {
       "id": "pledge-1a",
@@ -146,7 +155,10 @@
       "riskMitigations": [
         ""
       ],
-      "escalations": []
+      "escalations": [],
+      "timeSavedDays": 0,
+      "timeSavedNote": [],
+      "scopeReduced": false
     },
     {
       "id": "emm",
@@ -189,7 +201,10 @@
         "Business decision on Post Go-Live REQ — HTML report vs PDF",
         "Full expense reports feature — in progress"
       ],
-      "escalations": []
+      "escalations": [],
+      "timeSavedDays": 0,
+      "timeSavedNote": [],
+      "scopeReduced": false
     },
     {
       "id": "mybky-phase1",
@@ -248,7 +263,10 @@
         "Business/Stakeholder"
       ],
       "stage": "QA / UAT",
-      "escalations": []
+      "escalations": [],
+      "timeSavedDays": 0,
+      "timeSavedNote": [],
+      "scopeReduced": false
     },
     {
       "id": "mybky-phase2",
@@ -309,7 +327,10 @@
         "Business/Stakeholder"
       ],
       "stage": "Requirements",
-      "escalations": []
+      "escalations": [],
+      "timeSavedDays": 0,
+      "timeSavedNote": [],
+      "scopeReduced": false
     },
     {
       "id": "mymandir",
@@ -364,7 +385,10 @@
         "Business/Stakeholder (Shreyank)"
       ],
       "stage": "Requirements",
-      "escalations": []
+      "escalations": [],
+      "timeSavedDays": 0,
+      "timeSavedNote": [],
+      "scopeReduced": false
     },
     {
       "id": "gms",
@@ -399,7 +423,10 @@
       "delayTradeoffs": "",
       "dependencyTeams": [],
       "stage": "Production Release",
-      "escalations": []
+      "escalations": [],
+      "timeSavedDays": 0,
+      "timeSavedNote": [],
+      "scopeReduced": false
     },
     {
       "id": "baps-sso",
@@ -446,7 +473,10 @@
         "Other App Owners"
       ],
       "stage": "Development",
-      "escalations": []
+      "escalations": [],
+      "timeSavedDays": 0,
+      "timeSavedNote": [],
+      "scopeReduced": false
     },
     {
       "id": "spm",
@@ -509,7 +539,10 @@
         "DevOps"
       ],
       "stage": "QA / UAT",
-      "escalations": []
+      "escalations": [],
+      "timeSavedDays": 0,
+      "timeSavedNote": [],
+      "scopeReduced": false
     },
     {
       "id": "bkms",
@@ -553,7 +586,10 @@
         "DevOps"
       ],
       "stage": "Development",
-      "escalations": []
+      "escalations": [],
+      "timeSavedDays": 0,
+      "timeSavedNote": [],
+      "scopeReduced": false
     },
     {
       "id": "mis",
@@ -598,7 +634,10 @@
         ""
       ],
       "stage": "Development",
-      "escalations": []
+      "escalations": [],
+      "timeSavedDays": 0,
+      "timeSavedNote": [],
+      "scopeReduced": false
     },
     {
       "id": "mysatsang-bapsid",
@@ -662,7 +701,10 @@
         ""
       ],
       "stage": "Design / Estimation",
-      "escalations": []
+      "escalations": [],
+      "timeSavedDays": 0,
+      "timeSavedNote": [],
+      "scopeReduced": false
     }
   ]
 }

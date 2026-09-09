@@ -69,6 +69,18 @@ def apply_weekly_update(project, fields):
     if delay_tradeoffs:
         project["delayTradeoffs"] = delay_tradeoffs.strip()
 
+    time_saved_days = fields.get("Time saved this week (days)", "")
+    if time_saved_days:
+        project["timeSavedDays"] = to_int(time_saved_days, project.get("timeSavedDays", 0))
+
+    time_saved_note = fields.get("What did the team do to save that time?", "")
+    if time_saved_note:
+        project["timeSavedNote"] = lines(time_saved_note)
+
+    scope_reduced = fields.get("Reducing scope to hold the date?", "")
+    if scope_reduced:
+        project["scopeReduced"] = scope_reduced.strip().lower() == "yes"
+
     status = fields.get("Overall status", "")
     if status:
         key = STATUS_TEXT_TO_KEY.get(status.strip().lower())
@@ -134,7 +146,7 @@ def apply_weekly_update(project, fields):
     if risk_mitigation:
         project["riskMitigations"] = lines(risk_mitigation)
 
-    fast_follow = fields.get("Fast-follow items to close", "")
+    fast_follow = fields.get("Fast-follow items (planned or remaining)", "")
     if fast_follow:
         project["fastFollowItems"] = lines(fast_follow)
 
@@ -289,6 +301,9 @@ def snapshot_history(data, history):
                 "delayImpact": p.get("delayImpact", ""),
                 "delayMitigation": p.get("delayMitigation", []),
                 "delayTradeoffs": p.get("delayTradeoffs", ""),
+                "timeSavedDays": p.get("timeSavedDays", 0),
+                "timeSavedNote": p.get("timeSavedNote", []),
+                "scopeReduced": p.get("scopeReduced", False),
                 "risks": p.get("risks", []),
                 "riskMitigations": p.get("riskMitigations", []),
                 "fastFollowItems": p.get("fastFollowItems", []),

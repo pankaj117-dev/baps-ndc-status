@@ -31,7 +31,10 @@
         ],
         "stage": "Requirements",
         "delayNote": "No delay reported",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "pledge",
@@ -65,7 +68,10 @@
         ],
         "stage": "Production Release",
         "delayNote": "No delay reported",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "emm",
@@ -103,7 +109,10 @@
         ],
         "stage": "QA / UAT",
         "delayNote": "No impact on go-live",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "mybky-phase1",
@@ -151,7 +160,10 @@
         ],
         "stage": "QA / UAT",
         "delayNote": "Mobile dev delayed — may impact regression testing",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "mybky-phase2",
@@ -195,7 +207,10 @@
         ],
         "stage": "Requirements",
         "delayNote": "Requirement phase delayed",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "mymandir",
@@ -230,7 +245,10 @@
         ],
         "stage": "Design / Estimation",
         "delayNote": "12 days delayed",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "gms",
@@ -267,7 +285,10 @@
         ],
         "stage": "QA / UAT",
         "delayNote": "19 days delayed",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "baps-sso",
@@ -302,7 +323,10 @@
         ],
         "stage": "Development",
         "delayNote": "No delay reported",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "spm",
@@ -340,7 +364,10 @@
         ],
         "stage": "QA / UAT",
         "delayNote": "2 days delay in UAT deployment — timeline revised",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "bkms",
@@ -371,7 +398,10 @@
         ],
         "stage": "Development",
         "delayNote": "No delay reported",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "mis",
@@ -402,7 +432,10 @@
         ],
         "stage": "Development",
         "delayNote": "No delay reported",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       }
     ]
   },
@@ -432,7 +465,10 @@
         "dependencyTeams": [],
         "dependencyMitigations": [],
         "delayNote": "In hypercare through 15-Sep-2026 — infinite caching rollout ETA 3-Sep-2026",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "webnext-2",
@@ -463,7 +499,10 @@
           ""
         ],
         "delayNote": "No delay reported — new project just starting requirements",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "pledge",
@@ -488,7 +527,10 @@
         "dependencyTeams": [],
         "dependencyMitigations": [],
         "delayNote": "Live in production; in hypercare through 15-Sep-2026",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "pledge-1a",
@@ -514,7 +556,10 @@
         "dependencyTeams": [],
         "dependencyMitigations": [],
         "delayNote": "No delay reported — new project just starting TDD phase",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "emm",
@@ -551,7 +596,10 @@
           ""
         ],
         "delayNote": "Go-live slipped 3 days to 28-Aug-2026 due to performance risk in check printing and workflow approval",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "mybky-phase1",
@@ -598,7 +646,10 @@
           ""
         ],
         "delayNote": "Regression delayed 10 days; 2 CRs pushed go-live by 6 days (business requested to prioritize CRs); UAT sign-off for Event config/registration delayed to 4-Sep-2026",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "mybky-phase2",
@@ -645,7 +696,10 @@
           ""
         ],
         "delayNote": "Requirement phase delayed — GMS FRD review delayed 8 days, Guest Registration FRD creation delayed 12 days",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "mymandir",
@@ -686,7 +740,10 @@
           ""
         ],
         "delayNote": "Stakeholder sign-off on requirements delayed — Sameep on vacation leave, review pending with Amar Mehta as backup",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "gms",
@@ -711,7 +768,10 @@
         "dependencyTeams": [],
         "dependencyMitigations": [],
         "delayNote": "Production deployment ongoing, targeting 2-Sep-2026",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "baps-sso",
@@ -743,7 +803,10 @@
           ""
         ],
         "delayNote": "Go-live date TBD — dependent on other application owners integrating the SSO API",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "spm",
@@ -792,7 +855,10 @@
           ""
         ],
         "delayNote": "Go-live slipped to 7-Sep-2026 — pending VAPT re-verification, load testing, and production server readiness",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "bkms",
@@ -823,7 +889,10 @@
           ""
         ],
         "delayNote": "No delay reported",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "mis",
@@ -854,7 +923,10 @@
           ""
         ],
         "delayNote": "No delay reported",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "mysatsang-bapsid",
@@ -900,7 +972,10 @@
           ""
         ],
         "delayNote": "Not yet scheduled — start/due dates not set in the integration plan",
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       }
     ]
   },
@@ -940,7 +1015,10 @@
           ],
           "nextPlan": []
         },
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "webnext-2",
@@ -982,7 +1060,10 @@
             "New QA to be fully involved in project from the start — build test cases and test plan"
           ]
         },
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "pledge",
@@ -1018,7 +1099,10 @@
           ],
           "nextPlan": []
         },
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "pledge-1a",
@@ -1055,7 +1139,10 @@
             "15 user stories total — 4 achievable with 1 backend developer, 9 with 2 backend developers, by end of October"
           ]
         },
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "emm",
@@ -1098,7 +1185,10 @@
           ],
           "nextPlan": []
         },
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "mybky-phase1",
@@ -1158,7 +1248,10 @@
           ],
           "nextPlan": []
         },
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "mybky-phase2",
@@ -1220,7 +1313,10 @@
           ],
           "nextPlan": []
         },
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "mymandir",
@@ -1276,7 +1372,10 @@
             "Developers onboarded onto bug-fixing tasks immediately (per Swami's direction) until design approvals received"
           ]
         },
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "gms",
@@ -1312,7 +1411,10 @@
             "Go-live — 2-Sep-2026"
           ]
         },
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "baps-sso",
@@ -1360,7 +1462,10 @@
           ],
           "nextPlan": []
         },
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "spm",
@@ -1424,7 +1529,10 @@
             "Support needed from DevOps, VAPT and Performance Testing teams to complete pending activities on priority"
           ]
         },
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "bkms",
@@ -1469,7 +1577,10 @@
           ],
           "nextPlan": []
         },
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "mis",
@@ -1515,7 +1626,10 @@
           ],
           "nextPlan": []
         },
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       },
       {
         "id": "mysatsang-bapsid",
@@ -1580,7 +1694,10 @@
             "MST-UI — use POST me/devices to register the user's device"
           ]
         },
-        "escalations": []
+        "escalations": [],
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false
       }
     ]
   }

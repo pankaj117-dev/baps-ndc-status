@@ -138,6 +138,29 @@ body:
       label: Trade-off conversations
       description: "Any trade-offs discussed or decided because of this delay — cutting scope, shifting resources, accepting risk, revising the date, etc. Leave blank if none."
       placeholder: "Agreed with leadership to drop the PDF export feature from this release to hold the go-live date"
+  - type: input
+    id: time_saved_days
+    attributes:
+      label: Time saved this week (days)
+      description: "Went the other way? If the team pulled time back IN this week, how many days ahead of plan did that put you? Leave blank/0 if none."
+      placeholder: "2"
+  - type: textarea
+    id: time_saved_note
+    attributes:
+      label: What did the team do to save that time?
+      description: "One per line. What specifically got faster/parallelized/automated/cut that bought this time back? Required if 'Time saved' above is > 0."
+      placeholder: |
+        Automated the regression suite instead of running it manually
+        Parallelized mobile + web QA instead of doing them sequentially
+  - type: dropdown
+    id: scope_reduced
+    attributes:
+      label: Reducing scope to hold the date?
+      description: "Are you cutting/deferring any scope this week to keep the current go-live? If Yes, list what's being deferred in 'Fast-follow items' below so it's tracked and doesn't get lost after launch."
+      options:
+        - "No"
+        - "Yes"
+      default: 0
   - type: textarea
     id: dependencies
     attributes:
@@ -193,10 +216,13 @@ body:
   - type: textarea
     id: fast_follow
     attributes:
-      label: Fast-follow items to close
+      label: Fast-follow items (planned or remaining)
       description: >-
-        If this project is live/in production but not fully closed out, list what's still left to
-        deliver before it can be marked done. One per line. Leave blank once nothing remains.
+        Everything that's being deferred past go-live — whether that's scope you're cutting now to
+        hold the date (see "Reducing scope?" above) or, once live, what's still left to deliver
+        before the project can be marked fully done. One per line — this shows up as its own
+        tracked section on the project's dashboard view so it's not forgotten after launch.
+        Leave blank once nothing remains.
       placeholder: |
         Add bulk-export button to admin console
         Migrate legacy reports to new schema

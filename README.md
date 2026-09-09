@@ -108,9 +108,14 @@ Week-over-week history for an individual project (progress-over-time chart,
 a **schedule timeline** tracking every time the go-live or next-milestone
 date moved — e.g. from a CR — with the date it happened, plain-English
 change log, and full feedback history) lives inside that project's full
-detail view — click any project card to open it. If the project is live/in
-production but not fully closed out, a **"Fast-follow items to close"**
-block also shows up there listing what's left.
+detail view — click any project card to open it. If time was pulled back
+IN this week, a green **"Time saved"** block shows up there with how many
+days ahead of plan that put the team and what specifically was done to
+save it. If the project is cutting/deferring scope to hold the date, or is
+live/in production but not fully closed out, a **"Fast-follow items
+(planned or remaining)"** block shows up there listing what's been
+deferred — a card badge (✂️ scope cut / N fast-follow) flags this at a
+glance so nothing gets forgotten once the project launches.
 
 Each row in the **"Week-over-week changes"** log shows what changed that
 week (progress/phase/stage/status). Click a row to load the **Dependencies /
@@ -237,6 +242,12 @@ Everything lives in three files:
   "delayImpact": "",           // required in the form whenever delayDays > 0
   "delayMitigation": ["..."],  // one per line — what's being done to recover the delay
   "delayTradeoffs": "",        // any scope/resource/date trade-offs made because of the delay
+  "timeSavedDays": 0,          // positive integer if the team pulled time back IN this week
+  "timeSavedNote": ["..."],    // one per line — what specifically was done to save that time;
+                                // required in the form whenever timeSavedDays > 0
+  "scopeReduced": false,       // true if scope is being cut/deferred this week to hold the go-live
+                                // date — flags a "✂️ scope cut" badge on the card; what's being
+                                // deferred should be listed in fastFollowItems below
   "dependencies": ["..."],
   "dependencyTeams": ["..."],       // same length/order as dependencies — which team owns unblocking it
   "dependencyMitigations": ["..."], // same length/order as dependencies — plan + impact for each
@@ -247,8 +258,10 @@ Everything lives in three files:
   },
   "risks": ["..."],
   "riskMitigations": ["..."],  // same length/order as risks — mitigation plan + impact for each
-  "fastFollowItems": ["..."],  // one per line — remaining work to fully close out a live/in-production
-                                // project; shows a badge on the card and a block in the detail view
+  "fastFollowItems": ["..."],  // one per line — scope being deferred (see scopeReduced above) and/or
+                                // remaining work to fully close out a live/in-production project;
+                                // shows a badge on the card and a block in the detail view so it's
+                                // tracked and doesn't get forgotten once the project launches
   "escalations": ["..."],      // one per line — things needing a leadership decision/unblock THIS week.
                                 // Unlike other fields, a blank submission CLEARS this (it isn't "unchanged"
                                 // like most fields — it means nothing to escalate this week). Drives the

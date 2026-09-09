@@ -1453,6 +1453,19 @@ body {
   font-weight: 700;
 }
 
+.badge.has-scopecut {
+  background: var(--amber-bg);
+  border-color: transparent;
+  color: var(--amber);
+}
+
+.badge.has-timesaved {
+  background: var(--green-bg);
+  border-color: transparent;
+  color: var(--green);
+  font-weight: 700;
+}
+
 .detail-block.followups li { color: var(--accent); font-weight: 500; }
 
 .detail-block.delay-recovery,
@@ -1473,6 +1486,24 @@ body {
   border: 1px solid #f3dcae;
   border-radius: var(--radius);
   padding: 14px 16px;
+}
+
+.detail-block.time-saved {
+  background: var(--green-bg);
+  border: 1px solid #b7e6cd;
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.detail-block.time-saved h4 {
+  margin: 0 0 8px;
+  color: var(--green);
+  font-weight: 700;
+}
+
+.detail-block.time-saved li {
+  color: var(--ink);
+  font-weight: 500;
 }
 
 .detail-block.fast-follow .empty-note {

@@ -302,6 +302,12 @@
           ...((p.fastFollowItems || []).length
             ? [el("span", { class: "badge has-fastfollow" }, [(p.fastFollowItems || []).length + " fast-follow"])]
             : []),
+          ...(p.scopeReduced
+            ? [el("span", { class: "badge has-scopecut" }, ["✂️ scope cut"])]
+            : []),
+          ...((p.timeSavedDays || 0) > 0
+            ? [el("span", { class: "badge has-timesaved" }, ["⏱ +" + p.timeSavedDays + "d saved"])]
+            : []),
           ...((p.escalations || []).length
             ? [el("span", { class: "badge has-escalation" }, ["🚨 " + (p.escalations || []).length + " escalated"])]
             : []),
@@ -1378,6 +1384,18 @@
       );
     }
 
+    if ((p.timeSavedDays || 0) > 0) {
+      root.appendChild(el("h3", { class: "weekly-subhead" }, ["Time saved"]));
+      root.appendChild(
+        el("div", { class: "detail-block time-saved" }, [
+          el("h4", null, ["+" + p.timeSavedDays + " day" + (p.timeSavedDays === 1 ? "" : "s") + " ahead of plan"]),
+          p.timeSavedNote && p.timeSavedNote.length
+            ? el("ul", null, listOrDash(p.timeSavedNote))
+            : el("p", { class: "empty-note is-missing" }, ["Not yet documented"]),
+        ])
+      );
+    }
+
     if (openFollowUps.length) {
       root.appendChild(el("h3", { class: "weekly-subhead" }, ["Open follow-ups"]));
       root.appendChild(
@@ -1387,11 +1405,15 @@
       );
     }
 
-    if ((p.fastFollowItems || []).length) {
-      root.appendChild(el("h3", { class: "weekly-subhead" }, ["Fast-follow items to close"]));
+    if ((p.fastFollowItems || []).length || p.scopeReduced) {
+      root.appendChild(el("h3", { class: "weekly-subhead" }, ["Fast-follow items (planned or remaining)"]));
       root.appendChild(
         el("div", { class: "detail-block fast-follow" }, [
-          el("p", { class: "empty-note" }, ["Live / in production, but not fully closed out until these ship:"]),
+          el("p", { class: "empty-note" }, [
+            p.scopeReduced
+              ? "Scope is being cut/deferred to hold the current date. Live / in production, but not fully closed out until these ship:"
+              : "Live / in production, but not fully closed out until these ship:",
+          ]),
           el("ul", null, listOrDash(p.fastFollowItems)),
         ])
       );
