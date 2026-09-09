@@ -798,6 +798,7 @@ body {
 .status-history-row.is-worse { border-left-color: var(--red); }
 .status-history-row.is-better { border-left-color: var(--green); }
 .status-history-row.kind-schedule { border-left-color: var(--accent); }
+.status-history-row.kind-timesaved { border-left-color: var(--green); }
 
 .schedule-shift-badge {
   font-family: var(--font-mono);
@@ -809,6 +810,11 @@ body {
   padding: 3px 9px;
   border-radius: 999px;
   white-space: nowrap;
+}
+
+.schedule-shift-badge.is-saved {
+  color: var(--green);
+  background: var(--green-bg);
 }
 
 .status-history-date {
@@ -1091,6 +1097,13 @@ body {
 
 .schedule-timeline-delta.is-late { background: var(--red-bg); color: var(--red); }
 .schedule-timeline-delta.is-early { background: var(--green-bg); color: var(--green); }
+
+.schedule-timeline-row.kind-timesaved { border-color: #b7e6cd; }
+
+.schedule-timeline-note {
+  color: var(--ink-soft);
+  font-size: 12px;
+}
 
 @media (max-width: 640px) {
   .schedule-timeline-row { grid-template-columns: 1fr; }
@@ -1411,6 +1424,7 @@ body {
 
 .delay-flag.is-late { color: var(--red); }
 .delay-flag.is-ontime { color: var(--green); }
+.delay-flag.is-saved { color: var(--green); font-weight: 700; }
 
 .card-badges {
   display: flex;

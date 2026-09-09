@@ -125,6 +125,14 @@ a pill shows which week is being displayed ("Showing current data" or
 is captured going forward from each weekly update; older snapshots recorded
 before this existed will say so instead of showing stale/empty data.)
 
+**Time saved** is tracked the same way as delay: it's a per-week value
+(`timeSavedDays`/`timeSavedNote`), not a diff, so it shows up everywhere the
+delay does — a "Time saved: -N days" row on the card and detail facts
+(green, mirrors the "Delay" row), an entry in the project's own **Schedule
+timeline / Date change log**, and as a green "⏱ Time saved" row in the
+**Status History** tab (Tab 4) alongside status transitions and date
+shifts, every week it's reported.
+
 ## Tab 6 — 🚨 Escalations (live)
 
 Every current escalation to leadership, rolled up across every project —

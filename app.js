@@ -294,6 +294,12 @@
           el("dd", { class: "delay-flag " + (isLate ? "is-late" : "is-ontime") }, [
             isLate ? "+" + p.delayDays + " days" : "On schedule",
           ]),
+          ...((p.timeSavedDays || 0) > 0
+            ? [
+                el("dt", null, ["Time saved"]),
+                el("dd", { class: "delay-flag is-saved" }, ["-" + p.timeSavedDays + " days"]),
+              ]
+            : []),
         ]),
         el("div", { class: "card-badges" }, [
           el("span", { class: "badge" }, [(p.dependencies || []).length + " dependencies"]),
@@ -755,10 +761,41 @@
     return shifts;
   }
 
+  // Every week a project reported time pulled back IN (timeSavedDays > 0) —
+  // tracked the same way delayDays/statusChangeReason are: a this-week's-news
+  // value on the snapshot, not a diff, so it shows up once per week it's
+  // reported (same treatment escalations get).
+  function computeTimeSavedEvents() {
+    const dates = Object.keys(HISTORY).sort();
+    const nameById = {};
+    DATA.projects.forEach((p) => (nameById[p.id] = p.name));
+    const events = [];
+
+    dates.forEach((asOf) => {
+      (HISTORY[asOf].projects || []).forEach((snap) => {
+        nameById[snap.id] = nameById[snap.id] || snap.name;
+        const days = snap.timeSavedDays || 0;
+        if (days > 0) {
+          events.push({
+            projectId: snap.id,
+            projectName: nameById[snap.id] || snap.id,
+            date: asOf,
+            days,
+            note: snap.timeSavedNote || [],
+            status: snap.status,
+          });
+        }
+      });
+    });
+
+    return events;
+  }
+
   function renderStatusHistory() {
     const transitions = computeStatusTransitions().map((t) => Object.assign({ kind: "status" }, t));
     const shifts = computeScheduleShifts().map((s) => Object.assign({ kind: "schedule" }, s));
-    const combined = transitions.concat(shifts).sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+    const timeSaved = computeTimeSavedEvents().map((s) => Object.assign({ kind: "timesaved" }, s));
+    const combined = transitions.concat(shifts, timeSaved).sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
 
     const list = document.getElementById("statusHistoryList");
     list.innerHTML = "";
@@ -796,6 +833,24 @@
               ),
               el("button", { class: "status-history-project", "data-project-id": t.projectId }, [t.projectName]),
             ]),
+          ]),
+        ]);
+        list.appendChild(row);
+        return;
+      }
+
+      if (t.kind === "timesaved") {
+        const row = el("div", { class: "status-history-row kind-timesaved" }, [
+          el("div", { class: "status-history-date" }, [fmtDate(t.date)]),
+          el("div", { class: "status-history-main" }, [
+            el("div", { class: "status-history-transition" }, [
+              el("span", { class: "schedule-shift-badge is-saved" }, ["⏱ Time saved"]),
+              el("span", { class: "schedule-timeline-delta is-early" }, ["-" + t.days + " days"]),
+              el("button", { class: "status-history-project", "data-project-id": t.projectId }, [t.projectName]),
+            ]),
+            t.note && t.note.length
+              ? el("div", { class: "status-history-context" }, [t.note.join(" · ")])
+              : null,
           ]),
         ]);
         list.appendChild(row);
@@ -1090,6 +1145,18 @@
         prevMilestoneDate = milestoneDate;
         prevMilestoneName = milestoneName;
       }
+
+      // Time pulled back IN this week — tracked the same way as a delay:
+      // one event per week it's reported, not a diff.
+      if ((w.timeSavedDays || 0) > 0) {
+        events.push({
+          date: w.asOf,
+          label: "Time saved",
+          kind: "timesaved",
+          days: w.timeSavedDays,
+          note: w.timeSavedNote || [],
+        });
+      }
     });
 
     return events.reverse(); // newest first
@@ -1099,12 +1166,28 @@
     if (!events.length) {
       return el("p", { class: "empty-note" }, [
         "No schedule changes recorded yet — this fills in automatically whenever a go-live or " +
-          "milestone date moves (e.g. because of a CR), with the date it happened.",
+          "milestone date moves (e.g. because of a CR), or time gets saved, with the date it happened.",
       ]);
     }
 
     const box = el("div", { class: "schedule-timeline" });
     events.forEach((e) => {
+      if (e.kind === "timesaved") {
+        box.appendChild(
+          el("div", { class: "schedule-timeline-row kind-timesaved" }, [
+            el("div", { class: "schedule-timeline-date" }, [fmtDate(e.date)]),
+            el("div", { class: "schedule-timeline-main" }, [
+              el("span", { class: "schedule-timeline-label" }, [e.label]),
+              el("span", { class: "schedule-timeline-delta is-early" }, ["-" + e.days + " days"]),
+              e.note && e.note.length
+                ? el("span", { class: "schedule-timeline-note" }, [e.note.join(" · ")])
+                : null,
+            ]),
+          ])
+        );
+        return;
+      }
+
       const deltaDays = Math.round(
         (new Date(e.to + "T00:00:00") - new Date(e.from + "T00:00:00")) / 86400000
       );
@@ -1363,6 +1446,12 @@
               el("dd", { class: p.delayImpact ? "" : "is-missing" }, [
                 p.delayImpact || "Not yet documented",
               ]),
+            ]
+          : []),
+        ...((p.timeSavedDays || 0) > 0
+          ? [
+              el("dt", null, ["Time saved"]),
+              el("dd", { class: "delay-flag is-saved" }, ["-" + p.timeSavedDays + " days"]),
             ]
           : []),
       ])
