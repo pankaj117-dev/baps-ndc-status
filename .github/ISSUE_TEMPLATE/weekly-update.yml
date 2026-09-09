@@ -200,3 +200,15 @@ body:
       placeholder: |
         Add bulk-export button to admin console
         Migrate legacy reports to new schema
+  - type: textarea
+    id: escalations
+    attributes:
+      label: Escalations to leadership this week
+      description: >-
+        Anything that needs a leadership decision, unblock, or heads-up this sprint — separate from
+        the general risks/blockers above. One per line. This shows up on the dashboard's Escalations
+        tab and rolls up across every project so it's easy to walk through in the review meeting.
+        Leave blank if there's nothing to escalate this week.
+      placeholder: |
+        Need a go/no-go decision on cutting the PDF export feature to hold the go-live date
+        Security re-verification slot is 2 weeks out — need help getting it expedited

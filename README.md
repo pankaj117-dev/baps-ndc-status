@@ -120,7 +120,27 @@ a pill shows which week is being displayed ("Showing current data" or
 is captured going forward from each weekly update; older snapshots recorded
 before this existed will say so instead of showing stale/empty data.)
 
-## Tab 6 — Team Performance (skeleton only)
+## Tab 6 — 🚨 Escalations (live)
+
+Every current escalation to leadership, rolled up across every project —
+the go-to view for walking through the weekly review meeting. Grouped by
+project (with owner and status), newest asks first within each group. The
+metrics row shows total escalations and how many projects have one open.
+A **"📋 Copy summary to share"** button copies a plain-text, ready-to-paste
+summary (grouped by project, dated as of the current data) to the clipboard
+so it's easy to drop into Slack/email/meeting notes. Escalations are
+separate from general risks/blockers — they're specifically things that
+need a leadership decision, unblock, or heads-up.
+
+An escalation also shows up (in red) on the project's card as a
+**"🚨 N escalated"** badge, and inside the project detail view's snapshot
+sections (so clicking a past week in "Week-over-week changes" shows what
+was escalated that week, too). PMs add these via the **"Escalations to
+leadership this week"** field on the weekly update form — unlike most
+fields, leaving it blank clears it (it means "nothing to escalate this
+week"), it doesn't carry last week's escalation forward.
+
+## Tab 7 — Team Performance (skeleton only)
 
 Placeholder tab for engineering execution metrics (PR velocity, review
 turnaround, commit activity, deploy cadence) once we wire up GitHub data per
@@ -229,6 +249,11 @@ Everything lives in three files:
   "riskMitigations": ["..."],  // same length/order as risks — mitigation plan + impact for each
   "fastFollowItems": ["..."],  // one per line — remaining work to fully close out a live/in-production
                                 // project; shows a badge on the card and a block in the detail view
+  "escalations": ["..."],      // one per line — things needing a leadership decision/unblock THIS week.
+                                // Unlike other fields, a blank submission CLEARS this (it isn't "unchanged"
+                                // like most fields — it means nothing to escalate this week). Drives the
+                                // Escalations tab (Tab 6), the card's "🚨 N escalated" badge, and the
+                                // detail view's escalations block.
   "milestones": [              // OPTIONAL — full schedule for the Hawk-eye Gantt (Tab 3). If omitted,
                                 // Hawk-eye falls back to plotting just `nextMilestone` + `goLive`.
     { "name": "Requirements sign-off", "date": "2026-08-01", "status": "green" }

@@ -138,6 +138,15 @@ def apply_weekly_update(project, fields):
     if fast_follow:
         project["fastFollowItems"] = lines(fast_follow)
 
+    # Unlike most fields (blank = "unchanged"), escalations are inherently
+    # this-week's-news: if the PM leaves it blank they mean "nothing to
+    # escalate this week", so we clear it rather than carrying last week's
+    # escalation forward forever. Only skip entirely if the field wasn't
+    # part of the submitted form at all (old issues from before this field
+    # existed).
+    if "Escalations to leadership this week" in fields:
+        project["escalations"] = lines(fields.get("Escalations to leadership this week", ""))
+
 
 def ingest_weekly_updates(data):
     issues = fetch_issues("weekly-update")
@@ -283,6 +292,7 @@ def snapshot_history(data, history):
                 "risks": p.get("risks", []),
                 "riskMitigations": p.get("riskMitigations", []),
                 "fastFollowItems": p.get("fastFollowItems", []),
+                "escalations": p.get("escalations", []),
                 "dependencies": p.get("dependencies", []),
                 "dependencyTeams": p.get("dependencyTeams", []),
                 "dependencyMitigations": p.get("dependencyMitigations", []),

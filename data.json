@@ -33,7 +33,8 @@
       "delayMitigation": [],
       "delayTradeoffs": "",
       "dependencyTeams": [],
-      "stage": "Hypercare / Post-Launch"
+      "stage": "Hypercare / Post-Launch",
+      "escalations": []
     },
     {
       "id": "webnext-2",
@@ -73,7 +74,8 @@
         ]
       },
       "risks": [],
-      "riskMitigations": []
+      "riskMitigations": [],
+      "escalations": []
     },
     {
       "id": "pledge",
@@ -107,7 +109,8 @@
       "delayMitigation": [],
       "delayTradeoffs": "",
       "dependencyTeams": [],
-      "stage": "Hypercare / Post-Launch"
+      "stage": "Hypercare / Post-Launch",
+      "escalations": []
     },
     {
       "id": "pledge-1a",
@@ -142,7 +145,8 @@
       ],
       "riskMitigations": [
         ""
-      ]
+      ],
+      "escalations": []
     },
     {
       "id": "emm",
@@ -184,7 +188,8 @@
       "fastFollowItems": [
         "Business decision on Post Go-Live REQ — HTML report vs PDF",
         "Full expense reports feature — in progress"
-      ]
+      ],
+      "escalations": []
     },
     {
       "id": "mybky-phase1",
@@ -242,7 +247,8 @@
         "SSO Team",
         "Business/Stakeholder"
       ],
-      "stage": "QA / UAT"
+      "stage": "QA / UAT",
+      "escalations": []
     },
     {
       "id": "mybky-phase2",
@@ -302,7 +308,8 @@
         "Internal (shared w/ Phase 1)",
         "Business/Stakeholder"
       ],
-      "stage": "Requirements"
+      "stage": "Requirements",
+      "escalations": []
     },
     {
       "id": "mymandir",
@@ -356,7 +363,8 @@
         "Business/Stakeholder (Sameep / Amar Mehta)",
         "Business/Stakeholder (Shreyank)"
       ],
-      "stage": "Requirements"
+      "stage": "Requirements",
+      "escalations": []
     },
     {
       "id": "gms",
@@ -390,7 +398,8 @@
       "delayMitigation": [],
       "delayTradeoffs": "",
       "dependencyTeams": [],
-      "stage": "Production Release"
+      "stage": "Production Release",
+      "escalations": []
     },
     {
       "id": "baps-sso",
@@ -436,7 +445,8 @@
       "dependencyTeams": [
         "Other App Owners"
       ],
-      "stage": "Development"
+      "stage": "Development",
+      "escalations": []
     },
     {
       "id": "spm",
@@ -498,7 +508,8 @@
         "QA/Dev",
         "DevOps"
       ],
-      "stage": "QA / UAT"
+      "stage": "QA / UAT",
+      "escalations": []
     },
     {
       "id": "bkms",
@@ -541,7 +552,8 @@
       "dependencyTeams": [
         "DevOps"
       ],
-      "stage": "Development"
+      "stage": "Development",
+      "escalations": []
     },
     {
       "id": "mis",
@@ -585,7 +597,8 @@
       "dependencyTeams": [
         ""
       ],
-      "stage": "Development"
+      "stage": "Development",
+      "escalations": []
     },
     {
       "id": "mysatsang-bapsid",
@@ -648,7 +661,8 @@
         "",
         ""
       ],
-      "stage": "Design / Estimation"
+      "stage": "Design / Estimation",
+      "escalations": []
     }
   ]
 }

@@ -302,6 +302,9 @@
           ...((p.fastFollowItems || []).length
             ? [el("span", { class: "badge has-fastfollow" }, [(p.fastFollowItems || []).length + " fast-follow"])]
             : []),
+          ...((p.escalations || []).length
+            ? [el("span", { class: "badge has-escalation" }, ["🚨 " + (p.escalations || []).length + " escalated"])]
+            : []),
         ]),
         el("button", { class: "card-expand" }, ["View full details →"]),
       ]);
@@ -530,6 +533,7 @@
     renderHawkeye();
     renderCards();
     renderDependenciesTab();
+    renderEscalationsTab();
     renderStatusHistory();
   }
 
@@ -856,6 +860,126 @@
     const rows = collectDependencies();
     renderDependenciesMetrics(rows);
     renderDependenciesBoard(rows);
+  }
+
+  /* ---------------- Tab: Escalations ---------------- */
+
+  function collectEscalations() {
+    const rows = [];
+    visibleProjects().forEach((p) => {
+      (p.escalations || []).forEach((text) => {
+        if (!text) return;
+        rows.push({ projectId: p.id, projectName: p.name, owner: p.owner || "Unassigned", status: p.status, text });
+      });
+    });
+    return rows;
+  }
+
+  function renderEscalationsMetrics(rows) {
+    const projects = new Set(rows.map((r) => r.projectId));
+    const metrics = [
+      { label: "Total Escalations", num: rows.length, tone: rows.length ? "tone-red" : "tone-green" },
+      { label: "Projects Escalating", num: projects.size, tone: projects.size ? "tone-amber" : "tone-green" },
+    ];
+    const row = document.getElementById("escalationsMetricsRow");
+    row.innerHTML = "";
+    metrics.forEach((m) => {
+      row.appendChild(
+        el("div", { class: "metric-card " + m.tone }, [
+          el("div", { class: "num" }, [String(m.num)]),
+          el("div", { class: "label" }, [m.label]),
+        ])
+      );
+    });
+  }
+
+  function renderEscalationsBoard(rows) {
+    const board = document.getElementById("escalationsBoard");
+    board.innerHTML = "";
+
+    if (!rows.length) {
+      board.appendChild(
+        el("div", { class: "deps-empty-group" }, ["Nothing currently escalated to leadership. 🎉"])
+      );
+      return;
+    }
+
+    const groups = {};
+    rows.forEach((r) => {
+      (groups[r.projectId] = groups[r.projectId] || { projectName: r.projectName, owner: r.owner, status: r.status, items: [] }).items.push(r.text);
+    });
+
+    Object.keys(groups)
+      .sort((a, b) => groups[b].items.length - groups[a].items.length || groups[a].projectName.localeCompare(groups[b].projectName))
+      .forEach((projectId) => {
+        const g = groups[projectId];
+        const group = el("div", { class: "deps-group escalations-group" }, [
+          el("div", { class: "deps-group-head" }, [
+            el("div", { class: "deps-card-project escalations-project", "data-project-id": projectId }, [
+              el("span", { class: "timeline-dot", style: `background:var(--${g.status === "amber" ? "amber" : g.status})` }),
+              g.projectName,
+              el("span", { class: "escalations-owner" }, [" · " + g.owner]),
+            ]),
+            el("span", { class: "deps-group-count" }, [g.items.length + (g.items.length === 1 ? " escalation" : " escalations")]),
+          ]),
+        ]);
+        const list = el("ul", { class: "escalations-list" }, g.items.map((text) => el("li", null, [text])));
+        group.appendChild(list);
+        board.appendChild(group);
+      });
+
+    board.querySelectorAll(".deps-card-project").forEach((node) => {
+      node.addEventListener("click", () => openProjectDetail(node.getAttribute("data-project-id")));
+    });
+  }
+
+  function copyEscalationsSummary(rows) {
+    const btn = document.getElementById("copyEscalationsBtn");
+    if (!rows.length) {
+      btn.textContent = "Nothing to copy";
+      setTimeout(() => (btn.textContent = "📋 Copy summary to share"), 1500);
+      return;
+    }
+    const groups = {};
+    rows.forEach((r) => {
+      (groups[r.projectName] = groups[r.projectName] || []).push(r.text);
+    });
+    const asOf = DATA.asOf ? fmtDate(DATA.asOf) : "";
+    const lines = [`Escalations to leadership — as of ${asOf}`, ""];
+    Object.keys(groups).forEach((name) => {
+      lines.push(`${name}:`);
+      groups[name].forEach((text) => lines.push(`  • ${text}`));
+      lines.push("");
+    });
+    const text = lines.join("\n").trim();
+
+    const done = () => {
+      btn.textContent = "✅ Copied!";
+      setTimeout(() => (btn.textContent = "📋 Copy summary to share"), 1500);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(done);
+    } else {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+      } catch (e) {
+        // ignore
+      }
+      document.body.removeChild(ta);
+      done();
+    }
+  }
+
+  function renderEscalationsTab() {
+    const rows = collectEscalations();
+    renderEscalationsMetrics(rows);
+    renderEscalationsBoard(rows);
+    const btn = document.getElementById("copyEscalationsBtn");
+    if (btn) btn.onclick = () => copyEscalationsSummary(rows);
   }
 
   /* ---------------- Project detail overlay ---------------- */
@@ -1309,6 +1433,15 @@
         ])
       );
 
+      if (snap.escalations && snap.escalations.length) {
+        container.appendChild(el("h3", { class: "weekly-subhead" }, ["🚨 Escalated to leadership"]));
+        container.appendChild(
+          el("div", { class: "detail-block escalations" }, [
+            el("ul", null, snap.escalations.map((text) => el("li", null, [text]))),
+          ])
+        );
+      }
+
       container.appendChild(el("h3", { class: "weekly-subhead" }, ["Dependencies"]));
       container.appendChild(
         el("div", { class: "detail-block deps" }, [
@@ -1542,6 +1675,7 @@
     renderCards();
 
     renderDependenciesTab();
+    renderEscalationsTab();
 
     renderStatusHistory();
 

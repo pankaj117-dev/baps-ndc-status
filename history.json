@@ -30,7 +30,8 @@
           ""
         ],
         "stage": "Requirements",
-        "delayNote": "No delay reported"
+        "delayNote": "No delay reported",
+        "escalations": []
       },
       {
         "id": "pledge",
@@ -63,7 +64,8 @@
           "ASM Team"
         ],
         "stage": "Production Release",
-        "delayNote": "No delay reported"
+        "delayNote": "No delay reported",
+        "escalations": []
       },
       {
         "id": "emm",
@@ -100,7 +102,8 @@
           ""
         ],
         "stage": "QA / UAT",
-        "delayNote": "No impact on go-live"
+        "delayNote": "No impact on go-live",
+        "escalations": []
       },
       {
         "id": "mybky-phase1",
@@ -147,7 +150,8 @@
           "DevOps"
         ],
         "stage": "QA / UAT",
-        "delayNote": "Mobile dev delayed — may impact regression testing"
+        "delayNote": "Mobile dev delayed — may impact regression testing",
+        "escalations": []
       },
       {
         "id": "mybky-phase2",
@@ -190,7 +194,8 @@
           "Business/Stakeholder"
         ],
         "stage": "Requirements",
-        "delayNote": "Requirement phase delayed"
+        "delayNote": "Requirement phase delayed",
+        "escalations": []
       },
       {
         "id": "mymandir",
@@ -224,7 +229,8 @@
           "Business/Stakeholder (Sameep)"
         ],
         "stage": "Design / Estimation",
-        "delayNote": "12 days delayed"
+        "delayNote": "12 days delayed",
+        "escalations": []
       },
       {
         "id": "gms",
@@ -260,7 +266,8 @@
           ""
         ],
         "stage": "QA / UAT",
-        "delayNote": "19 days delayed"
+        "delayNote": "19 days delayed",
+        "escalations": []
       },
       {
         "id": "baps-sso",
@@ -294,7 +301,8 @@
           ""
         ],
         "stage": "Development",
-        "delayNote": "No delay reported"
+        "delayNote": "No delay reported",
+        "escalations": []
       },
       {
         "id": "spm",
@@ -331,7 +339,8 @@
           "DevOps"
         ],
         "stage": "QA / UAT",
-        "delayNote": "2 days delay in UAT deployment — timeline revised"
+        "delayNote": "2 days delay in UAT deployment — timeline revised",
+        "escalations": []
       },
       {
         "id": "bkms",
@@ -361,7 +370,8 @@
           "DevOps"
         ],
         "stage": "Development",
-        "delayNote": "No delay reported"
+        "delayNote": "No delay reported",
+        "escalations": []
       },
       {
         "id": "mis",
@@ -391,7 +401,8 @@
           ""
         ],
         "stage": "Development",
-        "delayNote": "No delay reported"
+        "delayNote": "No delay reported",
+        "escalations": []
       }
     ]
   },
@@ -420,7 +431,8 @@
         "dependencies": [],
         "dependencyTeams": [],
         "dependencyMitigations": [],
-        "delayNote": "In hypercare through 15-Sep-2026 — infinite caching rollout ETA 3-Sep-2026"
+        "delayNote": "In hypercare through 15-Sep-2026 — infinite caching rollout ETA 3-Sep-2026",
+        "escalations": []
       },
       {
         "id": "webnext-2",
@@ -450,7 +462,8 @@
         "dependencyMitigations": [
           ""
         ],
-        "delayNote": "No delay reported — new project just starting requirements"
+        "delayNote": "No delay reported — new project just starting requirements",
+        "escalations": []
       },
       {
         "id": "pledge",
@@ -474,7 +487,8 @@
         "dependencies": [],
         "dependencyTeams": [],
         "dependencyMitigations": [],
-        "delayNote": "Live in production; in hypercare through 15-Sep-2026"
+        "delayNote": "Live in production; in hypercare through 15-Sep-2026",
+        "escalations": []
       },
       {
         "id": "pledge-1a",
@@ -499,7 +513,8 @@
         "dependencies": [],
         "dependencyTeams": [],
         "dependencyMitigations": [],
-        "delayNote": "No delay reported — new project just starting TDD phase"
+        "delayNote": "No delay reported — new project just starting TDD phase",
+        "escalations": []
       },
       {
         "id": "emm",
@@ -535,7 +550,8 @@
         "dependencyMitigations": [
           ""
         ],
-        "delayNote": "Go-live slipped 3 days to 28-Aug-2026 due to performance risk in check printing and workflow approval"
+        "delayNote": "Go-live slipped 3 days to 28-Aug-2026 due to performance risk in check printing and workflow approval",
+        "escalations": []
       },
       {
         "id": "mybky-phase1",
@@ -581,7 +597,8 @@
           "Initial discussion completed, responsibility identification call planned for next week",
           ""
         ],
-        "delayNote": "Regression delayed 10 days; 2 CRs pushed go-live by 6 days (business requested to prioritize CRs); UAT sign-off for Event config/registration delayed to 4-Sep-2026"
+        "delayNote": "Regression delayed 10 days; 2 CRs pushed go-live by 6 days (business requested to prioritize CRs); UAT sign-off for Event config/registration delayed to 4-Sep-2026",
+        "escalations": []
       },
       {
         "id": "mybky-phase2",
@@ -627,7 +644,8 @@
           "",
           ""
         ],
-        "delayNote": "Requirement phase delayed — GMS FRD review delayed 8 days, Guest Registration FRD creation delayed 12 days"
+        "delayNote": "Requirement phase delayed — GMS FRD review delayed 8 days, Guest Registration FRD creation delayed 12 days",
+        "escalations": []
       },
       {
         "id": "mymandir",
@@ -667,7 +685,8 @@
           "",
           ""
         ],
-        "delayNote": "Stakeholder sign-off on requirements delayed — Sameep on vacation leave, review pending with Amar Mehta as backup"
+        "delayNote": "Stakeholder sign-off on requirements delayed — Sameep on vacation leave, review pending with Amar Mehta as backup",
+        "escalations": []
       },
       {
         "id": "gms",
@@ -691,7 +710,8 @@
         "dependencies": [],
         "dependencyTeams": [],
         "dependencyMitigations": [],
-        "delayNote": "Production deployment ongoing, targeting 2-Sep-2026"
+        "delayNote": "Production deployment ongoing, targeting 2-Sep-2026",
+        "escalations": []
       },
       {
         "id": "baps-sso",
@@ -722,7 +742,8 @@
         "dependencyMitigations": [
           ""
         ],
-        "delayNote": "Go-live date TBD — dependent on other application owners integrating the SSO API"
+        "delayNote": "Go-live date TBD — dependent on other application owners integrating the SSO API",
+        "escalations": []
       },
       {
         "id": "spm",
@@ -770,7 +791,8 @@
           "",
           ""
         ],
-        "delayNote": "Go-live slipped to 7-Sep-2026 — pending VAPT re-verification, load testing, and production server readiness"
+        "delayNote": "Go-live slipped to 7-Sep-2026 — pending VAPT re-verification, load testing, and production server readiness",
+        "escalations": []
       },
       {
         "id": "bkms",
@@ -800,7 +822,8 @@
         "dependencyMitigations": [
           ""
         ],
-        "delayNote": "No delay reported"
+        "delayNote": "No delay reported",
+        "escalations": []
       },
       {
         "id": "mis",
@@ -830,7 +853,8 @@
         "dependencyMitigations": [
           ""
         ],
-        "delayNote": "No delay reported"
+        "delayNote": "No delay reported",
+        "escalations": []
       },
       {
         "id": "mysatsang-bapsid",
@@ -875,7 +899,8 @@
           "",
           ""
         ],
-        "delayNote": "Not yet scheduled — start/due dates not set in the integration plan"
+        "delayNote": "Not yet scheduled — start/due dates not set in the integration plan",
+        "escalations": []
       }
     ]
   },
@@ -914,7 +939,8 @@
             "Infinite caching rollout — ETA 3-Sep-2026"
           ],
           "nextPlan": []
-        }
+        },
+        "escalations": []
       },
       {
         "id": "webnext-2",
@@ -955,7 +981,8 @@
           "nextPlan": [
             "New QA to be fully involved in project from the start — build test cases and test plan"
           ]
-        }
+        },
+        "escalations": []
       },
       {
         "id": "pledge",
@@ -990,7 +1017,8 @@
             "Hypercare monitoring"
           ],
           "nextPlan": []
-        }
+        },
+        "escalations": []
       },
       {
         "id": "pledge-1a",
@@ -1026,7 +1054,8 @@
           "nextPlan": [
             "15 user stories total — 4 achievable with 1 backend developer, 9 with 2 backend developers, by end of October"
           ]
-        }
+        },
+        "escalations": []
       },
       {
         "id": "emm",
@@ -1068,7 +1097,8 @@
             "Business decision on full expense reports feature — in progress"
           ],
           "nextPlan": []
-        }
+        },
+        "escalations": []
       },
       {
         "id": "mybky-phase1",
@@ -1127,7 +1157,8 @@
             "Regression sign-off — pending, delayed 10 days"
           ],
           "nextPlan": []
-        }
+        },
+        "escalations": []
       },
       {
         "id": "mybky-phase2",
@@ -1188,7 +1219,8 @@
             "Guest Registration FRD creation"
           ],
           "nextPlan": []
-        }
+        },
+        "escalations": []
       },
       {
         "id": "mymandir",
@@ -1243,7 +1275,8 @@
           "nextPlan": [
             "Developers onboarded onto bug-fixing tasks immediately (per Swami's direction) until design approvals received"
           ]
-        }
+        },
+        "escalations": []
       },
       {
         "id": "gms",
@@ -1278,7 +1311,8 @@
           "nextPlan": [
             "Go-live — 2-Sep-2026"
           ]
-        }
+        },
+        "escalations": []
       },
       {
         "id": "baps-sso",
@@ -1325,7 +1359,8 @@
             "SID deploy on UAT"
           ],
           "nextPlan": []
-        }
+        },
+        "escalations": []
       },
       {
         "id": "spm",
@@ -1388,7 +1423,8 @@
           "nextPlan": [
             "Support needed from DevOps, VAPT and Performance Testing teams to complete pending activities on priority"
           ]
-        }
+        },
+        "escalations": []
       },
       {
         "id": "bkms",
@@ -1432,7 +1468,8 @@
             "Mobile: BST quiz tab — QA testing"
           ],
           "nextPlan": []
-        }
+        },
+        "escalations": []
       },
       {
         "id": "mis",
@@ -1477,7 +1514,8 @@
             "Signup QR: frontend consent, validation & address UI — QA in progress"
           ],
           "nextPlan": []
-        }
+        },
+        "escalations": []
       },
       {
         "id": "mysatsang-bapsid",
@@ -1541,7 +1579,8 @@
             "MST-UI — implement UI for non-MIS users accessing a MIS-ID-only module",
             "MST-UI — use POST me/devices to register the user's device"
           ]
-        }
+        },
+        "escalations": []
       }
     ]
   }

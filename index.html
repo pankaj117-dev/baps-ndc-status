@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=32">
+<link rel="stylesheet" href="styles.css?v=33">
 </head>
 <body>
   <div class="wrap">
@@ -31,6 +31,7 @@
       <button class="tab-btn" data-tab="hawkeye" role="tab" aria-selected="false">🦅 Hawk-eye</button>
       <button class="tab-btn" data-tab="statushistory" role="tab" aria-selected="false">Status History</button>
       <button class="tab-btn" data-tab="deps" role="tab" aria-selected="false">Dependencies</button>
+      <button class="tab-btn" data-tab="escalations" role="tab" aria-selected="false">🚨 Escalations</button>
       <button class="tab-btn" data-tab="team" role="tab" aria-selected="false">Team Performance</button>
     </nav>
 
@@ -86,6 +87,15 @@
       <div id="depsMetricsRow" class="metrics-row"></div>
 
       <div id="depsBoard" class="deps-board"></div>
+    </section>
+
+    <section id="panel-escalations" class="tab-panel">
+      <div class="escalations-tab-head">
+        <p class="section-subhead" style="margin:0;">Everything currently being escalated to leadership, rolled up across every project — the go-to view for walking through the weekly review.</p>
+        <button id="copyEscalationsBtn" class="btn-primary btn-small">📋 Copy summary to share</button>
+      </div>
+      <div id="escalationsMetricsRow" class="metrics-row"></div>
+      <div id="escalationsBoard" class="deps-board"></div>
     </section>
 
     <section id="panel-team" class="tab-panel">
@@ -154,6 +164,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=29"></script>
+  <script src="app.js?v=30"></script>
 </body>
 </html>
