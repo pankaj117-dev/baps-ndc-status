@@ -718,7 +718,8 @@
         "delayImpact": "Unavailability of key stakeholders may impact overall project schedule and cause delays",
         "delayMitigation": [
           "Proceed with bug-fixing activities while awaiting design approvals to keep the team productive and reduce delay impact",
-          "Scheduled a call with Sameep on 1-Sep-2026"
+          "Scheduled a call with Sameep on 1-Sep-2026",
+          "Developers being onboarded and assigned to bug-fixing tasks immediately until stakeholder approvals for designs are received (per discussion with Swami)"
         ],
         "delayTradeoffs": "",
         "risks": [
