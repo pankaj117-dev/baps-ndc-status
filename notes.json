@@ -18,5 +18,15 @@
     "createdAt": "2026-09-09T02:41:29Z",
     "sourceIssue": "https://github.com/pankaj117-dev/baps-ndc-status/issues/1",
     "status": "open"
+  },
+  {
+    "id": "note-3",
+    "projectId": "emm",
+    "text": "1. Decision needed from business - HTML Reports or PDF Reports.\n2. FYI comment - Dev team will have bandwidth (no work) from the next week (15th Sept onwards) if business requirements (currently REQ RIP) are not approved.",
+    "mitigationImpact": "1. Follow up needed with ITC for pending business decisions.\n2. Follow up needed with the Accounting for submitted REQ for review and approval.",
+    "raisedBy": "Nitin",
+    "createdAt": "2026-09-09T10:50:24Z",
+    "sourceIssue": "https://github.com/pankaj117-dev/baps-ndc-status/issues/2",
+    "status": "open"
   }
 ]
