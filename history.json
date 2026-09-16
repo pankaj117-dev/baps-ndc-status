@@ -53,8 +53,8 @@
         "risks": [],
         "riskMitigations": [],
         "dependencies": [
-          "Integrate ASM-based permissions in Pledge module — UAT (RIP)",
-          "New permission — AssignedView & Campaign — REQ (RIP)"
+          "Integrate ASM-based permissions in Pledge module \u2014 UAT (RIP)",
+          "New permission \u2014 AssignedView & Campaign \u2014 REQ (RIP)"
         ],
         "dependencyMitigations": [
           "",
@@ -79,7 +79,7 @@
         "status": "amber",
         "progress": 85,
         "delayDays": 0,
-        "phase": "Sprint 26.16 (08/03 – 08/07)",
+        "phase": "Sprint 26.16 (08/03 \u2013 08/07)",
         "nextMilestone": {
           "name": "UAT",
           "date": "2026-08-10"
@@ -88,14 +88,14 @@
         "originalGoLive": "2026-08-25",
         "delayImpact": "",
         "risks": [
-          "EMM performance — unsatisfactory load testing results"
+          "EMM performance \u2014 unsatisfactory load testing results"
         ],
         "riskMitigations": [
           ""
         ],
         "dependencies": [
           "EMM pre-go-live requests status",
-          "Internal: Python replacement library in .NET (with Bhaveshbhai) — WIP"
+          "Internal: Python replacement library in .NET (with Bhaveshbhai) \u2014 WIP"
         ],
         "dependencyMitigations": [
           "",
@@ -131,7 +131,7 @@
         "risks": [
           "Multiple iterations of edit-registration functionality/feature",
           "Addition of 1 user story for refund transaction",
-          "GMS-related issues — API timeout & stuck campaign"
+          "GMS-related issues \u2014 API timeout & stuck campaign"
         ],
         "riskMitigations": [
           "",
@@ -141,7 +141,7 @@
         "dependencies": [
           "Kishor/Kishori participants without SSO accounts",
           "MIS BK department split production deployment",
-          "GMS performance improvement (15k emails + 15k push) — ETA 24-Aug",
+          "GMS performance improvement (15k emails + 15k push) \u2014 ETA 24-Aug",
           "Provisioning of the SFS bucket for UAT environment"
         ],
         "dependencyMitigations": [
@@ -159,7 +159,7 @@
           "DevOps"
         ],
         "stage": "QA / UAT",
-        "delayNote": "Mobile dev delayed — may impact regression testing",
+        "delayNote": "Mobile dev delayed \u2014 may impact regression testing",
         "escalations": [],
         "timeSavedDays": 0,
         "timeSavedNote": [],
@@ -186,9 +186,9 @@
           ""
         ],
         "dependencies": [
-          "New scenarios identified during UI/UX not covered in signed-off FRD — rework in progress",
+          "New scenarios identified during UI/UX not covered in signed-off FRD \u2014 rework in progress",
           "GMS package is UI-only; backend dev/customization owned by MyBKY team",
-          "Pending business review — review calls restarted",
+          "Pending business review \u2014 review calls restarted",
           "Stage-gate vs. sprint-by-sprint tracking approach not yet decided"
         ],
         "dependencyMitigations": [
@@ -227,13 +227,13 @@
         "originalGoLive": null,
         "delayImpact": "",
         "risks": [
-          "Sameep unavailable (vacation) — blocking REQ doc review"
+          "Sameep unavailable (vacation) \u2014 blocking REQ doc review"
         ],
         "riskMitigations": [
           ""
         ],
         "dependencies": [
-          "Dependency on Sameep for REQ doc review — he is on vacation leave"
+          "Dependency on Sameep for REQ doc review \u2014 he is on vacation leave"
         ],
         "dependencyMitigations": [
           ""
@@ -265,7 +265,7 @@
         "originalGoLive": "2026-08-06",
         "delayImpact": "",
         "risks": [
-          "myBKY informed of high DB usage issue — may continue load testing without invoking GMS until 24-Aug",
+          "myBKY informed of high DB usage issue \u2014 may continue load testing without invoking GMS until 24-Aug",
           "SPM production deployment not blocked by GMS activities (communicated to relevant teams)"
         ],
         "riskMitigations": [
@@ -305,7 +305,7 @@
         "originalGoLive": null,
         "delayImpact": "",
         "risks": [
-          "Yogesh temporarily moved to EMM project (regression + load testing) — needed back next week"
+          "Yogesh temporarily moved to EMM project (regression + load testing) \u2014 needed back next week"
         ],
         "riskMitigations": [
           ""
@@ -343,14 +343,14 @@
         "originalGoLive": "2026-08-29",
         "delayImpact": "",
         "risks": [
-          "No major bug/blocker — only minor UI/UX changes on template screen"
+          "No major bug/blocker \u2014 only minor UI/UX changes on template screen"
         ],
         "riskMitigations": [
           ""
         ],
         "dependencies": [
-          "DEVOPS-1082 — SPM production environment setup and configuration",
-          "DEVOPS-1078 — SPM UAT DB read-only access for QA"
+          "DEVOPS-1082 \u2014 SPM production environment setup and configuration",
+          "DEVOPS-1078 \u2014 SPM UAT DB read-only access for QA"
         ],
         "dependencyMitigations": [
           "",
@@ -363,7 +363,7 @@
           "DevOps"
         ],
         "stage": "QA / UAT",
-        "delayNote": "2 days delay in UAT deployment — timeline revised",
+        "delayNote": "2 days delay in UAT deployment \u2014 timeline revised",
         "escalations": [],
         "timeSavedDays": 0,
         "timeSavedNote": [],
@@ -386,7 +386,7 @@
         "risks": [],
         "riskMitigations": [],
         "dependencies": [
-          "DEVOPS-1029 — SMTP credentials/config for DEV/QA/UAT; emails not received post-config, under resolution with DevOps"
+          "DEVOPS-1029 \u2014 SMTP credentials/config for DEV/QA/UAT; emails not received post-config, under resolution with DevOps"
         ],
         "dependencyMitigations": [
           ""
@@ -420,7 +420,7 @@
         "risks": [],
         "riskMitigations": [],
         "dependencies": [
-          "MIS – BKY & iBKY production deployment approach still pending"
+          "MIS \u2013 BKY & iBKY production deployment approach still pending"
         ],
         "dependencyMitigations": [
           ""
@@ -464,7 +464,7 @@
         "dependencies": [],
         "dependencyTeams": [],
         "dependencyMitigations": [],
-        "delayNote": "In hypercare through 15-Sep-2026 — infinite caching rollout ETA 3-Sep-2026",
+        "delayNote": "In hypercare through 15-Sep-2026 \u2014 infinite caching rollout ETA 3-Sep-2026",
         "escalations": [],
         "timeSavedDays": 0,
         "timeSavedNote": [],
@@ -490,7 +490,7 @@
         "risks": [],
         "riskMitigations": [],
         "dependencies": [
-          "Requirements finalization & approval — ETA 7-Sep-2026"
+          "Requirements finalization & approval \u2014 ETA 7-Sep-2026"
         ],
         "dependencyTeams": [
           ""
@@ -498,7 +498,7 @@
         "dependencyMitigations": [
           ""
         ],
-        "delayNote": "No delay reported — new project just starting requirements",
+        "delayNote": "No delay reported \u2014 new project just starting requirements",
         "escalations": [],
         "timeSavedDays": 0,
         "timeSavedNote": [],
@@ -506,7 +506,7 @@
       },
       {
         "id": "pledge",
-        "name": "Pledge – 1.0",
+        "name": "Pledge \u2013 1.0",
         "status": "green",
         "progress": 95,
         "stage": "Hypercare / Post-Launch",
@@ -555,7 +555,7 @@
         "dependencies": [],
         "dependencyTeams": [],
         "dependencyMitigations": [],
-        "delayNote": "No delay reported — new project just starting TDD phase",
+        "delayNote": "No delay reported \u2014 new project just starting TDD phase",
         "escalations": [],
         "timeSavedDays": 0,
         "timeSavedNote": [],
@@ -579,15 +579,15 @@
         "delayMitigation": [],
         "delayTradeoffs": "",
         "risks": [
-          "Performance risk in check printing — taking more time than expected; team working on performance enhancements",
-          "Performance risk in workflow approval processes — invocation results good, WALL-E team working on 'approval' endpoint"
+          "Performance risk in check printing \u2014 taking more time than expected; team working on performance enhancements",
+          "Performance risk in workflow approval processes \u2014 invocation results good, WALL-E team working on 'approval' endpoint"
         ],
         "riskMitigations": [
           "Team working on performance enhancements for check printing",
           "WALL-E team addressing approval endpoint performance"
         ],
         "dependencies": [
-          "Business decision on Post Go-Live REQ — HTML report vs PDF"
+          "Business decision on Post Go-Live REQ \u2014 HTML report vs PDF"
         ],
         "dependencyTeams": [
           "Business/Stakeholder"
@@ -620,9 +620,9 @@
           "Support needed for Mobile App VAPT (Dipenbhai)",
           "Mobile app submission to App Stores in progress"
         ],
-        "delayTradeoffs": "2 CRs received — 6 days of effort added; another CR under RGC approval",
+        "delayTradeoffs": "2 CRs received \u2014 6 days of effort added; another CR under RGC approval",
         "risks": [
-          "Regression testing delayed by 10 days — open defects need fixing (ETA 1-Sep-2026)",
+          "Regression testing delayed by 10 days \u2014 open defects need fixing (ETA 1-Sep-2026)",
           "Awaiting performance reports (ETA 3-Sep-2026, 1st iteration)",
           "Awaiting security reports (ETA 1-Sep-2026)",
           "UAT sign-off for Event configuration and Event Registration delayed (ETA 4-Sep-2026)"
@@ -634,8 +634,8 @@
           ""
         ],
         "dependencies": [
-          "SSO — creation of Kishor/Kishori participants without SSO accounts",
-          "Dependency on Kishan bhai for functional clarifications — delayed responses due to time zone difference"
+          "SSO \u2014 creation of Kishor/Kishori participants without SSO accounts",
+          "Dependency on Kishan bhai for functional clarifications \u2014 delayed responses due to time zone difference"
         ],
         "dependencyTeams": [
           "SSO Team",
@@ -665,14 +665,14 @@
         },
         "goLive": "2027-01-02",
         "originalGoLive": "2026-12-20",
-        "delayImpact": "Even with a sprint-by-sprint development approach, the go-live is optimistic — only 4 development sprints available for 6 modules (2 large)",
+        "delayImpact": "Even with a sprint-by-sprint development approach, the go-live is optimistic \u2014 only 4 development sprints available for 6 modules (2 large)",
         "delayMitigation": [],
         "delayTradeoffs": "",
         "risks": [
           "Web Transportation TDDs under review/approval (Pratikbhai)",
           "GMS FRD review and approval delayed by 8 days",
           "Guest Registration FRD creation delayed by 12 days",
-          "New scenarios continue to be identified by Business during document review — further iterations impacting timeline"
+          "New scenarios continue to be identified by Business during document review \u2014 further iterations impacting timeline"
         ],
         "riskMitigations": [
           "",
@@ -683,7 +683,7 @@
         "dependencies": [
           "One dev resource occupied resolving Phase 1 regression defects; 1 QA resource on reverification",
           "Phase 1 change requests prioritized ahead of Phase 2",
-          "New scenarios identified during UI/UX design not covered in signed-off FRD — BA reverting to business for confirmation"
+          "New scenarios identified during UI/UX design not covered in signed-off FRD \u2014 BA reverting to business for confirmation"
         ],
         "dependencyTeams": [
           "Internal (shared w/ Phase 1)",
@@ -695,7 +695,7 @@
           "",
           ""
         ],
-        "delayNote": "Requirement phase delayed — GMS FRD review delayed 8 days, Guest Registration FRD creation delayed 12 days",
+        "delayNote": "Requirement phase delayed \u2014 GMS FRD review delayed 8 days, Guest Registration FRD creation delayed 12 days",
         "escalations": [],
         "timeSavedDays": 0,
         "timeSavedNote": [],
@@ -708,7 +708,7 @@
         "progress": 25,
         "stage": "Requirements",
         "delayDays": 12,
-        "phase": "Requirement (90% complete) — stakeholder sign-off delayed",
+        "phase": "Requirement (90% complete) \u2014 stakeholder sign-off delayed",
         "nextMilestone": {
           "name": "Stakeholder sign-off on requirements",
           "date": "2026-09-01"
@@ -722,14 +722,14 @@
         ],
         "delayTradeoffs": "",
         "risks": [
-          "Due to unavailability of key stakeholders, designs and FRD approval pending — may impact overall project schedule and cause delays"
+          "Due to unavailability of key stakeholders, designs and FRD approval pending \u2014 may impact overall project schedule and cause delays"
         ],
         "riskMitigations": [
           ""
         ],
         "dependencies": [
-          "Dependency on Sameep for REQ document review — on vacation leave; document also shared with Amar Mehta, review still pending; updated document shared 27-Aug",
-          "Shreyank unavailable 31-Aug due to medical emergency — dependency on Shreyank and Sameep for feedback"
+          "Dependency on Sameep for REQ document review \u2014 on vacation leave; document also shared with Amar Mehta, review still pending; updated document shared 27-Aug",
+          "Shreyank unavailable 31-Aug due to medical emergency \u2014 dependency on Shreyank and Sameep for feedback"
         ],
         "dependencyTeams": [
           "Business/Stakeholder (Sameep / Amar Mehta)",
@@ -739,7 +739,7 @@
           "",
           ""
         ],
-        "delayNote": "Stakeholder sign-off on requirements delayed — Sameep on vacation leave, review pending with Amar Mehta as backup",
+        "delayNote": "Stakeholder sign-off on requirements delayed \u2014 Sameep on vacation leave, review pending with Amar Mehta as backup",
         "escalations": [],
         "timeSavedDays": 0,
         "timeSavedNote": [],
@@ -780,7 +780,7 @@
         "progress": 70,
         "stage": "Development",
         "delayDays": 0,
-        "phase": "Implementation — Karyakar flow (100% complete)",
+        "phase": "Implementation \u2014 Karyakar flow (100% complete)",
         "nextMilestone": null,
         "goLive": null,
         "originalGoLive": null,
@@ -788,13 +788,13 @@
         "delayMitigation": [],
         "delayTradeoffs": "",
         "risks": [
-          "Shared communication email to respective people but no approval received yet — confusion on when to send communication"
+          "Shared communication email to respective people but no approval received yet \u2014 confusion on when to send communication"
         ],
         "riskMitigations": [
           "Will discuss with FPO on 31-Aug and decide; already have an implementation + integration plan for this"
         ],
         "dependencies": [
-          "Karyakar flow — dependent on other application owners integrating the API"
+          "Karyakar flow \u2014 dependent on other application owners integrating the API"
         ],
         "dependencyTeams": [
           "Other App Owners"
@@ -802,7 +802,7 @@
         "dependencyMitigations": [
           ""
         ],
-        "delayNote": "Go-live date TBD — dependent on other application owners integrating the SSO API",
+        "delayNote": "Go-live date TBD \u2014 dependent on other application owners integrating the SSO API",
         "escalations": [],
         "timeSavedDays": 0,
         "timeSavedNote": [],
@@ -815,7 +815,7 @@
         "progress": 80,
         "stage": "QA / UAT",
         "delayDays": 9,
-        "phase": "UAT (Signoff received) — VAPT re-verification, load testing, prod server setup pending",
+        "phase": "UAT (Signoff received) \u2014 VAPT re-verification, load testing, prod server setup pending",
         "nextMilestone": {
           "name": "Go-Live",
           "date": "2026-09-07"
@@ -834,10 +834,10 @@
           "Coordinate with respective teams for priority completion and track closure of pending activities"
         ],
         "dependencies": [
-          "SPM Production Server Setup & Configuration Pending — ETA 2-Sep-2026",
-          "VAPT re-verification — MySeva Sampark Module (solution submitted)",
-          "VAPT — Web app report, solution to be submitted soon",
-          "Load Testing — dev team improving performance, ETA 2-Sep-2026",
+          "SPM Production Server Setup & Configuration Pending \u2014 ETA 2-Sep-2026",
+          "VAPT re-verification \u2014 MySeva Sampark Module (solution submitted)",
+          "VAPT \u2014 Web app report, solution to be submitted soon",
+          "Load Testing \u2014 dev team improving performance, ETA 2-Sep-2026",
           "SPM UAT Worker PODs scaling issue"
         ],
         "dependencyTeams": [
@@ -854,7 +854,7 @@
           "",
           ""
         ],
-        "delayNote": "Go-live slipped to 7-Sep-2026 — pending VAPT re-verification, load testing, and production server readiness",
+        "delayNote": "Go-live slipped to 7-Sep-2026 \u2014 pending VAPT re-verification, load testing, and production server readiness",
         "escalations": [],
         "timeSavedDays": 0,
         "timeSavedNote": [],
@@ -880,7 +880,7 @@
         "risks": [],
         "riskMitigations": [],
         "dependencies": [
-          "DEVOPS-1029 — SMTP credentials/config for DEV/QA/UAT; emails not received post-config, under resolution with DevOps"
+          "DEVOPS-1029 \u2014 SMTP credentials/config for DEV/QA/UAT; emails not received post-config, under resolution with DevOps"
         ],
         "dependencyTeams": [
           "DevOps"
@@ -914,7 +914,7 @@
         "risks": [],
         "riskMitigations": [],
         "dependencies": [
-          "MIS – BKY & iBKY production deployment approach still pending"
+          "MIS \u2013 BKY & iBKY production deployment approach still pending"
         ],
         "dependencyTeams": [
           ""
@@ -930,12 +930,12 @@
       },
       {
         "id": "mysatsang-bapsid",
-        "name": "mySatsang – BAPS ID Integration",
+        "name": "mySatsang \u2013 BAPS ID Integration",
         "status": "amber",
         "progress": 0,
         "stage": "Design / Estimation",
         "delayDays": 0,
-        "phase": "Estimation — no committed start/due dates yet",
+        "phase": "Estimation \u2014 no committed start/due dates yet",
         "nextMilestone": null,
         "goLive": null,
         "originalGoLive": null,
@@ -943,19 +943,19 @@
         "delayMitigation": [],
         "delayTradeoffs": "",
         "risks": [
-          "No committed start/due dates yet — full timeline depends on SSO v2 requirements clarity from the India SSO team",
-          "Calendar module currently assumes North America timezone/locale — open item for India rollout"
+          "No committed start/due dates yet \u2014 full timeline depends on SSO v2 requirements clarity from the India SSO team",
+          "Calendar module currently assumes North America timezone/locale \u2014 open item for India rollout"
         ],
         "riskMitigations": [
           "",
           ""
         ],
         "dependencies": [
-          "BAPS ID — add new parameters to the Get Profile API",
-          "BAPS ID — clean up inconsistencies in the database",
-          "India SSO — confirm SSO v2 login flow requirements (est. 2 weeks to implement once clear)",
-          "SSO v2 — implement new login flow (80 hrs estimated)",
-          "India — calendar module is built for North America; needs review for India rollout"
+          "BAPS ID \u2014 add new parameters to the Get Profile API",
+          "BAPS ID \u2014 clean up inconsistencies in the database",
+          "India SSO \u2014 confirm SSO v2 login flow requirements (est. 2 weeks to implement once clear)",
+          "SSO v2 \u2014 implement new login flow (80 hrs estimated)",
+          "India \u2014 calendar module is built for North America; needs review for India rollout"
         ],
         "dependencyTeams": [
           "BAPS ID Team",
@@ -971,7 +971,7 @@
           "",
           ""
         ],
-        "delayNote": "Not yet scheduled — start/due dates not set in the integration plan",
+        "delayNote": "Not yet scheduled \u2014 start/due dates not set in the integration plan",
         "escalations": [],
         "timeSavedDays": 0,
         "timeSavedNote": [],
@@ -989,7 +989,7 @@
         "progress": 95,
         "stage": "Hypercare / Post-Launch",
         "delayDays": 0,
-        "delayNote": "In hypercare through 15-Sep-2026 — infinite caching rollout ETA 3-Sep-2026",
+        "delayNote": "In hypercare through 15-Sep-2026 \u2014 infinite caching rollout ETA 3-Sep-2026",
         "statusChangeReason": "",
         "phase": "Hypercare (90% complete)",
         "nextMilestone": {
@@ -1015,7 +1015,7 @@
           "completed": [],
           "inProgress": [
             "Hypercare monitoring",
-            "Infinite caching rollout — ETA 3-Sep-2026"
+            "Infinite caching rollout \u2014 ETA 3-Sep-2026"
           ],
           "nextPlan": []
         }
@@ -1027,7 +1027,7 @@
         "progress": 75,
         "stage": "Requirements",
         "delayDays": 1,
-        "delayNote": "Requirements gathering and approval stage missed its original deadline — dependent on Walle team availability for top-priority items",
+        "delayNote": "Requirements gathering and approval stage missed its original deadline \u2014 dependent on Walle team availability for top-priority items",
         "statusChangeReason": "",
         "phase": "Requirement (75% complete)",
         "nextMilestone": {
@@ -1063,13 +1063,13 @@
             "Requirements finalization & approval"
           ],
           "nextPlan": [
-            "New QA to be fully involved in project from the start — build test cases and test plan"
+            "New QA to be fully involved in project from the start \u2014 build test cases and test plan"
           ]
         }
       },
       {
         "id": "pledge",
-        "name": "Pledge – 1.0",
+        "name": "Pledge \u2013 1.0",
         "status": "green",
         "progress": 90,
         "stage": "Hypercare / Post-Launch",
@@ -1113,7 +1113,7 @@
         "progress": 20,
         "stage": "Design / Estimation",
         "delayDays": 0,
-        "delayNote": "No delay reported — new project just starting TDD phase",
+        "delayNote": "No delay reported \u2014 new project just starting TDD phase",
         "statusChangeReason": "",
         "phase": "TDD (20% complete)",
         "nextMilestone": {
@@ -1129,7 +1129,7 @@
         "timeSavedNote": [],
         "scopeReduced": false,
         "risks": [
-          "Backend-heavy user stories — not all 15 stories will fit before Diwali for Pledge 1.x"
+          "Backend-heavy user stories \u2014 not all 15 stories will fit before Diwali for Pledge 1.x"
         ],
         "riskMitigations": [
           ""
@@ -1149,13 +1149,13 @@
         ],
         "sprintStatus": {
           "completed": [
-            "Requirements gathering stage gate passed — on time"
+            "Requirements gathering stage gate passed \u2014 on time"
           ],
           "inProgress": [
-            "TDD phase — 20% complete"
+            "TDD phase \u2014 20% complete"
           ],
           "nextPlan": [
-            "15 user stories total — 4 achievable with 1 backend developer, 9 with 2 backend developers, by end of October"
+            "15 user stories total \u2014 4 achievable with 1 backend developer, 9 with 2 backend developers, by end of October"
           ]
         }
       },
@@ -1168,7 +1168,7 @@
         "delayDays": 3,
         "delayNote": "Go-live slipped 3 days to 28-Aug-2026 due to performance risk in check printing and workflow approval",
         "statusChangeReason": "",
-        "phase": "Live in production (pilot rollout) — monitoring check-printing & workflow-approval performance; tracking fast-follow items before full rollout",
+        "phase": "Live in production (pilot rollout) \u2014 monitoring check-printing & workflow-approval performance; tracking fast-follow items before full rollout",
         "nextMilestone": {
           "name": "Full rollout (post fast-follow closure)",
           "date": null
@@ -1182,16 +1182,16 @@
         "timeSavedNote": [],
         "scopeReduced": false,
         "risks": [
-          "Performance risk in check printing — taking more time than expected; team working on performance enhancements",
-          "Performance risk in workflow approval processes — invocation results good, WALL-E team working on 'approval' endpoint"
+          "Performance risk in check printing \u2014 taking more time than expected; team working on performance enhancements",
+          "Performance risk in workflow approval processes \u2014 invocation results good, WALL-E team working on 'approval' endpoint"
         ],
         "riskMitigations": [
           "Team working on performance enhancements for check printing",
           "WALL-E team addressing approval endpoint performance"
         ],
         "fastFollowItems": [
-          "Business decision on Post Go-Live REQ — HTML report vs PDF",
-          "Full expense reports feature — in progress"
+          "Business decision on Post Go-Live REQ \u2014 HTML report vs PDF",
+          "Full expense reports feature \u2014 in progress"
         ],
         "escalations": [],
         "dependencies": [],
@@ -1200,7 +1200,7 @@
         "sprintStatus": {
           "completed": [],
           "inProgress": [
-            "Business decision on full expense reports feature — in progress"
+            "Business decision on full expense reports feature \u2014 in progress"
           ],
           "nextPlan": []
         }
@@ -1221,18 +1221,18 @@
         },
         "goLive": "2026-10-05",
         "originalGoLive": "2026-09-21",
-        "delayImpact": "3 CRs — CR1 +10 working days, CR2 +6 working days, CR3 no impact on Go-Live; BKY requested Go-Live by 28-Sept; Mobile VAPT still pending; grammar/spelling change requests during UAT may alter design",
+        "delayImpact": "3 CRs \u2014 CR1 +10 working days, CR2 +6 working days, CR3 no impact on Go-Live; BKY requested Go-Live by 28-Sept; Mobile VAPT still pending; grammar/spelling change requests during UAT may alter design",
         "delayMitigation": [
           "Coordinating Mobile VAPT closure and Burp Suite Pro license renewal for Dhvanibhai",
-          "Majority of APIs meeting SLA — expecting no major code changes needed from spelling/grammar review"
+          "Majority of APIs meeting SLA \u2014 expecting no major code changes needed from spelling/grammar review"
         ],
-        "delayTradeoffs": "3 CRs already approved — CR1 added 10 working days, CR2 added 6 working days, CR3 no impact on Go-Live; no new CRs this week",
+        "delayTradeoffs": "3 CRs already approved \u2014 CR1 added 10 working days, CR2 added 6 working days, CR3 no impact on Go-Live; no new CRs this week",
         "timeSavedDays": 0,
         "timeSavedNote": [],
         "scopeReduced": false,
         "risks": [
           "Delay in completing Performance Testing",
-          "Delay in UAT completion — current progress 60%",
+          "Delay in UAT completion \u2014 current progress 60%",
           "Mobile VAPT still pending",
           "BKY team requested Go-Live by 28-Sept-2026",
           "UAT spelling/grammar/sentence revisions proposed by BKY team may alter design"
@@ -1242,7 +1242,7 @@
           "",
           "Renewing Burp Suite Pro license and prioritizing Mobile VAPT slot",
           "",
-          "Majority of APIs meeting SLA — expecting no major code changes needed"
+          "Majority of APIs meeting SLA \u2014 expecting no major code changes needed"
         ],
         "fastFollowItems": [],
         "escalations": [
@@ -1251,8 +1251,8 @@
           "Need BKY team approval for production URL (na.baps-apps.org/events)"
         ],
         "dependencies": [
-          "SSO — verify eligible BKY/iBKY participant list for accounts without SSO (Bhargavbhai)",
-          "Dhvanibhai cannot start Mobile VAPT before 9-Sep — prior commitments + expired Burp Suite Pro license",
+          "SSO \u2014 verify eligible BKY/iBKY participant list for accounts without SSO (Bhargavbhai)",
+          "Dhvanibhai cannot start Mobile VAPT before 9-Sep \u2014 prior commitments + expired Burp Suite Pro license",
           "BKMS UAT credentials needed to verify 2 recently received CRs",
           "Pending production integration keys"
         ],
@@ -1273,9 +1273,9 @@
             "Web Application development"
           ],
           "inProgress": [
-            "Mobile Development completion — delayed",
-            "QA sign-off — pending",
-            "Regression sign-off — pending, delayed 10 days"
+            "Mobile Development completion \u2014 delayed",
+            "QA sign-off \u2014 pending",
+            "Regression sign-off \u2014 pending, delayed 10 days"
           ],
           "nextPlan": []
         }
@@ -1287,7 +1287,7 @@
         "progress": 50,
         "stage": "Requirements",
         "delayDays": 13,
-        "delayNote": "Requirement phase delayed — GMS FRD review delayed 8 days, Guest Registration FRD creation delayed 12 days; current Go-Live is very challenging, revised realistic date being proposed to Aksharbhai",
+        "delayNote": "Requirement phase delayed \u2014 GMS FRD review delayed 8 days, Guest Registration FRD creation delayed 12 days; current Go-Live is very challenging, revised realistic date being proposed to Aksharbhai",
         "statusChangeReason": "",
         "phase": "Requirement Solidification (50% complete, target 8-Sep-2026)",
         "nextMilestone": {
@@ -1296,7 +1296,7 @@
         },
         "goLive": "2027-01-02",
         "originalGoLive": "2026-12-20",
-        "delayImpact": "Even with a sprint-by-sprint development approach, the go-live is optimistic — only 4 development sprints available for 6 modules (2 large)",
+        "delayImpact": "Even with a sprint-by-sprint development approach, the go-live is optimistic \u2014 only 4 development sprints available for 6 modules (2 large)",
         "delayMitigation": [
           "Highlighted to Aksharbhai that current Phase 2A Go-Live date is very challenging to achieve",
           "Proposing a revised realistic Go-Live date for Aksharbhai to discuss with the BKY team",
@@ -1310,7 +1310,7 @@
           "Web Transportation TDDs under review/approval (Pratikbhai)",
           "GMS FRD review and approval delayed by 8 days",
           "Guest Registration FRD creation delayed by 12 days",
-          "New scenarios continue to be identified by Business during document review — further iterations impacting timeline"
+          "New scenarios continue to be identified by Business during document review \u2014 further iterations impacting timeline"
         ],
         "riskMitigations": [
           "",
@@ -1323,7 +1323,7 @@
         "dependencies": [
           "One dev resource occupied resolving Phase 1 regression defects; 1 QA resource on Phase 1 reverification",
           "Phase 1 change requests prioritized ahead of Phase 2",
-          "New scenarios identified during UI/UX design not covered in signed-off FRD — BA reverting to business for confirmation"
+          "New scenarios identified during UI/UX design not covered in signed-off FRD \u2014 BA reverting to business for confirmation"
         ],
         "dependencyTeams": [
           "Internal (shared w/ Phase 1)",
@@ -1349,7 +1349,7 @@
             "Guest Registration FRD creation"
           ],
           "nextPlan": [
-            "Transportation module API integration — pending release dependency",
+            "Transportation module API integration \u2014 pending release dependency",
             "Partial GMS module + Response form module (Phase 1 carryover) development"
           ]
         }
@@ -1361,9 +1361,9 @@
         "progress": 90,
         "stage": "Requirements",
         "delayDays": 12,
-        "delayNote": "FRD sign-off received verbally from Sameep (documented in MoM); Design sign-off pending — final approval expected 9-Sep-2026",
+        "delayNote": "FRD sign-off received verbally from Sameep (documented in MoM); Design sign-off pending \u2014 final approval expected 9-Sep-2026",
         "statusChangeReason": "",
-        "phase": "Requirements (90% complete) — Design sign-off pending, final approval expected 9-Sep-2026",
+        "phase": "Requirements (90% complete) \u2014 Design sign-off pending, final approval expected 9-Sep-2026",
         "nextMilestone": {
           "name": "Design sign-off",
           "date": "2026-09-09"
@@ -1381,7 +1381,7 @@
         "risks": [
           "Delay in design sign-off may impact project timelines",
           "Project impacted by Shreyank's 1-week paternity leave",
-          "Lack of written FRD approval (email) remains open — followed up but no response received"
+          "Lack of written FRD approval (email) remains open \u2014 followed up but no response received"
         ],
         "riskMitigations": [
           "Regular follow-ups with Sameep for design review and final approval",
@@ -1393,8 +1393,8 @@
           "Need formal email confirmation of FRD and designs from Sameep"
         ],
         "dependencies": [
-          "Formal email confirmation for FRD approval still awaited — Sameep has a meeting with stakeholders on designs scheduled 9-Sep-2026",
-          "Review and approval pending from tech leads on estimations — follow-up already done"
+          "Formal email confirmation for FRD approval still awaited \u2014 Sameep has a meeting with stakeholders on designs scheduled 9-Sep-2026",
+          "Review and approval pending from tech leads on estimations \u2014 follow-up already done"
         ],
         "dependencyTeams": [
           "Business/Stakeholder (Sameep)",
@@ -1415,7 +1415,7 @@
             "UI Design Team dependency resolved through regular follow-ups and coordination"
           ],
           "inProgress": [
-            "Design sign-off — final approval expected 9-Sep-2026"
+            "Design sign-off \u2014 final approval expected 9-Sep-2026"
           ],
           "nextPlan": [
             "Developers onboarded onto bug-fixing tasks immediately (per Swami's direction) until design approvals received"
@@ -1431,7 +1431,7 @@
         "delayDays": 0,
         "delayNote": "GMS 1.3 missed its timely production deployment target; GMS 1.4 now in TDD (15% complete), targeting go-live 19-Oct-2026",
         "statusChangeReason": "",
-        "phase": "GMS 1.4 — TDD (15% complete, target 14-Oct-2026)",
+        "phase": "GMS 1.4 \u2014 TDD (15% complete, target 14-Oct-2026)",
         "nextMilestone": {
           "name": "GMS 1.4 Production deployment",
           "date": "2026-10-19"
@@ -1448,7 +1448,7 @@
         "riskMitigations": [],
         "fastFollowItems": [],
         "escalations": [
-          "Need RGC support to confirm From/Reply-to email addresses, advise on approach for mandir-level replies, and allocate a domain for hosting the unsubscribe page — required by 1-Oct-2026"
+          "Need RGC support to confirm From/Reply-to email addresses, advise on approach for mandir-level replies, and allocate a domain for hosting the unsubscribe page \u2014 required by 1-Oct-2026"
         ],
         "dependencies": [],
         "dependencyTeams": [],
@@ -1456,10 +1456,10 @@
         "sprintStatus": {
           "completed": [],
           "inProgress": [
-            "GMS 1.4 TDD — 15% complete"
+            "GMS 1.4 TDD \u2014 15% complete"
           ],
           "nextPlan": [
-            "GMS 1.4 production deployment target — 19-Oct-2026"
+            "GMS 1.4 production deployment target \u2014 19-Oct-2026"
           ]
         }
       },
@@ -1470,9 +1470,9 @@
         "progress": 75,
         "stage": "Development",
         "delayDays": 0,
-        "delayNote": "Go-live date TBD — dependent on other application owners integrating the SSO API",
+        "delayNote": "Go-live date TBD \u2014 dependent on other application owners integrating the SSO API",
         "statusChangeReason": "",
-        "phase": "Implementation — Karyakar flow 100% complete in UAT; Satsangi Flow deployment pending",
+        "phase": "Implementation \u2014 Karyakar flow 100% complete in UAT; Satsangi Flow deployment pending",
         "nextMilestone": null,
         "goLive": null,
         "originalGoLive": null,
@@ -1526,9 +1526,9 @@
         "progress": 85,
         "stage": "QA / UAT",
         "delayDays": 9,
-        "delayNote": "Production deployment missed the 7-Sep-2026 target — pending accepted-risk confirmation for open VAPT points on Web & MySeva App from Dharmaketu Swamiji",
+        "delayNote": "Production deployment missed the 7-Sep-2026 target \u2014 pending accepted-risk confirmation for open VAPT points on Web & MySeva App from Dharmaketu Swamiji",
         "statusChangeReason": "",
-        "phase": "UAT (Signoff received) — VAPT re-verification, load testing, prod server setup pending",
+        "phase": "UAT (Signoff received) \u2014 VAPT re-verification, load testing, prod server setup pending",
         "nextMilestone": {
           "name": "Go-Live",
           "date": "2026-09-07"
@@ -1547,7 +1547,7 @@
           "Production deployment pending due to VAPT sign-off / accepted-risk confirmation"
         ],
         "riskMitigations": [
-          "Continuous coordination with DevOps to monitor server load and resolve POD scaling/stability issues — issue resolved"
+          "Continuous coordination with DevOps to monitor server load and resolve POD scaling/stability issues \u2014 issue resolved"
         ],
         "fastFollowItems": [],
         "escalations": [
@@ -1568,8 +1568,8 @@
           ],
           "inProgress": [
             "VAPT re-verification (MySeva Sampark module + Web app report)",
-            "Load testing — performance tuning in progress, ETA 2-Sep-2026",
-            "Production server setup & configuration — ETA 2-Sep-2026"
+            "Load testing \u2014 performance tuning in progress, ETA 2-Sep-2026",
+            "Production server setup & configuration \u2014 ETA 2-Sep-2026"
           ],
           "nextPlan": [
             "Support needed from DevOps, VAPT and Performance Testing teams to complete pending activities on priority"
@@ -1603,7 +1603,7 @@
         "fastFollowItems": [],
         "escalations": [],
         "dependencies": [
-          "DEVOPS-1029 — SMTP credentials/config for DEV/QA/UAT; emails not received post-config, under resolution with DevOps"
+          "DEVOPS-1029 \u2014 SMTP credentials/config for DEV/QA/UAT; emails not received post-config, under resolution with DevOps"
         ],
         "dependencyTeams": [
           "DevOps"
@@ -1614,12 +1614,12 @@
         "sprintStatus": {
           "completed": [
             "Mobile: BST post-session summary tab",
-            "Web: BST reports — restrict attendance/quiz data entry",
-            "Release 1.0.24 → production deployment completed — 18-Aug-2026"
+            "Web: BST reports \u2014 restrict attendance/quiz data entry",
+            "Release 1.0.24 \u2192 production deployment completed \u2014 18-Aug-2026"
           ],
           "inProgress": [
-            "Mobile: BST session dashboard — QA testing",
-            "Mobile: BST quiz tab — QA testing"
+            "Mobile: BST session dashboard \u2014 QA testing",
+            "Mobile: BST quiz tab \u2014 QA testing"
           ],
           "nextPlan": []
         }
@@ -1651,7 +1651,7 @@
         "fastFollowItems": [],
         "escalations": [],
         "dependencies": [
-          "MIS – BKY & iBKY production deployment approach still pending"
+          "MIS \u2013 BKY & iBKY production deployment approach still pending"
         ],
         "dependencyTeams": [
           ""
@@ -1663,26 +1663,26 @@
           "completed": [
             "System: BKY sub-department creation & Gunbhavi mailing category split",
             "Search person: show application source in results",
-            "Release 1.0.23C → production deployment completed — 18-Aug-2026",
-            "Category change: Gunbhavi Mailing → Visitor and Unknown deployed to production"
+            "Release 1.0.23C \u2192 production deployment completed \u2014 18-Aug-2026",
+            "Category change: Gunbhavi Mailing \u2192 Visitor and Unknown deployed to production"
           ],
           "inProgress": [
-            "Report: add person status column — QA in progress",
-            "Signup QR: frontend consent, validation & address UI — QA in progress"
+            "Report: add person status column \u2014 QA in progress",
+            "Signup QR: frontend consent, validation & address UI \u2014 QA in progress"
           ],
           "nextPlan": []
         }
       },
       {
         "id": "mysatsang-bapsid",
-        "name": "mySatsang – BAPS ID Integration",
+        "name": "mySatsang \u2013 BAPS ID Integration",
         "status": "amber",
         "progress": 0,
         "stage": "Design / Estimation",
         "delayDays": 0,
-        "delayNote": "Not yet scheduled — start/due dates not set in the integration plan",
+        "delayNote": "Not yet scheduled \u2014 start/due dates not set in the integration plan",
         "statusChangeReason": "",
-        "phase": "Estimation — no committed start/due dates yet",
+        "phase": "Estimation \u2014 no committed start/due dates yet",
         "nextMilestone": null,
         "goLive": null,
         "originalGoLive": null,
@@ -1693,8 +1693,8 @@
         "timeSavedNote": [],
         "scopeReduced": false,
         "risks": [
-          "No committed start/due dates yet — full timeline depends on SSO v2 requirements clarity from the India SSO team",
-          "Calendar module currently assumes North America timezone/locale — open item for India rollout"
+          "No committed start/due dates yet \u2014 full timeline depends on SSO v2 requirements clarity from the India SSO team",
+          "Calendar module currently assumes North America timezone/locale \u2014 open item for India rollout"
         ],
         "riskMitigations": [
           "",
@@ -1703,11 +1703,11 @@
         "fastFollowItems": [],
         "escalations": [],
         "dependencies": [
-          "BAPS ID — add new parameters to the Get Profile API",
-          "BAPS ID — clean up inconsistencies in the database",
-          "India SSO — confirm SSO v2 login flow requirements (est. 2 weeks to implement once clear)",
-          "SSO v2 — implement new login flow (80 hrs estimated)",
-          "India — calendar module is built for North America; needs review for India rollout"
+          "BAPS ID \u2014 add new parameters to the Get Profile API",
+          "BAPS ID \u2014 clean up inconsistencies in the database",
+          "India SSO \u2014 confirm SSO v2 login flow requirements (est. 2 weeks to implement once clear)",
+          "SSO v2 \u2014 implement new login flow (80 hrs estimated)",
+          "India \u2014 calendar module is built for North America; needs review for India rollout"
         ],
         "dependencyTeams": [
           "BAPS ID Team",
@@ -1726,18 +1726,823 @@
         "sprintStatus": {
           "completed": [],
           "inProgress": [
-            "SID — upgrade to support BAPS ID (bapspid)"
+            "SID \u2014 upgrade to support BAPS ID (bapspid)"
           ],
           "nextPlan": [
-            "SID — integrate with SSO v2",
-            "MST-api — integrate BAPS ID APIs for profile",
-            "MST-api — integrate with SSO v2",
-            "MST-UI — update profile page based on new API response",
-            "MST-UI — integrate with SSO v2",
-            "MST-UI — investigate which modules should be hidden from users without a MIS ID",
-            "MST-UI — add flag in dynamic module to restrict to MIS ID users",
-            "MST-UI — implement UI for non-MIS users accessing a MIS-ID-only module",
-            "MST-UI — use POST me/devices to register the user's device"
+            "SID \u2014 integrate with SSO v2",
+            "MST-api \u2014 integrate BAPS ID APIs for profile",
+            "MST-api \u2014 integrate with SSO v2",
+            "MST-UI \u2014 update profile page based on new API response",
+            "MST-UI \u2014 integrate with SSO v2",
+            "MST-UI \u2014 investigate which modules should be hidden from users without a MIS ID",
+            "MST-UI \u2014 add flag in dynamic module to restrict to MIS ID users",
+            "MST-UI \u2014 implement UI for non-MIS users accessing a MIS-ID-only module",
+            "MST-UI \u2014 use POST me/devices to register the user's device"
+          ]
+        }
+      }
+    ]
+  },
+  "2026-09-15": {
+    "capturedAt": "2026-09-16T03:44:12.372875Z",
+    "projects": [
+      {
+        "id": "webnext",
+        "name": "WebNext",
+        "status": "green",
+        "progress": 95,
+        "stage": "Hypercare / Post-Launch",
+        "delayDays": 0,
+        "delayNote": "In hypercare through 15-Sep-2026 \u2014 infinite caching rollout ETA 3-Sep-2026",
+        "statusChangeReason": "",
+        "phase": "Hypercare (90% complete)",
+        "nextMilestone": {
+          "name": "Hypercare completion",
+          "date": "2026-09-15"
+        },
+        "goLive": null,
+        "originalGoLive": null,
+        "delayImpact": "",
+        "delayMitigation": [],
+        "delayTradeoffs": "",
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false,
+        "risks": [],
+        "riskMitigations": [],
+        "fastFollowItems": [],
+        "escalations": [],
+        "dependencies": [],
+        "dependencyTeams": [],
+        "dependencyMitigations": [],
+        "sprintStatus": {
+          "completed": [],
+          "inProgress": [
+            "Hypercare monitoring",
+            "Infinite caching rollout \u2014 ETA 3-Sep-2026"
+          ],
+          "nextPlan": []
+        }
+      },
+      {
+        "id": "webnext-2",
+        "name": "WebNext 2.0",
+        "status": "green",
+        "progress": 80,
+        "stage": "Requirements",
+        "delayDays": 0,
+        "delayNote": "Requirements gathering completed 17-Sep-2026; project plan to be ready by 9/18",
+        "statusChangeReason": "",
+        "phase": "Requirement sign-off complete (12-Jun to 17-Sep); TDD starting 17-Sep",
+        "nextMilestone": {
+          "name": "TDD",
+          "date": "2026-09-07"
+        },
+        "goLive": "2026-12-24",
+        "originalGoLive": "2026-12-31",
+        "delayImpact": "",
+        "delayMitigation": [
+          "Connecting with Walle team to set pre-expectations, scope of work, and priority"
+        ],
+        "delayTradeoffs": "",
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false,
+        "risks": [
+          "RCG \u2014 Two full-time QA resources required from this week onward (High priority)"
+        ],
+        "riskMitigations": [
+          "Requesting dedicated QA allocation from RCG"
+        ],
+        "fastFollowItems": [],
+        "escalations": [],
+        "dependencies": [
+          "Walle team availability for top-priority items to be developed"
+        ],
+        "dependencyTeams": [
+          "Walle Team"
+        ],
+        "dependencyMitigations": [
+          ""
+        ],
+        "sprintStatus": {
+          "completed": [],
+          "inProgress": [
+            "Requirements finalization & approval"
+          ],
+          "nextPlan": [
+            "New QA to be fully involved in project from the start \u2014 build test cases and test plan"
+          ]
+        }
+      },
+      {
+        "id": "pledge",
+        "name": "Pledge \u2013 1.0",
+        "status": "green",
+        "progress": 90,
+        "stage": "Hypercare / Post-Launch",
+        "delayDays": 0,
+        "delayNote": "Live in production; in hypercare through 15-Sep-2026",
+        "statusChangeReason": "",
+        "phase": "Hypercare (90% complete)",
+        "nextMilestone": {
+          "name": "Hypercare completion",
+          "date": "2026-09-15"
+        },
+        "goLive": "2026-08-19",
+        "originalGoLive": "2026-08-19",
+        "delayImpact": "",
+        "delayMitigation": [],
+        "delayTradeoffs": "",
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false,
+        "risks": [],
+        "riskMitigations": [],
+        "fastFollowItems": [],
+        "escalations": [],
+        "dependencies": [],
+        "dependencyTeams": [],
+        "dependencyMitigations": [],
+        "sprintStatus": {
+          "completed": [
+            "ASM Integration moved to production"
+          ],
+          "inProgress": [
+            "Hypercare monitoring"
+          ],
+          "nextPlan": []
+        }
+      },
+      {
+        "id": "pledge-1a",
+        "name": "Pledge - 1.x",
+        "status": "green",
+        "progress": 35,
+        "stage": "Design / Estimation",
+        "delayDays": 0,
+        "delayNote": "Scope confirmed with Manojbhai; project plan summary reviewed and confirmed with Manojbhai",
+        "statusChangeReason": "",
+        "phase": "Requirement complete (05-Aug to 07-Sep); TDD in progress (09-Sep to 25-Sep)",
+        "nextMilestone": {
+          "name": "TDD",
+          "date": "2026-09-25"
+        },
+        "goLive": "2026-10-29",
+        "originalGoLive": "2026-11-06",
+        "delayImpact": "",
+        "delayMitigation": [],
+        "delayTradeoffs": "",
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false,
+        "risks": [
+          "Backend-heavy user stories \u2014 not all 15 stories will fit before Diwali for Pledge 1.x"
+        ],
+        "riskMitigations": [
+          ""
+        ],
+        "fastFollowItems": [],
+        "escalations": [
+          "Need 1 additional backend development resource to complete more stories (7-8 stories)"
+        ],
+        "dependencies": [
+          "Timely TDD design delivery for each story, with required approvals"
+        ],
+        "dependencyTeams": [
+          "Internal"
+        ],
+        "dependencyMitigations": [
+          ""
+        ],
+        "sprintStatus": {
+          "completed": [
+            "Requirement stage gate passed on time (05-Aug to 07-Sep)",
+            "Scope confirmed with Manojbhai"
+          ],
+          "inProgress": [
+            "TDD (09-Sep to 25-Sep)"
+          ],
+          "nextPlan": [
+            "15 user stories total \u2014 4 achievable with 1 backend developer, 9 with 2 backend developers, by end of October"
+          ]
+        }
+      },
+      {
+        "id": "emm",
+        "name": "EMM",
+        "status": "amber",
+        "progress": 92,
+        "stage": "Hypercare / Post-Launch",
+        "delayDays": 0,
+        "delayNote": "Pre-go-live UAT/Production stages both completed (with 5-day and 3-day slips already reflected in Go-Live date); now in post-go-live REQ phase",
+        "statusChangeReason": "New solution failed under concurrent users in production; two performance risks open (check-printing / PDF generation via .NET, and WALL-E invocation+approval) \u2014 moving to Amber while fixes roll out, no impact to the already-completed go-live.",
+        "phase": "Live in production; Post Go-Live REQ phase started 02-Sep-2026",
+        "nextMilestone": {
+          "name": "Post Go-Live REQ",
+          "date": null
+        },
+        "goLive": "2026-08-28",
+        "originalGoLive": "2026-08-25",
+        "delayImpact": "",
+        "delayMitigation": [],
+        "delayTradeoffs": "",
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false,
+        "risks": [
+          "New solution failed with concurrent users (Bhaveshbhai, Medium)",
+          "WALL-E workaround for workflow override emails \u2014 Invocation v2, Approval v2, Status v2 (Pratikbhai Gohil, Medium)",
+          "Default accounting entities for location, Canada (Pratikbhai Gohil, Medium)",
+          "Rate limiting implementation in EMM (Vishalbhai, Low)",
+          "Business decision on PDF report generation; events functionality (P. Satyanishth Swamiji, Medium)"
+        ],
+        "riskMitigations": [
+          "Dev provided a solution using a single Chromium instance instead of multiple; EMM team testing WIP",
+          "WALL-E invocation v2 reverted; WALL-E team doing detailed analysis"
+        ],
+        "fastFollowItems": [
+          "Business decision: REQ \u2014 HTML report vs. PDF",
+          "Canada taxation and expense reports requirements",
+          "Vendor management enhancements approval from stakeholders",
+          "Events functionality REQ documentation"
+        ],
+        "escalations": [
+          "In-progress business decision needed on full expense reports feature"
+        ],
+        "dependencies": [
+          "Post go-live: business decision on REQ \u2014 HTML report vs. PDF",
+          "Post go-live: Canada taxation and expense reports requirements",
+          "Country-specific: vendor management enhancements approval from stakeholders"
+        ],
+        "dependencyTeams": [
+          "Business/Stakeholder",
+          "Business/Stakeholder",
+          "Business/Stakeholder"
+        ],
+        "dependencyMitigations": [
+          "In-progress \u2014 business decision on full expense reports feature"
+        ],
+        "sprintStatus": {
+          "completed": [],
+          "inProgress": [
+            "Business decision on full expense reports feature \u2014 in progress"
+          ],
+          "nextPlan": []
+        }
+      },
+      {
+        "id": "mybky-phase1",
+        "name": "MyBKY (Phase 1)",
+        "status": "amber",
+        "progress": 65,
+        "stage": "QA / UAT",
+        "delayDays": 5,
+        "delayNote": "UAT end revised from 09-Sep to 16-Sep (+5 days); VAPT and Load now aligned to 16-Sep",
+        "statusChangeReason": "",
+        "phase": "UAT revised to 16-Sep (5-day slip); VAPT/Load also targeting 16-Sep",
+        "nextMilestone": {
+          "name": "UAT / VAPT / Load",
+          "date": "2026-09-16"
+        },
+        "goLive": "2026-10-05",
+        "originalGoLive": "2026-09-21",
+        "delayImpact": "UAT stakeholder sign-off received for 75% of test cases, 25% remaining; downstream VAPT/Load/Go-Live hold at 16-Sep/05-Oct as planned",
+        "delayMitigation": [
+          "Escalated remaining 25% of UAT test-case sign-off with stakeholder",
+          "Tracking mobile VAPT and QA sign-off as critical items this week"
+        ],
+        "delayTradeoffs": "3 CRs already approved \u2014 CR1 added 10 working days, CR2 added 6 working days, CR3 no impact on Go-Live; no new CRs this week",
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false,
+        "risks": [
+          "Web: VAPT completion sign-off awaited from QA (Nimeshbhai, Critical)",
+          "Performance/Load testing sign-off awaited (Nimeshbhai, Critical)",
+          "Mobile: VAPT completion sign-off awaited (Dhwanibhai/Dipenbhai, Critical)",
+          "UAT stakeholder sign-off received for 75% of test cases; 25% remaining (Critical)",
+          "Mobile store app name decision pending (RGC, Critical)",
+          "BKMS \u2013 MIS data misalignment (Nitin Chaudhary, Critical)",
+          "Pending production readiness items (DevOps, High)",
+          "SSO account creation (Janakbhai, High)",
+          "User profile disappears in MIS when user details are edited (Sandeep Pistolwala, Medium)"
+        ],
+        "riskMitigations": [],
+        "fastFollowItems": [],
+        "escalations": [
+          "Whether to publish the mobile app on both Google Play Store and Apple App Store using the UAT environment",
+          "Getting mobile VAPT closure",
+          "Is BKY team's approval needed for production URL (na.baps-apps.org/events)"
+        ],
+        "dependencies": [
+          "SSO creation for Kishor/Kishori participants without SSO accounts \u2014 Bhargavbhai to verify eligible BKY/iBKY list queries",
+          "Dhvanibhai cannot start mobile VAPT before 9-Sep due to prior commitments; Burp Suite Pro license expired",
+          "BKMS UAT credentials needed to verify one of 2 recently received CRs",
+          "Pending production integration keys"
+        ],
+        "dependencyTeams": [
+          "SSO Team",
+          "Security/VAPT",
+          "BKMS Team",
+          "DevOps"
+        ],
+        "dependencyMitigations": [],
+        "sprintStatus": {
+          "completed": [
+            "Web Application development"
+          ],
+          "inProgress": [
+            "Mobile Development completion \u2014 delayed",
+            "QA sign-off \u2014 pending",
+            "Regression sign-off \u2014 pending, delayed 10 days"
+          ],
+          "nextPlan": []
+        }
+      },
+      {
+        "id": "mybky-phase2",
+        "name": "myBKY 2A",
+        "status": "amber",
+        "progress": 45,
+        "stage": "Requirements",
+        "delayDays": 14,
+        "delayNote": "Requirement end revised from 08-Sep to 28-Sep (+14 days); TDD revised from 02-Oct to 12-Oct (+6 days)",
+        "statusChangeReason": "",
+        "phase": "Requirement revised to 28-Sep (+14 days); TDD revised to 12-Oct (+6 days)",
+        "nextMilestone": {
+          "name": "Requirement + TDD",
+          "date": "2026-09-28"
+        },
+        "goLive": "2027-01-04",
+        "originalGoLive": "2026-12-20",
+        "delayImpact": "Current Phase 2A go-live date is very challenging to hold; a revised, realistic go-live date is being proposed",
+        "delayMitigation": [
+          "Highlighted to Aksharbhai that current go-live date is very challenging to achieve",
+          "Aksharbhai asked for a proposed revised, realistic go-live date to discuss with the BKY team",
+          "Satish and Kishanbhai finalizing the realistic go-live date to share with Aksharbhai"
+        ],
+        "delayTradeoffs": "",
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false,
+        "risks": [
+          "Scope creep \u2014 requirement gaps identified in the approved transportation module (RGC, Critical)",
+          "Timely review and approval of requirements \u2014 challenges getting stakeholder time (RGC, Critical)",
+          "Timely review and approval of TDDs (Vishalbhai Patel/Dharmaketu Swami, Critical)",
+          "Should development hold off if requirements & TDDs aren't approved? (RGC, Critical)",
+          "Team is partially utilized in Phase 1 (RGC, High)"
+        ],
+        "riskMitigations": [],
+        "fastFollowItems": [],
+        "escalations": [],
+        "dependencies": [
+          "One dev and both QA resources are occupied on Phase 1 tasks",
+          "Dependent on BKY team's availability for requirement review and approval"
+        ],
+        "dependencyTeams": [
+          "Internal (shared w/ Phase 1)",
+          "Business/Stakeholder"
+        ],
+        "dependencyMitigations": [],
+        "sprintStatus": {
+          "completed": [
+            "Sprint 1 Dev started",
+            "Transportation Module Frontend development completed",
+            "Transportation Backend development completed"
+          ],
+          "inProgress": [
+            "Requirement completion",
+            "Sprint 1 TDD submission & approval",
+            "Web Transportation TDD review",
+            "GMS FRD review",
+            "Guest Registration FRD creation"
+          ],
+          "nextPlan": [
+            "Transportation module API integration \u2014 pending release dependency",
+            "Partial GMS module + Response form module (Phase 1 carryover) development"
+          ]
+        }
+      },
+      {
+        "id": "mymandir",
+        "name": "myMandir 1B",
+        "status": "green",
+        "progress": 85,
+        "stage": "Development",
+        "delayDays": 0,
+        "delayNote": "Renamed to myMandir 1B this week (split out from the general myMandir umbrella alongside new myMandir 1C). Formal FRD sign-off has landed \u2014 status recovers from Red to Green.",
+        "statusChangeReason": "",
+        "phase": "myMandir 1B \u2014 Requirement complete (22-Jul to 14-Sep); TDD in progress (17-Sep to 22-Sep)",
+        "nextMilestone": {
+          "name": "TDD",
+          "date": "2026-09-22"
+        },
+        "goLive": "2026-10-30",
+        "originalGoLive": "2026-10-30",
+        "delayImpact": "Delay in design sign-off may impact overall project schedule; lack of written FRD approval (email) remains open despite follow-up",
+        "delayMitigation": [
+          "Aniket connected with Sameep during BA's leave period to secure FRD sign-off"
+        ],
+        "delayTradeoffs": "",
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false,
+        "risks": [
+          "Need one more front-end (mobile) developer (RGC, Critical)",
+          "Oct/Nov timeline is tight \u2014 need to keep driving project pace (Aniket Udgaonkar, High)"
+        ],
+        "riskMitigations": [
+          "Aniket driving weekly pace checks to hold the Oct/Nov timeline"
+        ],
+        "fastFollowItems": [],
+        "escalations": [],
+        "dependencies": [
+          "Need one more front-end (mobile) developer"
+        ],
+        "dependencyTeams": [
+          "Internal"
+        ],
+        "dependencyMitigations": [
+          "",
+          ""
+        ],
+        "sprintStatus": {
+          "completed": [
+            "Sign-off received from Sameep"
+          ],
+          "inProgress": [
+            "TDD (17-Sep to 22-Sep)"
+          ],
+          "nextPlan": [
+            "Development & QA (22-Sep to 22-Oct)",
+            "UAT (23-Oct to 26-Oct)",
+            "VAPT / Load (16-Oct to 28-Oct)",
+            "Go-Live (28-Oct to 30-Oct)"
+          ]
+        }
+      },
+      {
+        "id": "gms",
+        "name": "GMS 1.4",
+        "status": "green",
+        "progress": 35,
+        "stage": "Design / Estimation",
+        "delayDays": 2,
+        "delayNote": "Requirement end revised from 09-Sep to 13-Sep (+3 days); TDD revised from 14-Sep to 16-Sep (+2 days). Small but critical release covering Unsubscribe and Contact Type; Unsubscribe requirements finalized and TDD underway, Contact Type targeted for finalization by 9-Sep.",
+        "statusChangeReason": "",
+        "phase": "GMS 1.4 \u2014 Requirement revised to 13-Sep (+3 days); TDD revised to 16-Sep (+2 days); Pilot (selected centers) started 14-Sep",
+        "nextMilestone": {
+          "name": "Development",
+          "date": "2026-09-24"
+        },
+        "goLive": "2026-10-12",
+        "originalGoLive": "2026-10-19",
+        "delayImpact": "No material impact to the 12-Oct-2026 go-live target",
+        "delayMitigation": [
+          "Running requirements and technical design in parallel to absorb the slip"
+        ],
+        "delayTradeoffs": "",
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false,
+        "risks": [],
+        "riskMitigations": [],
+        "fastFollowItems": [],
+        "escalations": [
+          "RGC support needed to confirm From/Reply-to email addresses, advise on handling mandir-level replies, and allocate a domain for the unsubscribe page \u2014 required by 1-Oct-2026"
+        ],
+        "dependencies": [],
+        "dependencyTeams": [],
+        "dependencyMitigations": [],
+        "sprintStatus": {
+          "completed": [],
+          "inProgress": [
+            "GMS 1.4 TDD \u2014 15% complete"
+          ],
+          "nextPlan": [
+            "GMS 1.4 production deployment target \u2014 19-Oct-2026"
+          ]
+        }
+      },
+      {
+        "id": "baps-sso",
+        "name": "SSO V2",
+        "status": "green",
+        "progress": 80,
+        "stage": "Development",
+        "delayDays": 0,
+        "delayNote": "Renamed to SSO V2 this week. Karyakar deployment was blocked on SID; session 1 scheduled 9/17 with Vishal Patel (Tampa) for ASM/GSS.",
+        "statusChangeReason": "",
+        "phase": "SSO V2 \u2014 Karyakar flow deployed to UAT; Satsangi flow in progress",
+        "nextMilestone": {
+          "name": "UAT",
+          "date": "2026-12-21"
+        },
+        "goLive": "2027-01-04",
+        "originalGoLive": "2027-01-04",
+        "delayImpact": "",
+        "delayMitigation": [
+          "Following up with pending application owners for meeting schedules and integration details"
+        ],
+        "delayTradeoffs": "",
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false,
+        "risks": [
+          "Karyakar deployment blocked due to SID (Hitesh Patel, Critical)",
+          "Waiting on other applications' implementation plan with session 2 dates \u2014 Inbox/MSD (Vasu, High)",
+          "Waiting on other applications' implementation plan with session 2 dates \u2014 MIS (Sandeep Pistolwala, High)",
+          "Session 1 scheduled 9/17 with Vishal Patel, Tampa, for ASM/GSS (Low)"
+        ],
+        "riskMitigations": [],
+        "fastFollowItems": [],
+        "escalations": [
+          "Need timely responses from application owners for meeting schedules and integration forms"
+        ],
+        "dependencies": [
+          "Waiting on other applications' implementation plan with session 2 dates (Inbox, MSD, MIS)"
+        ],
+        "dependencyTeams": [
+          "Other App Owners"
+        ],
+        "dependencyMitigations": [
+          ""
+        ],
+        "sprintStatus": {
+          "completed": [
+            "Advance notification email and integration form shared with impacted application owners",
+            "SSO V2 implementation plan completed",
+            "Phase 1 application owner meeting scheduled",
+            "UI updates completed in Demo App",
+            "SID API integrated with Karyakar Flow",
+            "Karyakar Flow deployed successfully in UAT"
+          ],
+          "inProgress": [
+            "Satsangi Flow deployment",
+            "QA testing on UAT of Karyakar flow"
+          ],
+          "nextPlan": []
+        }
+      },
+      {
+        "id": "spm",
+        "name": "SPM",
+        "status": "green",
+        "progress": 97,
+        "stage": "Hypercare / Post-Launch",
+        "delayDays": 12,
+        "delayNote": "UAT/VAPT/Load/Go-Live all slipped from original plan (UAT +3d, VAPT/Load +15d, Go-Live +12d) but production deployment is now complete and stable.",
+        "statusChangeReason": "",
+        "phase": "Production go-live completed; Hypercare started 14-Sep (2 days early vs. revised plan)",
+        "nextMilestone": {
+          "name": "Hypercare completion",
+          "date": "2026-10-31"
+        },
+        "goLive": "2026-09-12",
+        "originalGoLive": "2026-08-29",
+        "delayImpact": "Go-live moved from 31-Aug to 12-Sep; no further downstream impact \u2014 Hypercare is already underway",
+        "delayMitigation": [
+          "Dharmaketu Swamiji's accepted-risk confirmation obtained for VAPT points, enabling final sign-off and deployment"
+        ],
+        "delayTradeoffs": "",
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false,
+        "risks": [
+          "Production deployment pending due to VAPT sign-off / accepted-risk confirmation"
+        ],
+        "riskMitigations": [
+          "Continuous coordination with DevOps to monitor server load and resolve POD scaling/stability issues \u2014 issue resolved"
+        ],
+        "fastFollowItems": [
+          "Dashboard minimal feature \u2014 TDD in progress"
+        ],
+        "escalations": [],
+        "dependencies": [
+          "Accepted Risk confirmation for open VAPT points on Web & MySeva App from Dharmaketu Swamiji for VAPT sign-off"
+        ],
+        "dependencyTeams": [
+          "Business/Stakeholder (Dharmaketu Swamiji)"
+        ],
+        "dependencyMitigations": [
+          ""
+        ],
+        "sprintStatus": {
+          "completed": [
+            "Production go-live completed"
+          ],
+          "inProgress": [
+            "Dashboard minimal feature \u2014 TDD in progress"
+          ],
+          "nextPlan": [
+            "Support needed from DevOps, VAPT and Performance Testing teams to complete pending activities on priority"
+          ]
+        }
+      },
+      {
+        "id": "bkms",
+        "name": "BKMS",
+        "status": "green",
+        "progress": 70,
+        "stage": "Development",
+        "delayDays": 0,
+        "delayNote": "No delay reported",
+        "statusChangeReason": "",
+        "phase": "Sprint 26.17",
+        "nextMilestone": {
+          "name": "UAT",
+          "date": "2026-08-20"
+        },
+        "goLive": null,
+        "originalGoLive": null,
+        "delayImpact": "",
+        "delayMitigation": [],
+        "delayTradeoffs": "",
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false,
+        "risks": [],
+        "riskMitigations": [],
+        "fastFollowItems": [],
+        "escalations": [],
+        "dependencies": [
+          "DEVOPS-1029 \u2014 SMTP credentials/config for DEV/QA/UAT; emails not received post-config, under resolution with DevOps"
+        ],
+        "dependencyTeams": [
+          "DevOps"
+        ],
+        "dependencyMitigations": [
+          ""
+        ],
+        "sprintStatus": {
+          "completed": [
+            "Mobile: BST post-session summary tab",
+            "Web: BST reports \u2014 restrict attendance/quiz data entry",
+            "Release 1.0.24 \u2192 production deployment completed \u2014 18-Aug-2026"
+          ],
+          "inProgress": [
+            "Mobile: BST session dashboard \u2014 QA testing",
+            "Mobile: BST quiz tab \u2014 QA testing"
+          ],
+          "nextPlan": []
+        }
+      },
+      {
+        "id": "mis",
+        "name": "MIS",
+        "status": "green",
+        "progress": 75,
+        "stage": "Development",
+        "delayDays": 0,
+        "delayNote": "No delay reported",
+        "statusChangeReason": "",
+        "phase": "Sprint 26.17",
+        "nextMilestone": {
+          "name": "UAT",
+          "date": "2026-08-26"
+        },
+        "goLive": null,
+        "originalGoLive": null,
+        "delayImpact": "",
+        "delayMitigation": [],
+        "delayTradeoffs": "",
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false,
+        "risks": [],
+        "riskMitigations": [],
+        "fastFollowItems": [],
+        "escalations": [],
+        "dependencies": [
+          "MIS \u2013 BKY & iBKY production deployment approach still pending"
+        ],
+        "dependencyTeams": [
+          ""
+        ],
+        "dependencyMitigations": [
+          ""
+        ],
+        "sprintStatus": {
+          "completed": [
+            "System: BKY sub-department creation & Gunbhavi mailing category split",
+            "Search person: show application source in results",
+            "Release 1.0.23C \u2192 production deployment completed \u2014 18-Aug-2026",
+            "Category change: Gunbhavi Mailing \u2192 Visitor and Unknown deployed to production"
+          ],
+          "inProgress": [
+            "Report: add person status column \u2014 QA in progress",
+            "Signup QR: frontend consent, validation & address UI \u2014 QA in progress"
+          ],
+          "nextPlan": []
+        }
+      },
+      {
+        "id": "mysatsang-bapsid",
+        "name": "mySatsang \u2013 BAPS ID Integration",
+        "status": "amber",
+        "progress": 0,
+        "stage": "Design / Estimation",
+        "delayDays": 0,
+        "delayNote": "Not yet scheduled \u2014 start/due dates not set in the integration plan",
+        "statusChangeReason": "",
+        "phase": "Estimation \u2014 no committed start/due dates yet",
+        "nextMilestone": null,
+        "goLive": null,
+        "originalGoLive": null,
+        "delayImpact": "",
+        "delayMitigation": [],
+        "delayTradeoffs": "",
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false,
+        "risks": [
+          "No committed start/due dates yet \u2014 full timeline depends on SSO v2 requirements clarity from the India SSO team",
+          "Calendar module currently assumes North America timezone/locale \u2014 open item for India rollout"
+        ],
+        "riskMitigations": [
+          "",
+          ""
+        ],
+        "fastFollowItems": [],
+        "escalations": [],
+        "dependencies": [
+          "BAPS ID \u2014 add new parameters to the Get Profile API",
+          "BAPS ID \u2014 clean up inconsistencies in the database",
+          "India SSO \u2014 confirm SSO v2 login flow requirements (est. 2 weeks to implement once clear)",
+          "SSO v2 \u2014 implement new login flow (80 hrs estimated)",
+          "India \u2014 calendar module is built for North America; needs review for India rollout"
+        ],
+        "dependencyTeams": [
+          "BAPS ID Team",
+          "BAPS ID Team",
+          "SSO Team (India)",
+          "SSO Team",
+          "India Team"
+        ],
+        "dependencyMitigations": [
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "sprintStatus": {
+          "completed": [],
+          "inProgress": [
+            "SID \u2014 upgrade to support BAPS ID (bapspid)"
+          ],
+          "nextPlan": [
+            "SID \u2014 integrate with SSO v2",
+            "MST-api \u2014 integrate BAPS ID APIs for profile",
+            "MST-api \u2014 integrate with SSO v2",
+            "MST-UI \u2014 update profile page based on new API response",
+            "MST-UI \u2014 integrate with SSO v2",
+            "MST-UI \u2014 investigate which modules should be hidden from users without a MIS ID",
+            "MST-UI \u2014 add flag in dynamic module to restrict to MIS ID users",
+            "MST-UI \u2014 implement UI for non-MIS users accessing a MIS-ID-only module",
+            "MST-UI \u2014 use POST me/devices to register the user's device"
+          ]
+        }
+      },
+      {
+        "id": "mymandir-1c",
+        "name": "myMandir 1C",
+        "status": "green",
+        "progress": 15,
+        "stage": "Design / Estimation",
+        "delayDays": 0,
+        "delayNote": "New this week \u2014 no prior snapshot as its own line item",
+        "statusChangeReason": "",
+        "phase": "Split out from the myMandir umbrella this week, alongside myMandir 1B",
+        "nextMilestone": {
+          "name": "TDD",
+          "date": "2026-09-22"
+        },
+        "goLive": "2026-11-30",
+        "originalGoLive": "2026-11-30",
+        "delayImpact": "",
+        "delayMitigation": [],
+        "delayTradeoffs": "",
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false,
+        "risks": [],
+        "riskMitigations": [],
+        "fastFollowItems": [],
+        "escalations": [],
+        "dependencies": [],
+        "dependencyTeams": [],
+        "dependencyMitigations": [],
+        "sprintStatus": {
+          "completed": [],
+          "inProgress": [
+            "TDD (17-Sep to 22-Sep)"
+          ],
+          "nextPlan": [
+            "Development & QA (22-Sep to 22-Oct)",
+            "UAT (23-Oct to 26-Oct)",
+            "VAPT / Load (16-Oct to 28-Oct)",
+            "Go-Live (27-Nov to 30-Nov)"
           ]
         }
       }
