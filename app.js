@@ -1009,15 +1009,20 @@
     const list = document.getElementById("statusHistoryList");
     list.innerHTML = "";
 
+    const ownerById = {};
+    DATA.projects.forEach((p) => (ownerById[p.id] = p.owner || "Unassigned"));
+
     const filtered = combined.filter(
-      (t) => globalProjectFilter === "all" || t.projectId === globalProjectFilter
+      (t) =>
+        (globalProjectFilter === "all" || t.projectId === globalProjectFilter) &&
+        (activeOwner === "all" || ownerById[t.projectId] === activeOwner)
     );
 
     if (!filtered.length) {
       list.appendChild(
         el("div", { class: "deps-empty-group" }, [
           combined.length
-            ? "Nothing to show for this project filter."
+            ? "Nothing to show for this project/PM filter."
             : "No status changes or date shifts recorded yet — once weekly updates move a project's status, go-live, or milestone dates, they'll show up here with dates and the why.",
         ])
       );
