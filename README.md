@@ -216,16 +216,24 @@ zero custom backend/hosting.
 ### Closing out a follow-up
 
 Every open follow-up — in the "Open follow-ups" block and in the Week-over-Week
-**Feedback history** list — has a **"✓ Resolve"** link. Clicking it opens a
-pre-filled GitHub issue ("Resolve a Follow-up" template) with the note's ID
-already filled in, plus an optional field to note how it was resolved.
+**Feedback history** list — has a **"✓ Resolve"** button. Clicking it is
+instant: no GitHub tab, no form. It drops off the open list and the "Open
+Follow-ups" count right away. Under the hood the note itself is left
+completely untouched in `notes.json` — the resolve is tracked as a
+local-only override in that browser's `localStorage`. If you resolved
+something by mistake, an **"↺ Undo"** link puts it back in the open list.
 
-The same scheduled Action picks up open "resolve-feedback" issues and flips
-that note's `status` from `"open"` to `"resolved"` in `notes.json` — it's
-**never deleted**. The note, who raised it, who resolved it, when, and how
-all stay in `notes.json` and in git history permanently; it just stops
-counting toward "Open Follow-ups" and drops off the open list. The full
-history (open + resolved) is always visible in a project's Feedback history.
+Because it's local-only by default, it won't show as resolved for someone
+else viewing the dashboard in a different browser, and a fresh deploy/clear
+of `localStorage` would bring it back. Once you resolve something locally,
+a **"Sync to GitHub ↗"** link appears next to it in the Feedback history —
+clicking that opens a pre-filled GitHub issue ("Resolve a Follow-up"
+template); the same scheduled Action picks up open "resolve-feedback" issues
+and flips that note's `status` from `"open"` to `"resolved"` in `notes.json`
+for real (never deleted — `resolvedAt`/`resolvedBy`/`resolutionNote` get
+added), so it's permanent, in git, and visible to everyone. The full history
+(open + resolved, local or synced) is always visible in a project's Feedback
+history.
 
 ## Data model
 

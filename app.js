@@ -8,6 +8,49 @@
   let DATA = null;
   let HISTORY = {};
   let NOTES = [];
+
+  // Resolving a follow-up on the dashboard is instant (no GitHub round trip) —
+  // it's tracked as a locally-resolved override in this browser's
+  // localStorage. The underlying note is never touched/deleted; it still
+  // exists exactly as-is in notes.json/git. When you're ready to make the
+  // resolution permanent (so it also shows resolved for everyone else / in
+  // git history), use the "Sync to GitHub ↗" link that appears once
+  // something's been resolved locally.
+  const LOCAL_RESOLVED_KEY = "baps-ndc-status:locally-resolved";
+
+  function loadLocalResolved() {
+    try {
+      return new Set(JSON.parse(localStorage.getItem(LOCAL_RESOLVED_KEY) || "[]"));
+    } catch (e) {
+      return new Set();
+    }
+  }
+
+  function saveLocalResolved(set) {
+    try {
+      localStorage.setItem(LOCAL_RESOLVED_KEY, JSON.stringify(Array.from(set)));
+    } catch (e) {
+      /* localStorage unavailable — resolve still works for this page view */
+    }
+  }
+
+  let LOCAL_RESOLVED = loadLocalResolved();
+
+  function isLocallyResolved(noteId) {
+    return LOCAL_RESOLVED.has(noteId);
+  }
+
+  function setLocallyResolved(noteId, resolved) {
+    if (resolved) LOCAL_RESOLVED.add(noteId);
+    else LOCAL_RESOLVED.delete(noteId);
+    saveLocalResolved(LOCAL_RESOLVED);
+  }
+
+  // A note's effective status, folding in any local-only resolve/undo.
+  function noteStatus(note) {
+    if (note.status === "resolved") return "resolved";
+    return isLocallyResolved(note.id) ? "resolved" : "open";
+  }
   let activeFilter = "all";
   let activeOwner = "all";
   let globalProjectFilter = "all";
@@ -51,7 +94,7 @@
   }
 
   function openNotesFor(projectId) {
-    return NOTES.filter((n) => n.projectId === projectId && n.status === "open");
+    return NOTES.filter((n) => n.projectId === projectId && noteStatus(n) === "open");
   }
 
   function todayISO() {
@@ -68,10 +111,13 @@
     return `${base}?${search.toString()}`;
   }
 
-  // Closing a follow-up doesn't delete it — it opens a "resolve-feedback"
-  // GitHub issue that the ingestion bot uses to flip notes.json's status to
-  // "resolved". The note (and who resolved it, and when) stays in notes.json
-  // and in git history forever; it just stops showing up as "open" in the UI.
+  // "Resolve" is instant and local — no GitHub tab, no form. The note itself
+  // is left completely as-is in notes.json; this just remembers (in this
+  // browser's localStorage) that it should be treated as resolved. Use the
+  // "Sync to GitHub ↗" link (only shown once something's resolved locally)
+  // when you want that to become permanent / visible to everyone else — that
+  // opens a pre-filled "resolve-feedback" issue that the bot uses to flip
+  // notes.json's real status, so it's still fully preserved in git.
   function resolveUrl(note, projectName) {
     return issueUrl("resolve-feedback.yml", {
       note_id: note.id || "",
@@ -80,18 +126,73 @@
     });
   }
 
-  function resolveLink(note, projectName, label) {
-    return el(
-      "a",
-      {
-        class: "resolve-link",
-        target: "_blank",
-        rel: "noopener",
-        title: "Mark this follow-up resolved (stays in git history, just closes out)",
-        href: resolveUrl(note, projectName),
-      },
-      [label || "✓ Resolve ↗"]
+  function resolveLink(note, projectName) {
+    const wrap = el("span", { class: "resolve-actions" });
+
+    const resolveBtn = el(
+      "button",
+      { type: "button", class: "resolve-link", title: "Close this out — no GitHub needed, just hides it here" },
+      ["✓ Resolve"]
     );
+    resolveBtn.addEventListener("click", () => {
+      setLocallyResolved(note.id, true);
+      refreshProjectViews(note.projectId);
+    });
+    wrap.appendChild(resolveBtn);
+
+    return wrap;
+  }
+
+  // Shown next to already-resolved (locally) notes in the full feedback
+  // history: an "Undo" in case it was closed by mistake, and a "Sync to
+  // GitHub" for making the resolution permanent in notes.json/git.
+  function resolvedActions(note, projectName) {
+    const wrap = el("span", { class: "resolve-actions" });
+
+    const undoBtn = el(
+      "button",
+      { type: "button", class: "resolve-link is-undo", title: "Put this back in the open list" },
+      ["↺ Undo"]
+    );
+    undoBtn.addEventListener("click", () => {
+      setLocallyResolved(note.id, false);
+      refreshProjectViews(note.projectId);
+    });
+    wrap.appendChild(undoBtn);
+
+    wrap.appendChild(
+      el(
+        "a",
+        {
+          class: "resolve-link is-sync",
+          target: "_blank",
+          rel: "noopener",
+          title: "Make this resolution permanent in notes.json/git (visible to everyone, not just this browser)",
+          href: resolveUrl(note, projectName),
+        },
+        ["Sync to GitHub ↗"]
+      )
+    );
+
+    return wrap;
+  }
+
+  // Re-render whatever's currently on screen after a resolve/undo so the
+  // change shows up immediately without a full page reload.
+  function refreshProjectViews(projectId) {
+    renderMetrics();
+    renderCards();
+    const overlay = document.getElementById("projectDetail");
+    if (!overlay.hidden) {
+      const project = DATA.projects.find((p) => p.id === projectId);
+      if (project) {
+        const content = document.getElementById("detailContent");
+        const scrollTop = overlay.scrollTop;
+        content.innerHTML = "";
+        content.appendChild(buildProjectDetail(project));
+        overlay.scrollTop = scrollTop;
+      }
+    }
   }
 
   /* ---------------- Header ---------------- */
@@ -126,7 +227,7 @@
     if (counts.black) metrics.push({ label: "Non-Recoverable", num: counts.black, tone: "tone-black", filter: "black" });
     metrics.push(
       { label: "Avg Delay (days)", num: avgDelay, tone: "tone-accent" },
-      { label: "Open Follow-ups", num: NOTES.filter((n) => n.status === "open").length, tone: "tone-accent" }
+      { label: "Open Follow-ups", num: NOTES.filter((n) => noteStatus(n) === "open").length, tone: "tone-accent" }
     );
 
     const row = document.getElementById("metricsRow");
@@ -1716,9 +1817,11 @@
         .slice()
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .forEach((n) => {
+          const effective = noteStatus(n);
+          const locallyOnly = effective === "resolved" && n.status !== "resolved";
           notesList.appendChild(
-            el("div", { class: "note-row " + (n.status === "open" ? "is-open" : "is-resolved") }, [
-              el("span", { class: "note-status" }, [n.status === "open" ? "OPEN" : "RESOLVED"]),
+            el("div", { class: "note-row " + (effective === "open" ? "is-open" : "is-resolved") }, [
+              el("span", { class: "note-status" }, [effective === "open" ? "OPEN" : "RESOLVED"]),
               el("span", { class: "note-text" }, [n.text]),
               ...(n.mitigationImpact
                 ? [el("span", { class: "note-mitigation" }, ["Mitigation / impact: " + n.mitigationImpact])]
@@ -1731,8 +1834,10 @@
                 n.status === "resolved" && n.resolvedBy
                   ? " · resolved by " + n.resolvedBy + (n.resolvedAt ? " " + fmtDate((n.resolvedAt || "").slice(0, 10)) : "")
                   : "",
+                locallyOnly ? " · resolved in your browser, not yet synced" : "",
               ]),
-              ...(n.status === "open" ? [resolveLink(n, p.name)] : []),
+              ...(effective === "open" ? [resolveLink(n, p.name)] : []),
+              ...(locallyOnly ? [resolvedActions(n, p.name)] : []),
             ])
           );
         });
