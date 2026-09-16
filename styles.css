@@ -484,6 +484,12 @@ body {
   line-height: 1.35;
 }
 
+.stage-lane-sla {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-faint);
+}
+
 .stage-col-count {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -557,6 +563,102 @@ body {
 
 .stage-card-progress .progress-track { height: 4px; }
 .stage-card-progress .progress-pct { font-size: 10px; }
+
+.stage-duration-badge {
+  display: inline-block;
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-faint);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+.stage-duration-badge.is-warn { color: var(--amber); background: var(--amber-bg); border-color: transparent; }
+.stage-duration-badge.is-breach { color: var(--red); background: var(--red-bg); border-color: transparent; font-weight: 700; }
+
+/* Stage-gate SLA flags callout (top of Pipeline Stages tab) */
+.stage-sla-flags { margin-bottom: 18px; }
+
+.stage-sla-flags-ok {
+  font-size: 13px;
+  color: var(--green);
+  background: var(--green-bg);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+}
+
+.stage-sla-flag-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stage-sla-flag-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.stage-sla-flag-row:hover { border-color: var(--accent); box-shadow: var(--shadow); }
+.stage-sla-flag-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.stage-sla-flag-row.is-breach { border-color: #f3c2cb; background: var(--red-bg); }
+.stage-sla-flag-row.is-warn { border-color: #f3dcae; background: var(--amber-bg); }
+
+.stage-sla-flag-detail {
+  flex: 1 1 auto;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+}
+
+/* Per-project stage-gate timeline (project detail view) */
+.stage-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+
+.stage-timeline-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+}
+.stage-timeline-row.is-ongoing { border-color: var(--accent); }
+
+.stage-timeline-stage {
+  flex: 0 0 170px;
+  font-weight: 600;
+}
+
+.stage-timeline-range {
+  flex: 1 1 auto;
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.stage-timeline-duration {
+  flex: 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.stage-timeline-duration.is-warn { color: var(--amber); }
+.stage-timeline-duration.is-breach { color: var(--red); }
 
 /* Full-tab, roomier variant of the stage board */
 .stage-board-expanded {

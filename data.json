@@ -1,6 +1,14 @@
 {
   "asOf": "2026-09-15",
   "lastUpdated": "2026-09-16T03:44:12.372647Z",
+  "stageSlaDays": {
+    "Requirements": 10,
+    "Design / Estimation": 10,
+    "Development": 30,
+    "QA / UAT": 14,
+    "Production Release": 5,
+    "Hypercare / Post-Launch": 21
+  },
   "projects": [
     {
       "id": "webnext",

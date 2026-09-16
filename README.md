@@ -49,6 +49,30 @@ portfolio actually sits without opening each card. Click any card to jump
 into its full detail view. Inspired by the stage board on Intuit's internal
 PDLC dashboard.
 
+**Stage-gate SLA flags.** Every stage card shows a "Xd in stage" badge —
+how many days the project has been sitting in its *current* stage — colored
+against that stage's SLA (grey = fine, amber = ≥80% of SLA, red = over SLA).
+At the top of the tab, a **"Stage-gate SLA flags"** callout lists every
+project that's at/over SLA for its current stage, worst-first, so it's the
+first thing you scan before the meeting — click a row to jump straight to
+that project.
+
+"Days in stage" is reconstructed from the weekly history snapshots (only
+granularity we have): it's the time since the stage last changed, calendar
+days, not business days. The very first stage a project was ever seen in
+is marked with a "≥" since we don't know how long it was in that stage
+before tracking began.
+
+SLAs per stage live in `data.json`'s top-level `stageSlaDays` (defaults:
+Requirements 10d, Design/Estimation 10d, Development 30d, QA/UAT 14d,
+Production Release 5d, Hypercare/Post-Launch 21d) — edit that object
+directly to tune them, no code change needed.
+
+A project's full detail view also has a **"Stage-gate timeline"** section:
+every stage it's ever passed through, with the date range and duration for
+each (including past stages that blew their SLA — useful context even
+after the project has moved on).
+
 ## Tab 3 — 🦅 Hawk-eye (live, rough until fuller schedule data lands)
 
 A cross-project Gantt: every project on one shared calendar timeline, one
@@ -240,9 +264,11 @@ history.
 Everything lives in three files:
 
 - **`data.json`** — current live state, one object per project in the
-  `projects` array.
+  `projects` array, plus a top-level `stageSlaDays` object (SLA, in calendar
+  days, per pipeline stage — used for the Stage-gate SLA flags on Tab 2).
 - **`history.json`** — one snapshot per `asOf` date, keyed by date, used by
-  the Week-over-Week tab.
+  the Week-over-Week tab and to reconstruct each project's stage-gate
+  timeline (how long it's spent in each stage).
 - **`notes.json`** — flat array of feedback/follow-up entries, each tied to
   a `projectId`, with `status: "open" | "resolved"`. Resolved entries also
   carry `resolvedAt`, `resolvedBy`, `resolutionNote`, and `resolvedVia`

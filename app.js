@@ -280,6 +280,78 @@
     "Hypercare / Post-Launch",
   ];
 
+  // Small "42 days in stage" pill, color-coded against the stage's SLA.
+  function stageDurationBadge(info) {
+    if (!info) return null;
+    const label = (info.approxStart ? "≥" : "") + info.days + "d in stage";
+    const flagClass = info.flag ? " is-" + info.flag : "";
+    const title =
+      info.sla != null
+        ? `${info.days} day${info.days === 1 ? "" : "s"} in "${info.stage}" so far (SLA: ${info.sla}d)` +
+          (info.flag === "breach" ? ` — ${info.days - info.sla}d over SLA` : "")
+        : `${info.days} day${info.days === 1 ? "" : "s"} in "${info.stage}" so far`;
+    return el("span", { class: "stage-duration-badge" + flagClass, title }, [label]);
+  }
+
+  // Cross-project callout at the top of the Pipeline Stages tab: which
+  // projects have been sitting in their current stage longer than the SLA
+  // (or are getting close), sorted worst-first.
+  function renderStageSlaFlags() {
+    const box = document.getElementById("stageSlaFlags");
+    if (!box) return;
+    box.innerHTML = "";
+
+    const flagged = visibleProjects()
+      .map((p) => ({ p, info: currentStageInfo(p) }))
+      .filter((row) => row.info && (row.info.flag === "breach" || row.info.flag === "warn"))
+      .sort((a, b) => (b.info.days - b.info.sla) - (a.info.days - a.info.sla));
+
+    if (!flagged.length) {
+      box.appendChild(
+        el("div", { class: "stage-sla-flags-ok" }, ["✅ No stage-gate SLA flags — every project is within SLA for its current stage."])
+      );
+      return;
+    }
+
+    box.appendChild(
+      el("h3", { class: "weekly-subhead" }, [
+        `⚠️ Stage-gate SLA flags (${flagged.length})`,
+      ])
+    );
+    const list = el("div", { class: "stage-sla-flag-list" });
+    flagged.forEach(({ p, info }) => {
+      const over = info.days - info.sla;
+      const row = el(
+        "div",
+        { class: "stage-sla-flag-row is-" + info.flag, "data-project-id": p.id, tabindex: "0", role: "button" },
+        [
+          el("span", { class: "timeline-dot", style: `background:var(--${p.status === "amber" ? "amber" : p.status})` }),
+          el("strong", null, [p.name]),
+          el("span", { class: "stage-sla-flag-detail" }, [
+            (info.approxStart ? "≥" : "") +
+              `${info.days}d in "${info.stage}"` +
+              ` (SLA ${info.sla}d, ` +
+              (over > 0 ? `+${over}d over` : `${-over}d left`) +
+              ")",
+          ]),
+          el("span", { class: "pill pill-" + p.status }, [STATUS_LABEL[p.status]]),
+        ]
+      );
+      list.appendChild(row);
+    });
+    box.appendChild(list);
+
+    box.querySelectorAll(".stage-sla-flag-row").forEach((row) => {
+      row.addEventListener("click", () => openProjectDetail(row.getAttribute("data-project-id")));
+      row.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openProjectDetail(row.getAttribute("data-project-id"));
+        }
+      });
+    });
+  }
+
   function renderStageBoard() {
     const board = document.getElementById("stageBoard");
     board.innerHTML = "";
@@ -294,11 +366,13 @@
 
     PIPELINE_STAGES.forEach((stage) => {
       const projects = byStage[stage];
+      const sla = stageSlaDays(stage);
       const cardsWrap = el("div", { class: "stage-lane-cards" });
       if (!projects.length) {
         cardsWrap.appendChild(el("div", { class: "stage-col-empty" }, ["No projects in this stage"]));
       } else {
         projects.forEach((p) => {
+          const info = currentStageInfo(p);
           cardsWrap.appendChild(
             el("div", { class: "stage-card", "data-project-id": p.id, tabindex: "0", role: "button" }, [
               el("div", { class: "stage-card-top" }, [
@@ -312,6 +386,7 @@
                 ]),
                 el("div", { class: "progress-pct" }, [p.progress + "%"]),
               ]),
+              stageDurationBadge(info),
             ])
           );
         });
@@ -320,6 +395,7 @@
         el("div", { class: "stage-lane-label" }, [
           el("h3", null, [stage]),
           el("span", { class: "stage-col-count" }, [String(projects.length)]),
+          sla != null ? el("span", { class: "stage-lane-sla" }, ["SLA " + sla + "d"]) : null,
         ]),
         cardsWrap,
       ]);
@@ -668,6 +744,7 @@
 
   function renderAllTabs() {
     renderMetrics();
+    renderStageSlaFlags();
     renderStageBoard();
     renderHawkeye();
     renderCards();
@@ -1182,6 +1259,81 @@
       .filter(Boolean);
   }
 
+  /* ---------------- Stage-gate timeline + SLA ---------------- */
+
+  // Fallback SLAs (business days aren't tracked here, just calendar days —
+  // close enough for a weekly cadence). data.json's top-level `stageSlaDays`
+  // always wins if present, so these can be tuned without touching code.
+  const DEFAULT_STAGE_SLA_DAYS = {
+    "Requirements": 10,
+    "Design / Estimation": 10,
+    "Development": 30,
+    "QA / UAT": 14,
+    "Production Release": 5,
+    "Hypercare / Post-Launch": 21,
+  };
+
+  function stageSlaDays(stage) {
+    const configured = DATA && DATA.stageSlaDays;
+    if (configured && configured[stage] != null) return configured[stage];
+    return DEFAULT_STAGE_SLA_DAYS[stage] != null ? DEFAULT_STAGE_SLA_DAYS[stage] : null;
+  }
+
+  function daysBetweenIso(aIso, bIso) {
+    const DAY = 86400000;
+    return Math.round((new Date(bIso + "T00:00:00") - new Date(aIso + "T00:00:00")) / DAY);
+  }
+
+  // "ok" | "warn" (>=80% of SLA) | "breach" (over SLA) | null (no SLA tracked
+  // for this stage, e.g. "Unstaged").
+  function stageFlagLevel(days, sla) {
+    if (sla == null) return null;
+    if (days > sla) return "breach";
+    if (days >= sla * 0.8) return "warn";
+    return "ok";
+  }
+
+  // Reconstructs how long a project has spent in each pipeline stage, using
+  // the weekly history snapshots (only granularity we have — this isn't
+  // exact to the day, but good enough for a weekly leadership review).
+  // Returns an ordered list of segments: { stage, start, end, ongoing,
+  // approxStart }. `approxStart` marks the very first segment, since we
+  // don't know how long the project was in that stage before tracking began.
+  function computeStageSegments(p) {
+    const today = todayISO();
+    const points = historyForProject(p.id).map((w) => ({ asOf: w.asOf, stage: w.stage || "Unstaged" }));
+    const currentStage = p.stage || "Unstaged";
+    if (!points.length || points[points.length - 1].stage !== currentStage) {
+      points.push({ asOf: today, stage: currentStage });
+    }
+
+    const segments = [];
+    points.forEach((pt) => {
+      const last = segments[segments.length - 1];
+      if (!last || last.stage !== pt.stage) {
+        if (last) last.end = pt.asOf;
+        segments.push({ stage: pt.stage, start: pt.asOf, end: null });
+      }
+    });
+
+    const finalSeg = segments[segments.length - 1];
+    if (finalSeg) {
+      finalSeg.end = today;
+      finalSeg.ongoing = true;
+    }
+    if (segments.length) segments[0].approxStart = true;
+
+    return segments.map((seg) => ({ ...seg, days: Math.max(0, daysBetweenIso(seg.start, seg.end)) }));
+  }
+
+  function currentStageInfo(p) {
+    const segments = computeStageSegments(p);
+    const seg = segments[segments.length - 1];
+    if (!seg) return null;
+    const sla = stageSlaDays(seg.stage);
+    return { ...seg, sla, flag: stageFlagLevel(seg.days, sla) };
+  }
+
   const STATUS_COLOR = { green: "#2f6b4f", amber: "#a6650f", red: "#b5342a", black: "#1c1d24" };
 
   function buildTrendGraph(weeks) {
@@ -1584,6 +1736,32 @@
       ])
     );
 
+    // Stage-gate timeline — how long the project has spent in each pipeline
+    // stage, reconstructed from weekly history snapshots, flagged against
+    // each stage's SLA (from data.json's stageSlaDays, tunable per stage).
+    root.appendChild(el("h3", { class: "weekly-subhead" }, ["Stage-gate timeline"]));
+    root.appendChild(
+      el(
+        "div",
+        { class: "stage-timeline" },
+        computeStageSegments(p).map((seg) => {
+          const sla = stageSlaDays(seg.stage);
+          const flag = stageFlagLevel(seg.days, sla);
+          return el("div", { class: "stage-timeline-row" + (seg.ongoing ? " is-ongoing" : "") }, [
+            el("span", { class: "stage-timeline-stage" }, [seg.stage]),
+            el("span", { class: "stage-timeline-range" }, [
+              (seg.approxStart ? "since before tracking, " : "") +
+                fmtDateShort(seg.start) +
+                (seg.ongoing ? " → now" : " → " + fmtDateShort(seg.end)),
+            ]),
+            el("span", { class: "stage-timeline-duration" + (flag ? " is-" + flag : "") }, [
+              (seg.approxStart ? "≥" : "") + seg.days + "d" + (sla != null ? " / SLA " + sla + "d" : ""),
+            ]),
+          ]);
+        })
+      )
+    );
+
     if (isLate) {
       root.appendChild(el("h3", { class: "weekly-subhead" }, ["Delay recovery"]));
       root.appendChild(
@@ -1928,6 +2106,7 @@
     populateGlobalOwnerFilter();
     wireGlobalOwnerFilter();
     renderMetrics();
+    renderStageSlaFlags();
     renderStageBoard();
     renderHawkeye();
     renderCards();
