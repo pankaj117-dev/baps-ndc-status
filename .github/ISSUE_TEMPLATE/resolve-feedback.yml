@@ -1,0 +1,37 @@
+name: "Resolve a Follow-up"
+description: "Close out an open follow-up/feedback item on the dashboard. It won't be deleted — it stays in notes.json and git history, just marked resolved so it stops showing as open."
+title: "[Resolve] "
+labels: ["resolve-feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use the "✓ Resolve" link on the dashboard to open this pre-filled — you shouldn't
+        normally need to fill this out by hand. Submitting it tells the bot to flip the
+        matching follow-up's status to "resolved" in `notes.json`. The item, who raised it,
+        and this resolution note all stay in git history forever; it just stops counting
+        toward "Open Follow-ups" and no longer shows in the open list.
+  - type: input
+    id: note_id
+    attributes:
+      label: Note ID
+      description: "Pre-filled by the dashboard's Resolve link — don't change this."
+      placeholder: "note-3"
+    validations:
+      required: true
+  - type: input
+    id: project
+    attributes:
+      label: Project
+      description: "Pre-filled for context — just so it's easy to eyeball which item this is."
+  - type: textarea
+    id: summary
+    attributes:
+      label: Follow-up being resolved
+      description: "Pre-filled with the original feedback text, for context."
+  - type: textarea
+    id: resolution
+    attributes:
+      label: How was this resolved?
+      description: "Optional — what happened / what the PM did about it. Shows up in the feedback history."
+      placeholder: "Tickets shared in #ndc-hypercare on 9/16; linked in this week's update."

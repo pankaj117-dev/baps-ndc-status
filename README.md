@@ -206,12 +206,26 @@ as **open follow-ups**, tied to a project. They show up as a badge on that
 project's card, in the Week-over-Week feedback history, and — most
 importantly — as a reminder comment the next time that PM opens a weekly
 update issue for the same project. Once ingested, the follow-up issue is
-closed automatically; it stays "open" in `notes.json` until someone flips
-it to `"status": "resolved"` (currently a manual edit — see Roadmap).
+closed automatically; it stays "open" in `notes.json` until it's resolved
+(see below).
 
 **Note:** this means every PM (and anyone logging feedback) needs a GitHub
 account with access to open issues on this repo. That's the trade-off for
 zero custom backend/hosting.
+
+### Closing out a follow-up
+
+Every open follow-up — in the "Open follow-ups" block and in the Week-over-Week
+**Feedback history** list — has a **"✓ Resolve"** link. Clicking it opens a
+pre-filled GitHub issue ("Resolve a Follow-up" template) with the note's ID
+already filled in, plus an optional field to note how it was resolved.
+
+The same scheduled Action picks up open "resolve-feedback" issues and flips
+that note's `status` from `"open"` to `"resolved"` in `notes.json` — it's
+**never deleted**. The note, who raised it, who resolved it, when, and how
+all stay in `notes.json` and in git history permanently; it just stops
+counting toward "Open Follow-ups" and drops off the open list. The full
+history (open + resolved) is always visible in a project's Feedback history.
 
 ## Data model
 
@@ -222,7 +236,9 @@ Everything lives in three files:
 - **`history.json`** — one snapshot per `asOf` date, keyed by date, used by
   the Week-over-Week tab.
 - **`notes.json`** — flat array of feedback/follow-up entries, each tied to
-  a `projectId`, with `status: "open" | "resolved"`.
+  a `projectId`, with `status: "open" | "resolved"`. Resolved entries also
+  carry `resolvedAt`, `resolvedBy`, `resolutionNote`, and `resolvedVia`
+  (the resolving issue's URL) — nothing is ever deleted, just flipped.
 
 `data.json` project shape:
 
@@ -324,7 +340,9 @@ the app code.
 - [ ] Once fuller project schedule data comes in, add a `milestones` array
       per project (see Hawk-eye, Tab 3) so the Gantt plots the full timeline
       instead of just next-milestone + go-live.
-- [ ] Add a "resolve" action for follow-ups (currently a manual edit to
-      `notes.json` — flip `"status": "open"` to `"resolved"`).
+- [x] Add a "resolve" action for follow-ups — click "✓ Resolve" on the
+      dashboard, which opens a pre-filled "Resolve a Follow-up" GitHub issue
+      that the ingestion bot uses to flip `"status"` to `"resolved"` (stays in
+      `notes.json`/git history, just drops off the open list).
 - [ ] Consider a GitHub Action that auto-resolves a follow-up when the next
       weekly update for that project explicitly references it.

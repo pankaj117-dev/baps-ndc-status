@@ -68,6 +68,32 @@
     return `${base}?${search.toString()}`;
   }
 
+  // Closing a follow-up doesn't delete it — it opens a "resolve-feedback"
+  // GitHub issue that the ingestion bot uses to flip notes.json's status to
+  // "resolved". The note (and who resolved it, and when) stays in notes.json
+  // and in git history forever; it just stops showing up as "open" in the UI.
+  function resolveUrl(note, projectName) {
+    return issueUrl("resolve-feedback.yml", {
+      note_id: note.id || "",
+      project: projectName || "",
+      summary: (note.text || "").slice(0, 120),
+    });
+  }
+
+  function resolveLink(note, projectName, label) {
+    return el(
+      "a",
+      {
+        class: "resolve-link",
+        target: "_blank",
+        rel: "noopener",
+        title: "Mark this follow-up resolved (stays in git history, just closes out)",
+        href: resolveUrl(note, projectName),
+      },
+      [label || "✓ Resolve ↗"]
+    );
+  }
+
   /* ---------------- Header ---------------- */
 
   function renderHeader() {
@@ -1489,7 +1515,16 @@
       root.appendChild(el("h3", { class: "weekly-subhead" }, ["Open follow-ups"]));
       root.appendChild(
         el("div", { class: "detail-block followups" }, [
-          el("ul", null, openFollowUps.map((n) => el("li", null, [n.text + (n.raisedBy ? ` — ${n.raisedBy}` : "")]))),
+          el(
+            "ul",
+            null,
+            openFollowUps.map((n) =>
+              el("li", { class: "followup-item" }, [
+                el("span", null, [n.text + (n.raisedBy ? ` — ${n.raisedBy}` : "")]),
+                resolveLink(n, p.name),
+              ])
+            )
+          ),
         ])
       );
     }
@@ -1688,9 +1723,16 @@
               ...(n.mitigationImpact
                 ? [el("span", { class: "note-mitigation" }, ["Mitigation / impact: " + n.mitigationImpact])]
                 : []),
+              ...(n.status === "resolved" && n.resolutionNote
+                ? [el("span", { class: "note-mitigation" }, ["Resolution: " + n.resolutionNote])]
+                : []),
               el("span", { class: "note-meta" }, [
                 (n.raisedBy ? n.raisedBy + " · " : "") + fmtDate((n.createdAt || "").slice(0, 10)),
+                n.status === "resolved" && n.resolvedBy
+                  ? " · resolved by " + n.resolvedBy + (n.resolvedAt ? " " + fmtDate((n.resolvedAt || "").slice(0, 10)) : "")
+                  : "",
               ]),
+              ...(n.status === "open" ? [resolveLink(n, p.name)] : []),
             ])
           );
         });

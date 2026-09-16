@@ -269,6 +269,45 @@ def ingest_feedback(notes):
     return ingested
 
 
+def ingest_resolutions(notes):
+    """Pick up 'resolve-feedback' issues (opened via the dashboard's "✓ Resolve"
+    link) and flip the matching note's status to "resolved" in place. The note
+    is never removed — it stays in notes.json and git history, just no longer
+    counts as "open"."""
+    issues = fetch_issues("resolve-feedback")
+    if not issues:
+        return []
+
+    by_id = {n["id"]: n for n in notes}
+    ingested = []
+
+    for issue in issues:
+        fields = parse_issue_form_body(issue["body"] or "")
+        note_id = fields.get("Note ID", "").strip()
+        resolution = fields.get("How was this resolved?", "").strip()
+        resolved_by = (issue.get("author") or {}).get("login", "unknown")
+
+        note = by_id.get(note_id)
+        if not note:
+            print(f"issue #{issue['number']}: no note with id '{note_id}' found, closing anyway")
+            ingested.append(issue["number"])
+            continue
+
+        if note["status"] != "resolved":
+            note["status"] = "resolved"
+            note["resolvedAt"] = issue.get("createdAt")
+            note["resolvedBy"] = resolved_by
+            note["resolutionNote"] = resolution
+            note["resolvedVia"] = issue.get("url")
+            print(f"issue #{issue['number']}: resolved '{note_id}'")
+        else:
+            print(f"issue #{issue['number']}: '{note_id}' was already resolved, closing anyway")
+
+        ingested.append(issue["number"])
+
+    return ingested
+
+
 def close_issues(numbers, comment):
     for n in numbers:
         try:
@@ -325,10 +364,11 @@ def main():
 
     update_issue_numbers, as_of_changed, blocked_issue_numbers = ingest_weekly_updates(data)
     feedback_issue_numbers = ingest_feedback(notes)
+    resolve_issue_numbers = ingest_resolutions(notes)
     if blocked_issue_numbers:
         print(f"note: {len(blocked_issue_numbers)} issue(s) left open pending a reason for status change: {blocked_issue_numbers}")
 
-    if update_issue_numbers or feedback_issue_numbers:
+    if update_issue_numbers or feedback_issue_numbers or resolve_issue_numbers:
         data["lastUpdated"] = datetime.datetime.utcnow().isoformat() + "Z"
         snapshot_history(data, history)
 
@@ -344,6 +384,11 @@ def main():
             feedback_issue_numbers,
             "✅ Logged as an open follow-up — it'll show on the dashboard and the PM will be "
             "reminded next time they submit a weekly update for this project.",
+        )
+        close_issues(
+            resolve_issue_numbers,
+            "✅ Marked resolved — it'll drop off the open follow-ups list but stays in the "
+            "feedback history (and in git) for the record.",
         )
         print("done: data updated, issues closed")
     else:
