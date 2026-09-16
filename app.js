@@ -280,17 +280,29 @@
     "Hypercare / Post-Launch",
   ];
 
-  // Small "42 days in stage" pill, color-coded against the stage's SLA.
-  function stageDurationBadge(info) {
+  // "42d in stage" pill + (when there's an SLA to compare against) a small
+  // second line spelling out the SLA and how far over/under it is — enough
+  // detail to read straight off the tile without needing a separate list.
+  function stageDurationInfo(info) {
     if (!info) return null;
-    const label = (info.approxStart ? "≥" : "") + info.days + "d in stage";
     const flagClass = info.flag ? " is-" + info.flag : "";
+    const label = (info.approxStart ? "≥" : "") + info.days + "d in stage";
     const title =
       info.sla != null
         ? `${info.days} day${info.days === 1 ? "" : "s"} in "${info.stage}" so far (SLA: ${info.sla}d)` +
           (info.flag === "breach" ? ` — ${info.days - info.sla}d over SLA` : "")
         : `${info.days} day${info.days === 1 ? "" : "s"} in "${info.stage}" so far`;
-    return el("span", { class: "stage-duration-badge" + flagClass, title }, [label]);
+
+    const children = [el("span", { class: "stage-duration-badge" + flagClass }, [label])];
+    if (info.sla != null) {
+      const over = info.days - info.sla;
+      children.push(
+        el("span", { class: "stage-sla-detail" + flagClass }, [
+          `SLA ${info.sla}d · ` + (over > 0 ? `+${over}d over` : `${-over}d left`),
+        ])
+      );
+    }
+    return el("div", { class: "stage-duration-info", title }, children);
   }
 
   // Cross-project callout at the top of the Pipeline Stages tab: which
@@ -313,42 +325,34 @@
       return;
     }
 
-    box.appendChild(
-      el("h3", { class: "weekly-subhead" }, [
-        `⚠️ Stage-gate SLA flags (${flagged.length})`,
-      ])
-    );
-    const list = el("div", { class: "stage-sla-flag-list" });
+    const breachCount = flagged.filter((r) => r.info.flag === "breach").length;
+    const warnCount = flagged.length - breachCount;
+    const summaryBits = [];
+    if (breachCount) summaryBits.push(`${breachCount} over SLA`);
+    if (warnCount) summaryBits.push(`${warnCount} approaching`);
+
+    const bar = el("div", { class: "stage-sla-bar" }, [
+      el("span", { class: "stage-sla-bar-label" }, [`⚠️ ${summaryBits.join(" · ")}`]),
+      el("div", { class: "stage-sla-chip-row" }),
+    ]);
+    box.appendChild(bar);
+
+    const chipRow = bar.querySelector(".stage-sla-chip-row");
     flagged.forEach(({ p, info }) => {
       const over = info.days - info.sla;
-      const row = el(
-        "div",
-        { class: "stage-sla-flag-row is-" + info.flag, "data-project-id": p.id, tabindex: "0", role: "button" },
-        [
-          el("span", { class: "timeline-dot", style: `background:var(--${p.status === "amber" ? "amber" : p.status})` }),
-          el("strong", null, [p.name]),
-          el("span", { class: "stage-sla-flag-detail" }, [
-            (info.approxStart ? "≥" : "") +
-              `${info.days}d in "${info.stage}"` +
-              ` (SLA ${info.sla}d, ` +
-              (over > 0 ? `+${over}d over` : `${-over}d left`) +
-              ")",
-          ]),
-          el("span", { class: "pill pill-" + p.status }, [STATUS_LABEL[p.status]]),
-        ]
+      const chip = el(
+        "button",
+        {
+          type: "button",
+          class: "stage-sla-chip is-" + info.flag,
+          title: `${p.name}: ${info.approxStart ? "≥" : ""}${info.days}d in "${info.stage}" (SLA ${info.sla}d) — ${
+            over > 0 ? `${over}d over` : `${-over}d left`
+          }. Click to open.`,
+        },
+        [p.name + " " + (over > 0 ? "+" + over + "d" : over + "d")]
       );
-      list.appendChild(row);
-    });
-    box.appendChild(list);
-
-    box.querySelectorAll(".stage-sla-flag-row").forEach((row) => {
-      row.addEventListener("click", () => openProjectDetail(row.getAttribute("data-project-id")));
-      row.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          openProjectDetail(row.getAttribute("data-project-id"));
-        }
-      });
+      chip.addEventListener("click", () => openProjectDetail(p.id));
+      chipRow.appendChild(chip);
     });
   }
 
@@ -373,8 +377,9 @@
       } else {
         projects.forEach((p) => {
           const info = currentStageInfo(p);
+          const flagClass = info && info.flag && info.flag !== "ok" ? " is-" + info.flag : "";
           cardsWrap.appendChild(
-            el("div", { class: "stage-card", "data-project-id": p.id, tabindex: "0", role: "button" }, [
+            el("div", { class: "stage-card" + flagClass, "data-project-id": p.id, tabindex: "0", role: "button" }, [
               el("div", { class: "stage-card-top" }, [
                 el("span", { class: "timeline-dot", style: `background:var(--${p.status === "amber" ? "amber" : p.status})` }),
                 el("strong", null, [p.name]),
@@ -386,7 +391,7 @@
                 ]),
                 el("div", { class: "progress-pct" }, [p.progress + "%"]),
               ]),
-              stageDurationBadge(info),
+              stageDurationInfo(info),
             ])
           );
         });

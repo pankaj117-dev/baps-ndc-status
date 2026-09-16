@@ -49,13 +49,15 @@ portfolio actually sits without opening each card. Click any card to jump
 into its full detail view. Inspired by the stage board on Intuit's internal
 PDLC dashboard.
 
-**Stage-gate SLA flags.** Every stage card shows a "Xd in stage" badge —
-how many days the project has been sitting in its *current* stage — colored
-against that stage's SLA (grey = fine, amber = ≥80% of SLA, red = over SLA).
-At the top of the tab, a **"Stage-gate SLA flags"** callout lists every
-project that's at/over SLA for its current stage, worst-first, so it's the
-first thing you scan before the meeting — click a row to jump straight to
-that project.
+**Stage-gate SLA flags.** Every stage card shows how many days the project
+has been sitting in its *current* stage plus how that compares to the
+stage's SLA (e.g. "SLA 14d · +15d over"), colored grey/amber/red. Flagged
+tiles also get a colored left edge so they stand out in the board without
+needing to read every card. At the top of the tab there's one compact bar
+— "⚠️ N over SLA · M approaching" — with a small clickable chip per flagged
+project (e.g. "myBKY 2A +19d"); click a chip to jump straight to that
+project. All the detail lives on the tiles themselves, so the page stays
+scannable instead of turning into a long list.
 
 "Days in stage" is reconstructed from the weekly history snapshots (only
 granularity we have): it's the time since the stage last changed, calendar

@@ -564,9 +564,16 @@ body {
 .stage-card-progress .progress-track { height: 4px; }
 .stage-card-progress .progress-pct { font-size: 10px; }
 
+.stage-duration-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
 .stage-duration-badge {
   display: inline-block;
-  margin-top: 6px;
   font-family: var(--font-mono);
   font-size: 10.5px;
   font-weight: 600;
@@ -579,7 +586,22 @@ body {
 .stage-duration-badge.is-warn { color: var(--amber); background: var(--amber-bg); border-color: transparent; }
 .stage-duration-badge.is-breach { color: var(--red); background: var(--red-bg); border-color: transparent; font-weight: 700; }
 
-/* Stage-gate SLA flags callout (top of Pipeline Stages tab) */
+.stage-sla-detail {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-faint);
+}
+.stage-sla-detail.is-warn { color: var(--amber); }
+.stage-sla-detail.is-breach { color: var(--red); font-weight: 600; }
+
+/* A flagged tile gets a quiet colored edge — enough to catch the eye in the
+   board without needing a separate detailed list alongside it. */
+.stage-card.is-warn { border-left: 3px solid var(--amber); }
+.stage-card.is-breach { border-left: 3px solid var(--red); }
+
+/* Stage-gate SLA callout (top of Pipeline Stages tab) — a single compact
+   bar with small clickable chips, so the page stays scannable; the real
+   detail lives on each tile itself (see .stage-duration-info above). */
 .stage-sla-flags { margin-bottom: 18px; }
 
 .stage-sla-flags-ok {
@@ -587,36 +609,49 @@ body {
   color: var(--green);
   background: var(--green-bg);
   border-radius: var(--radius);
-  padding: 12px 16px;
+  padding: 10px 16px;
 }
 
-.stage-sla-flag-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.stage-sla-flag-row {
+.stage-sla-bar {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
   background: var(--bg-panel);
   border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 10px 14px;
-  cursor: pointer;
-  font-size: 13px;
+  border-radius: var(--radius);
+  padding: 10px 16px;
 }
-.stage-sla-flag-row:hover { border-color: var(--accent); box-shadow: var(--shadow); }
-.stage-sla-flag-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-.stage-sla-flag-row.is-breach { border-color: #f3c2cb; background: var(--red-bg); }
-.stage-sla-flag-row.is-warn { border-color: #f3dcae; background: var(--amber-bg); }
 
-.stage-sla-flag-detail {
-  flex: 1 1 auto;
-  color: var(--ink-soft);
+.stage-sla-bar-label {
   font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  white-space: nowrap;
 }
+
+.stage-sla-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1 1 auto;
+}
+
+.stage-sla-chip {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 3px 10px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  background: var(--bg);
+  color: var(--ink-soft);
+}
+.stage-sla-chip:hover { box-shadow: var(--shadow); }
+.stage-sla-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.stage-sla-chip.is-warn { color: var(--amber); background: var(--amber-bg); }
+.stage-sla-chip.is-breach { color: var(--red); background: var(--red-bg); }
 
 /* Per-project stage-gate timeline (project detail view) */
 .stage-timeline {
