@@ -1,6 +1,6 @@
 {
-  "asOf": "2026-09-15",
-  "lastUpdated": "2026-09-16T03:44:12.372647Z",
+  "asOf": "2026-09-22",
+  "lastUpdated": "2026-09-21T17:23:54.414392Z",
   "stageSlaDays": {
     "Requirements": 10,
     "Design / Estimation": 10,
@@ -259,16 +259,16 @@
       "name": "MyBKY (Phase 1)",
       "owner": "Satish Buddhadev",
       "status": "amber",
-      "progress": 65,
-      "phase": "UAT revised to 16-Sep (5-day slip); VAPT/Load also targeting 16-Sep",
+      "progress": 80,
+      "phase": "Regression / Performance / Security / UAT",
       "nextMilestone": {
-        "name": "UAT / VAPT / Load",
-        "date": "2026-09-16"
+        "name": "Production Release",
+        "date": "2026-10-05"
       },
-      "goLive": "2026-10-05",
+      "goLive": "2026-10-2026",
       "originalGoLive": "2026-09-21",
-      "delayDays": 5,
-      "delayNote": "UAT end revised from 09-Sep to 16-Sep (+5 days); VAPT and Load now aligned to 16-Sep",
+      "delayDays": 3,
+      "delayNote": "Mobile VAPT Delayed + QA sign off pending due to 1 open defect + UAT testcase status are not updated +Production readiness (Pending DevOps items; Ticket was raised on 1st Sept)",
       "dependencies": [
         "SSO creation for Kishor/Kishori participants without SSO accounts \u2014 Bhargavbhai to verify eligible BKY/iBKY list queries",
         "Dhvanibhai cannot start mobile VAPT before 9-Sep due to prior commitments; Burp Suite Pro license expired",
@@ -287,22 +287,21 @@
         "nextPlan": []
       },
       "risks": [
-        "Web: VAPT completion sign-off awaited from QA (Nimeshbhai, Critical)",
-        "Performance/Load testing sign-off awaited (Nimeshbhai, Critical)",
-        "Mobile: VAPT completion sign-off awaited (Dhwanibhai/Dipenbhai, Critical)",
-        "UAT stakeholder sign-off received for 75% of test cases; 25% remaining (Critical)",
-        "Mobile store app name decision pending (RGC, Critical)",
-        "BKMS \u2013 MIS data misalignment (Nitin Chaudhary, Critical)",
-        "Pending production readiness items (DevOps, High)",
-        "SSO account creation (Janakbhai, High)",
-        "User profile disappears in MIS when user details are edited (Sandeep Pistolwala, Medium)"
+        "1. QA Sign off",
+        "2. UAT testcases status update",
+        "3. VAPT sign offs (Web + Mobile)",
+        "4. VAPT Acknowledgements for accepted risks",
+        "5. Pending DevOps items"
       ],
-      "delayImpact": "UAT stakeholder sign-off received for 75% of test cases, 25% remaining; downstream VAPT/Load/Go-Live hold at 16-Sep/05-Oct as planned",
+      "delayImpact": "Go_live slips",
       "riskMitigations": [],
       "dependencyMitigations": [],
       "delayMitigation": [
-        "Escalated remaining 25% of UAT test-case sign-off with stakeholder",
-        "Tracking mobile VAPT and QA sign-off as critical items this week"
+        "1. Mobile App uploaded on app stores with exceptions - to be resolved before Go-Live",
+        "2. Chasing P. Dharmaketu Swami to provide pending DevOps items",
+        "3. Awaiting Performance testing final report, however formal approval received from QA",
+        "4. Formal UAT approval received, however, UAT test cases are not marked as pass, informed to UAT team to update status of all the testcases",
+        "5. Web and Mobile VAPT remediation completed, informed respective team to validate and confirm"
       ],
       "delayTradeoffs": "3 CRs already approved \u2014 CR1 added 10 working days, CR2 added 6 working days, CR3 no impact on Go-Live; no new CRs this week",
       "dependencyTeams": [
@@ -312,11 +311,7 @@
         "DevOps"
       ],
       "stage": "QA / UAT",
-      "escalations": [
-        "Whether to publish the mobile app on both Google Play Store and Apple App Store using the UAT environment",
-        "Getting mobile VAPT closure",
-        "Is BKY team's approval needed for production URL (na.baps-apps.org/events)"
-      ],
+      "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
@@ -390,14 +385,14 @@
       "id": "mymandir",
       "name": "myMandir 1B",
       "owner": "Aniket Udgaonkar",
-      "status": "green",
-      "progress": 85,
-      "phase": "myMandir 1B \u2014 Requirement complete (22-Jul to 14-Sep); TDD in progress (17-Sep to 22-Sep)",
+      "status": "amber",
+      "progress": 10,
+      "phase": "TDD",
       "nextMilestone": {
-        "name": "TDD",
+        "name": "Development",
         "date": "2026-09-22"
       },
-      "goLive": "2026-10-30",
+      "goLive": "2026-10-31",
       "originalGoLive": "2026-10-30",
       "delayDays": 0,
       "delayNote": "Renamed to myMandir 1B this week (split out from the general myMandir umbrella alongside new myMandir 1C). Formal FRD sign-off has landed \u2014 status recovers from Red to Green.",
@@ -437,12 +432,14 @@
       "dependencyTeams": [
         "Internal"
       ],
-      "stage": "Development",
-      "escalations": [],
+      "stage": "None",
+      "escalations": [
+        "Waiting for feedback on bug fixes\u200b  on UAT from stakeholder  end."
+      ],
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
-      "statusChangeReason": ""
+      "statusChangeReason": "I can see there will be delay in TDD preparation as grooming session with dev team in ongoing."
     },
     {
       "id": "gms",
