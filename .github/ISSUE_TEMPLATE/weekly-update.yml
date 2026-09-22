@@ -191,16 +191,22 @@ body:
     attributes:
       label: Completed this week
       description: "One per line"
+    validations:
+      required: true
   - type: textarea
     id: in_progress
     attributes:
       label: In progress
       description: "One per line"
+    validations:
+      required: true
   - type: textarea
     id: next_plan
     attributes:
       label: Next plan
       description: "One per line"
+    validations:
+      required: true
   - type: textarea
     id: risks
     attributes:
