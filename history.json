@@ -2929,7 +2929,7 @@
         "name": "myMandir 1B",
         "status": "amber",
         "progress": 10,
-        "stage": "None",
+        "stage": "Development",
         "delayDays": 0,
         "delayNote": "Renamed to myMandir 1B this week (split out from the general myMandir umbrella alongside new myMandir 1C). Formal FRD sign-off has landed \u2014 status recovers from Red to Green.",
         "statusChangeReason": "I can see there will be delay in TDD preparation as grooming session with dev team in ongoing.",

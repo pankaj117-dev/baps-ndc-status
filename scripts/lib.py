@@ -61,7 +61,12 @@ def parse_issue_form_body(body):
     """Parse a rendered GitHub issue-form body into {label: value}.
 
     GitHub renders each field as a "### Label" heading followed by the
-    answer text (or "_No response_" if left blank).
+    answer text. Most unanswered fields render as "_No response_", but an
+    *optional* `type: dropdown` left unselected renders the literal word
+    "None" instead (a GitHub Issue Forms quirk) — treat that the same as
+    blank, otherwise apply_weekly_update() would happily write the string
+    "None" into a project's real field (e.g. clobbering `stage`) since it
+    only skips truly empty values.
     """
     fields = {}
     matches = list(_HEADING_RE.finditer(body))
@@ -70,7 +75,7 @@ def parse_issue_form_body(body):
         start = m.end()
         end = matches[i + 1].start() if i + 1 < len(matches) else len(body)
         value = body[start:end].strip()
-        if value == "_No response_":
+        if value in ("_No response_", "None"):
             value = ""
         fields[label] = value
     return fields

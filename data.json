@@ -432,7 +432,7 @@
       "dependencyTeams": [
         "Internal"
       ],
-      "stage": "None",
+      "stage": "Development",
       "escalations": [
         "Waiting for feedback on bug fixes\u200b  on UAT from stakeholder  end."
       ],
