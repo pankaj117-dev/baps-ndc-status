@@ -441,6 +441,151 @@
     });
   }
 
+  // Short column headers for the Grid tab — same stages, tighter labels so
+  // 6 columns + the project name column fit without too much horizontal
+  // scroll.
+  const STAGE_GRID_SHORT = {
+    "Requirements": "Requirements",
+    "Design / Estimation": "Design / Est.",
+    "Development": "Development",
+    "QA / UAT": "QA / UAT",
+    "Production Release": "Prod. Release",
+    "Hypercare / Post-Launch": "Hypercare",
+  };
+
+  function renderStageGridLegend() {
+    const box = document.getElementById("stageGridLegend");
+    if (!box) return;
+    box.innerHTML = "";
+    [
+      { cls: "is-done", label: "Done" },
+      { cls: "is-current", label: "Current stage — on track" },
+      { cls: "is-current is-warn", label: "Current stage — approaching SLA" },
+      { cls: "is-current is-breach", label: "Current stage — over SLA" },
+      { cls: "is-none", label: "Not reached yet" },
+    ].forEach((it) => {
+      box.appendChild(
+        el("span", { class: "stage-grid-legend-item" }, [
+          el("span", { class: "stage-grid-swatch " + it.cls }),
+          it.label,
+        ])
+      );
+    });
+  }
+
+  // Portfolio-wide matrix: every visible project as a row, every pipeline
+  // stage as a column. Reuses the same stage-segment reconstruction and SLA
+  // logic as the per-project "Stage-gate timeline" (see computeStageSegments
+  // / stageSlaDays / stageFlagLevel above) so the two views never disagree.
+  function renderStageGrid() {
+    renderStageGridLegend();
+    const wrap = document.getElementById("stageGrid");
+    if (!wrap) return;
+    wrap.innerHTML = "";
+
+    const projects = visibleProjects();
+    if (!projects.length) {
+      wrap.appendChild(el("div", { class: "stage-col-empty" }, ["No projects match the current filters"]));
+      return;
+    }
+
+    const grid = el("div", { class: "stage-grid" });
+
+    const headerRow = el("div", { class: "stage-grid-row stage-grid-header" }, [
+      el("div", { class: "stage-grid-cell stage-grid-name-cell" }, ["Project"]),
+    ]);
+    PIPELINE_STAGES.forEach((stage) => {
+      headerRow.appendChild(
+        el("div", { class: "stage-grid-cell stage-grid-col-head", title: stage }, [STAGE_GRID_SHORT[stage] || stage])
+      );
+    });
+    grid.appendChild(headerRow);
+
+    projects.forEach((p) => {
+      const segByStage = {};
+      computeStageSegments(p).forEach((seg) => {
+        segByStage[seg.stage] = seg;
+      });
+      const currentIndex = PIPELINE_STAGES.indexOf(p.stage || "Unstaged");
+
+      const row = el("div", { class: "stage-grid-row" });
+
+      const nameCell = el(
+        "div",
+        { class: "stage-grid-name-cell stage-grid-cell", "data-project-id": p.id, tabindex: "0", role: "button" },
+        [
+          el("span", { class: "timeline-dot", style: `background:var(--${p.status === "amber" ? "amber" : p.status})` }),
+          el("div", { class: "stage-grid-name-text" }, [
+            el("strong", null, [p.name]),
+            el("span", { class: "stage-grid-name-meta" }, [
+              (p.owner || "Unassigned") + (currentIndex === -1 ? " · Unstaged" : ""),
+            ]),
+          ]),
+        ]
+      );
+      row.appendChild(nameCell);
+
+      PIPELINE_STAGES.forEach((stage, i) => {
+        let cell;
+        if (currentIndex === -1 || i > currentIndex) {
+          cell = el("div", { class: "stage-grid-cell stage-grid-status-cell is-none" }, ["—"]);
+        } else if (i < currentIndex) {
+          const seg = segByStage[stage];
+          cell = el(
+            "div",
+            {
+              class: "stage-grid-cell stage-grid-status-cell is-done",
+              title: seg ? `${stage}: ${seg.approxStart ? "≥" : ""}${seg.days}d spent` : `${stage}: done`,
+            },
+            [
+              el("span", { class: "stage-grid-check" }, ["✓"]),
+              seg ? el("span", { class: "stage-grid-days" }, [(seg.approxStart ? "≥" : "") + seg.days + "d"]) : null,
+            ]
+          );
+        } else {
+          const seg = segByStage[stage];
+          const sla = stageSlaDays(stage);
+          const flag = seg ? stageFlagLevel(seg.days, sla) : null;
+          const flagClass = flag && flag !== "ok" ? " is-" + flag : "";
+          const days = seg ? seg.days : null;
+          const over = days != null && sla != null ? days - sla : null;
+          cell = el(
+            "div",
+            {
+              class: "stage-grid-cell stage-grid-status-cell is-current" + flagClass,
+              title:
+                days != null
+                  ? `${stage}: ${seg.approxStart ? "≥" : ""}${days}d so far` +
+                    (sla != null ? ` (SLA ${sla}d${over > 0 ? `, ${over}d over` : ""})` : "")
+                  : `${stage}: in progress`,
+            },
+            [
+              el("span", { class: "stage-grid-days" }, [
+                days != null ? (seg.approxStart ? "≥" : "") + days + "d" : "In progress",
+              ]),
+              sla != null ? el("span", { class: "stage-grid-sla" }, ["SLA " + sla + "d"]) : null,
+            ]
+          );
+        }
+        row.appendChild(cell);
+      });
+
+      grid.appendChild(row);
+    });
+
+    wrap.appendChild(grid);
+
+    wrap.querySelectorAll("[data-project-id]").forEach((node) => {
+      node.addEventListener("click", () => openProjectDetail(node.getAttribute("data-project-id"), "stage-gate-timeline-section"));
+      node.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openProjectDetail(node.getAttribute("data-project-id"), "stage-gate-timeline-section");
+        }
+      });
+    });
+  }
+
   function listOrDash(items) {
     return items.length ? items.map((d) => el("li", null, [d])) : [el("li", null, ["—"])];
   }
@@ -751,6 +896,7 @@
     renderMetrics();
     renderStageSlaFlags();
     renderStageBoard();
+    renderStageGrid();
     renderHawkeye();
     renderCards();
     renderDependenciesTab();
@@ -1753,7 +1899,7 @@
     root.appendChild(
       el(
         "div",
-        { class: "stage-timeline" },
+        { id: "stage-gate-timeline-section", class: "stage-timeline" },
         computeStageSegments(p).map((seg) => {
           const sla = stageSlaDays(seg.stage);
           const flag = stageFlagLevel(seg.days, sla);

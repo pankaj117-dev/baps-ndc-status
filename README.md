@@ -10,7 +10,7 @@ so any PM can update it by editing one JSON file and pushing.
 
 A **"🔎 Project" dropdown** sits right under the tab bar, visible on every
 tab, next to a **"PM" dropdown**. Pick a project and/or a PM and Program
-Status, Pipeline Stages, Hawk-eye, Status History, and Dependencies all
+Status, Pipeline Stages, Grid, Hawk-eye, Status History, and Dependencies all
 narrow down to match (the metrics row recomputes for the filtered set too).
 Clear either with the ✕ button to see everything again. These two global
 filters replace the old per-tab Team/Status/PM filter rows — one filter bar,
@@ -75,7 +75,30 @@ every stage it's ever passed through, with the date range and duration for
 each (including past stages that blew their SLA — useful context even
 after the project has moved on).
 
-## Tab 3 — 🦅 Hawk-eye (live, rough until fuller schedule data lands)
+## Tab 3 — Grid (live)
+
+A portfolio-wide matrix: every project as a row, every pipeline stage as a
+column (Requirements → Design/Estimation → Development → QA/UAT →
+Production Release → Hypercare/Post-Launch). One glance shows exactly where
+every project sits relative to every other project, not just relative to
+its own lane.
+
+- **Green cell with a ✓ and "Xd"** — that stage is done; the number is how
+  many calendar days the project spent there (from the same stage-gate
+  reconstruction used in Tab 2 / the per-project timeline).
+- **Highlighted cell** (the project's current stage) — blue/neutral if it's
+  within SLA, amber if approaching (≥80% of SLA), red and bold if over SLA,
+  with "Xd" and "SLA Xd" shown directly in the cell.
+- **Grey "—" cell** — stage not reached yet.
+
+Click any project name or any cell to open that project's full detail view,
+scrolled straight to its Stage-gate timeline section. Respects the global
+Project/PM filters. This was adapted from a "Project × Stage Status" grid
+concept the team liked in a separate internal admin-dashboard mockup, rebuilt
+here using our own stage-gate SLA data and the site's existing visual style
+instead of copying that mockup's own design system.
+
+## Tab 4 — 🦅 Hawk-eye (live, rough until fuller schedule data lands)
 
 A cross-project Gantt: every project on one shared calendar timeline, one
 row each, sorted by go-live date. Shows the next milestone (small square),
@@ -91,7 +114,7 @@ so it's a rough first pass. It's built to also read a richer, optional
 project (see data model below) — once that's populated, each project's row
 will plot its **full** schedule instead of just one milestone + go-live.
 
-## Tab 4 — Status History (live)
+## Tab 5 — Status History (live)
 
 A flat, chronological feed that merges **two kinds of events** across the
 whole portfolio, newest first:
@@ -117,7 +140,7 @@ ingested; the same status-change is also highlighted (as colored pills)
 inside each project's own week-over-week change log in its detail view, and
 the same schedule shifts also drive the per-project schedule timeline there.
 
-## Tab 5 — Dependencies (live)
+## Tab 6 — Dependencies (live)
 
 Every dependency across every project, flattened into one cross-project
 board and grouped by the **owning team** (DevOps, Security, GMS Team,
@@ -159,7 +182,7 @@ timeline / Date change log**, and as a green "⏱ Time saved" row in the
 **Status History** tab (Tab 4) alongside status transitions and date
 shifts, every week it's reported.
 
-## Tab 6 — 🚨 Escalations (live)
+## Tab 7 — 🚨 Escalations (live)
 
 Every current escalation to leadership, rolled up across every project —
 the go-to view for walking through the weekly review meeting. Grouped by
@@ -179,7 +202,7 @@ leadership this week"** field on the weekly update form — unlike most
 fields, leaving it blank clears it (it means "nothing to escalate this
 week"), it doesn't carry last week's escalation forward.
 
-## Tab 7 — Team Performance (skeleton only)
+## Tab 8 — Team Performance (skeleton only)
 
 Placeholder tab for engineering execution metrics (PR velocity, review
 turnaround, commit activity, deploy cadence) once we wire up GitHub data per
@@ -327,7 +350,7 @@ Everything lives in three files:
                                 // like most fields — it means nothing to escalate this week). Drives the
                                 // Escalations tab (Tab 6), the card's "🚨 N escalated" badge, and the
                                 // detail view's escalations block.
-  "milestones": [              // OPTIONAL — full schedule for the Hawk-eye Gantt (Tab 3). If omitted,
+  "milestones": [              // OPTIONAL — full schedule for the Hawk-eye Gantt (Tab 4). If omitted,
                                 // Hawk-eye falls back to plotting just `nextMilestone` + `goLive`.
     { "name": "Requirements sign-off", "date": "2026-08-01", "status": "green" }
   ]
@@ -374,7 +397,7 @@ the app code.
 - [ ] Wire Tab 6 up to real GitHub data (PRs, reviews, commits, deploys) per
       project repo.
 - [ ] Once fuller project schedule data comes in, add a `milestones` array
-      per project (see Hawk-eye, Tab 3) so the Gantt plots the full timeline
+      per project (see Hawk-eye, Tab 4) so the Gantt plots the full timeline
       instead of just next-milestone + go-live.
 - [x] Add a "resolve" action for follow-ups — click "✓ Resolve" on the
       dashboard, which opens a pre-filled "Resolve a Follow-up" GitHub issue
