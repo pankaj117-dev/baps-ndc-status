@@ -2002,7 +2002,7 @@
     scheduleSection.appendChild(renderScheduleTimeline(scheduleEvents));
     root.appendChild(scheduleSection);
 
-    // Renders the Dependencies / Sprint status / Risks blocks for a given
+    // Renders the Dependencies / Weekly Status / Risks blocks for a given
     // week's data (either the live project `p` or a historical snapshot),
     // into the shared container below the change log.
     function renderSnapshotSections(container, snap, label, isLatest) {
@@ -2034,7 +2034,7 @@
         ])
       );
 
-      container.appendChild(el("h3", { class: "weekly-subhead" }, ["Sprint status"]));
+      container.appendChild(el("h3", { class: "weekly-subhead" }, ["Weekly Status"]));
       if (!snap.sprintStatus) {
         container.appendChild(
           el("p", { class: "empty-note" }, ["Sprint work detail wasn't captured for this week's snapshot yet."])
@@ -2070,7 +2070,7 @@
 
     const snapshotSections = el("div", { class: "snapshot-sections" });
 
-    // Change log — click a week to load its Dependencies / Sprint status /
+    // Change log — click a week to load its Dependencies / Weekly Status /
     // Risks below as they were that week, instead of always showing current.
     if (weeks.length) {
       root.appendChild(el("h3", { class: "weekly-subhead" }, ["Week-over-week changes"]));

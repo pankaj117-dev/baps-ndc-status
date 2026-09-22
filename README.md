@@ -168,10 +168,10 @@ glance so nothing gets forgotten once the project launches.
 
 Each row in the **"Week-over-week changes"** log shows what changed that
 week (progress/phase/stage/status). Click a row to load the **Dependencies /
-Sprint status / Risks** sections right below it as they stood that week —
+Weekly Status / Risks** sections right below it as they stood that week —
 a pill shows which week is being displayed ("Showing current data" or
-"Showing snapshot as of ..."). Defaults to the latest week. (Sprint detail
-is captured going forward from each weekly update; older snapshots recorded
+"Showing snapshot as of ..."). Defaults to the latest week. (Weekly Status
+detail is captured going forward from each weekly update; older snapshots recorded
 before this existed will say so instead of showing stale/empty data.)
 
 **Time saved** is tracked the same way as delay: it's a per-week value
