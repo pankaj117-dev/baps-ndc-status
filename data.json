@@ -1,6 +1,6 @@
 {
   "asOf": "2026-09-22",
-  "lastUpdated": "2026-09-21T17:23:54.414392Z",
+  "lastUpdated": "2026-09-23T15:45:31.330555Z",
   "stageSlaDays": {
     "Requirements": 10,
     "Design / Estimation": 10,
@@ -445,44 +445,53 @@
       "id": "gms",
       "name": "GMS 1.4",
       "owner": "Vasu Champaneria",
-      "status": "green",
+      "status": "amber",
       "progress": 35,
-      "phase": "GMS 1.4 \u2014 Requirement revised to 13-Sep (+3 days); TDD revised to 16-Sep (+2 days); Pilot (selected centers) started 14-Sep",
+      "phase": "Development",
       "nextMilestone": {
-        "name": "Development",
-        "date": "2026-09-24"
+        "name": "Development Completion",
+        "date": "2026-09-28"
       },
-      "goLive": "2026-10-12",
+      "goLive": "2026-19-12",
       "originalGoLive": "2026-10-19",
-      "delayDays": 2,
-      "delayNote": "Requirement end revised from 09-Sep to 13-Sep (+3 days); TDD revised from 14-Sep to 16-Sep (+2 days). Small but critical release covering Unsubscribe and Contact Type; Unsubscribe requirements finalized and TDD underway, Contact Type targeted for finalization by 9-Sep.",
-      "dependencies": [],
+      "delayDays": 8,
+      "delayNote": "Pilot raised a bunch of S1 issues which needed to be addressed in P0.",
+      "dependencies": [
+        "**MIS dependency:** GMS requires MIS support and clarification on **API authentication, Person API field definitions, update behavior, ID validation, idempotency, and batch/rate limits** to finalize and proceed with the integration."
+      ],
       "sprintStatus": {
-        "completed": [],
+        "completed": [
+          "Fixed 6 major Pilot issues (Prod) related to Recipient permissions, Correcting Data retrieval query, Admin Secretary approvals, etc)",
+          "Hotfix Prod deployment with Hotfix QA sign off."
+        ],
         "inProgress": [
-          "GMS 1.4 TDD \u2014 15% complete"
+          "Technical Design for Unsubscribe feature"
         ],
         "nextPlan": [
-          "GMS 1.4 production deployment target \u2014 19-Oct-2026"
+          "Start Development for Unsubscrive Feature"
         ]
       },
-      "risks": [],
-      "delayImpact": "No material impact to the 12-Oct-2026 go-live target",
-      "riskMitigations": [],
+      "risks": [
+        "If more S1 issues appear on Pilot, will need to prioritize those which might impact unsubscribe feature delivery."
+      ],
+      "delayImpact": "go-live slip = 0",
+      "riskMitigations": [
+        "might lead to 1 week delay in Go-live."
+      ],
       "dependencyMitigations": [],
       "delayMitigation": [
-        "Running requirements and technical design in parallel to absorb the slip"
+        "Scope Reduction: Of the two planned features, we will prioritize the Unsubscribe feature for the current delivery. The Contact Reorder feature will be addressed separately as a hotfix, as it does not impact the current production functionality."
       ],
-      "delayTradeoffs": "",
-      "dependencyTeams": [],
-      "stage": "Design / Estimation",
-      "escalations": [
-        "RGC support needed to confirm From/Reply-to email addresses, advise on handling mandir-level replies, and allocate a domain for the unsubscribe page \u2014 required by 1-Oct-2026"
+      "delayTradeoffs": "Reducing the scope; Management is aware.",
+      "dependencyTeams": [
+        "MIS - Sandeep bhai Pistolwala"
       ],
+      "stage": "Development",
+      "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
-      "scopeReduced": false,
-      "statusChangeReason": ""
+      "scopeReduced": true,
+      "statusChangeReason": "Support to Pilot lead to delay in finalizing Technical Design of Unsubscribe feature"
     },
     {
       "id": "baps-sso",
