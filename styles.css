@@ -720,7 +720,14 @@ body {
   background: var(--bg);
 }
 
+.stage-grid-metric-sub {
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  margin-top: 4px;
+}
+
 .stage-grid-swatch.is-done { background: var(--green-bg); border-color: var(--green); }
+.stage-grid-swatch.is-done.is-was-breach { background: var(--red-bg); border-color: var(--red); }
 .stage-grid-swatch.is-current { background: var(--accent-soft); border-color: var(--accent); }
 .stage-grid-swatch.is-current.is-warn { background: var(--amber-bg); border-color: var(--amber); }
 .stage-grid-swatch.is-current.is-breach { background: var(--red-bg); border-color: var(--red); }
@@ -838,7 +845,30 @@ body {
   color: var(--green);
 }
 
-.stage-grid-check { font-weight: 700; }
+.stage-grid-status-cell.is-done.is-was-breach {
+  background: var(--red-bg);
+  color: var(--red);
+}
+
+.stage-grid-daterange {
+  font-size: 9.5px;
+  opacity: 0.75;
+}
+
+.stage-grid-daterange.is-was-breach {
+  color: var(--red);
+  opacity: 1;
+  font-weight: 700;
+}
+
+.stage-grid-col-sla {
+  display: block;
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: none;
+  color: var(--ink-faint);
+  margin-top: 2px;
+}
 
 .stage-grid-status-cell.is-current {
   background: var(--accent-soft);

@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=36">
+<link rel="stylesheet" href="styles.css?v=37">
 </head>
 <body>
   <div class="wrap">
@@ -85,7 +85,8 @@
 
     <section id="panel-grid" class="tab-panel">
       <h2 class="section-heading">Project × stage grid</h2>
-      <p class="section-subhead">Every project against every pipeline stage in one view. Green = done (with days spent), the highlighted column = where the project is right now (days in stage vs. SLA, colored if it's approaching or over), grey = not reached yet. Click a project or cell to open the full detail view.</p>
+      <p class="section-subhead">Every project against every pipeline stage in one view. Green = done (with the date range and whether it blew its SLA at the time), the highlighted column = where the project is right now (days in stage vs. SLA, colored if it's approaching or over), grey = not reached yet. Click a project or cell to open the full detail view.</p>
+      <div id="stageGridMetrics" class="metrics-row"></div>
       <div id="stageGridLegend" class="stage-grid-legend"></div>
       <div id="stageGrid" class="stage-grid-wrap"></div>
     </section>
@@ -183,6 +184,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=34"></script>
+  <script src="app.js?v=35"></script>
 </body>
 </html>

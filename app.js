@@ -462,7 +462,8 @@
     if (!box) return;
     box.innerHTML = "";
     [
-      { cls: "is-done", label: "Done" },
+      { cls: "is-done", label: "Done — on time" },
+      { cls: "is-done is-was-breach", label: "Done — blew its SLA" },
       { cls: "is-current", label: "Current stage — on track" },
       { cls: "is-current is-warn", label: "Current stage — approaching SLA" },
       { cls: "is-current is-breach", label: "Current stage — over SLA" },
@@ -477,11 +478,59 @@
     });
   }
 
+  // KPI strip above the grid — portfolio-wide stage-gate health at a glance,
+  // reusing the same .metric-card look as the Program Status tab's metrics
+  // row. All numbers respect the global Project/PM/Team filters.
+  function renderStageGridMetrics() {
+    const row = document.getElementById("stageGridMetrics");
+    if (!row) return;
+    row.innerHTML = "";
+
+    const projects = visibleProjects();
+    const pmCount = new Set(projects.map((p) => p.owner || "Unassigned")).size;
+
+    let breachCount = 0;
+    let hypercareCount = 0;
+    let cumulativeSlaOverage = 0;
+
+    projects.forEach((p) => {
+      const segments = computeStageSegments(p);
+      segments.forEach((seg) => {
+        const sla = stageSlaDays(seg.stage);
+        if (sla != null) cumulativeSlaOverage += Math.max(0, seg.days - sla);
+      });
+      const info = currentStageInfo(p);
+      if (info && info.flag === "breach") breachCount += 1;
+      if ((p.stage || "") === "Hypercare / Post-Launch") hypercareCount += 1;
+    });
+
+    const metrics = [
+      { label: "Active Projects", num: projects.length, sub: `across ${pmCount} PM${pmCount === 1 ? "" : "s"}`, tone: "" },
+      { label: "Stages Over SLA", num: breachCount, sub: breachCount ? "need escalation" : "none right now", tone: breachCount ? "tone-red" : "tone-green" },
+      { label: "Cumulative SLA Overage", num: cumulativeSlaOverage + "d", sub: "summed across every stage", tone: cumulativeSlaOverage ? "tone-amber" : "tone-green" },
+      { label: "In Hypercare / Post-Launch", num: hypercareCount, sub: "live, post go-live", tone: "tone-accent" },
+    ];
+
+    metrics.forEach((m) => {
+      row.appendChild(
+        el("div", { class: ["metric-card", m.tone].filter(Boolean).join(" ") }, [
+          el("div", { class: "num" }, [String(m.num)]),
+          el("div", { class: "label" }, [m.label]),
+          el("div", { class: "stage-grid-metric-sub" }, [m.sub]),
+        ])
+      );
+    });
+  }
+
   // Portfolio-wide matrix: every visible project as a row, every pipeline
   // stage as a column. Reuses the same stage-segment reconstruction and SLA
   // logic as the per-project "Stage-gate timeline" (see computeStageSegments
   // / stageSlaDays / stageFlagLevel above) so the two views never disagree.
+  // Each cell carries the actual date range it covered plus whether that
+  // stage blew its SLA (not just the current one) — the fuller "stage-gate"
+  // picture, not just a status dot.
   function renderStageGrid() {
+    renderStageGridMetrics();
     renderStageGridLegend();
     const wrap = document.getElementById("stageGrid");
     if (!wrap) return;
@@ -499,8 +548,12 @@
       el("div", { class: "stage-grid-cell stage-grid-name-cell" }, ["Project"]),
     ]);
     PIPELINE_STAGES.forEach((stage) => {
+      const sla = stageSlaDays(stage);
       headerRow.appendChild(
-        el("div", { class: "stage-grid-cell stage-grid-col-head", title: stage }, [STAGE_GRID_SHORT[stage] || stage])
+        el("div", { class: "stage-grid-cell stage-grid-col-head", title: stage }, [
+          STAGE_GRID_SHORT[stage] || stage,
+          sla != null ? el("span", { class: "stage-grid-col-sla" }, ["SLA " + sla + "d"]) : null,
+        ])
       );
     });
     grid.appendChild(headerRow);
@@ -534,16 +587,34 @@
         if (currentIndex === -1 || i > currentIndex) {
           cell = el("div", { class: "stage-grid-cell stage-grid-status-cell is-none" }, ["—"]);
         } else if (i < currentIndex) {
+          // Already passed through this stage — show how long it took, the
+          // actual date range, and (the part the old version was missing)
+          // whether THIS stage blew its own SLA back when it was current,
+          // regardless of how the project is doing today.
           const seg = segByStage[stage];
+          const sla = stageSlaDays(stage);
+          const over = seg && sla != null ? seg.days - sla : null;
+          const wasBreach = over != null && over > 0;
           cell = el(
             "div",
             {
-              class: "stage-grid-cell stage-grid-status-cell is-done",
-              title: seg ? `${stage}: ${seg.approxStart ? "≥" : ""}${seg.days}d spent` : `${stage}: done`,
+              class: "stage-grid-cell stage-grid-status-cell is-done" + (wasBreach ? " is-was-breach" : ""),
+              title: seg
+                ? `${stage}: ${seg.approxStart ? "≥" : ""}${seg.days}d (${fmtDateShort(seg.start)} \u2192 ${fmtDateShort(seg.end)})` +
+                  (sla != null ? ` — SLA ${sla}d${wasBreach ? `, ${over}d over` : ""}` : "")
+                : `${stage}: done`,
             },
             [
-              el("span", { class: "stage-grid-check" }, ["✓"]),
-              seg ? el("span", { class: "stage-grid-days" }, [(seg.approxStart ? "≥" : "") + seg.days + "d"]) : null,
+              el("span", { class: "stage-grid-days" }, [
+                "✓ " + (seg ? (seg.approxStart ? "≥" : "") + seg.days + "d" : "Done"),
+              ]),
+              seg
+                ? el("span", { class: "stage-grid-daterange" + (wasBreach ? " is-was-breach" : "") }, [
+                    wasBreach
+                      ? `+${over}d over SLA`
+                      : `${fmtDateShort(seg.start)} → ${fmtDateShort(seg.end)}`,
+                  ])
+                : null,
             ]
           );
         } else {
@@ -559,15 +630,21 @@
               class: "stage-grid-cell stage-grid-status-cell is-current" + flagClass,
               title:
                 days != null
-                  ? `${stage}: ${seg.approxStart ? "≥" : ""}${days}d so far` +
-                    (sla != null ? ` (SLA ${sla}d${over > 0 ? `, ${over}d over` : ""})` : "")
+                  ? `${stage}: ${seg.approxStart ? "≥" : ""}${days}d so far (since ${fmtDateShort(seg.start)})` +
+                    (sla != null ? ` — SLA ${sla}d${over > 0 ? `, ${over}d over` : ""}` : "")
                   : `${stage}: in progress`,
             },
             [
               el("span", { class: "stage-grid-days" }, [
                 days != null ? (seg.approxStart ? "≥" : "") + days + "d" : "In progress",
               ]),
-              sla != null ? el("span", { class: "stage-grid-sla" }, ["SLA " + sla + "d"]) : null,
+              sla != null
+                ? el("span", { class: "stage-grid-sla" }, [
+                    "SLA " + sla + "d" + (over > 0 ? ` · +${over}d over` : ""),
+                  ])
+                : seg
+                ? el("span", { class: "stage-grid-daterange" }, ["since " + fmtDateShort(seg.start)])
+                : null,
             ]
           );
         }

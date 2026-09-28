@@ -92,20 +92,38 @@ Production Release → Hypercare/Post-Launch). One glance shows exactly where
 every project sits relative to every other project, not just relative to
 its own lane.
 
-- **Green cell with a ✓ and "Xd"** — that stage is done; the number is how
-  many calendar days the project spent there (from the same stage-gate
+**KPI strip** at the top (respects the global Project/PM/Team filters, same
+as everything else):
+- **Active Projects** — count in view, plus how many PMs that spans.
+- **Stages Over SLA** — how many projects' *current* stage is past its SLA
+  right now (the "needs escalation" number).
+- **Cumulative SLA Overage** — total days over SLA, summed across *every*
+  stage segment of *every* project in view (not just current stages) — the
+  full stage-gate picture, including stages a project has already moved
+  past.
+- **In Hypercare / Post-Launch** — how many are live, post go-live.
+
+**Each column header** also shows that stage's SLA (e.g. "SLA 10d").
+
+**Each cell:**
+- **Green, "✓ Xd" + a date range** — that stage is done, on time. The date
+  range is the actual start → end for that stage (from the same stage-gate
   reconstruction used in Tab 2 / the per-project timeline).
-- **Highlighted cell** (the project's current stage) — blue/neutral if it's
+- **Green→red, "✓ Xd" + "+Xd over SLA"** — that stage is done, but blew its
+  own SLA back when the project was in it. This is tracked per-stage, so a
+  project doing fine today can still show a past stage that ran long — the
+  history isn't lost once a project moves on.
+- **Highlighted cell** (the project's *current* stage) — blue/neutral if
   within SLA, amber if approaching (≥80% of SLA), red and bold if over SLA,
-  with "Xd" and "SLA Xd" shown directly in the cell.
+  with "Xd" and "SLA Xd · +Xd over" shown directly in the cell.
 - **Grey "—" cell** — stage not reached yet.
 
 Click any project name or any cell to open that project's full detail view,
-scrolled straight to its Stage-gate timeline section. Respects the global
-Project/PM filters. This was adapted from a "Project × Stage Status" grid
-concept the team liked in a separate internal admin-dashboard mockup, rebuilt
-here using our own stage-gate SLA data and the site's existing visual style
-instead of copying that mockup's own design system.
+scrolled straight to its Stage-gate timeline section. This was adapted from
+a "Project × Stage Status" grid concept the team liked in a separate
+internal admin-dashboard mockup, rebuilt here using our own stage-gate SLA
+data and the site's existing visual style instead of copying that mockup's
+own design system.
 
 ## Tab 4 — 🦅 Hawk-eye (live, rough until fuller schedule data lands)
 
