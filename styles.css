@@ -1570,59 +1570,106 @@ body {
   height: 58px;
 }
 
-.hawkeye-slip-line {
-  position: absolute;
-  top: 50%;
-  height: 0;
-  border-top: 2px dashed var(--ink-faint);
+.hawkeye-row-track-empty {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: var(--ink-faint);
+  font-style: italic;
 }
 
-.hawkeye-marker {
+/* Per-stage block on the calendar strip. Done stages get a solid fill,
+   the current stage is colored by its SLA flag, future/not-yet-reached
+   stages are outline-only (their width is just a planned placeholder,
+   not a real date range). */
+.hawkeye-stage-block {
   position: absolute;
   top: 50%;
-  transform: translate(-50%, -50%);
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid #fff;
-  box-shadow: 0 0 0 1px var(--line-strong);
+  transform: translateY(-50%);
+  height: 30px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0 4px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.hawkeye-stage-block.is-done {
+  background: var(--green-bg);
+  border: 1px solid var(--green);
+  color: var(--green);
+}
+
+.hawkeye-stage-block.is-current {
+  background: var(--accent-soft);
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  box-shadow: var(--shadow);
   z-index: 1;
 }
 
-.hawkeye-marker-ghost {
-  background: var(--ink-faint);
-  opacity: 0.6;
-  width: 9px;
-  height: 9px;
+.hawkeye-stage-block.is-current.is-warn {
+  background: var(--amber-bg);
+  border-color: var(--amber);
+  color: var(--amber);
 }
 
-.hawkeye-marker-milestone {
-  border-radius: 3px;
+.hawkeye-stage-block.is-current.is-breach {
+  background: var(--red-bg);
+  border-color: var(--red);
+  color: var(--red);
 }
 
-.hawkeye-marker-golive {
-  width: 14px;
-  height: 14px;
-}
-
-.hawkeye-marker.status-green { background: var(--green); }
-.hawkeye-marker.status-amber { background: var(--amber); }
-.hawkeye-marker.status-red { background: var(--red); }
-.hawkeye-marker.status-black { background: var(--black); }
-
-.hawkeye-marker-label {
-  position: absolute;
-  top: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: var(--font-mono);
-  font-size: 9.5px;
+.hawkeye-stage-block.is-future {
+  background: transparent;
+  border: 1.5px dashed var(--line-strong);
   color: var(--ink-faint);
-  white-space: nowrap;
+  font-weight: 500;
 }
+
+.hawkeye-stage-block:hover {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.hawkeye-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 0 0 14px 220px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.hawkeye-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hawkeye-legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+  border: 1.5px solid var(--line);
+}
+
+.hawkeye-legend-swatch.is-done { background: var(--green-bg); border-color: var(--green); }
+.hawkeye-legend-swatch.is-current { background: var(--accent-soft); border-color: var(--accent); }
+.hawkeye-legend-swatch.is-warn { background: var(--amber-bg); border-color: var(--amber); }
+.hawkeye-legend-swatch.is-breach { background: var(--red-bg); border-color: var(--red); }
+.hawkeye-legend-swatch.is-future { background: transparent; border-color: var(--line-strong); border-style: dashed; }
 
 @media (max-width: 720px) {
   .hawkeye-months, .hawkeye-rows { margin-left: 130px; }
+  .hawkeye-legend { margin-left: 130px; }
   .hawkeye-row-label { left: -130px; width: 122px; }
   .hawkeye-row-label strong { max-width: 100px; }
 }

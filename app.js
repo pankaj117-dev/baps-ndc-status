@@ -494,11 +494,7 @@
     let cumulativeSlaOverage = 0;
 
     projects.forEach((p) => {
-      const segments = computeStageSegments(p);
-      segments.forEach((seg) => {
-        const sla = stageSlaDays(seg.stage);
-        if (sla != null) cumulativeSlaOverage += Math.max(0, seg.days - sla);
-      });
+      cumulativeSlaOverage += cumulativeStageOverageDays(p);
       const info = currentStageInfo(p);
       if (info && info.flag === "breach") breachCount += 1;
       if ((p.stage || "") === "Hypercare / Post-Launch") hypercareCount += 1;
@@ -845,40 +841,153 @@
     });
   }
 
-  /* ---------------- Hawk-eye (cross-project Gantt) ---------------- */
+  /* ---------------- Hawk-eye (cross-project stage-gate calendar) ---------------- */
+
+  const STAGE_SHORT_CODE = {
+    "Requirements": "REQ",
+    "Design / Estimation": "DES",
+    "Development": "DEV",
+    "QA / UAT": "QA",
+    "Production Release": "REL",
+    "Hypercare / Post-Launch": "HC",
+  };
+
+  // Fallback planned width (calendar days) for a future stage with no
+  // configured SLA — shouldn't normally hit since every real pipeline
+  // stage has one in DEFAULT_STAGE_SLA_DAYS, but keeps the chain from
+  // collapsing to zero-width if data.json ever removes one.
+  const DEFAULT_FUTURE_STAGE_DAYS = 14;
+
+  function addDaysIso(iso, days) {
+    const d = new Date(iso + "T00:00:00");
+    d.setDate(d.getDate() + days);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
+
+  // Total days a project has spent over-SLA, summed across every stage
+  // segment it's been through (including its current one) — the
+  // per-project version of the Grid tab's portfolio-wide "Cumulative SLA
+  // Overage" KPI.
+  function cumulativeStageOverageDays(p) {
+    return computeStageSegments(p).reduce((sum, seg) => {
+      const sla = stageSlaDays(seg.stage);
+      return sum + (sla != null ? Math.max(0, seg.days - sla) : 0);
+    }, 0);
+  }
+
+  // Builds the full sequence of stage blocks for one project's Hawk-eye
+  // row: real start/end dates for stages already passed through (from the
+  // same history reconstruction as Tab 2 / the Grid tab / the per-project
+  // Stage-gate timeline), the current stage sized to at least its SLA (so
+  // it reads as "expected to land around here" even mid-stage), then every
+  // remaining stage chained forward using its SLA as a planned-only
+  // placeholder width. Returns [] for a project with no recognized stage
+  // (e.g. "Unstaged") — nothing real to plot yet.
+  function buildHawkeyeBlocks(p) {
+    const today = todayISO();
+    const segments = computeStageSegments(p);
+    const segByStage = {};
+    segments.forEach((seg) => {
+      segByStage[seg.stage] = seg;
+    });
+    const currentIndex = PIPELINE_STAGES.indexOf(p.stage || "Unstaged");
+    if (currentIndex === -1) return [];
+
+    const blocks = [];
+    PIPELINE_STAGES.forEach((stage, i) => {
+      if (i < currentIndex) {
+        const seg = segByStage[stage];
+        if (!seg) return;
+        const sla = stageSlaDays(stage);
+        blocks.push({
+          stage,
+          start: seg.start,
+          end: seg.end,
+          kind: "done",
+          overDays: sla != null ? Math.max(0, seg.days - sla) : 0,
+        });
+      } else if (i === currentIndex) {
+        const seg = segByStage[stage] || { start: today, days: 0 };
+        const sla = stageSlaDays(stage);
+        const plannedEnd = sla != null ? addDaysIso(seg.start, sla) : null;
+        const end = plannedEnd && plannedEnd > today ? plannedEnd : today;
+        blocks.push({
+          stage,
+          start: seg.start,
+          end,
+          kind: "current",
+          flag: stageFlagLevel(seg.days, sla),
+          overDays: sla != null ? Math.max(0, seg.days - sla) : 0,
+        });
+      } else {
+        const sla = stageSlaDays(stage) || DEFAULT_FUTURE_STAGE_DAYS;
+        const prev = blocks[blocks.length - 1];
+        const start = prev ? prev.end : today;
+        blocks.push({ stage, start, end: addDaysIso(start, sla), kind: "future" });
+      }
+    });
+    return blocks;
+  }
 
   function renderHawkeye() {
     const board = document.getElementById("hawkeyeGantt");
     board.innerHTML = "";
 
     const projects = visibleProjects();
-    const DAY = 86400000;
-    const todayIso = todayISO();
-
-    const allDates = [todayIso];
-    projects.forEach((p) => {
-      if (p.originalGoLive) allDates.push(p.originalGoLive);
-      if (p.goLive) allDates.push(p.goLive);
-      if (p.nextMilestone && p.nextMilestone.date) allDates.push(p.nextMilestone.date);
-      (p.milestones || []).forEach((m) => {
-        if (m.date) allDates.push(m.date);
-      });
-    });
-
-    if (!projects.length || allDates.length < 2) {
-      board.appendChild(el("p", { class: "empty-note" }, ["No dates to plot yet."]));
+    if (!projects.length) {
+      board.appendChild(el("p", { class: "empty-note" }, ["No projects match the current filters."]));
       return;
     }
 
+    const DAY = 86400000;
+    const todayIso = todayISO();
+    const rows = projects.map((p) => ({ p, blocks: buildHawkeyeBlocks(p) }));
+    const withBlocks = rows.filter((r) => r.blocks.length);
+
+    if (!withBlocks.length) {
+      board.appendChild(el("p", { class: "empty-note" }, ["No pipeline stage data to plot yet."]));
+      return;
+    }
+
+    const allDates = [todayIso];
+    withBlocks.forEach(({ blocks }) => {
+      blocks.forEach((b) => {
+        allDates.push(b.start);
+        allDates.push(b.end);
+      });
+    });
+
     const times = allDates.map((d) => new Date(d + "T00:00:00").getTime());
-    let minTime = Math.min(...times) - 10 * DAY;
-    let maxTime = Math.max(...times) + 14 * DAY;
+    let minTime = Math.min(...times) - 7 * DAY;
+    let maxTime = Math.max(...times) + 7 * DAY;
     if (maxTime - minTime < 30 * DAY) maxTime = minTime + 30 * DAY;
 
     const xPct = (iso) => {
       const t = new Date(iso + "T00:00:00").getTime();
       return Math.max(0, Math.min(100, ((t - minTime) / (maxTime - minTime)) * 100));
     };
+
+    board.appendChild(
+      el("div", { class: "hawkeye-legend" }, [
+        el("span", { class: "hawkeye-legend-item" }, [el("span", { class: "hawkeye-legend-swatch is-done" }), "Done"]),
+        el("span", { class: "hawkeye-legend-item" }, [
+          el("span", { class: "hawkeye-legend-swatch is-current" }),
+          "Current — on track",
+        ]),
+        el("span", { class: "hawkeye-legend-item" }, [el("span", { class: "hawkeye-legend-swatch is-warn" }), "At risk"]),
+        el("span", { class: "hawkeye-legend-item" }, [
+          el("span", { class: "hawkeye-legend-swatch is-breach" }),
+          "Blocked / over SLA",
+        ]),
+        el("span", { class: "hawkeye-legend-item" }, [
+          el("span", { class: "hawkeye-legend-swatch is-future" }),
+          "Not started (planned)",
+        ]),
+      ])
+    );
 
     // Month gridlines spanning the whole board
     const monthMarks = [];
@@ -913,78 +1022,59 @@
       ])
     );
 
-    projects
+    rows
       .slice()
       .sort((a, b) => {
-        const ta = a.goLive ? new Date(a.goLive).getTime() : Infinity;
-        const tb = b.goLive ? new Date(b.goLive).getTime() : Infinity;
+        const ta = a.p.goLive ? new Date(a.p.goLive).getTime() : Infinity;
+        const tb = b.p.goLive ? new Date(b.p.goLive).getTime() : Infinity;
         return ta - tb;
       })
-      .forEach((p) => {
+      .forEach(({ p, blocks }) => {
+        const cumulativeDelay = cumulativeStageOverageDays(p);
         const row = el("div", { class: "hawkeye-row", "data-project-id": p.id, tabindex: "0", role: "button" }, [
           el("div", { class: "hawkeye-row-label" }, [
             el("span", { class: "timeline-dot", style: `background:var(--${p.status})` }),
             el("div", null, [
               el("strong", null, [p.name]),
-              el("div", { class: "hawkeye-row-sub" }, [p.owner || "Unassigned"]),
+              el("div", { class: "hawkeye-row-sub" }, [
+                cumulativeDelay > 0 ? `${cumulativeDelay}d cumulative delay` : "On pace — no SLA overage",
+              ]),
             ]),
           ]),
         ]);
 
-        const track = el("div", { class: "hawkeye-row-track" });
-
-        if (p.originalGoLive && p.goLive && p.originalGoLive !== p.goLive) {
-          const a = xPct(p.originalGoLive);
-          const b = xPct(p.goLive);
-          const left = Math.min(a, b);
-          const width = Math.abs(b - a);
-          track.appendChild(el("div", { class: "hawkeye-slip-line", style: `left:${left}%;width:${width}%` }));
-          track.appendChild(
-            el("div", {
-              class: "hawkeye-marker hawkeye-marker-ghost",
-              style: `left:${a}%`,
-              title: `Original Go-Live · ${fmtDate(p.originalGoLive)}`,
-            })
+        if (!blocks.length) {
+          row.appendChild(
+            el("div", { class: "hawkeye-row-track hawkeye-row-track-empty" }, ["No pipeline stage set yet"])
           );
+          rowsWrap.appendChild(row);
+          return;
         }
 
-        const milestones =
-          p.milestones && p.milestones.length
-            ? p.milestones
-            : p.nextMilestone && p.nextMilestone.date
-            ? [{ name: p.nextMilestone.name || "Milestone", date: p.nextMilestone.date, status: p.status }]
-            : [];
+        const track = el("div", { class: "hawkeye-row-track" });
 
-        milestones.forEach((m) => {
-          if (!m.date) return;
-          const mPct = xPct(m.date);
+        blocks.forEach((b) => {
+          const left = xPct(b.start);
+          const width = Math.max(xPct(b.end) - left, 0.6);
+          const kindClass =
+            b.kind === "done"
+              ? "is-done"
+              : b.kind === "future"
+              ? "is-future"
+              : "is-current" + (b.flag && b.flag !== "ok" ? " is-" + b.flag : "");
+          const code = STAGE_SHORT_CODE[b.stage] || b.stage;
+          const label = code + (b.overDays ? ` +${b.overDays}d` : "");
+          const title =
+            `${p.name} — ${b.stage}: ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)}` +
+            (b.overDays ? ` (+${b.overDays}d over SLA)` : b.kind === "future" ? " (planned, not started)" : "");
           track.appendChild(
             el(
               "div",
-              {
-                class: "hawkeye-marker hawkeye-marker-milestone status-" + (m.status || p.status),
-                style: `left:${mPct}%`,
-                title: `${m.name} · ${fmtDate(m.date)}`,
-              },
-              [el("span", { class: "hawkeye-marker-label", style: ganttLabelEdgeStyle(mPct) }, [m.name])]
+              { class: "hawkeye-stage-block " + kindClass, style: `left:${left}%;width:${width}%`, title },
+              [label]
             )
           );
         });
-
-        if (p.goLive) {
-          const golivePct = xPct(p.goLive);
-          track.appendChild(
-            el(
-              "div",
-              {
-                class: "hawkeye-marker hawkeye-marker-golive status-" + p.status,
-                style: `left:${golivePct}%`,
-                title: `Go-Live · ${fmtDate(p.goLive)}`,
-              },
-              [el("span", { class: "hawkeye-marker-label", style: ganttLabelEdgeStyle(golivePct) }, ["Go-Live"])]
-            )
-          );
-        }
 
         row.appendChild(track);
         rowsWrap.appendChild(row);
@@ -993,11 +1083,11 @@
     board.appendChild(rowsWrap);
 
     board.querySelectorAll(".hawkeye-row").forEach((row) => {
-      row.addEventListener("click", () => openProjectDetail(row.getAttribute("data-project-id"), "detailScheduleSection"));
+      row.addEventListener("click", () => openProjectDetail(row.getAttribute("data-project-id"), "stage-gate-timeline-section"));
       row.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-          openProjectDetail(row.getAttribute("data-project-id"), "detailScheduleSection");
+          openProjectDetail(row.getAttribute("data-project-id"), "stage-gate-timeline-section");
         }
       });
     });

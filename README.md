@@ -125,21 +125,36 @@ internal admin-dashboard mockup, rebuilt here using our own stage-gate SLA
 data and the site's existing visual style instead of copying that mockup's
 own design system.
 
-## Tab 4 — 🦅 Hawk-eye (live, rough until fuller schedule data lands)
+## Tab 4 — 🦅 Hawk-eye (live)
 
-A cross-project Gantt: every project on one shared calendar timeline, one
-row each, sorted by go-live date. Shows the next milestone (small square),
-the go-live date (large circle, colored by status), and — whenever a
-project has slipped — a faint dashed line connecting the original go-live
-to the current one. A blue "Today" line runs through every row so you can
-see at a glance what's imminent vs. far out. Click any row to open the full
-detail view.
+A cross-project **stage-gate calendar**: every project on one shared
+timeline, one row each, sorted by go-live date — but instead of a couple of
+milestone dots, each row is the project's actual pipeline stages laid out
+end to end as blocks, built from the same stage-segment reconstruction used
+by Tab 2 / the Grid tab / each project's Stage-gate timeline, so all four
+views always agree.
 
-This currently plots from `goLive` / `originalGoLive` / `nextMilestone` only,
-so it's a rough first pass. It's built to also read a richer, optional
-`"milestones": [{ "name": "...", "date": "...", "status": "..." }]` array per
-project (see data model below) — once that's populated, each project's row
-will plot its **full** schedule instead of just one milestone + go-live.
+- **Solid block, green** — a stage already completed, positioned at its
+  real date range.
+- **Solid block, blue/amber/red** — the project's *current* stage, colored
+  by its SLA flag (on track / approaching / over). Sized to at least that
+  stage's SLA even mid-stage, so it visually reads as "expected to land
+  around here."
+- **Outlined block (dashed border, grey)** — a stage the project hasn't
+  reached yet. Purely a **planned placeholder**: chained forward from the
+  end of the current stage, each sized to that stage's configured SLA — not
+  a real commitment, just "if things ran to SLA from here."
+- Any block gets a small red **"+Xd"** appended to its label if that stage
+  ran (or is running) over its own SLA.
+- A per-row **"Xd cumulative delay"** line under each project's name sums
+  the SLA overage across every stage it's been through — the per-project
+  version of the Grid tab's portfolio-wide "Cumulative SLA Overage" KPI.
+- A blue "Today" line runs through every row.
+
+Click any row or block to open the full detail view, scrolled straight to
+the Stage-gate timeline. Adapted from the same "Project States in Calendar"
+concept in the internal admin-dashboard mockup mentioned in Tab 3, rebuilt
+with our real stage-gate data instead of copying its design system.
 
 ## Tab 5 — Status History (live)
 
@@ -346,7 +361,7 @@ Everything lives in three files:
   "nextMilestone": { "name": "Requirements Finalization", "date": "2026-08-21" },
   "goLive": "2026-09-25",     // current planned go-live, or null if not yet set
   "originalGoLive": "2026-09-21", // baseline date, set once and preserved across
-                                   // slips so Hawk-eye and the changelog can show the delta
+                                   // slips so the changelog can show the delta
   "delayDays": 0,              // 0 if on schedule, positive integer if late
   "delayNote": "No delay reported",
   "delayImpact": "",           // required in the form whenever delayDays > 0
@@ -377,8 +392,10 @@ Everything lives in three files:
                                 // like most fields — it means nothing to escalate this week). Drives the
                                 // Escalations tab (Tab 6), the card's "🚨 N escalated" badge, and the
                                 // detail view's escalations block.
-  "milestones": [              // OPTIONAL — full schedule for the Hawk-eye Gantt (Tab 4). If omitted,
-                                // Hawk-eye falls back to plotting just `nextMilestone` + `goLive`.
+  "milestones": [              // OPTIONAL — full schedule for the mini Gantt in a project's own
+                                // detail view. If omitted, that view falls back to plotting just
+                                // `nextMilestone` + `goLive`. (Hawk-eye/Tab 4 plots pipeline stages
+                                // instead, built entirely from history — doesn't read this field.)
     { "name": "Requirements sign-off", "date": "2026-08-01", "status": "green" }
   ]
 }
@@ -421,11 +438,13 @@ the app code.
 
 ## Roadmap
 
-- [ ] Wire Tab 6 up to real GitHub data (PRs, reviews, commits, deploys) per
-      project repo.
-- [ ] Once fuller project schedule data comes in, add a `milestones` array
-      per project (see Hawk-eye, Tab 4) so the Gantt plots the full timeline
-      instead of just next-milestone + go-live.
+- [ ] Wire Tab 8 (Team Performance) up to real GitHub data (PRs, reviews,
+      commits, deploys) per project repo.
+- [x] Hawk-eye (Tab 4) now plots each project's full pipeline-stage history
+      built from `history.json` — no per-project `milestones` array needed
+      for that anymore. `milestones` is still useful for the finer-grained
+      mini Gantt in a project's own detail view, if you want to hand-track
+      sub-milestones within a stage.
 - [x] Add a "resolve" action for follow-ups — click "✓ Resolve" on the
       dashboard, which opens a pre-filled "Resolve a Follow-up" GitHub issue
       that the ingestion bot uses to flip `"status"` to `"resolved"` (stays in
