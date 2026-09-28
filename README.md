@@ -6,15 +6,24 @@ so any PM can update it by editing one JSON file and pushing.
 
 **Live site:** `https://pankaj117.github.io/baps-ndc-status/` (enabled via GitHub Pages on the `main` branch)
 
-## Global project filter
+## Global filter bar
 
 A **"🔎 Project" dropdown** sits right under the tab bar, visible on every
-tab, next to a **"PM" dropdown**. Pick a project and/or a PM and Program
-Status, Pipeline Stages, Grid, Hawk-eye, Status History, and Dependencies all
-narrow down to match (the metrics row recomputes for the filtered set too).
-Clear either with the ✕ button to see everything again. These two global
-filters replace the old per-tab Team/Status/PM filter rows — one filter bar,
-same effect everywhere.
+tab, next to a **"PM" dropdown** and a **"Team" dropdown**. Pick any
+combination and Program Status, Pipeline Stages, Grid, Hawk-eye, Status
+History, Dependencies, and Escalations all narrow down to match (the
+metrics row recomputes for the filtered set too). Clear any one with its
+✕ button to see everything again. These global filters replace the old
+per-tab Team/Status/PM filter rows — one filter bar, same effect everywhere.
+
+- **Project / PM** — the usual "just show me one project" / "just show me
+  one PM's projects" filters.
+- **Team** — filters to projects that have a dependency owned by another
+  team (DevOps, BAPS ID Team, SSO Team, etc. — populated from whatever's
+  actually been entered in each project's `dependencyTeams`, see the Data
+  model section). Handy for someone on one of those teams to jump straight
+  to "which of these projects need something from me" without scanning
+  every card.
 
 ## Why this exists
 

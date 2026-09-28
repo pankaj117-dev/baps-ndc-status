@@ -56,6 +56,16 @@
       </div>
       <button id="globalOwnerClear" class="global-filter-clear" type="button" title="Clear PM filter" hidden>✕</button>
 
+      <span class="global-filter-sep"></span>
+
+      <label class="global-filter-label" for="globalTeamFilter" title="Filter to projects with a dependency on this team">Team</label>
+      <div class="global-filter-select-wrap">
+        <select id="globalTeamFilter" class="global-filter-select">
+          <option value="all">All teams</option>
+        </select>
+      </div>
+      <button id="globalTeamClear" class="global-filter-clear" type="button" title="Clear team filter" hidden>✕</button>
+
       <span class="global-filter-hint">Applies to every tab</span>
     </div>
 
@@ -173,6 +183,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=33"></script>
+  <script src="app.js?v=34"></script>
 </body>
 </html>

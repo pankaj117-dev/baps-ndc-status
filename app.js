@@ -54,6 +54,7 @@
   let activeFilter = "all";
   let activeOwner = "all";
   let globalProjectFilter = "all";
+  let globalTeamFilter = "all";
 
   function visibleProjects() {
     let projects = DATA.projects;
@@ -62,6 +63,9 @@
     }
     if (activeOwner !== "all") {
       projects = projects.filter((p) => (p.owner || "Unassigned") === activeOwner);
+    }
+    if (globalTeamFilter !== "all") {
+      projects = projects.filter((p) => (p.dependencyTeams || []).includes(globalTeamFilter));
     }
     return projects;
   }
@@ -706,6 +710,7 @@
   function updateGlobalOwnerFilterUI() {
     const clearBtn = document.getElementById("globalOwnerClear");
     clearBtn.hidden = activeOwner === "all";
+    updateGlobalFilterUI();
   }
 
   function wireGlobalOwnerFilter() {
@@ -720,6 +725,45 @@
       activeOwner = "all";
       select.value = "all";
       updateGlobalOwnerFilterUI();
+      renderAllTabs();
+    });
+  }
+
+  // Filters to projects that have a dependency owned by another team
+  // (DevOps, BAPS ID Team, SSO Team, etc. — whatever's actually been entered
+  // in `dependencyTeams` across the portfolio). Useful for someone from one
+  // of those teams to jump straight to "what do I need to look at."
+  function populateGlobalTeamFilter() {
+    const select = document.getElementById("globalTeamFilter");
+    const teams = Array.from(
+      new Set(
+        DATA.projects.flatMap((p) => (p.dependencyTeams || []).filter(Boolean))
+      )
+    ).sort((a, b) => a.localeCompare(b));
+
+    teams.forEach((team) => {
+      select.appendChild(el("option", { value: team }, [team]));
+    });
+  }
+
+  function updateGlobalTeamFilterUI() {
+    const clearBtn = document.getElementById("globalTeamClear");
+    clearBtn.hidden = globalTeamFilter === "all";
+    updateGlobalFilterUI();
+  }
+
+  function wireGlobalTeamFilter() {
+    const select = document.getElementById("globalTeamFilter");
+    select.addEventListener("change", () => {
+      globalTeamFilter = select.value;
+      updateGlobalTeamFilterUI();
+      renderAllTabs();
+    });
+
+    document.getElementById("globalTeamClear").addEventListener("click", () => {
+      globalTeamFilter = "all";
+      select.value = "all";
+      updateGlobalTeamFilterUI();
       renderAllTabs();
     });
   }
@@ -908,8 +952,11 @@
     const bar = document.getElementById("globalFilterBar");
     const clearBtn = document.getElementById("globalFilterClear");
     const isActive = globalProjectFilter !== "all";
-    bar.classList.toggle("is-active", isActive);
     clearBtn.hidden = !isActive;
+    bar.classList.toggle(
+      "is-active",
+      isActive || activeOwner !== "all" || globalTeamFilter !== "all"
+    );
   }
 
   function wireGlobalProjectFilter() {
@@ -2261,6 +2308,8 @@
     wireGlobalProjectFilter();
     populateGlobalOwnerFilter();
     wireGlobalOwnerFilter();
+    populateGlobalTeamFilter();
+    wireGlobalTeamFilter();
     renderMetrics();
     renderStageSlaFlags();
     renderStageBoard();
