@@ -452,7 +452,7 @@
         "name": "Development Completion",
         "date": "2026-09-28"
       },
-      "goLive": "2026-19-12",
+      "goLive": "2026-10-27",
       "originalGoLive": "2026-10-19",
       "delayDays": 8,
       "delayNote": "Pilot raised a bunch of S1 issues which needed to be addressed in P0.",

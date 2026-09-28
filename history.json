@@ -2998,7 +2998,7 @@
           "name": "Development Completion",
           "date": "2026-09-28"
         },
-        "goLive": "2026-19-12",
+        "goLive": "2026-10-27",
         "originalGoLive": "2026-10-19",
         "delayImpact": "go-live slip = 0",
         "delayMitigation": [
