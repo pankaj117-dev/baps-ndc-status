@@ -2550,7 +2550,7 @@
     ]
   },
   "2026-09-22": {
-    "capturedAt": "2026-09-29T03:26:45.416819Z",
+    "capturedAt": "2026-09-29T17:14:38.236994Z",
     "projects": [
       {
         "id": "webnext",
@@ -2575,7 +2575,6 @@
         "timeSavedNote": [],
         "scopeReduced": false,
         "risks": [],
-        "riskMitigations": [],
         "fastFollowItems": [],
         "escalations": [],
         "dependencies": [],
@@ -2614,23 +2613,29 @@
         "timeSavedNote": [],
         "scopeReduced": false,
         "risks": [
-          "Two full-time QA resources required from this week onward (PMO/Bhavinbhai Patel & Rushabh Kothari, High)",
-          "Project plan due 2026-09-29 (PM/Jeet Savani, High)"
-        ],
-        "riskMitigations": [
-          "Requesting dedicated QA allocation",
-          "Project plan in progress"
+          {
+            "id": "RISK-101",
+            "text": "Two full-time QA resources required from this week onward (PMO/Bhavinbhai Patel & Rushabh Kothari, High)",
+            "mitigation": "Requesting dedicated QA allocation",
+            "resolved": false
+          },
+          {
+            "id": "RISK-102",
+            "text": "Project plan due 2026-09-29 (PM/Jeet Savani, High)",
+            "mitigation": "Project plan in progress",
+            "resolved": false
+          }
         ],
         "fastFollowItems": [],
         "escalations": [],
         "dependencies": [
           {
             "id": "DEP-101",
-            "text": "Walle team availability for top-priority items to be developed",
-            "team": "Walle Team",
+            "text": "One full-time QA resource is needed starting this week. \u2014 Rushabh Kothari",
+            "team": "PMO",
             "mitigation": "",
-            "dueBy": "",
-            "priority": "Medium",
+            "dueBy": "2026-10-03",
+            "priority": "High",
             "escalated": false,
             "resolved": false
           }
@@ -2638,7 +2643,9 @@
         "stagePlan": {
           "Requirements": {
             "initialEnd": "2026-09-17",
-            "latestEnd": "2026-09-17"
+            "latestEnd": "2026-09-17",
+            "initialStart": "2026-06-12",
+            "latestStart": "2026-06-12"
           },
           "Tech. Design": {
             "initialStart": "2026-09-17",
@@ -2680,7 +2687,6 @@
         "timeSavedNote": [],
         "scopeReduced": false,
         "risks": [],
-        "riskMitigations": [],
         "fastFollowItems": [],
         "escalations": [],
         "dependencies": [],
@@ -2718,10 +2724,12 @@
         "timeSavedNote": [],
         "scopeReduced": false,
         "risks": [
-          "Backend-heavy user stories \u2014 not all 15 stories will fit before Diwali for Pledge 1.x"
-        ],
-        "riskMitigations": [
-          ""
+          {
+            "id": "RISK-101",
+            "text": "Backend-heavy user stories \u2014 not all 15 stories will fit before Diwali for Pledge 1.x",
+            "mitigation": "",
+            "resolved": false
+          }
         ],
         "fastFollowItems": [],
         "escalations": [
@@ -2730,18 +2738,8 @@
         "dependencies": [
           {
             "id": "DEP-101",
-            "text": "Timely TDD design delivery for each story, with required approvals",
-            "team": "Internal",
-            "mitigation": "",
-            "dueBy": "",
-            "priority": "Medium",
-            "escalated": false,
-            "resolved": true
-          },
-          {
-            "id": "DEP-102",
-            "text": "Stakeholders want INBOX but Dev track recommends GMS \u2014 final decision needed \u2014 Dharmaketu Swami",
-            "team": "Dev",
+            "text": "Stakeholders want to use INBOX, but the Dev track recommends GMS; a final decision is needed. ETA: 09/24/2026. \u2014 Dharmaketu Swami",
+            "team": "DEV",
             "mitigation": "",
             "dueBy": "2026-09-24",
             "priority": "Critical",
@@ -2749,32 +2747,32 @@
             "resolved": false
           },
           {
-            "id": "DEP-103",
-            "text": "Pledge: Paresh S. Patel (Houston) needs UAT database and Power BI access",
+            "id": "DEP-102",
+            "text": "Pledge: Paresh S. Patel (Houston) needs access to the UAT database and Power BI. ETA: 09/24/2026. \u2014 Parkshit Chauhan",
             "team": "DevOps",
             "mitigation": "",
-            "dueBy": "2026-09-24",
+            "dueBy": "2026-10-02",
+            "priority": "High",
+            "escalated": false,
+            "resolved": false
+          },
+          {
+            "id": "DEP-103",
+            "text": "Historical Boon data import: Field mapping is being finalized (in progress). ETA: 09/30/2026. \u2014 Bhavin Patel",
+            "team": "PM",
+            "mitigation": "",
+            "dueBy": "2026-09-30",
             "priority": "High",
             "escalated": false,
             "resolved": false
           },
           {
             "id": "DEP-104",
-            "text": "Historical Boon data import \u2014 field mapping being finalized (in progress) \u2014 Bhavin Patel",
-            "team": "PM",
-            "mitigation": "",
-            "dueBy": "2026-09-24",
-            "priority": "Medium",
-            "escalated": false,
-            "resolved": false
-          },
-          {
-            "id": "DEP-105",
-            "text": "Volunteer Python developer needed for data import \u2014 Rushabh Kothari",
+            "text": "A volunteer Python developer is needed for the data import work. ETA: 09/24/2026. \u2014 Rushabh Kothari",
             "team": "PMO",
             "mitigation": "",
-            "dueBy": "2026-09-24",
-            "priority": "Medium",
+            "dueBy": "2026-09-30",
+            "priority": "High",
             "escalated": false,
             "resolved": false
           }
@@ -2816,20 +2814,42 @@
         "timeSavedNote": [],
         "scopeReduced": false,
         "risks": [
-          "Check printing library failed under concurrent users \u2014 dev fix 2026-09-18, in QA (DEV/Bhavesh Patel, Medium) ETA 2026-09-25",
-          "Workflow override emails \u2014 workaround or permanent fix needed (WALLE/Pratikbhai Gohil, High) ETA 2026-10-02",
-          "Invocation/Review/Status API v2 in progress (WALLE, High) ETA 2026-09-25",
-          "Separate default accounting entities for USA and Canada (MDS/Vasubhai, High) ETA 2026-09-30",
-          "Rate limiting in EMM \u2014 dev complete 2026-09-16, in QA (DEV/Vishalbhai, Low) ETA 2026-09-25",
-          "Events feature \u2014 business decision still TBD (RGC/Ashishbhai, Medium)"
-        ],
-        "riskMitigations": [
-          "Dev completed fix; currently in QA",
-          "WALL-E team working workaround/permanent fix",
-          "API v2 work in progress",
-          "",
-          "In QA",
-          ""
+          {
+            "id": "RISK-101",
+            "text": "Check printing library failed under concurrent users \u2014 dev fix 2026-09-18, in QA (DEV/Bhavesh Patel, Medium) ETA 2026-09-25",
+            "mitigation": "Dev completed fix; currently in QA",
+            "resolved": false
+          },
+          {
+            "id": "RISK-102",
+            "text": "Workflow override emails \u2014 workaround or permanent fix needed (WALLE/Pratikbhai Gohil, High) ETA 2026-10-02",
+            "mitigation": "WALL-E team working workaround/permanent fix",
+            "resolved": false
+          },
+          {
+            "id": "RISK-103",
+            "text": "Invocation/Review/Status API v2 in progress (WALLE, High) ETA 2026-09-25",
+            "mitigation": "API v2 work in progress",
+            "resolved": false
+          },
+          {
+            "id": "RISK-104",
+            "text": "Separate default accounting entities for USA and Canada (MDS/Vasubhai, High) ETA 2026-09-30",
+            "mitigation": "",
+            "resolved": false
+          },
+          {
+            "id": "RISK-105",
+            "text": "Rate limiting in EMM \u2014 dev complete 2026-09-16, in QA (DEV/Vishalbhai, Low) ETA 2026-09-25",
+            "mitigation": "In QA",
+            "resolved": false
+          },
+          {
+            "id": "RISK-106",
+            "text": "Events feature \u2014 business decision still TBD (RGC/Ashishbhai, Medium)",
+            "mitigation": "",
+            "resolved": false
+          }
         ],
         "fastFollowItems": [
           "Canada taxation and expense reports requirements",
@@ -2840,28 +2860,58 @@
         "dependencies": [
           {
             "id": "DEP-101",
-            "text": "Post go-live: business decision on REQ \u2014 HTML report vs. PDF",
-            "team": "Business/Stakeholder",
-            "mitigation": "Business decision on PDF report generation completed 2026-09-22 (per deck)",
-            "dueBy": "",
-            "priority": "Medium",
-            "escalated": false,
-            "resolved": true
-          },
-          {
-            "id": "DEP-102",
-            "text": "Post go-live: Canada taxation and expense reports requirements",
-            "team": "Business/Stakeholder",
+            "text": "The new check printing library failed when multiple users used it at the same time. Dev completed on 09/18/2026;\nCurrently in EMM QA for Load Testing. EMM QA ETA: 09/28/2026. \u2014 Bhavesh Patel",
+            "team": "DEV",
             "mitigation": "",
-            "dueBy": "",
+            "dueBy": "2026-10-01",
             "priority": "Medium",
             "escalated": false,
             "resolved": false
           },
           {
+            "id": "DEP-102",
+            "text": "A workaround or permanent fix is needed for the workflow override emails issue. \nWALL-E ETA: 10/02/2026.\nEMM ETA: 10/06/2026 \u2014 Pratikbhai Gohil",
+            "team": "WALLE",
+            "mitigation": "",
+            "dueBy": "2026-10-06",
+            "priority": "High",
+            "escalated": false,
+            "resolved": false
+          },
+          {
             "id": "DEP-103",
-            "text": "Country-specific: vendor management enhancements approval from stakeholders",
-            "team": "Business/Stakeholder",
+            "text": "Version 2 of the Invocation API, Review API, and Status API is in progress. \nWALLE ETA: 09/23/2026.\nEMM ETA: \u2014 Pratikbhai Gohil",
+            "team": "WALLE",
+            "mitigation": "",
+            "dueBy": "2026-09-24",
+            "priority": "High",
+            "escalated": false,
+            "resolved": false
+          },
+          {
+            "id": "DEP-104",
+            "text": "Separate default accounting entities need to be set up for the USA and Canada. \nMDS ETA: 09/30/2026.\nEMM ETA: 10/07/2026 \u2014 Vasu",
+            "team": "MDS",
+            "mitigation": "",
+            "dueBy": "2026-10-07",
+            "priority": "High",
+            "escalated": false,
+            "resolved": false
+          },
+          {
+            "id": "DEP-105",
+            "text": "Rate limiting implementation in EMM. Dev completed on 09/16/2026; \nCurrently in EMM QA. EMM QA ETA: 09/25/2026. \u2014 Vishalbhai Patel",
+            "team": "DEV",
+            "mitigation": "",
+            "dueBy": "2026-09-25",
+            "priority": "Low",
+            "escalated": false,
+            "resolved": false
+          },
+          {
+            "id": "DEP-106",
+            "text": "Business decision on the Events feature. REQ feasibility in progress - TBD \u2014 Ashishbhai Trivedi",
+            "team": "RGC",
             "mitigation": "",
             "dueBy": "",
             "priority": "Medium",
@@ -2869,7 +2919,20 @@
             "resolved": false
           }
         ],
-        "stagePlan": {},
+        "stagePlan": {
+          "UAT": {
+            "initialStart": "2026-07-18",
+            "latestStart": "2026-07-18",
+            "initialEnd": "2026-08-22",
+            "latestEnd": "2026-08-27"
+          },
+          "Rollout": {
+            "initialStart": "2026-08-22",
+            "latestStart": "2026-08-22",
+            "initialEnd": "2026-08-25",
+            "latestEnd": "2026-08-28"
+          }
+        },
         "sprintStatus": {
           "completed": [],
           "inProgress": [
@@ -2908,211 +2971,127 @@
         "timeSavedNote": [],
         "scopeReduced": false,
         "risks": [
-          "Mobile VAPT sign-off pending (VAPT \u2014 Critical)",
-          "UAT sign-off received but ~25% of items still need updates in tracking sheet (Stakeholders \u2014 Critical)",
-          "Production integration keys needed for SSO, SFS, MIS, MDS (DevOps \u2014 Critical)",
-          "Read-only MIS access, Google Maps API key, Apple Pay for Stripe, n8n pipelines (DevOps \u2014 Critical)",
-          "SSO user accounts for Kishor/Kishori participants still need creation (NAHQ \u2014 Critical)"
-        ],
-        "riskMitigations": [
-          "",
-          "UAT team updating tracking sheet",
-          "DevOps/NAHQ chasing keys and access",
-          "",
-          "NAHQ creating SSO accounts"
+          {
+            "id": "RISK-101",
+            "text": "Mobile VAPT sign-off pending (VAPT \u2014 Critical)",
+            "mitigation": "",
+            "resolved": false
+          },
+          {
+            "id": "RISK-102",
+            "text": "UAT sign-off received but ~25% of items still need updates in tracking sheet (Stakeholders \u2014 Critical)",
+            "mitigation": "UAT team updating tracking sheet",
+            "resolved": false
+          },
+          {
+            "id": "RISK-103",
+            "text": "Production integration keys needed for SSO, SFS, MIS, MDS (DevOps \u2014 Critical)",
+            "mitigation": "DevOps/NAHQ chasing keys and access",
+            "resolved": false
+          },
+          {
+            "id": "RISK-104",
+            "text": "Read-only MIS access, Google Maps API key, Apple Pay for Stripe, n8n pipelines (DevOps \u2014 Critical)",
+            "mitigation": "",
+            "resolved": false
+          },
+          {
+            "id": "RISK-105",
+            "text": "SSO user accounts for Kishor/Kishori participants still need creation (NAHQ \u2014 Critical)",
+            "mitigation": "NAHQ creating SSO accounts",
+            "resolved": false
+          }
         ],
         "fastFollowItems": [],
         "escalations": [],
         "dependencies": [
           {
             "id": "DEP-101",
-            "text": "Web: VAPT completion sign-off awaited from QA \u2014 Nimeshbhai Chauhan",
-            "team": "QA",
+            "text": "UAT sign-off received; 25% of the items still need to be updated in the tracking sheet. \u2014 Dharmadev Trivedi",
+            "team": "RGC",
             "mitigation": "",
-            "dueBy": "2026-09-18",
+            "dueBy": "2026-09-24",
             "priority": "Critical",
             "escalated": false,
-            "resolved": true
+            "resolved": false
           },
           {
             "id": "DEP-102",
-            "text": "Web: VAPT re-test and completion sign-off \u2014 Dharmadev Trivedi",
-            "team": "VAPT",
+            "text": "SSO (Single Sign-On) user accounts still need to be created. \u2014 Ketul Patel",
+            "team": "MIS",
             "mitigation": "",
-            "dueBy": "2026-09-23",
-            "priority": "Critical",
+            "dueBy": "2026-09-25",
+            "priority": "High",
             "escalated": false,
-            "resolved": true
+            "resolved": false
           },
           {
             "id": "DEP-103",
-            "text": "Performance/Load testing sign-off awaited from QA \u2014 Nimeshbhai Chauhan",
-            "team": "QA",
+            "text": "A Google Maps API key is required. \u2014 Janak Patel",
+            "team": "DevOps",
             "mitigation": "",
-            "dueBy": "2026-09-18",
+            "dueBy": "2026-09-24",
             "priority": "Critical",
             "escalated": false,
-            "resolved": true
+            "resolved": false
           },
           {
             "id": "DEP-104",
-            "text": "Mobile App name decision is pending \u2014 Sandipbhai Patel",
-            "team": "RGC",
+            "text": "Apple Pay needs to be enabled for Stripe. \u2014 Janak Patel",
+            "team": "DevOps",
             "mitigation": "",
-            "dueBy": "2026-09-18",
+            "dueBy": "2026-09-24",
             "priority": "Critical",
             "escalated": false,
-            "resolved": true
+            "resolved": false
           },
           {
             "id": "DEP-105",
-            "text": "BMKS \u2013 MIS data misalignment \u2014 Nitin Chaudhary",
-            "team": "PM",
-            "mitigation": "",
-            "dueBy": "2026-09-21",
-            "priority": "Critical",
-            "escalated": false,
-            "resolved": true
-          },
-          {
-            "id": "DEP-106",
-            "text": "User profile disappears in MIS when user details are edited \u2014 Sandeep Pistolwala",
+            "text": "User profile disappears in MIS when user details are edited (Reopened) \u2014 Janak Patel",
             "team": "MIS",
             "mitigation": "",
             "dueBy": "2026-09-25",
             "priority": "Medium",
             "escalated": false,
-            "resolved": true
-          },
-          {
-            "id": "DEP-107",
-            "text": "Production readiness items pending: read-only database access, API keys, and Google API key. \u2014 Divyesh Patel",
-            "team": "DevOps",
-            "mitigation": "",
-            "dueBy": "2026-09-25",
-            "priority": "High",
-            "escalated": false,
-            "resolved": true
-          },
-          {
-            "id": "DEP-108",
-            "text": "Scope creep: New requirement gaps found in the Transportation module even though it was already approved. \u2014 Dharmadev Trivedi",
-            "team": "RGC",
-            "mitigation": "",
-            "dueBy": "2026-09-21",
-            "priority": "Critical",
-            "escalated": false,
-            "resolved": true
-          },
-          {
-            "id": "DEP-109",
-            "text": "Requirement reviews and approvals are delayed because stakeholders have limited availability. \u2014 Dharmadev Trivedi",
-            "team": "RGC",
-            "mitigation": "",
-            "dueBy": "2026-09-21",
-            "priority": "Critical",
-            "escalated": false,
-            "resolved": true
-          },
-          {
-            "id": "DEP-110",
-            "text": "Response form TDD walkthrough has been completed on 2026-09-18, since then we are awaiting approval/feedback, currently the Development and QA activities are on hold until we get the TDD approval \u2014 Pratikbhai",
-            "team": "Dev Track",
-            "mitigation": "",
-            "dueBy": "2026-09-25",
-            "priority": "Critical",
-            "escalated": false,
-            "resolved": true
-          },
-          {
-            "id": "DEP-111",
-            "text": "Mobile: Waiting for VAPT team sign-off on mobile app security testing \u2014 Dhvani Patel & Dipen Patel",
-            "team": "VAPT",
-            "mitigation": "",
-            "dueBy": "2026-09-24",
-            "priority": "Critical",
-            "escalated": false,
-            "resolved": false
-          },
-          {
-            "id": "DEP-112",
-            "text": "UAT sign-off received; 25% of items still need to be updated in the tracking sheet \u2014 Bhargav Patel",
-            "team": "Stakeholders",
-            "mitigation": "",
-            "dueBy": "2026-09-24",
-            "priority": "Critical",
-            "escalated": false,
-            "resolved": false
-          },
-          {
-            "id": "DEP-113",
-            "text": "Integration keys needed for SSO, SFS, MIS, and MDS \u2014 Dharmaketu Swami",
-            "team": "DevOps",
-            "mitigation": "",
-            "dueBy": "2026-09-24",
-            "priority": "Critical",
-            "escalated": false,
-            "resolved": false
-          },
-          {
-            "id": "DEP-114",
-            "text": "Read-only access to MIS required \u2014 Parikshit Chauhan",
-            "team": "DevOps",
-            "mitigation": "",
-            "dueBy": "2026-09-24",
-            "priority": "Critical",
-            "escalated": false,
-            "resolved": false
-          },
-          {
-            "id": "DEP-115",
-            "text": "Google Maps API key required \u2014 Janak Patel",
-            "team": "DevOps",
-            "mitigation": "",
-            "dueBy": "2026-09-24",
-            "priority": "Critical",
-            "escalated": false,
-            "resolved": false
-          },
-          {
-            "id": "DEP-116",
-            "text": "Apple Pay needs to be enabled for Stripe \u2014 Janak Patel",
-            "team": "DevOps",
-            "mitigation": "",
-            "dueBy": "2026-09-24",
-            "priority": "Critical",
-            "escalated": false,
-            "resolved": false
-          },
-          {
-            "id": "DEP-117",
-            "text": "n8n pipelines need to be set up \u2014 Kishan Patel",
-            "team": "DevOps",
-            "mitigation": "",
-            "dueBy": "2026-09-24",
-            "priority": "Critical",
-            "escalated": false,
-            "resolved": false
-          },
-          {
-            "id": "DEP-118",
-            "text": "SSO user accounts still need to be created \u2014 Janak Patel / Ketul Patel",
-            "team": "NAHQ",
-            "mitigation": "",
-            "dueBy": "2026-09-25",
-            "priority": "Critical",
-            "escalated": false,
             "resolved": false
           }
         ],
         "stagePlan": {
-          "UAT": {
-            "initialEnd": "2026-09-21",
+          "Requirements": {
+            "initialStart": "2025-11-08",
+            "latestStart": "2025-11-08",
+            "initialEnd": "2026-06-25",
+            "latestEnd": "2026-06-25"
+          },
+          "Tech. Design": {
+            "initialStart": "2026-03-09",
+            "latestStart": "2026-03-09",
+            "initialEnd": "2026-07-14",
+            "latestEnd": "2026-07-14"
+          },
+          "Development": {
+            "initialStart": "2026-03-28",
+            "latestStart": "2026-03-28",
+            "initialEnd": "2026-08-17",
             "latestEnd": "2026-09-21"
           },
+          "UAT": {
+            "initialStart": "2026-08-18",
+            "latestStart": "2026-08-18",
+            "initialEnd": "2026-09-16",
+            "latestEnd": "2026-09-24"
+          },
           "Rollout": {
+            "initialStart": "2026-09-16",
+            "latestStart": "2026-09-16",
             "initialEnd": "2026-10-05",
             "latestEnd": "2026-10-05"
+          },
+          "Hypercare": {
+            "initialStart": "2026-10-06",
+            "latestStart": "2026-10-06",
+            "initialEnd": "2026-11-06",
+            "latestEnd": "2026-11-06"
           }
         },
         "sprintStatus": {
@@ -3154,78 +3133,71 @@
         "timeSavedNote": [],
         "scopeReduced": false,
         "risks": [
-          "Scope creep \u2014 requirement gaps in approved transportation module (RGC, Critical)",
-          "Timely requirement reviews/approvals \u2014 stakeholder availability (RGC, Critical)"
-        ],
-        "riskMitigations": [
-          "",
-          ""
+          {
+            "id": "RISK-101",
+            "text": "Scope creep \u2014 requirement gaps in approved transportation module (RGC, Critical)",
+            "mitigation": "",
+            "resolved": false
+          },
+          {
+            "id": "RISK-102",
+            "text": "Timely requirement reviews/approvals \u2014 stakeholder availability (RGC, Critical)",
+            "mitigation": "",
+            "resolved": false
+          }
         ],
         "fastFollowItems": [],
         "escalations": [],
         "dependencies": [
           {
             "id": "DEP-101",
-            "text": "Timely review and approval of TDDs \u2014 Pratikbhai Gohil, Dharmaketu",
-            "team": "DEV",
+            "text": "Response form TDD walkthrough has been completed on 09/18/2026, since then we are awaiting approval /feedbak, currently the Development and QA activities are on hold until we get the TDD approval \u2014 Pratikbhai",
+            "team": "Dev Track",
             "mitigation": "",
-            "dueBy": "2026-09-19",
-            "priority": "Critical",
-            "escalated": false,
-            "resolved": true
-          },
-          {
-            "id": "DEP-102",
-            "text": "Submit TDD review and approval timeline to DEV track \u2014 Satish Buddhadev",
-            "team": "PM",
-            "mitigation": "",
-            "dueBy": "2026-09-21",
-            "priority": "Critical",
-            "escalated": false,
-            "resolved": true
-          },
-          {
-            "id": "DEP-103",
-            "text": "Should we hold off on development if requirements & TDDs are not approved?",
-            "team": "RGC",
-            "mitigation": "",
-            "dueBy": "2026-09-21",
-            "priority": "High",
-            "escalated": false,
-            "resolved": true
-          },
-          {
-            "id": "DEP-104",
-            "text": "Team is partially utilized in phase 1 \u2014 Satyanistha Swami",
-            "team": "RGC",
-            "mitigation": "",
-            "dueBy": "2026-09-21",
-            "priority": "High",
-            "escalated": false,
-            "resolved": true
-          },
-          {
-            "id": "DEP-105",
-            "text": "Scope creep: new requirement gaps in Transportation module though already approved \u2014 Dharmadev Trivedi",
-            "team": "RGC",
-            "mitigation": "",
-            "dueBy": "2026-09-21",
-            "priority": "Critical",
-            "escalated": false,
-            "resolved": false
-          },
-          {
-            "id": "DEP-106",
-            "text": "Requirement reviews/approvals delayed \u2014 stakeholders have limited availability \u2014 Dharmadev Trivedi / Sandipbhai Patel",
-            "team": "RGC",
-            "mitigation": "",
-            "dueBy": "2026-09-21",
+            "dueBy": "2026-09-25",
             "priority": "Critical",
             "escalated": false,
             "resolved": false
           }
         ],
-        "stagePlan": {},
+        "stagePlan": {
+          "Requirements": {
+            "initialStart": "2026-06-12",
+            "latestStart": "2026-06-12",
+            "initialEnd": "2026-10-02",
+            "latestEnd": "2026-10-02"
+          },
+          "Tech. Design": {
+            "initialStart": "2026-08-10",
+            "latestStart": "2026-08-10",
+            "initialEnd": "2026-10-23",
+            "latestEnd": "2026-10-23"
+          },
+          "Development": {
+            "initialStart": "2026-08-24",
+            "latestStart": "2026-08-24",
+            "initialEnd": "2026-12-18",
+            "latestEnd": "2026-12-18"
+          },
+          "UAT": {
+            "initialStart": "2026-12-21",
+            "latestStart": "2026-12-21",
+            "initialEnd": "2027-01-08",
+            "latestEnd": "2027-01-08"
+          },
+          "Rollout": {
+            "initialStart": "2027-01-11",
+            "latestStart": "2027-01-11",
+            "initialEnd": "2027-01-28",
+            "latestEnd": "2027-01-28"
+          },
+          "Hypercare": {
+            "initialStart": "2027-02-01",
+            "latestStart": "2027-02-01",
+            "initialEnd": "2027-03-05",
+            "latestEnd": "2027-03-05"
+          }
+        },
         "sprintStatus": {
           "completed": [
             "Sprint 1 Dev started",
@@ -3270,33 +3242,63 @@
         "timeSavedNote": [],
         "scopeReduced": false,
         "risks": [
-          "Need one more front-end (mobile) developer (RGC, Critical)",
-          "Oct/Nov timeline is tight \u2014 need to keep driving project pace (Aniket Udgaonkar, High)"
-        ],
-        "riskMitigations": [
-          "",
-          "Aniket driving weekly pace checks to hold the Oct/Nov timeline"
+          {
+            "id": "RISK-101",
+            "text": "Need one more front-end (mobile) developer (RGC, Critical)",
+            "mitigation": "",
+            "resolved": false
+          },
+          {
+            "id": "RISK-102",
+            "text": "Oct/Nov timeline is tight \u2014 need to keep driving project pace (Aniket Udgaonkar, High)",
+            "mitigation": "Aniket driving weekly pace checks to hold the Oct/Nov timeline",
+            "resolved": false
+          }
         ],
         "fastFollowItems": [],
         "escalations": [],
         "dependencies": [
           {
             "id": "DEP-101",
-            "text": "Need one more front end (mobile) developer. Sign off received from Sameep",
-            "team": "RGC",
+            "text": "Need confirmation that GMS will be used instead of SMTP. \u2014 Vasu",
+            "team": "GMS",
             "mitigation": "",
-            "dueBy": "2026-09-16",
+            "dueBy": "2026-09-28",
             "priority": "Critical",
             "escalated": false,
-            "resolved": true
+            "resolved": false
           }
         ],
         "stagePlan": {
           "Tech. Design": {
             "initialStart": "2026-09-17",
             "latestStart": "2026-09-17",
-            "initialEnd": "2026-09-25",
+            "initialEnd": "2026-09-22",
             "latestEnd": "2026-09-25"
+          },
+          "Requirements": {
+            "initialStart": "2026-07-22",
+            "latestStart": "2026-07-22",
+            "initialEnd": "2026-09-14",
+            "latestEnd": "2026-09-14"
+          },
+          "Development": {
+            "initialStart": "2026-09-22",
+            "latestStart": "2026-09-22",
+            "initialEnd": "2026-10-22",
+            "latestEnd": "2026-10-22"
+          },
+          "UAT": {
+            "initialStart": "2026-10-16",
+            "latestStart": "2026-10-16",
+            "initialEnd": "2026-10-26",
+            "latestEnd": "2026-10-28"
+          },
+          "Rollout": {
+            "initialStart": "2026-10-28",
+            "latestStart": "2026-10-28",
+            "initialEnd": "2026-10-30",
+            "latestEnd": "2026-10-30"
           }
         },
         "sprintStatus": {
@@ -3339,31 +3341,33 @@
         "timeSavedNote": [],
         "scopeReduced": true,
         "risks": [
-          "Domain needed for Reply-to email and Unsubscribe page hosting (RGC, High)"
-        ],
-        "riskMitigations": [
-          ""
+          {
+            "id": "RISK-101",
+            "text": "Domain needed for Reply-to email and Unsubscribe page hosting (RGC, High)",
+            "mitigation": "",
+            "resolved": false
+          }
         ],
         "fastFollowItems": [],
         "escalations": [],
         "dependencies": [
           {
             "id": "DEP-101",
-            "text": "Business decision Events functionality ETA: TBD",
+            "text": "MIS team development is required to support application-level authentication for the Person Add/Update Phone and Email APIs. Awaiting the implementation timeline from MIS. Need by: 09/28/2026. ETA: TBD. \u2014 Sandeep Pistolwala",
+            "team": "MIS",
+            "mitigation": "",
+            "dueBy": "2026-09-26",
+            "priority": "High",
+            "escalated": false,
+            "resolved": false
+          },
+          {
+            "id": "DEP-102",
+            "text": "A domain is required for the \"Reply-to\" email address and for hosting the Unsubscribe page.",
             "team": "RGC",
             "mitigation": "",
             "dueBy": "2026-10-01",
             "priority": "Medium",
-            "escalated": false,
-            "resolved": true
-          },
-          {
-            "id": "DEP-102",
-            "text": "Domain required for Reply-to email address and hosting the Unsubscribe page",
-            "team": "RGC",
-            "mitigation": "",
-            "dueBy": "",
-            "priority": "High",
             "escalated": false,
             "resolved": false
           }
@@ -3371,9 +3375,39 @@
         "stagePlan": {
           "Development": {
             "initialStart": "2026-09-15",
-            "latestStart": "2026-09-15",
-            "initialEnd": "2026-10-05",
+            "latestStart": "2026-09-23",
+            "initialEnd": "2026-09-24",
             "latestEnd": "2026-10-05"
+          },
+          "Requirements": {
+            "initialStart": "2026-09-03",
+            "latestStart": "2026-09-03",
+            "initialEnd": "2026-09-09",
+            "latestEnd": "2026-09-13"
+          },
+          "Tech. Design": {
+            "initialStart": "2026-09-07",
+            "latestStart": "2026-09-07",
+            "initialEnd": "2026-09-14",
+            "latestEnd": "2026-09-22"
+          },
+          "UAT": {
+            "initialStart": "2026-09-17",
+            "latestStart": "2026-10-07",
+            "initialEnd": "2026-10-08",
+            "latestEnd": "2026-10-12"
+          },
+          "Rollout": {
+            "initialStart": "2026-10-11",
+            "latestStart": "2026-10-11",
+            "initialEnd": "2026-10-12",
+            "latestEnd": "2026-10-12"
+          },
+          "Hypercare": {
+            "initialStart": "2026-10-12",
+            "latestStart": "2026-10-12",
+            "initialEnd": "2026-12-31",
+            "latestEnd": "2026-12-31"
           }
         },
         "sprintStatus": {
@@ -3414,24 +3448,54 @@
         "timeSavedNote": [],
         "scopeReduced": false,
         "risks": [
-          "Not getting clarity on when QA resource can test Karyakar in dev (Dev, Critical)",
-          "Need to create users (QA, High)",
-          "Karyakar flow still not on UAT \u2014 pending long time (Dev, Critical)",
-          "QA will test on Dev or UAT? Multiple dev env changes expected (FPO, Critical)",
-          "Karyakar deployment blocked due to SID OTP issue (Hitesh Patel, Critical)",
-          "Waiting on other apps' implementation plans / session 2 dates \u2014 Inbox/MSD (Vasu, High)",
-          "Waiting on other apps' implementation plans / session 2 dates \u2014 MIS (Sandeep, High)",
-          "Phase 2 app owner availability for session 1 (PM track, Medium)"
-        ],
-        "riskMitigations": [
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          ""
+          {
+            "id": "RISK-101",
+            "text": "Not getting clarity on when QA resource can test Karyakar in dev (Dev, Critical)",
+            "mitigation": "",
+            "resolved": false
+          },
+          {
+            "id": "RISK-102",
+            "text": "Need to create users (QA, High)",
+            "mitigation": "",
+            "resolved": false
+          },
+          {
+            "id": "RISK-103",
+            "text": "Karyakar flow still not on UAT \u2014 pending long time (Dev, Critical)",
+            "mitigation": "",
+            "resolved": false
+          },
+          {
+            "id": "RISK-104",
+            "text": "QA will test on Dev or UAT? Multiple dev env changes expected (FPO, Critical)",
+            "mitigation": "",
+            "resolved": false
+          },
+          {
+            "id": "RISK-105",
+            "text": "Karyakar deployment blocked due to SID OTP issue (Hitesh Patel, Critical)",
+            "mitigation": "",
+            "resolved": false
+          },
+          {
+            "id": "RISK-106",
+            "text": "Waiting on other apps' implementation plans / session 2 dates \u2014 Inbox/MSD (Vasu, High)",
+            "mitigation": "",
+            "resolved": false
+          },
+          {
+            "id": "RISK-107",
+            "text": "Waiting on other apps' implementation plans / session 2 dates \u2014 MIS (Sandeep, High)",
+            "mitigation": "",
+            "resolved": false
+          },
+          {
+            "id": "RISK-108",
+            "text": "Phase 2 app owner availability for session 1 (PM track, Medium)",
+            "mitigation": "",
+            "resolved": false
+          }
         ],
         "fastFollowItems": [],
         "escalations": [
@@ -3441,16 +3505,49 @@
         "dependencies": [
           {
             "id": "DEP-101",
-            "text": "Session 1 schedule on 9/17 with Vishal Patel (Tampa) for ASM, GSS",
-            "team": "Dev",
+            "text": "Karyakar deployment is blocked because of an SID issue. \u2014 Hitesh Patel",
+            "team": "DEV",
             "mitigation": "",
-            "dueBy": "2026-09-16",
-            "priority": "Low",
+            "dueBy": "2026-10-05",
+            "priority": "Critical",
+            "escalated": false,
+            "resolved": false
+          },
+          {
+            "id": "DEP-102",
+            "text": "Waiting for the GMS, ASM implementation plan, including the Session 2 dates. \u2014 Vasu",
+            "team": "PM",
+            "mitigation": "",
+            "dueBy": "2026-09-25",
+            "priority": "High",
             "escalated": false,
             "resolved": true
+          },
+          {
+            "id": "DEP-103",
+            "text": "Waiting for the MIS implementation plan, including the Session 2 dates. \u2014 Sandeep Pistolwala",
+            "team": "PM",
+            "mitigation": "",
+            "dueBy": "2026-09-25",
+            "priority": "High",
+            "escalated": false,
+            "resolved": false
           }
         ],
-        "stagePlan": {},
+        "stagePlan": {
+          "Requirements": {
+            "initialStart": "2026-02-09",
+            "latestStart": "2026-02-09",
+            "initialEnd": "2026-06-11",
+            "latestEnd": "2026-06-11"
+          },
+          "Tech. Design": {
+            "initialStart": "2026-06-15",
+            "latestStart": "2026-06-15",
+            "initialEnd": "2026-06-30",
+            "latestEnd": "2026-06-30"
+          }
+        },
         "sprintStatus": {
           "completed": [
             "Demo application creation completed (Megh)",
@@ -3494,10 +3591,12 @@
         "timeSavedNote": [],
         "scopeReduced": false,
         "risks": [
-          "Production deployment pending due to VAPT sign-off / accepted-risk confirmation"
-        ],
-        "riskMitigations": [
-          "Continuous coordination with DevOps to monitor server load and resolve POD scaling/stability issues \u2014 issue resolved"
+          {
+            "id": "RISK-101",
+            "text": "Production deployment pending due to VAPT sign-off / accepted-risk confirmation",
+            "mitigation": "Continuous coordination with DevOps to monitor server load and resolve POD scaling/stability issues \u2014 issue resolved",
+            "resolved": false
+          }
         ],
         "fastFollowItems": [
           "SPM 1A Dashboard (one screen): TDD completion pending (Tirth Patel medical) \u2014 revised plan complete by 26-Sep-2026 with Pratikbhai Gohil review"
@@ -3551,7 +3650,6 @@
         "timeSavedNote": [],
         "scopeReduced": false,
         "risks": [],
-        "riskMitigations": [],
         "fastFollowItems": [],
         "escalations": [],
         "dependencies": [
@@ -3603,7 +3701,6 @@
         "timeSavedNote": [],
         "scopeReduced": false,
         "risks": [],
-        "riskMitigations": [],
         "fastFollowItems": [],
         "escalations": [],
         "dependencies": [
@@ -3653,12 +3750,18 @@
         "timeSavedNote": [],
         "scopeReduced": false,
         "risks": [
-          "No committed start/due dates yet \u2014 full timeline depends on SSO v2 requirements clarity from the India SSO team",
-          "Calendar module currently assumes North America timezone/locale \u2014 open item for India rollout"
-        ],
-        "riskMitigations": [
-          "",
-          ""
+          {
+            "id": "RISK-101",
+            "text": "No committed start/due dates yet \u2014 full timeline depends on SSO v2 requirements clarity from the India SSO team",
+            "mitigation": "",
+            "resolved": false
+          },
+          {
+            "id": "RISK-102",
+            "text": "Calendar module currently assumes North America timezone/locale \u2014 open item for India rollout",
+            "mitigation": "",
+            "resolved": false
+          }
         ],
         "fastFollowItems": [],
         "escalations": [],
@@ -3756,7 +3859,6 @@
         "timeSavedNote": [],
         "scopeReduced": false,
         "risks": [],
-        "riskMitigations": [],
         "fastFollowItems": [],
         "escalations": [],
         "dependencies": [],

@@ -1,6 +1,6 @@
 {
   "asOf": "2026-09-22",
-  "lastUpdated": "2026-09-29T03:51:28.546Z",
+  "lastUpdated": "2026-09-29T17:14:38.236960Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -39,7 +39,6 @@
       },
       "risks": [],
       "delayImpact": "",
-      "riskMitigations": [],
       "delayMitigation": [],
       "delayTradeoffs": "",
       "stage": "Hypercare",
@@ -47,7 +46,8 @@
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
-      "dependencySeq": 100
+      "dependencySeq": 100,
+      "riskSeq": 100
     },
     {
       "id": "webnext-2",
@@ -92,12 +92,18 @@
         ]
       },
       "risks": [
-        "Two full-time QA resources required from this week onward (PMO/Bhavinbhai Patel & Rushabh Kothari, High)",
-        "Project plan due 2026-09-29 (PM/Jeet Savani, High)"
-      ],
-      "riskMitigations": [
-        "Requesting dedicated QA allocation",
-        "Project plan in progress"
+        {
+          "id": "RISK-101",
+          "text": "Two full-time QA resources required from this week onward (PMO/Bhavinbhai Patel & Rushabh Kothari, High)",
+          "mitigation": "Requesting dedicated QA allocation",
+          "resolved": false
+        },
+        {
+          "id": "RISK-102",
+          "text": "Project plan due 2026-09-29 (PM/Jeet Savani, High)",
+          "mitigation": "Project plan in progress",
+          "resolved": false
+        }
       ],
       "escalations": [],
       "timeSavedDays": 0,
@@ -118,7 +124,8 @@
           "initialEnd": "2026-09-29",
           "latestEnd": "2026-09-29"
         }
-      }
+      },
+      "riskSeq": 102
     },
     {
       "id": "pledge",
@@ -147,7 +154,6 @@
       },
       "risks": [],
       "delayImpact": "",
-      "riskMitigations": [],
       "delayMitigation": [],
       "delayTradeoffs": "",
       "stage": "Hypercare",
@@ -155,7 +161,8 @@
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
-      "dependencySeq": 100
+      "dependencySeq": 100,
+      "riskSeq": 100
     },
     {
       "id": "pledge-1a",
@@ -231,10 +238,12 @@
         ]
       },
       "risks": [
-        "Backend-heavy user stories \u2014 not all 15 stories will fit before Diwali for Pledge 1.x"
-      ],
-      "riskMitigations": [
-        ""
+        {
+          "id": "RISK-101",
+          "text": "Backend-heavy user stories \u2014 not all 15 stories will fit before Diwali for Pledge 1.x",
+          "mitigation": "",
+          "resolved": false
+        }
       ],
       "escalations": [
         "Need 1 additional backend development resource to complete more stories (7-8 stories)"
@@ -243,7 +252,8 @@
       "timeSavedNote": [],
       "scopeReduced": false,
       "statusChangeReason": "22-Sep deck Amber: new cross-track dependencies (INBOX vs GMS decision, DevOps UAT access, data import resourcing).",
-      "dependencySeq": 104
+      "dependencySeq": 104,
+      "riskSeq": 101
     },
     {
       "id": "emm",
@@ -332,22 +342,44 @@
         "nextPlan": []
       },
       "risks": [
-        "Check printing library failed under concurrent users \u2014 dev fix 2026-09-18, in QA (DEV/Bhavesh Patel, Medium) ETA 2026-09-25",
-        "Workflow override emails \u2014 workaround or permanent fix needed (WALLE/Pratikbhai Gohil, High) ETA 2026-10-02",
-        "Invocation/Review/Status API v2 in progress (WALLE, High) ETA 2026-09-25",
-        "Separate default accounting entities for USA and Canada (MDS/Vasubhai, High) ETA 2026-09-30",
-        "Rate limiting in EMM \u2014 dev complete 2026-09-16, in QA (DEV/Vishalbhai, Low) ETA 2026-09-25",
-        "Events feature \u2014 business decision still TBD (RGC/Ashishbhai, Medium)"
+        {
+          "id": "RISK-101",
+          "text": "Check printing library failed under concurrent users \u2014 dev fix 2026-09-18, in QA (DEV/Bhavesh Patel, Medium) ETA 2026-09-25",
+          "mitigation": "Dev completed fix; currently in QA",
+          "resolved": false
+        },
+        {
+          "id": "RISK-102",
+          "text": "Workflow override emails \u2014 workaround or permanent fix needed (WALLE/Pratikbhai Gohil, High) ETA 2026-10-02",
+          "mitigation": "WALL-E team working workaround/permanent fix",
+          "resolved": false
+        },
+        {
+          "id": "RISK-103",
+          "text": "Invocation/Review/Status API v2 in progress (WALLE, High) ETA 2026-09-25",
+          "mitigation": "API v2 work in progress",
+          "resolved": false
+        },
+        {
+          "id": "RISK-104",
+          "text": "Separate default accounting entities for USA and Canada (MDS/Vasubhai, High) ETA 2026-09-30",
+          "mitigation": "",
+          "resolved": false
+        },
+        {
+          "id": "RISK-105",
+          "text": "Rate limiting in EMM \u2014 dev complete 2026-09-16, in QA (DEV/Vishalbhai, Low) ETA 2026-09-25",
+          "mitigation": "In QA",
+          "resolved": false
+        },
+        {
+          "id": "RISK-106",
+          "text": "Events feature \u2014 business decision still TBD (RGC/Ashishbhai, Medium)",
+          "mitigation": "",
+          "resolved": false
+        }
       ],
       "delayImpact": "",
-      "riskMitigations": [
-        "Dev completed fix; currently in QA",
-        "WALL-E team working workaround/permanent fix",
-        "API v2 work in progress",
-        "",
-        "In QA",
-        ""
-      ],
       "delayMitigation": [],
       "delayTradeoffs": "",
       "stage": "Hypercare",
@@ -375,7 +407,8 @@
           "initialEnd": "2026-08-25",
           "latestEnd": "2026-08-28"
         }
-      }
+      },
+      "riskSeq": 106
     },
     {
       "id": "mybky-phase1",
@@ -456,20 +489,38 @@
         "nextPlan": []
       },
       "risks": [
-        "Mobile VAPT sign-off pending (VAPT \u2014 Critical)",
-        "UAT sign-off received but ~25% of items still need updates in tracking sheet (Stakeholders \u2014 Critical)",
-        "Production integration keys needed for SSO, SFS, MIS, MDS (DevOps \u2014 Critical)",
-        "Read-only MIS access, Google Maps API key, Apple Pay for Stripe, n8n pipelines (DevOps \u2014 Critical)",
-        "SSO user accounts for Kishor/Kishori participants still need creation (NAHQ \u2014 Critical)"
+        {
+          "id": "RISK-101",
+          "text": "Mobile VAPT sign-off pending (VAPT \u2014 Critical)",
+          "mitigation": "",
+          "resolved": false
+        },
+        {
+          "id": "RISK-102",
+          "text": "UAT sign-off received but ~25% of items still need updates in tracking sheet (Stakeholders \u2014 Critical)",
+          "mitigation": "UAT team updating tracking sheet",
+          "resolved": false
+        },
+        {
+          "id": "RISK-103",
+          "text": "Production integration keys needed for SSO, SFS, MIS, MDS (DevOps \u2014 Critical)",
+          "mitigation": "DevOps/NAHQ chasing keys and access",
+          "resolved": false
+        },
+        {
+          "id": "RISK-104",
+          "text": "Read-only MIS access, Google Maps API key, Apple Pay for Stripe, n8n pipelines (DevOps \u2014 Critical)",
+          "mitigation": "",
+          "resolved": false
+        },
+        {
+          "id": "RISK-105",
+          "text": "SSO user accounts for Kishor/Kishori participants still need creation (NAHQ \u2014 Critical)",
+          "mitigation": "NAHQ creating SSO accounts",
+          "resolved": false
+        }
       ],
       "delayImpact": "Go_live slips",
-      "riskMitigations": [
-        "",
-        "UAT team updating tracking sheet",
-        "DevOps/NAHQ chasing keys and access",
-        "",
-        "NAHQ creating SSO accounts"
-      ],
       "delayMitigation": [
         "Mobile app uploaded to app stores with exceptions to resolve before go-live",
         "Chasing Dharmaketu Swami / DevOps for integration keys and production readiness items",
@@ -521,7 +572,8 @@
           "initialEnd": "2026-11-06",
           "latestEnd": "2026-11-06"
         }
-      }
+      },
+      "riskSeq": 105
     },
     {
       "id": "mybky-phase2",
@@ -569,14 +621,20 @@
         ]
       },
       "risks": [
-        "Scope creep \u2014 requirement gaps in approved transportation module (RGC, Critical)",
-        "Timely requirement reviews/approvals \u2014 stakeholder availability (RGC, Critical)"
+        {
+          "id": "RISK-101",
+          "text": "Scope creep \u2014 requirement gaps in approved transportation module (RGC, Critical)",
+          "mitigation": "",
+          "resolved": false
+        },
+        {
+          "id": "RISK-102",
+          "text": "Timely requirement reviews/approvals \u2014 stakeholder availability (RGC, Critical)",
+          "mitigation": "",
+          "resolved": false
+        }
       ],
       "delayImpact": "Current Phase 2A go-live date is very challenging to hold; a revised, realistic go-live date is being proposed",
-      "riskMitigations": [
-        "",
-        ""
-      ],
       "delayMitigation": [
         "Highlighted to Aksharbhai that current go-live date is very challenging to achieve",
         "Aksharbhai asked for a proposed revised, realistic go-live date to discuss with the BKY team",
@@ -627,7 +685,8 @@
           "initialEnd": "2027-03-05",
           "latestEnd": "2027-03-05"
         }
-      }
+      },
+      "riskSeq": 102
     },
     {
       "id": "mymandir",
@@ -671,14 +730,20 @@
         ]
       },
       "risks": [
-        "Need one more front-end (mobile) developer (RGC, Critical)",
-        "Oct/Nov timeline is tight \u2014 need to keep driving project pace (Aniket Udgaonkar, High)"
+        {
+          "id": "RISK-101",
+          "text": "Need one more front-end (mobile) developer (RGC, Critical)",
+          "mitigation": "",
+          "resolved": false
+        },
+        {
+          "id": "RISK-102",
+          "text": "Oct/Nov timeline is tight \u2014 need to keep driving project pace (Aniket Udgaonkar, High)",
+          "mitigation": "Aniket driving weekly pace checks to hold the Oct/Nov timeline",
+          "resolved": false
+        }
       ],
       "delayImpact": "TDD +2d slip may impact downstream development start (22-Sep deck)",
-      "riskMitigations": [
-        "",
-        "Aniket driving weekly pace checks to hold the Oct/Nov timeline"
-      ],
       "delayMitigation": [
         "Aniket connected with Sameep during BA's leave period to secure FRD sign-off"
       ],
@@ -721,7 +786,8 @@
           "initialEnd": "2026-10-30",
           "latestEnd": "2026-10-30"
         }
-      }
+      },
+      "riskSeq": 102
     },
     {
       "id": "gms",
@@ -773,12 +839,14 @@
         ]
       },
       "risks": [
-        "Domain needed for Reply-to email and Unsubscribe page hosting (RGC, High)"
+        {
+          "id": "RISK-101",
+          "text": "Domain needed for Reply-to email and Unsubscribe page hosting (RGC, High)",
+          "mitigation": "",
+          "resolved": false
+        }
       ],
       "delayImpact": "",
-      "riskMitigations": [
-        ""
-      ],
       "delayMitigation": [
         "Scope Reduction: Of the two planned features, we will prioritize the Unsubscribe feature for the current delivery. The Contact Reorder feature will be addressed separately as a hotfix, as it does not impact the current production functionality."
       ],
@@ -828,7 +896,8 @@
           "initialEnd": "2026-12-31",
           "latestEnd": "2026-12-31"
         }
-      }
+      },
+      "riskSeq": 101
     },
     {
       "id": "baps-sso",
@@ -895,26 +964,56 @@
         ]
       },
       "risks": [
-        "Not getting clarity on when QA resource can test Karyakar in dev (Dev, Critical)",
-        "Need to create users (QA, High)",
-        "Karyakar flow still not on UAT \u2014 pending long time (Dev, Critical)",
-        "QA will test on Dev or UAT? Multiple dev env changes expected (FPO, Critical)",
-        "Karyakar deployment blocked due to SID OTP issue (Hitesh Patel, Critical)",
-        "Waiting on other apps' implementation plans / session 2 dates \u2014 Inbox/MSD (Vasu, High)",
-        "Waiting on other apps' implementation plans / session 2 dates \u2014 MIS (Sandeep, High)",
-        "Phase 2 app owner availability for session 1 (PM track, Medium)"
+        {
+          "id": "RISK-101",
+          "text": "Not getting clarity on when QA resource can test Karyakar in dev (Dev, Critical)",
+          "mitigation": "",
+          "resolved": false
+        },
+        {
+          "id": "RISK-102",
+          "text": "Need to create users (QA, High)",
+          "mitigation": "",
+          "resolved": false
+        },
+        {
+          "id": "RISK-103",
+          "text": "Karyakar flow still not on UAT \u2014 pending long time (Dev, Critical)",
+          "mitigation": "",
+          "resolved": false
+        },
+        {
+          "id": "RISK-104",
+          "text": "QA will test on Dev or UAT? Multiple dev env changes expected (FPO, Critical)",
+          "mitigation": "",
+          "resolved": false
+        },
+        {
+          "id": "RISK-105",
+          "text": "Karyakar deployment blocked due to SID OTP issue (Hitesh Patel, Critical)",
+          "mitigation": "",
+          "resolved": false
+        },
+        {
+          "id": "RISK-106",
+          "text": "Waiting on other apps' implementation plans / session 2 dates \u2014 Inbox/MSD (Vasu, High)",
+          "mitigation": "",
+          "resolved": false
+        },
+        {
+          "id": "RISK-107",
+          "text": "Waiting on other apps' implementation plans / session 2 dates \u2014 MIS (Sandeep, High)",
+          "mitigation": "",
+          "resolved": false
+        },
+        {
+          "id": "RISK-108",
+          "text": "Phase 2 app owner availability for session 1 (PM track, Medium)",
+          "mitigation": "",
+          "resolved": false
+        }
       ],
       "delayImpact": "",
-      "riskMitigations": [
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        ""
-      ],
       "delayMitigation": [
         "Following up with pending application owners for meeting schedules and integration details"
       ],
@@ -942,7 +1041,8 @@
           "initialEnd": "2026-06-30",
           "latestEnd": "2026-06-30"
         }
-      }
+      },
+      "riskSeq": 108
     },
     {
       "id": "spm",
@@ -983,12 +1083,14 @@
         ]
       },
       "risks": [
-        "Production deployment pending due to VAPT sign-off / accepted-risk confirmation"
+        {
+          "id": "RISK-101",
+          "text": "Production deployment pending due to VAPT sign-off / accepted-risk confirmation",
+          "mitigation": "Continuous coordination with DevOps to monitor server load and resolve POD scaling/stability issues \u2014 issue resolved",
+          "resolved": false
+        }
       ],
       "delayImpact": "Go-live moved from 31-Aug to 12-Sep; no further downstream impact \u2014 Hypercare is already underway",
-      "riskMitigations": [
-        "Continuous coordination with DevOps to monitor server load and resolve POD scaling/stability issues \u2014 issue resolved"
-      ],
       "delayMitigation": [
         "Dharmaketu Swamiji's accepted-risk confirmation obtained for VAPT points, enabling final sign-off and deployment"
       ],
@@ -1002,7 +1104,8 @@
         "SPM 1A Dashboard (one screen): TDD completion pending (Tirth Patel medical) \u2014 revised plan complete by 26-Sep-2026 with Pratikbhai Gohil review"
       ],
       "statusChangeReason": "",
-      "dependencySeq": 101
+      "dependencySeq": 101,
+      "riskSeq": 101
     },
     {
       "id": "bkms",
@@ -1045,7 +1148,6 @@
       },
       "risks": [],
       "delayImpact": "",
-      "riskMitigations": [],
       "delayMitigation": [],
       "delayTradeoffs": "",
       "stage": "Development",
@@ -1053,7 +1155,8 @@
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
-      "dependencySeq": 101
+      "dependencySeq": 101,
+      "riskSeq": 100
     },
     {
       "id": "mis",
@@ -1097,7 +1200,6 @@
       },
       "risks": [],
       "delayImpact": "",
-      "riskMitigations": [],
       "delayMitigation": [],
       "delayTradeoffs": "",
       "stage": "Development",
@@ -1105,7 +1207,8 @@
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
-      "dependencySeq": 101
+      "dependencySeq": 101,
+      "riskSeq": 100
     },
     {
       "id": "mysatsang-bapsid",
@@ -1192,19 +1295,26 @@
         ]
       },
       "risks": [
-        "No committed start/due dates yet \u2014 full timeline depends on SSO v2 requirements clarity from the India SSO team",
-        "Calendar module currently assumes North America timezone/locale \u2014 open item for India rollout"
-      ],
-      "riskMitigations": [
-        "",
-        ""
+        {
+          "id": "RISK-101",
+          "text": "No committed start/due dates yet \u2014 full timeline depends on SSO v2 requirements clarity from the India SSO team",
+          "mitigation": "",
+          "resolved": false
+        },
+        {
+          "id": "RISK-102",
+          "text": "Calendar module currently assumes North America timezone/locale \u2014 open item for India rollout",
+          "mitigation": "",
+          "resolved": false
+        }
       ],
       "stage": "Tech. Design",
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
-      "dependencySeq": 105
+      "dependencySeq": 105,
+      "riskSeq": 102
     },
     {
       "id": "mymandir-1c",
@@ -1240,13 +1350,13 @@
         ]
       },
       "risks": [],
-      "riskMitigations": [],
       "fastFollowItems": [],
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
-      "dependencySeq": 100
+      "dependencySeq": 100,
+      "riskSeq": 100
     }
   ]
 }
