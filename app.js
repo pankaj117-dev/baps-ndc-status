@@ -57,7 +57,6 @@
   let globalTeamFilter = "all";
   let depsPivotGroupBy = "project"; // "project" | "team" — which rollup the Dependencies tab shows first
   let depsPivotCompact = false;
-  let depsPortfolioFilter = "all"; // deps-tab project scope (projects with open deps only)
   let depsCycleFilter = "all"; // calendar year string from dueBy, e.g. "2026"
   let lastDepsPivotExport = null;
 
@@ -106,6 +105,46 @@
 
   function openNotesFor(projectId) {
     return NOTES.filter((n) => n.projectId === projectId && noteStatus(n) === "open");
+  }
+
+  // The target completion date for a project's CURRENT canonical pipeline
+  // stage — the "next due target" for whatever it's actively working on
+  // right now, distinct from the overall project's Go-Live/Next Milestone
+  // (which can be much further out). Prefers the latest (revised) date,
+  // falling back to the original plan if nothing's slipped. Returns null
+  // when there's no stagePlan entry for the current stage (most projects
+  // don't have this backfilled — the fact row just omits the date then).
+  function currentStageTargetDate(p) {
+    const stage = p.stage;
+    const plan = stage && p.stagePlan && p.stagePlan[stage];
+    if (!plan) return null;
+    return plan.latestEnd || plan.initialEnd || null;
+  }
+
+  // Replaces the old free-text-only "Phase" fact with the actual current
+  // state (the canonical pipeline Stage, same value driving the Grid /
+  // Hawk-eye / Stage-gate timeline tabs) plus its own next due target date
+  // — rather than a vague sub-activity description with no date attached.
+  // The original free-text `phase` (when present) is kept as a secondary
+  // detail line since it often carries useful specifics (e.g. "Regression
+  // / Performance / Security / UAT") the canonical stage name alone loses.
+  function currentStageFactNodes(p) {
+    const stage = p.stage || "Unstaged";
+    const targetDate = currentStageTargetDate(p);
+    return [
+      el("dt", null, ["Current Stage"]),
+      el("dd", { class: "phase-fact" }, [
+        el(
+          "div",
+          { class: "phase-fact-stage" },
+          [
+            stage,
+            targetDate ? el("span", { class: "phase-fact-target" }, [" — target " + fmtDateShort(targetDate)]) : null,
+          ].filter(Boolean)
+        ),
+        p.phase ? el("div", { class: "phase-fact-detail" }, [p.phase]) : null,
+      ].filter(Boolean)),
+    ];
   }
 
   function todayISO() {
@@ -283,24 +322,30 @@
   }
 
   const PIPELINE_STAGES = [
+    "Proposal",
     "Requirements",
-    "Design / Estimation",
+    "Tech. Design",
+    "Estimate & Planning",
     "Development",
-    "QA / UAT",
-    "Production Release",
-    "Hypercare / Post-Launch",
+    "UAT",
+    "VAPT",
+    "Rollout",
+    "Hypercare",
   ];
 
   // Short column headers for the Grid tab — same stages, tighter labels so
-  // 6 columns + the project name column fit without too much horizontal
+  // 9 columns + the project name column fit without too much horizontal
   // scroll.
   const STAGE_GRID_SHORT = {
+    "Proposal": "Proposal",
     "Requirements": "Requirements",
-    "Design / Estimation": "Design / Est.",
+    "Tech. Design": "Tech. Design",
+    "Estimate & Planning": "Estimate & Planning",
     "Development": "Development",
-    "QA / UAT": "QA / UAT",
-    "Production Release": "Prod. Release",
-    "Hypercare / Post-Launch": "Hypercare",
+    "UAT": "UAT",
+    "VAPT": "VAPT",
+    "Rollout": "Rollout",
+    "Hypercare": "Hypercare",
   };
 
   function renderStageGridLegend() {
@@ -343,14 +388,14 @@
       cumulativeSlaOverage += cumulativeStageOverageDays(p);
       const info = currentStageInfo(p);
       if (info && info.flag === "breach") breachCount += 1;
-      if ((p.stage || "") === "Hypercare / Post-Launch") hypercareCount += 1;
+      if ((p.stage || "") === "Hypercare") hypercareCount += 1;
     });
 
     const metrics = [
       { label: "Active Projects", num: projects.length, sub: `across ${pmCount} PM${pmCount === 1 ? "" : "s"}`, tone: "" },
       { label: "Stages Over SLA", num: breachCount, sub: breachCount ? "need escalation" : "none right now", tone: breachCount ? "tone-red" : "tone-green" },
       { label: "Cumulative SLA Overage", num: cumulativeSlaOverage + "d", sub: "summed across every stage", tone: cumulativeSlaOverage ? "tone-amber" : "tone-green" },
-      { label: "In Hypercare / Post-Launch", num: hypercareCount, sub: "live, post go-live", tone: "tone-accent" },
+      { label: "In Hypercare", num: hypercareCount, sub: "live, post go-live", tone: "tone-accent" },
     ];
 
     metrics.forEach((m) => {
@@ -440,11 +485,16 @@
           cell = el(
             "div",
             {
-              class: "stage-grid-cell stage-grid-status-cell is-done" + (wasBreach ? " is-was-breach" : ""),
+              class: "stage-grid-cell stage-grid-status-cell is-done is-clickable" + (wasBreach ? " is-was-breach" : ""),
+              "data-project-id": p.id,
+              "data-stage": stage,
+              tabindex: "0",
+              role: "button",
               title: seg
                 ? `${stage}: ${seg.approxStart ? "≥" : ""}${seg.days}d (${fmtDateShort(seg.start)} \u2192 ${fmtDateShort(seg.end)})` +
-                  (sla != null ? ` — SLA ${sla}d${wasBreach ? `, ${over}d over` : ""}` : "")
-                : `${stage}: done`,
+                  (sla != null ? ` — SLA ${sla}d${wasBreach ? `, ${over}d over` : ""}` : "") +
+                  " — click for full detail"
+                : `${stage}: done — click for full detail`,
             },
             [
               el("span", { class: "stage-grid-days" }, [
@@ -469,12 +519,16 @@
           cell = el(
             "div",
             {
-              class: "stage-grid-cell stage-grid-status-cell is-current" + flagClass,
+              class: "stage-grid-cell stage-grid-status-cell is-current is-clickable" + flagClass,
+              "data-project-id": p.id,
+              "data-stage": stage,
+              tabindex: "0",
+              role: "button",
               title:
-                days != null
+                (days != null
                   ? `${stage}: ${seg.approxStart ? "≥" : ""}${days}d so far (since ${fmtDateShort(seg.start)})` +
                     (sla != null ? ` — SLA ${sla}d${over > 0 ? `, ${over}d over` : ""}` : "")
-                  : `${stage}: in progress`,
+                  : `${stage}: in progress`) + " — click for full detail",
             },
             [
               el("span", { class: "stage-grid-days" }, [
@@ -498,12 +552,32 @@
 
     wrap.appendChild(grid);
 
-    wrap.querySelectorAll("[data-project-id]").forEach((node) => {
-      node.addEventListener("click", () => openProjectDetail(node.getAttribute("data-project-id"), "stage-gate-timeline-section"));
+    // Project name cell → open the full project detail view, scrolled to
+    // the Schedule timeline (calendar + date-change log) — the Grid tab is
+    // fundamentally a "what moved" / scheduling view, so that's the more
+    // relevant landing spot than the Stage-gate timeline section below it.
+    // Individual stage cells → open that exact stage's detail modal
+    // directly (Overview/Date History/Delay Analysis/Delay Log), the SAME
+    // modal and same openStageDetail(projectId, stage) call used when
+    // clicking a row in the per-project Stage-gate timeline — so clicking a
+    // cell here has the identical effect.
+    wrap.querySelectorAll(".stage-grid-name-cell[data-project-id]").forEach((node) => {
+      const open = () => openProjectDetail(node.getAttribute("data-project-id"), "detailScheduleSection");
+      node.addEventListener("click", open);
       node.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-          openProjectDetail(node.getAttribute("data-project-id"), "stage-gate-timeline-section");
+          open();
+        }
+      });
+    });
+    wrap.querySelectorAll(".stage-grid-status-cell[data-project-id][data-stage]").forEach((node) => {
+      const open = () => openStageDetail(node.getAttribute("data-project-id"), node.getAttribute("data-stage"));
+      node.addEventListener("click", open);
+      node.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          open();
         }
       });
     });
@@ -543,6 +617,8 @@
       return;
     }
 
+    const recentChanges = mostRecentChangeByProject();
+
     projects.forEach((p) => {
       const isLate = p.delayDays > 0;
       const notes = openNotesFor(p.id);
@@ -553,6 +629,7 @@
           el("span", { class: "pill pill-" + p.status }, [STATUS_LABEL[p.status]]),
         ]),
         el("div", { class: "card-owner" }, [p.owner ? "PM: " + p.owner : "PM: unassigned"]),
+        cardRecentChangeNode(recentChanges[p.id]),
         el("div", { class: "progress-row" }, [
           el("div", { class: "progress-track" }, [
             el("div", { class: "progress-fill status-" + p.status, style: "width:" + p.progress + "%" }),
@@ -560,8 +637,7 @@
           el("div", { class: "progress-pct" }, [p.progress + "%"]),
         ]),
         el("dl", { class: "card-facts" }, [
-          el("dt", null, ["Phase"]),
-          el("dd", null, [p.phase || "—"]),
+          ...currentStageFactNodes(p),
           el("dt", null, ["Next milestone"]),
           el("dd", null, [(p.nextMilestone && p.nextMilestone.name || "—") + (p.nextMilestone && p.nextMilestone.date ? " · " + fmtDateShort(p.nextMilestone.date) : "")]),
           el("dt", null, ["Go-live"]),
@@ -694,12 +770,15 @@
   /* ---------------- Hawk-eye (cross-project stage-gate calendar) ---------------- */
 
   const STAGE_SHORT_CODE = {
+    "Proposal": "PROP",
     "Requirements": "REQ",
-    "Design / Estimation": "DES",
+    "Tech. Design": "TD",
+    "Estimate & Planning": "EST",
     "Development": "DEV",
-    "QA / UAT": "QA",
-    "Production Release": "REL",
-    "Hypercare / Post-Launch": "HC",
+    "UAT": "UAT",
+    "VAPT": "VAPT",
+    "Rollout": "ROL",
+    "Hypercare": "HC",
   };
 
   // Fallback planned width (calendar days) for a future stage with no
@@ -1059,7 +1138,7 @@
     return String(new Date(dueBy + "T00:00:00").getFullYear());
   }
 
-  const POST_UAT_STAGES = new Set(["Production Release", "Hypercare / Post-Launch"]);
+  const POST_UAT_STAGES = new Set(["Rollout", "Hypercare"]);
 
   const PRIORITY_ORDER = ["Critical", "High", "Medium", "Low"];
 
@@ -1145,12 +1224,125 @@
     }, [label + " ↗"]);
   }
 
+  // Opens the "Update / Resolve a Dependency" issue form, pre-filled with
+  // the project + dependency id so the PM doesn't have to look either up.
+  // `extra` can pre-select the resolve/escalate dropdown so a single click
+  // (e.g. "Resolve") opens the form already set to do that — the PM still
+  // has to submit the GitHub issue, since this is a static site with no
+  // write access of its own.
+  function dependencyUpdateUrl(projectName, depId, extra) {
+    return issueUrl("update-dependency.yml", {
+      project: projectName,
+      dependency_id: depId,
+      ...(extra || {}),
+    });
+  }
+
+  function dependencyActionLink(href, label) {
+    return el("a", {
+      class: "dep-action-link",
+      target: "_blank",
+      rel: "noopener",
+      href,
+    }, [label]);
+  }
+
+  /** Like pairedList(), but for the Dependencies section only: shows each
+   * dependency's stable id, an escalated badge when set, and quick-action
+   * links (Update / Escalate·Un-escalate / Resolve) that open the
+   * "update-dependency.yml" issue form pre-filled for that one row. Legacy
+   * dependencies with no id (pre-migration data still mid-flight) get no
+   * action links, since there's nothing stable to target. The row itself
+   * is also clickable (anywhere except the action links) to open the
+   * item detail modal with every field (team/priority/due date/escalated/
+   * resolved), not just what fits inline here. */
+  function dependencyListItems(deps, project) {
+    if (!deps.length) return [el("li", null, ["—"])];
+    const projectName = project.name;
+    return deps.map((dep) => {
+      const mitigation = dep.mitigation || "";
+      const actions = dep.id
+        ? [
+            dependencyActionLink(dependencyUpdateUrl(projectName, dep.id, {}), "✎ Update"),
+            dep.escalated
+              ? dependencyActionLink(
+                  dependencyUpdateUrl(projectName, dep.id, { mark_escalated: "No — un-escalate" }),
+                  "✓ Un-escalate"
+                )
+              : dependencyActionLink(
+                  dependencyUpdateUrl(projectName, dep.id, { mark_escalated: "Yes — escalate" }),
+                  "🚨 Escalate"
+                ),
+            dependencyActionLink(
+              dependencyUpdateUrl(projectName, dep.id, { mark_resolved: "Yes — resolved" }),
+              "✓ Resolve"
+            ),
+          ]
+        : [];
+      const li = el("li", { class: "paired-item is-clickable", tabindex: "0", role: "button" }, [
+        el("div", { class: "paired-item-text" }, [
+          dep.id ? el("span", { class: "dep-id-tag" }, [dep.id]) : null,
+          dep.text,
+          dep.escalated ? el("span", { class: "deps-badge deps-badge-escalated" }, ["🚨 Escalated"]) : null,
+          el("span", { class: "team-tag" + (dep.team ? "" : " is-missing") }, [dep.team || "No team labeled"]),
+        ].filter(Boolean)),
+        el("div", { class: "paired-item-mitigation" + (mitigation ? "" : " is-missing") }, [
+          el("span", { class: "mitigation-label" }, ["Mitigation / impact: "]),
+          mitigation || "Not yet documented",
+        ]),
+        actions.length ? el("div", { class: "dep-actions-row" }, actions) : null,
+      ].filter(Boolean));
+      const open = () => openItemDetail("dependency", project, dep);
+      li.addEventListener("click", (e) => {
+        if (e.target.tagName === "A") return; // action links handle their own click
+        open();
+      });
+      li.addEventListener("keydown", (e) => {
+        if (e.target.tagName === "A") return;
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          open();
+        }
+      });
+      return li;
+    });
+  }
+
+  /** Read-only counterpart of dependencyListItems() for the Risks /
+   * blockers section — risks don't have team/priority/due-date fields to
+   * offer quick actions on, but the row is still clickable to open the
+   * item detail modal (full text, mitigation plan, resolved state). */
+  function riskListItems(risks, project) {
+    if (!risks.length) return [el("li", null, ["—"])];
+    return risks.map((risk) => {
+      const mitigation = risk.mitigation || "";
+      const li = el("li", { class: "paired-item is-clickable", tabindex: "0", role: "button" }, [
+        el("div", { class: "paired-item-text" }, [
+          risk.id ? el("span", { class: "dep-id-tag" }, [risk.id]) : null,
+          risk.text,
+        ].filter(Boolean)),
+        el("div", { class: "paired-item-mitigation" + (mitigation ? "" : " is-missing") }, [
+          el("span", { class: "mitigation-label" }, ["Mitigation plan: "]),
+          mitigation || "Not yet documented",
+        ]),
+      ]);
+      const open = () => openItemDetail("risk", project, risk);
+      li.addEventListener("click", open);
+      li.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          open();
+        }
+      });
+      return li;
+    });
+  }
+
   function collectDependencies(opts) {
     const skipCycle = opts && opts.skipCycle;
     const rows = [];
     const today = todayISO();
     visibleProjects().forEach((p) => {
-      if (depsPortfolioFilter !== "all" && p.id !== depsPortfolioFilter) return;
       getDependencyObjects(p).forEach((dep) => {
         if (dep.resolved || isPlaceholderDependencyText(dep.text)) return;
         const dueBy = dep.dueBy || "";
@@ -1196,9 +1388,7 @@
     const activeProjects = new Set(rows.map((r) => r.projectId)).size;
     const activeTeams = new Set(rows.map((r) => r.team || "Unlabeled")).size;
 
-    const scopedProjects = projectsWithOpenDependencies().filter(
-      (p) => depsPortfolioFilter === "all" || p.id === depsPortfolioFilter
-    );
+    const scopedProjects = projectsWithOpenDependencies();
 
     let blockedStages = 0;
     let cumulativeDelay = 0;
@@ -1431,6 +1621,48 @@
     });
 
     return events;
+  }
+
+  // For each project, the single most recent status transition OR
+  // go-live/milestone date shift (whichever happened later) — same source
+  // data as the Status History tab, just collapsed to "what changed most
+  // recently" per project so a card can show a one-line glimpse of it
+  // without opening the full detail view. Returns { [projectId]: event }.
+  function mostRecentChangeByProject() {
+    const byProject = {};
+    const consider = (event) => {
+      const cur = byProject[event.projectId];
+      if (!cur || event.date > cur.date) byProject[event.projectId] = event;
+    };
+    computeStatusTransitions().forEach((t) => consider(Object.assign({ kind: "status" }, t)));
+    computeScheduleShifts().forEach((s) => consider(Object.assign({ kind: "schedule" }, s)));
+    return byProject;
+  }
+
+  // Compact one-line rendering of a `mostRecentChangeByProject()` entry for
+  // a project card — mirrors the Status History tab's row content (status
+  // pill → pill, or "label moved from → to (±Nd)"), just squeezed down.
+  function cardRecentChangeNode(event) {
+    if (!event) return null;
+    if (event.kind === "status") {
+      return el("div", { class: "card-recent-change", title: "Most recent status/date change — see Status History tab or this project's detail view for the full log" }, [
+        el("span", { class: "card-recent-change-date" }, [fmtDateShort(event.date)]),
+        el("span", { class: "pill pill-" + event.from }, [STATUS_LABEL[event.from]]),
+        el("span", { class: "card-recent-change-arrow" }, ["→"]),
+        el("span", { class: "pill pill-" + event.to }, [STATUS_LABEL[event.to]]),
+      ]);
+    }
+    const deltaDays = Math.round((new Date(event.to + "T00:00:00") - new Date(event.from + "T00:00:00")) / 86400000);
+    return el("div", { class: "card-recent-change", title: "Most recent status/date change — see Status History tab or this project's detail view for the full log" }, [
+      el("span", { class: "card-recent-change-date" }, [fmtDateShort(event.date)]),
+      el("span", { class: "schedule-shift-badge" }, ["📅 " + event.label + " moved"]),
+      el("span", { class: "golive-date-original" }, [fmtDateShort(event.from)]),
+      el("span", { class: "card-recent-change-arrow" }, ["→"]),
+      el("span", { class: "golive-date-current" }, [fmtDateShort(event.to)]),
+      deltaDays !== 0
+        ? el("span", { class: "schedule-timeline-delta " + (deltaDays > 0 ? "is-late" : "is-early") }, [(deltaDays > 0 ? "+" : "") + deltaDays + "d"])
+        : null,
+    ].filter(Boolean));
   }
 
   function renderStatusHistory() {
@@ -1779,6 +2011,14 @@
       list.appendChild(el("p", { class: "deps-empty-group" }, ["No matching items."]));
     } else {
       const table = el("table", { class: "deps-drill-table" }, [
+        el("colgroup", null, [
+          el("col", { class: "deps-drill-col-project" }),
+          el("col", { class: "deps-drill-col-team" }),
+          el("col", { class: "deps-drill-col-priority" }),
+          el("col", { class: "deps-drill-col-due" }),
+          el("col", { class: "deps-drill-col-escalated" }),
+          el("col", { class: "deps-drill-col-desc" }),
+        ]),
         el("thead", null, [
           el("tr", null, [
             el("th", null, ["Project"]),
@@ -1794,13 +2034,13 @@
           null,
           items.map((r) =>
             el("tr", null, [
-              el("td", null, [r.projectName]),
-              el("td", null, [r.team || "—"]),
-              el("td", null, [
+              el("td", { class: "deps-drill-col-project" }, [r.projectName]),
+              el("td", { class: "deps-drill-col-team" }, [r.team || "—"]),
+              el("td", { class: "deps-drill-col-priority" }, [
                 el("span", { class: "deps-badge deps-badge-priority is-" + r.priority.toLowerCase() }, [r.priority]),
               ]),
-              el("td", null, [r.dueBy ? fmtDate(r.dueBy) : "No date"]),
-              el("td", null, [r.escalated ? "Yes" : "—"]),
+              el("td", { class: "deps-drill-col-due" }, [r.dueBy ? fmtDate(r.dueBy) : "No date"]),
+              el("td", { class: "deps-drill-col-escalated" }, [r.escalated ? "Yes" : "—"]),
               el("td", { class: "deps-drill-desc" }, [r.text]),
             ])
           )
@@ -1865,25 +2105,6 @@
     URL.revokeObjectURL(a.href);
   }
 
-  function populateDepsPortfolioFilter() {
-    const select = document.getElementById("depsPortfolioFilter");
-    if (!select) return;
-    const projects = projectsWithOpenDependencies();
-    const prev = depsPortfolioFilter;
-    select.innerHTML = "";
-    select.appendChild(
-      el("option", { value: "all" }, ["All (" + projects.length + ")"])
-    );
-    projects.forEach((p) => {
-      select.appendChild(el("option", { value: p.id }, [p.name]));
-    });
-    if (prev !== "all" && projects.some((p) => p.id === prev)) select.value = prev;
-    else {
-      depsPortfolioFilter = "all";
-      select.value = "all";
-    }
-  }
-
   function populateDepsCycleFilter(rows) {
     const select = document.getElementById("depsCycleFilter");
     if (!select) return;
@@ -1919,15 +2140,6 @@
           updateDepsPivotSectionTitle();
           renderDependenciesTab();
         });
-      });
-    }
-
-    const portfolio = document.getElementById("depsPortfolioFilter");
-    if (portfolio && !portfolio.dataset.wired) {
-      portfolio.dataset.wired = "1";
-      portfolio.addEventListener("change", () => {
-        depsPortfolioFilter = portfolio.value;
-        renderDependenciesTab();
       });
     }
 
@@ -1972,7 +2184,6 @@
   }
 
   function renderDependenciesTab() {
-    populateDepsPortfolioFilter();
     const rowsPreCycle = collectDependencies({ skipCycle: true });
     populateDepsCycleFilter(rowsPreCycle);
     const rows = collectDependencies();
@@ -2122,12 +2333,15 @@
   // close enough for a weekly cadence). data.json's top-level `stageSlaDays`
   // always wins if present, so these can be tuned without touching code.
   const DEFAULT_STAGE_SLA_DAYS = {
+    "Proposal": 7,
     "Requirements": 10,
-    "Design / Estimation": 10,
+    "Tech. Design": 7,
+    "Estimate & Planning": 5,
     "Development": 30,
-    "QA / UAT": 14,
-    "Production Release": 5,
-    "Hypercare / Post-Launch": 21,
+    "UAT": 10,
+    "VAPT": 5,
+    "Rollout": 5,
+    "Hypercare": 21,
   };
 
   function stageSlaDays(stage) {
@@ -2180,7 +2394,78 @@
     }
     if (segments.length) segments[0].approxStart = true;
 
-    return segments.map((seg) => ({ ...seg, days: Math.max(0, daysBetweenIso(seg.start, seg.end)) }));
+    const withDays = segments.map((seg) => ({ ...seg, days: Math.max(0, daysBetweenIso(seg.start, seg.end)) }));
+
+    // History only ever captures the stage a project was in AS OF each
+    // weekly snapshot. If tracking started after a project had already
+    // moved past its earliest canonical stages (e.g. Requirements/Design
+    // were done before this dashboard existed), those stages never show up
+    // in `points` above and the Stage-gate timeline looks like it's
+    // missing rows — even though the real dates are known and recorded on
+    // `stagePlan`. Backfill any canonical PIPELINE_STAGES entry that's
+    // strictly before the current stage, has real dates on `stagePlan`,
+    // and has no history-derived segment of its own — using those planned
+    // dates as the actual completed range. This never overrides a real
+    // history-derived segment; it only fills gaps, so it's a no-op for
+    // every project that doesn't have this kind of pre-tracking stagePlan
+    // backfill recorded.
+    const currentIndex = PIPELINE_STAGES.indexOf(currentStage);
+    const covered = new Set(withDays.map((seg) => seg.stage));
+    const backfilled = [];
+    if (currentIndex > 0 && p.stagePlan) {
+      PIPELINE_STAGES.slice(0, currentIndex).forEach((stage) => {
+        if (covered.has(stage)) return;
+        const plan = p.stagePlan[stage];
+        if (!plan) return;
+        const start = plan.initialStart || plan.latestStart;
+        const end = plan.latestEnd || plan.initialEnd;
+        if (!start || !end) return;
+        backfilled.push({ stage, start, end, days: Math.max(0, daysBetweenIso(start, end)) });
+      });
+    }
+
+    // Also use the current (ongoing) stage's own planned start date instead
+    // of the history-derived guess, when available — same reasoning as the
+    // backfill above: a recorded stagePlan date is more accurate than
+    // "first time we saw this project's stage in a weekly snapshot". This
+    // runs regardless of whether any earlier stage needed backfilling (a
+    // project whose CURRENT stage is already the very first canonical
+    // stage, e.g. still in Requirements, has nothing to backfill but can
+    // still have a real recorded start date worth using).
+    const liveSeg = withDays[withDays.length - 1];
+    const livePlan = p.stagePlan && p.stagePlan[currentStage];
+    if (liveSeg && liveSeg.ongoing && livePlan) {
+      const planStart = livePlan.initialStart || livePlan.latestStart;
+      if (planStart && planStart < liveSeg.start) {
+        liveSeg.start = planStart;
+        liveSeg.days = Math.max(0, daysBetweenIso(planStart, today));
+        liveSeg.approxStart = false;
+      }
+    }
+
+    if (!backfilled.length) return withDays;
+
+    // A backfilled stage is now the true first stage we know about — clear
+    // approxStart from whatever history-derived segment used to be first
+    // (it no longer is; the earliest backfilled stage's start came from
+    // real recorded dates, not a guess, so none of these need the "≥" hedge
+    // anymore).
+    withDays.forEach((seg) => { seg.approxStart = false; });
+
+    // Merge into canonical stage order (backfilled entries slot in among
+    // the history-derived ones by their position in PIPELINE_STAGES; any
+    // "Unstaged"/unrecognized stage name sorts after known stages but
+    // otherwise keeps its original relative position).
+    const combined = [...backfilled, ...withDays];
+    combined.sort((a, b) => {
+      const ai = PIPELINE_STAGES.indexOf(a.stage);
+      const bi = PIPELINE_STAGES.indexOf(b.stage);
+      if (ai === -1 && bi === -1) return 0;
+      if (ai === -1) return 1;
+      if (bi === -1) return -1;
+      return ai - bi;
+    });
+    return combined;
   }
 
   function currentStageInfo(p) {
@@ -2270,6 +2555,21 @@
     return (p.delayLog || []).filter((e) => e.stage === stage);
   }
 
+  // Auto-detected schedule shifts for one stage — reuses the exact same
+  // Go-Live / milestone-date-shift events shown in the project's Schedule
+  // timeline "Date change log", filtered to shifts that happened while the
+  // project was reported in this stage, and to actual delays only (date
+  // moved LATER — "no change" and pulled-in/early shifts aren't delays).
+  // These are kept separate from the manually-reported `p.delayLog`
+  // entries (which have a reason/team/member) since this data has none of
+  // that — it's purely "the date moved, and by how much."
+  function stageAutoScheduleShifts(p, stage) {
+    return buildScheduleTimeline(historyForProject(p.id))
+      .filter((e) => e.kind !== "timesaved" && e.stage === stage)
+      .map((e) => Object.assign({ deltaDays: daysBetweenIso(e.from, e.to) }, e))
+      .filter((e) => e.deltaDays > 0);
+  }
+
   // Groups delay-log entries by a key (team/member/reason) and sums days —
   // the data behind the stage detail modal's "Delay Analysis" tab. Sorted
   // by days descending so the biggest contributor leads.
@@ -2353,8 +2653,13 @@
       const milestoneName = (w.nextMilestone && w.nextMilestone.name) || null;
       const milestoneDate = (w.nextMilestone && w.nextMilestone.date) || null;
 
+      // `stage` records which pipeline stage the project was reported in
+      // during the week the shift happened — this is what lets a shift get
+      // attributed to a specific stage's Delay Log (see
+      // stageAutoScheduleShifts) without having to guess from the
+      // free-text milestone label.
       if (prevGoLive && goLive && goLive !== prevGoLive) {
-        events.push({ date: w.asOf, label: "Go-Live", from: prevGoLive, to: goLive });
+        events.push({ date: w.asOf, label: "Go-Live", from: prevGoLive, to: goLive, stage: w.stage || null });
       }
       if (
         prevMilestoneDate &&
@@ -2366,6 +2671,7 @@
           label: milestoneName || prevMilestoneName || "Milestone",
           from: prevMilestoneDate,
           to: milestoneDate,
+          stage: w.stage || null,
         });
       }
 
@@ -2655,8 +2961,7 @@
 
     root.appendChild(
       el("dl", { class: "card-facts detail-facts" }, [
-        el("dt", null, ["Phase"]),
-        el("dd", null, [p.phase || "—"]),
+        ...currentStageFactNodes(p),
         el("dt", null, ["Next milestone"]),
         el("dd", null, [(p.nextMilestone && p.nextMilestone.name || "—") + (p.nextMilestone && p.nextMilestone.date ? " · " + fmtDateShort(p.nextMilestone.date) : "")]),
         el("dt", null, ["Go-live"]),
@@ -2847,12 +3152,14 @@
           el(
             "ul",
             { class: "paired-list" },
-            pairedList(
-              snapDeps.map((d) => d.text),
-              snapDeps.map((d) => d.mitigation),
-              "Mitigation / impact",
-              snapDeps.map((d) => d.team)
-            )
+            isLatest
+              ? dependencyListItems(snapDeps, p)
+              : pairedList(
+                  snapDeps.map((d) => d.text),
+                  snapDeps.map((d) => d.mitigation),
+                  "Mitigation / impact",
+                  snapDeps.map((d) => d.team)
+                )
           ),
         ])
       );
@@ -2895,11 +3202,17 @@
       container.appendChild(
         el("div", { class: "detail-block risks" }, [
           snapRisks.length
-            ? el("ul", { class: "paired-list" }, pairedList(
-                snapRisks.map((r) => r.text),
-                snapRisks.map((r) => r.mitigation),
-                "Mitigation plan"
-              ))
+            ? el(
+                "ul",
+                { class: "paired-list" },
+                isLatest
+                  ? riskListItems(snapRisks, p)
+                  : pairedList(
+                      snapRisks.map((r) => r.text),
+                      snapRisks.map((r) => r.mitigation),
+                      "Mitigation plan"
+                    )
+              )
             : el("ul", null, [el("li", null, ["None reported"])]),
         ])
       );
@@ -3036,6 +3349,92 @@
     document.getElementById("stageDetail").hidden = true;
   }
 
+  // Dependency / Risk item detail modal — opened by clicking a dependency
+  // or risk/blocker row in a project's full detail view. Takes the actual
+  // objects directly (not an id to re-look-up) since legacy risk rows
+  // don't always have a stable id to look up by.
+  function openItemDetail(kind, project, item) {
+    const overlay = document.getElementById("itemDetail");
+    const content = document.getElementById("itemDetailContent");
+    content.innerHTML = "";
+    content.appendChild(buildItemDetail(kind, project, item));
+    overlay.hidden = false;
+    overlay.scrollTop = 0;
+  }
+
+  function closeItemDetail() {
+    document.getElementById("itemDetail").hidden = true;
+  }
+
+  function buildItemDetail(kind, project, item) {
+    const isDep = kind === "dependency";
+    const root = el("div", { class: "itemdetail-root" });
+
+    root.appendChild(
+      el("div", { class: "stagedetail-head" }, [
+        el("div", null, [
+          el("div", { class: "stagedetail-kicker" }, [
+            project.name.toUpperCase() + " · " + (isDep ? "DEPENDENCY" : "RISK / BLOCKER"),
+          ]),
+          el("h2", null, [item.id || (isDep ? "Unlabeled dependency" : "Unlabeled risk")]),
+        ]),
+      ])
+    );
+
+    const fields = [el("dt", null, ["Description"]), el("dd", null, [item.text || "—"])];
+
+    if (isDep) {
+      fields.push(
+        el("dt", null, ["Team"]),
+        el("dd", null, [item.team || "No team labeled"]),
+        el("dt", null, ["Priority"]),
+        el("dd", null, [item.priority || "—"]),
+        el("dt", null, ["Due by"]),
+        el("dd", null, [item.dueBy ? fmtDate(item.dueBy) : "Not set"]),
+        el("dt", null, ["Escalated"]),
+        el("dd", null, [item.escalated ? "🚨 Yes — escalated to leadership" : "No"])
+      );
+    }
+
+    fields.push(
+      el("dt", null, ["Resolved"]),
+      el("dd", null, [item.resolved ? "Yes" : "No — still open"]),
+      el("dt", null, [isDep ? "Mitigation / impact" : "Mitigation plan"]),
+      el("dd", null, [item.mitigation || "Not yet documented"])
+    );
+
+    root.appendChild(el("dl", { class: "detail-facts itemdetail-facts" }, fields));
+
+    if (isDep && item.id) {
+      root.appendChild(
+        el("div", { class: "dep-actions-row itemdetail-actions" }, [
+          dependencyActionLink(dependencyUpdateUrl(project.name, item.id, {}), "✎ Update"),
+          item.escalated
+            ? dependencyActionLink(
+                dependencyUpdateUrl(project.name, item.id, { mark_escalated: "No — un-escalate" }),
+                "✓ Un-escalate"
+              )
+            : dependencyActionLink(
+                dependencyUpdateUrl(project.name, item.id, { mark_escalated: "Yes — escalate" }),
+                "🚨 Escalate"
+              ),
+          dependencyActionLink(
+            dependencyUpdateUrl(project.name, item.id, { mark_resolved: "Yes — resolved" }),
+            "✓ Resolve"
+          ),
+        ])
+      );
+    } else if (!isDep) {
+      root.appendChild(
+        el("div", { class: "dep-actions-row itemdetail-actions" }, [
+          detailSectionIssueLink("new-risk.yml", project.name, "+ Report an update"),
+        ])
+      );
+    }
+
+    return root;
+  }
+
   function stageStatusBadge(kind) {
     return { done: "Done", current: "In Progress", future: "Not Started" }[kind] || kind;
   }
@@ -3051,6 +3450,7 @@
     const flag = seg ? stageFlagLevel(days, sla) : null;
     const plan = (p.stagePlan && p.stagePlan[stage]) || {};
     const delayEntries = stageDelayLog(p, stage);
+    const autoShifts = stageAutoScheduleShifts(p, stage);
     const revisions = stagePlanRevisions(p, stage);
 
     const root = el("div", { class: "stagedetail-root" });
@@ -3084,7 +3484,7 @@
       ]),
       el("div", { class: "stagedetail-panel", "data-panel": "history" }, [buildStageHistoryPanel(revisions)]),
       el("div", { class: "stagedetail-panel", "data-panel": "analysis" }, [buildStageAnalysisPanel(delayEntries)]),
-      el("div", { class: "stagedetail-panel", "data-panel": "log" }, [buildStageLogPanel(delayEntries)]),
+      el("div", { class: "stagedetail-panel", "data-panel": "log" }, [buildStageLogPanel(delayEntries, autoShifts)]),
     ]);
     root.appendChild(panels);
 
@@ -3281,8 +3681,25 @@
 
   const BREAKDOWN_COLORS = ["#c1502e", "#5a3b30", "#dfa23a", "#3562e8", "#1a9f6b", "#8a5fd6"];
 
-  function buildStageLogPanel(entries) {
+  function buildStageLogPanel(entries, autoShifts) {
     const wrap = el("div", { class: "stagedetail-log-wrap" });
+
+    // Auto-detected schedule shifts first — same Go-Live / milestone-shift
+    // data as the Schedule timeline's "Date change log", filtered to
+    // shifts that happened while the project was in this stage.
+    wrap.appendChild(el("h4", { class: "weekly-subhead" }, ["Schedule shifts (auto-detected)"]));
+    wrap.appendChild(
+      el("p", { class: "section-subhead" }, [
+        "Go-Live / milestone date moves that happened while this project was in this stage — pulled automatically from the Schedule timeline, not manually reported.",
+      ])
+    );
+    if (!autoShifts || !autoShifts.length) {
+      wrap.appendChild(el("p", { class: "empty-note" }, ["No schedule-driven delays detected for this stage yet."]));
+    } else {
+      wrap.appendChild(renderScheduleTimeline(autoShifts));
+    }
+
+    wrap.appendChild(el("h4", { class: "weekly-subhead stagedetail-manual-log-head" }, ["Manually reported delay log"]));
 
     const reasons = Array.from(new Set(entries.map((e) => e.reason).filter(Boolean))).sort();
     const teams = Array.from(new Set(entries.map((e) => e.team).filter(Boolean))).sort();
@@ -3380,6 +3797,16 @@
     });
   }
 
+  function wireItemDetailModal() {
+    document.getElementById("itemDetailClose").addEventListener("click", closeItemDetail);
+    document.getElementById("itemDetail").addEventListener("click", (e) => {
+      if (e.target.id === "itemDetail") closeItemDetail();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !document.getElementById("itemDetail").hidden) closeItemDetail();
+    });
+  }
+
   function wireProjectDetail() {
     document.getElementById("detailClose").addEventListener("click", closeProjectDetail);
     document.getElementById("projectDetail").addEventListener("click", (e) => {
@@ -3474,6 +3901,7 @@
 
     wireProjectDetail();
     wireStageDetailModal();
+    wireItemDetailModal();
     wireFeedbackModal();
     wireTabs();
   }

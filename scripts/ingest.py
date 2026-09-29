@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Pull open 'weekly-update', 'new-dependency', 'new-risk', and 'feedback' issues into
+"""Pull open 'weekly-update', 'new-dependency', 'update-dependency', 'new-risk', and
+'feedback' issues into
 data.json / history.json / notes.json, then close successfully ingested issues.
 
 Run by .github/workflows/ingest.yml (scheduled + manual). Safe to run
@@ -572,6 +573,98 @@ def ingest_new_dependencies(data):
     return ingested
 
 
+def apply_dependency_update(data, fields):
+    """Update, escalate, or resolve ONE existing dependency by id — does not
+    require listing every other open dependency (unlike the weekly-update
+    form's bulk dependency fields)."""
+    project_name = fields.get("Project", "").strip()
+    project_id = PROJECT_NAME_TO_ID.get(project_name)
+    if not project_id:
+        return False, f"unrecognized project '{project_name}'"
+
+    by_id = {p["id"]: p for p in data["projects"]}
+    project = by_id.get(project_id)
+    if not project:
+        return False, f"no project with id '{project_id}' in data.json"
+
+    migrate_project_dependencies(project)
+
+    dep_id = fields.get("Dependency ID", "").strip().upper()
+    if not dep_id:
+        return False, "missing dependency ID"
+
+    deps = project.get("dependencies") or []
+    dep = next((d for d in deps if (d.get("id") or "").upper() == dep_id), None)
+    if not dep:
+        return False, f"no dependency '{dep_id}' found on '{project_id}'"
+
+    changes = []
+
+    new_text = fields.get("Updated description", "").strip()
+    if new_text:
+        dep["text"] = new_text
+        changes.append("description")
+
+    new_team = fields.get("Updated owning team(s)", "").strip()
+    if new_team:
+        dep["team"] = new_team
+        changes.append("team")
+
+    new_mitigation = fields.get("Updated mitigation plan", "").strip()
+    if new_mitigation:
+        dep["mitigation"] = new_mitigation
+        changes.append("mitigation")
+
+    new_due_raw = fields.get("Updated needed-by date", "").strip()
+    if new_due_raw:
+        if is_valid_iso_date(new_due_raw):
+            dep["dueBy"] = new_due_raw
+            changes.append("due date")
+        else:
+            print(f"warning: invalid updated due date {new_due_raw!r} on {dep_id}, ignoring", file=sys.stderr)
+
+    new_priority = fields.get("Updated priority", "No change").strip()
+    if new_priority and new_priority != "No change":
+        dep["priority"] = normalize_priority(new_priority)
+        changes.append("priority")
+
+    mark_resolved = fields.get("Resolve this dependency?", "No change").strip()
+    if mark_resolved == "Yes — resolved":
+        dep["resolved"] = True
+        changes.append("resolved")
+
+    mark_escalated = fields.get("Escalated to leadership?", "No change").strip()
+    if mark_escalated == "Yes — escalate":
+        dep["escalated"] = True
+        changes.append("escalated")
+    elif mark_escalated == "No — un-escalate":
+        dep["escalated"] = False
+        changes.append("un-escalated")
+
+    if not changes:
+        return False, f"no changes specified for {dep_id} on '{project_id}'"
+
+    return True, f"updated {dep_id} on '{project_id}' ({', '.join(changes)})"
+
+
+def ingest_dependency_updates(data):
+    issues = fetch_issues("update-dependency")
+    if not issues:
+        return []
+
+    ingested = []
+    for issue in issues:
+        fields = parse_issue_form_body(issue["body"] or "")
+        ok, msg = apply_dependency_update(data, fields)
+        if ok:
+            ingested.append(issue["number"])
+            print(f"issue #{issue['number']}: {msg}")
+        else:
+            print(f"issue #{issue['number']}: {msg}, skipping")
+
+    return ingested
+
+
 def ensure_all_projects_migrated(data):
     changed = False
     for project in data.get("projects", []):
@@ -974,6 +1067,7 @@ def main():
 
     update_issue_numbers, as_of_changed, blocked_issue_numbers = ingest_weekly_updates(data)
     new_dep_issue_numbers = ingest_new_dependencies(data)
+    dep_update_issue_numbers = ingest_dependency_updates(data)
     new_risk_issue_numbers = ingest_new_risks(data)
     feedback_issue_numbers = ingest_feedback(notes)
     resolve_issue_numbers = ingest_resolutions(notes)
@@ -984,6 +1078,7 @@ def main():
         migrated
         or update_issue_numbers
         or new_dep_issue_numbers
+        or dep_update_issue_numbers
         or new_risk_issue_numbers
         or feedback_issue_numbers
         or resolve_issue_numbers
@@ -1002,6 +1097,10 @@ def main():
         close_issues(
             new_dep_issue_numbers,
             "✅ Dependency logged in `data.json` — it'll show on the Dependencies tab shortly.",
+        )
+        close_issues(
+            dep_update_issue_numbers,
+            "✅ Dependency updated in `data.json` — the change will show up on the dashboard shortly.",
         )
         close_issues(
             new_risk_issue_numbers,

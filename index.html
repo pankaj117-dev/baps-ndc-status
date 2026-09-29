@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=45">
+<link rel="stylesheet" href="styles.css?v=54">
 </head>
 <body>
   <div class="wrap">
@@ -31,7 +31,6 @@
       <button class="tab-btn" data-tab="hawkeye" role="tab" aria-selected="false">🦅 Hawk-eye</button>
       <button class="tab-btn" data-tab="statushistory" role="tab" aria-selected="false">Status History</button>
       <button class="tab-btn" data-tab="deps" role="tab" aria-selected="false">Dependencies</button>
-      <button class="tab-btn" data-tab="escalations" role="tab" aria-selected="false">🚨 Escalations</button>
       <button class="tab-btn" data-tab="team" role="tab" aria-selected="false">Team Performance</button>
     </nav>
 
@@ -111,10 +110,6 @@
             <button class="deps-view-btn" data-group="team" type="button">By Team</button>
           </div>
           <label class="deps-control">
-            <span class="deps-control-label">Portfolio</span>
-            <select id="depsPortfolioFilter" class="deps-control-select" title="Narrow to one project (among those with open dependencies)"></select>
-          </label>
-          <label class="deps-control">
             <span class="deps-control-label">Cycle</span>
             <select id="depsCycleFilter" class="deps-control-select" title="Filter by calendar year of needed-by date"></select>
           </label>
@@ -126,12 +121,15 @@
 
       <h3 class="deps-pivot-title deps-detail-title">Detail</h3>
       <div id="depsBoard" class="deps-board"></div>
-    </section>
 
-    <section id="panel-escalations" class="tab-panel">
-      <div class="escalations-tab-head">
-        <p class="section-subhead" style="margin:0;">Everything currently being escalated to leadership, rolled up across every project — the go-to view for walking through the weekly review.</p>
-        <button id="copyEscalationsBtn" class="btn-primary btn-small">📋 Copy summary to share</button>
+      <div class="deps-pivot-head deps-escalations-head">
+        <div class="deps-pivot-head-left">
+          <h3 class="deps-pivot-title">🚨 Escalated to leadership</h3>
+          <p class="deps-pivot-hint">Everything currently being escalated to leadership, rolled up across every project — the go-to view for walking through the weekly review.</p>
+        </div>
+        <div class="deps-pivot-head-right">
+          <button id="copyEscalationsBtn" class="btn-primary btn-small">📋 Copy summary to share</button>
+        </div>
       </div>
       <div id="escalationsMetricsRow" class="metrics-row"></div>
       <div id="escalationsBoard" class="deps-board"></div>
@@ -188,6 +186,13 @@
     </div>
   </div>
 
+  <div id="itemDetail" class="detail-overlay" hidden>
+    <div class="detail-panel itemdetail-panel-outer">
+      <button id="itemDetailClose" class="detail-close" aria-label="Close">✕</button>
+      <div id="itemDetailContent"></div>
+    </div>
+  </div>
+
   <div id="depsDrillModal" class="modal-overlay" hidden>
     <div class="modal deps-drill-modal">
       <div class="deps-drill-modal-head">
@@ -221,6 +226,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=45"></script>
+  <script src="app.js?v=57"></script>
 </body>
 </html>

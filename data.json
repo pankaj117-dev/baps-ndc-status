@@ -2,12 +2,15 @@
   "asOf": "2026-09-22",
   "lastUpdated": "2026-09-29T03:51:28.546Z",
   "stageSlaDays": {
+    "Proposal": 7,
     "Requirements": 10,
-    "Design / Estimation": 10,
+    "Tech. Design": 10,
+    "Estimate & Planning": 5,
     "Development": 30,
-    "QA / UAT": 14,
-    "Production Release": 5,
-    "Hypercare / Post-Launch": 21
+    "UAT": 14,
+    "VAPT": 5,
+    "Rollout": 5,
+    "Hypercare": 21
   },
   "projects": [
     {
@@ -39,7 +42,7 @@
       "riskMitigations": [],
       "delayMitigation": [],
       "delayTradeoffs": "",
-      "stage": "Hypercare / Post-Launch",
+      "stage": "Hypercare",
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
@@ -105,9 +108,11 @@
       "stagePlan": {
         "Requirements": {
           "initialEnd": "2026-09-17",
-          "latestEnd": "2026-09-17"
+          "latestEnd": "2026-09-17",
+          "initialStart": "2026-06-12",
+          "latestStart": "2026-06-12"
         },
-        "Design / Estimation": {
+        "Tech. Design": {
           "initialStart": "2026-09-17",
           "latestStart": "2026-09-17",
           "initialEnd": "2026-09-29",
@@ -145,7 +150,7 @@
       "riskMitigations": [],
       "delayMitigation": [],
       "delayTradeoffs": "",
-      "stage": "Hypercare / Post-Launch",
+      "stage": "Hypercare",
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
@@ -158,7 +163,7 @@
       "owner": "Jeet Savani",
       "status": "amber",
       "progress": 35,
-      "stage": "Design / Estimation",
+      "stage": "Tech. Design",
       "phase": "Requirement complete (05-Aug to 07-Sep); TDD in progress (09-Sep to 25-Sep)",
       "nextMilestone": {
         "name": "TDD",
@@ -345,7 +350,7 @@
       ],
       "delayMitigation": [],
       "delayTradeoffs": "",
-      "stage": "Hypercare / Post-Launch",
+      "stage": "Hypercare",
       "fastFollowItems": [
         "Canada taxation and expense reports requirements",
         "Vendor management enhancements approval from stakeholders",
@@ -356,7 +361,21 @@
       "timeSavedNote": [],
       "scopeReduced": false,
       "statusChangeReason": "New solution failed under concurrent users in production; two performance risks open (check-printing / PDF generation via .NET, and WALL-E invocation+approval) \u2014 moving to Amber while fixes roll out, no impact to the already-completed go-live.",
-      "dependencySeq": 106
+      "dependencySeq": 106,
+      "stagePlan": {
+        "UAT": {
+          "initialStart": "2026-07-18",
+          "latestStart": "2026-07-18",
+          "initialEnd": "2026-08-22",
+          "latestEnd": "2026-08-27"
+        },
+        "Rollout": {
+          "initialStart": "2026-08-22",
+          "latestStart": "2026-08-22",
+          "initialEnd": "2026-08-25",
+          "latestEnd": "2026-08-28"
+        }
+      }
     },
     {
       "id": "mybky-phase1",
@@ -458,7 +477,7 @@
         "Web/mobile VAPT remediation completed \u2014 awaiting validation sign-offs"
       ],
       "delayTradeoffs": "3 CRs already approved \u2014 CR1 added 10 working days, CR2 added 6 working days, CR3 no impact on Go-Live; no new CRs this week",
-      "stage": "QA / UAT",
+      "stage": "UAT",
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
@@ -466,13 +485,41 @@
       "statusChangeReason": "Weekly 22-Sep review: RED \u2014 mobile VAPT sign-off pending, UAT tracking sheet incomplete, and multiple critical DevOps/NAHQ production-readiness items (keys, MIS read-only, Maps API, Stripe Apple Pay, n8n, SSO accounts).",
       "dependencySeq": 105,
       "stagePlan": {
-        "QA / UAT": {
-          "initialEnd": "2026-09-21",
+        "Requirements": {
+          "initialStart": "2025-11-08",
+          "latestStart": "2025-11-08",
+          "initialEnd": "2026-06-25",
+          "latestEnd": "2026-06-25"
+        },
+        "Tech. Design": {
+          "initialStart": "2026-03-09",
+          "latestStart": "2026-03-09",
+          "initialEnd": "2026-07-14",
+          "latestEnd": "2026-07-14"
+        },
+        "Development": {
+          "initialStart": "2026-03-28",
+          "latestStart": "2026-03-28",
+          "initialEnd": "2026-08-17",
           "latestEnd": "2026-09-21"
         },
-        "Production Release": {
+        "UAT": {
+          "initialStart": "2026-08-18",
+          "latestStart": "2026-08-18",
+          "initialEnd": "2026-09-16",
+          "latestEnd": "2026-09-24"
+        },
+        "Rollout": {
+          "initialStart": "2026-09-16",
+          "latestStart": "2026-09-16",
           "initialEnd": "2026-10-05",
           "latestEnd": "2026-10-05"
+        },
+        "Hypercare": {
+          "initialStart": "2026-10-06",
+          "latestStart": "2026-10-06",
+          "initialEnd": "2026-11-06",
+          "latestEnd": "2026-11-06"
         }
       }
     },
@@ -542,7 +589,45 @@
       "timeSavedNote": [],
       "scopeReduced": false,
       "statusChangeReason": "22-Sep deck marks Phase 2A RED with open critical RGC scope/approval blockers on transportation requirements.",
-      "dependencySeq": 101
+      "dependencySeq": 101,
+      "stagePlan": {
+        "Requirements": {
+          "initialStart": "2026-06-12",
+          "latestStart": "2026-06-12",
+          "initialEnd": "2026-10-02",
+          "latestEnd": "2026-10-02"
+        },
+        "Tech. Design": {
+          "initialStart": "2026-08-10",
+          "latestStart": "2026-08-10",
+          "initialEnd": "2026-10-23",
+          "latestEnd": "2026-10-23"
+        },
+        "Development": {
+          "initialStart": "2026-08-24",
+          "latestStart": "2026-08-24",
+          "initialEnd": "2026-12-18",
+          "latestEnd": "2026-12-18"
+        },
+        "UAT": {
+          "initialStart": "2026-12-21",
+          "latestStart": "2026-12-21",
+          "initialEnd": "2027-01-08",
+          "latestEnd": "2027-01-08"
+        },
+        "Rollout": {
+          "initialStart": "2027-01-11",
+          "latestStart": "2027-01-11",
+          "initialEnd": "2027-01-28",
+          "latestEnd": "2027-01-28"
+        },
+        "Hypercare": {
+          "initialStart": "2027-02-01",
+          "latestStart": "2027-02-01",
+          "initialEnd": "2027-03-05",
+          "latestEnd": "2027-03-05"
+        }
+      }
     },
     {
       "id": "mymandir",
@@ -606,11 +691,35 @@
       "statusChangeReason": "I can see there will be delay in TDD preparation as grooming session with dev team in ongoing.",
       "dependencySeq": 101,
       "stagePlan": {
-        "Design / Estimation": {
+        "Tech. Design": {
           "initialStart": "2026-09-17",
           "latestStart": "2026-09-17",
-          "initialEnd": "2026-09-25",
+          "initialEnd": "2026-09-22",
           "latestEnd": "2026-09-25"
+        },
+        "Requirements": {
+          "initialStart": "2026-07-22",
+          "latestStart": "2026-07-22",
+          "initialEnd": "2026-09-14",
+          "latestEnd": "2026-09-14"
+        },
+        "Development": {
+          "initialStart": "2026-09-22",
+          "latestStart": "2026-09-22",
+          "initialEnd": "2026-10-22",
+          "latestEnd": "2026-10-22"
+        },
+        "UAT": {
+          "initialStart": "2026-10-16",
+          "latestStart": "2026-10-16",
+          "initialEnd": "2026-10-26",
+          "latestEnd": "2026-10-28"
+        },
+        "Rollout": {
+          "initialStart": "2026-10-28",
+          "latestStart": "2026-10-28",
+          "initialEnd": "2026-10-30",
+          "latestEnd": "2026-10-30"
         }
       }
     },
@@ -685,9 +794,39 @@
       "stagePlan": {
         "Development": {
           "initialStart": "2026-09-15",
-          "latestStart": "2026-09-15",
-          "initialEnd": "2026-10-05",
+          "latestStart": "2026-09-23",
+          "initialEnd": "2026-09-24",
           "latestEnd": "2026-10-05"
+        },
+        "Requirements": {
+          "initialStart": "2026-09-03",
+          "latestStart": "2026-09-03",
+          "initialEnd": "2026-09-09",
+          "latestEnd": "2026-09-13"
+        },
+        "Tech. Design": {
+          "initialStart": "2026-09-07",
+          "latestStart": "2026-09-07",
+          "initialEnd": "2026-09-14",
+          "latestEnd": "2026-09-22"
+        },
+        "UAT": {
+          "initialStart": "2026-09-17",
+          "latestStart": "2026-10-07",
+          "initialEnd": "2026-10-08",
+          "latestEnd": "2026-10-12"
+        },
+        "Rollout": {
+          "initialStart": "2026-10-11",
+          "latestStart": "2026-10-11",
+          "initialEnd": "2026-10-12",
+          "latestEnd": "2026-10-12"
+        },
+        "Hypercare": {
+          "initialStart": "2026-10-12",
+          "latestStart": "2026-10-12",
+          "initialEnd": "2026-12-31",
+          "latestEnd": "2026-12-31"
         }
       }
     },
@@ -789,7 +928,21 @@
       "timeSavedNote": [],
       "scopeReduced": false,
       "statusChangeReason": "",
-      "dependencySeq": 103
+      "dependencySeq": 103,
+      "stagePlan": {
+        "Requirements": {
+          "initialStart": "2026-02-09",
+          "latestStart": "2026-02-09",
+          "initialEnd": "2026-06-11",
+          "latestEnd": "2026-06-11"
+        },
+        "Tech. Design": {
+          "initialStart": "2026-06-15",
+          "latestStart": "2026-06-15",
+          "initialEnd": "2026-06-30",
+          "latestEnd": "2026-06-30"
+        }
+      }
     },
     {
       "id": "spm",
@@ -840,7 +993,7 @@
         "Dharmaketu Swamiji's accepted-risk confirmation obtained for VAPT points, enabling final sign-off and deployment"
       ],
       "delayTradeoffs": "",
-      "stage": "Hypercare / Post-Launch",
+      "stage": "Hypercare",
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
@@ -1046,7 +1199,7 @@
         "",
         ""
       ],
-      "stage": "Design / Estimation",
+      "stage": "Tech. Design",
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
@@ -1060,7 +1213,7 @@
       "status": "green",
       "statusChangeReason": "",
       "progress": 15,
-      "stage": "Design / Estimation",
+      "stage": "Tech. Design",
       "phase": "Split out from the myMandir umbrella this week, alongside myMandir 1B",
       "nextMilestone": {
         "name": "TDD",

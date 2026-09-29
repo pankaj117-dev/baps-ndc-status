@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Ingest open weekly-update / new-dependency / new-risk / feedback issues
+      - name: Ingest open weekly-update / new-dependency / update-dependency / new-risk / feedback issues
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 scripts/ingest.py

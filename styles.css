@@ -269,7 +269,6 @@ body {
   font-family: var(--font-mono);
   font-size: 10.5px;
   line-height: 1.35;
-  min-height: calc(2 * 1.35 * 1em);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--ink-faint);
@@ -528,7 +527,16 @@ body {
 .stage-grid-metric-sub {
   font-size: 10.5px;
   color: var(--ink-faint);
-  margin-top: 4px;
+  /* `margin-top: auto` (not a fixed 4px) pushes this line all the way to
+     the bottom of its .metric-card. Every card in a .metrics-row grid
+     stretches to match the tallest sibling by default, so whichever
+     card's label happens to wrap to 2 lines sets the row height — this
+     way every OTHER card's "sub" line still lands at that same bottom
+     edge, without needing to force every label into an artificial fixed
+     height (which just left ugly forced gaps under short 1-line labels).
+     Num stays pinned to the top; label sits naturally in between. */
+  margin-top: auto;
+  padding-top: 4px;
 }
 
 .stage-grid-swatch.is-done { background: var(--green-bg); border-color: var(--green); }
@@ -549,7 +557,9 @@ body {
 .stage-grid {
   display: flex;
   flex-direction: column;
-  min-width: 900px;
+  /* Name cell (200px) + 9 stage cells (min-width 110px each) — bumped from
+     the old 6-stage estimate now that the pipeline has 9 stages. */
+  min-width: 1190px;
 }
 
 .stage-grid-row {
@@ -788,15 +798,6 @@ body {
   margin-bottom: 4px;
 }
 
-.escalations-tab-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 18px;
-}
-
 .escalations-group {
   border-color: #f0bcbc;
 }
@@ -893,6 +894,15 @@ body {
   flex-wrap: wrap;
   gap: 12px;
   margin: 18px 0 10px;
+}
+
+/* Visually separates the "Escalated to leadership" section (merged in from
+   the former standalone Escalations tab) from the dependency Detail board
+   above it, since they're two distinct concerns sharing one tab now. */
+.deps-escalations-head {
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
 }
 
 .deps-pivot-head-left {
@@ -1161,7 +1171,12 @@ table.deps-pivot thead th {
   border-radius: 6px;
 }
 
-.deps-drill-modal {
+/* Use the combined ".modal.deps-drill-modal" selector (not just
+   ".deps-drill-modal") so this reliably beats the later, equally-specific
+   ".modal { max-width: 440px; }" rule in the cascade regardless of source
+   order — this is what was silently squeezing the drill-down modal down
+   to 440px and forcing the Description column to wrap one word per line. */
+.modal.deps-drill-modal {
   max-width: min(920px, 96vw);
   max-height: 85vh;
   overflow: hidden;
@@ -1186,15 +1201,29 @@ table.deps-pivot thead th {
 }
 
 .deps-drill-list {
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: auto;
   margin-top: 8px;
 }
 
 table.deps-drill-table {
   width: 100%;
+  min-width: 640px;
   border-collapse: collapse;
   font-size: 12px;
+  table-layout: fixed;
 }
+
+/* Fixed column widths so the short columns (priority/date/escalated
+   badges) can't shrink-to-fit and steal room from Description, and
+   Description gets the majority of the remaining width instead of
+   collapsing to a single-word-per-line column. */
+table.deps-drill-table col.deps-drill-col-project { width: 14%; }
+table.deps-drill-table col.deps-drill-col-team { width: 12%; }
+table.deps-drill-table col.deps-drill-col-priority { width: 10%; }
+table.deps-drill-table col.deps-drill-col-due { width: 12%; }
+table.deps-drill-table col.deps-drill-col-escalated { width: 10%; }
+table.deps-drill-table col.deps-drill-col-desc { width: 42%; }
 
 table.deps-drill-table th,
 table.deps-drill-table td {
@@ -1202,6 +1231,15 @@ table.deps-drill-table td {
   border-bottom: 1px solid var(--line);
   text-align: left;
   vertical-align: top;
+  overflow-wrap: break-word;
+}
+
+table.deps-drill-table td.deps-drill-col-project,
+table.deps-drill-table td.deps-drill-col-team,
+table.deps-drill-table td.deps-drill-col-priority,
+table.deps-drill-table td.deps-drill-col-due,
+table.deps-drill-table td.deps-drill-col-escalated {
+  white-space: nowrap;
 }
 
 table.deps-drill-table th {
@@ -1213,12 +1251,13 @@ table.deps-drill-table th {
   background: var(--bg);
   position: sticky;
   top: 0;
+  white-space: nowrap;
 }
 
 .deps-drill-desc {
-  max-width: 280px;
   white-space: normal;
   color: var(--ink-soft);
+  line-height: 1.4;
 }
 
 .deps-empty-group {
@@ -1870,6 +1909,57 @@ table.deps-drill-table th {
   margin-bottom: 14px;
 }
 
+/* One-line glimpse of this project's most recent status change or go-live/
+   milestone date shift, right on the card — the full log (every change,
+   with reasons) still lives in the Status History tab and this project's
+   own detail view; this is just a "what happened last" preview so you
+   don't have to open either to see it. Reuses the same badge/pill/delta
+   classes as the Status History tab and Schedule timeline, just packed
+   into a compact wrapping row and shrunk down to fit a card. */
+.card-recent-change {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: -6px 0 14px;
+  padding: 6px 8px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 11px;
+}
+
+.card-recent-change-date {
+  font-family: var(--font-mono);
+  color: var(--ink-faint);
+  margin-right: 2px;
+}
+
+.card-recent-change-arrow {
+  color: var(--ink-faint);
+}
+
+.card-recent-change .pill {
+  padding: 2px 8px;
+  font-size: 10px;
+}
+
+.card-recent-change .schedule-shift-badge {
+  font-size: 10px;
+  padding: 2px 7px;
+}
+
+.card-recent-change .golive-date-original,
+.card-recent-change .golive-date-current {
+  font-size: 11px;
+}
+
+.card-recent-change .schedule-timeline-delta {
+  margin-left: 0;
+  font-size: 10px;
+  padding: 1px 7px;
+}
+
 .progress-row {
   display: flex;
   align-items: center;
@@ -1923,6 +2013,21 @@ table.deps-drill-table th {
 .card-facts dd {
   margin: 0;
   color: var(--ink);
+}
+
+.phase-fact-stage {
+  font-weight: 600;
+}
+
+.phase-fact-target {
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.phase-fact-detail {
+  margin-top: 2px;
+  font-size: 11.5px;
+  color: var(--ink-faint);
 }
 
 .delay-flag {
@@ -2609,6 +2714,43 @@ body.no-scroll { overflow: hidden; }
   color: var(--amber);
 }
 
+/* Dependency id tag + quick-action row (Update / Escalate / Resolve),
+   shown per-row in the project detail view's Dependencies section. */
+.dep-id-tag {
+  display: inline-block;
+  margin-right: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  color: var(--ink-faint);
+  vertical-align: middle;
+}
+
+.dep-actions-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.dep-action-link {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--line-strong);
+}
+
+.dep-action-link:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
 dd.is-missing {
   color: var(--amber);
 }
@@ -2659,6 +2801,32 @@ dd.is-missing {
 
 .stagedetail-panel-outer {
   max-width: 900px;
+}
+
+/* ---------- Dependency / Risk item detail modal ---------- */
+
+.itemdetail-panel-outer {
+  max-width: 640px;
+}
+
+.itemdetail-facts dt {
+  margin-top: 12px;
+}
+.itemdetail-facts dt:first-child {
+  margin-top: 0;
+}
+
+.itemdetail-actions {
+  margin-top: 18px;
+}
+
+.paired-item.is-clickable {
+  cursor: pointer;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.paired-item.is-clickable:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent) inset;
 }
 
 .stagedetail-kicker {

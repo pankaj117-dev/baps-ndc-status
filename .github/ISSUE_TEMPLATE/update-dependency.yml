@@ -1,0 +1,99 @@
+name: "Update / Resolve a Dependency"
+description: "Change, escalate, or resolve ONE existing dependency by its ID — no need to wait for the weekly update or retype the whole list."
+title: "[Update Dependency] "
+labels: ["update-dependency"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this to change a single dependency that's already tracked (find its ID — e.g.
+        `DEP-104` — on the project's detail view on the dashboard, next to each dependency).
+        Leave any field below blank/"No change" to keep it as-is. This does NOT require
+        listing every other open dependency — only the one you name here is touched.
+  - type: dropdown
+    id: project
+    attributes:
+      label: Project
+      options:
+        - WebNext
+        - WebNext 2.0
+        - Pledge – 1.0
+        - Pledge - 1.x
+        - EMM
+        - MyBKY (Phase 1)
+        - myBKY 2A
+        - myMandir 1B
+        - myMandir 1C
+        - GMS 1.4
+        - SSO V2
+        - SPM
+        - BKMS
+        - MIS
+        - mySatsang – BAPS ID Integration
+    validations:
+      required: true
+  - type: input
+    id: dependency_id
+    attributes:
+      label: Dependency ID
+      description: "e.g. DEP-104 — shown next to the dependency on the project detail view."
+      placeholder: "DEP-104"
+    validations:
+      required: true
+  - type: dropdown
+    id: mark_resolved
+    attributes:
+      label: Resolve this dependency?
+      description: "Yes = it's done and drops off the Dependencies tab (still kept in history)."
+      options:
+        - "No change"
+        - "Yes — resolved"
+      default: 0
+  - type: dropdown
+    id: mark_escalated
+    attributes:
+      label: Escalated to leadership?
+      description: "Change whether this specific dependency is flagged as escalated."
+      options:
+        - "No change"
+        - "Yes — escalate"
+        - "No — un-escalate"
+      default: 0
+  - type: textarea
+    id: new_text
+    attributes:
+      label: Updated description
+      description: "Optional — leave blank to keep the current description."
+      placeholder: |
+        DEVOPS-1082 — SPM production environment setup (now includes staging too)
+  - type: input
+    id: new_team
+    attributes:
+      label: Updated owning team(s)
+      description: "Optional — leave blank to keep the current team."
+      placeholder: "DevOps"
+  - type: textarea
+    id: new_mitigation
+    attributes:
+      label: Updated mitigation plan
+      description: "Optional — leave blank to keep the current mitigation plan."
+      placeholder: |
+        Escalated to DevOps lead — if missed, UAT start slips by same amount
+  - type: input
+    id: new_due_by
+    attributes:
+      label: Updated needed-by date
+      description: "Optional — format YYYY-MM-DD. Leave blank to keep the current date."
+      placeholder: "2026-10-05"
+  - type: dropdown
+    id: new_priority
+    attributes:
+      label: Updated priority
+      description: "Optional — leave on 'No change' to keep the current priority."
+      options:
+        - "No change"
+        - Critical
+        - High
+        - Medium
+        - Low
+      default: 0

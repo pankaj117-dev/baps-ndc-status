@@ -79,12 +79,15 @@ body:
       label: Pipeline stage
       description: "Which canonical stage is this project in right now? Drives the Pipeline stages board on the dashboard. Leave as-is if unchanged."
       options:
+        - Proposal
         - Requirements
-        - Design / Estimation
+        - Tech. Design
+        - Estimate & Planning
         - Development
-        - QA / UAT
-        - Production Release
-        - Hypercare / Post-Launch
+        - UAT
+        - VAPT
+        - Rollout
+        - Hypercare
   - type: input
     id: stage_planned_start
     attributes:
