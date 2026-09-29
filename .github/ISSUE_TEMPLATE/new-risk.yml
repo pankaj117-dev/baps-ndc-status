@@ -1,0 +1,50 @@
+name: "Report a Risk"
+description: "Log a new risk or blocker as soon as it comes up — no need to wait for the weekly update."
+title: "[New Risk] "
+labels: ["new-risk"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this when a new risk or blocker appears mid-week. It appends one
+        risk to the project in `data.json` with a stable `RISK-*` id. You can still
+        edit or clear it on the weekly update form (list every **open** risk there,
+        same order as today — one line per field).
+  - type: dropdown
+    id: project
+    attributes:
+      label: Project
+      options:
+        - WebNext
+        - WebNext 2.0
+        - Pledge – 1.0
+        - Pledge - 1.x
+        - EMM
+        - MyBKY (Phase 1)
+        - myBKY 2A
+        - myMandir 1B
+        - myMandir 1C
+        - GMS 1.4
+        - SSO V2
+        - SPM
+        - BKMS
+        - MIS
+        - mySatsang – BAPS ID Integration
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Risk description
+      description: "What could go wrong or what's blocking progress? Include ticket links where you can."
+      placeholder: |
+        Security re-verification slot may not land before UAT exit — could push go-live
+    validations:
+      required: true
+  - type: textarea
+    id: mitigation
+    attributes:
+      label: Mitigation plan
+      description: "Optional — what's being done and what's the impact if this isn't mitigated?"
+      placeholder: |
+        Escalated to security lead for expedited slot — if missed, go-live slips ~1 week

@@ -61,10 +61,9 @@ body:
     attributes:
       label: Reason for status change
       description: >-
-        REQUIRED if the status above got worse than last week (On Track → At Risk, At Risk → Critical,
-        anything → Non-Recoverable, etc). Explain what changed and why. If the status did not get worse
-        this week, leave this blank. Submissions with a worse status and no reason will be sent back for
-        more detail before they're merged into the dashboard.
+        ⚠️ **Required when overall status got worse** than last week (Green → Amber, Amber → Red,
+        anything → Non-Recoverable, etc.). Explain what changed and why. If status did not get worse,
+        leave blank. Submissions with a worse status and no reason are **not merged** until you add one.
       placeholder: "VAPT re-verification failed a second time; infra team says earliest re-slot is 2 weeks out"
   - type: input
     id: progress
@@ -86,6 +85,35 @@ body:
         - QA / UAT
         - Production Release
         - Hypercare / Post-Launch
+  - type: input
+    id: stage_planned_start
+    attributes:
+      label: Current stage — planned start date
+      description: >-
+        Format YYYY-MM-DD. The planned/target start date for the CURRENT stage selected above. Leave
+        blank to keep unchanged. The first value you submit for a given stage becomes its locked
+        baseline on the dashboard's stage detail view — submitting a different date later is recorded
+        as a plan revision, not a silent overwrite.
+      placeholder: "2026-09-01"
+  - type: input
+    id: stage_planned_end
+    attributes:
+      label: Current stage — planned completion date
+      description: "Format YYYY-MM-DD. Same rules as the planned start date above — first value is the baseline, later changes are tracked as revisions."
+      placeholder: "2026-09-15"
+  - type: textarea
+    id: delay_log_entries
+    attributes:
+      label: Delay log entries (this week)
+      description: >-
+        Optional — only if something specifically caused lost time THIS week within the CURRENT
+        stage selected above. One per line, format: `date | reason | team | person | days` — e.g.
+        `2026-09-14 | Review defects resolution | Team2 | V. Mehta | 1`. These ADD to that stage's
+        running delay log on the dashboard (they don't replace prior weeks' entries), and feed the
+        stage detail view's Delay Analysis / Delay Log tabs. Leave blank if there's nothing to log.
+      placeholder: |
+        2026-09-14 | Review defects resolution | Team2 | V. Mehta | 1
+        2026-09-17 | Unplanned meeting attendance | Team1 | R. Shah | 1
   - type: input
     id: phase
     attributes:
@@ -112,8 +140,10 @@ body:
     id: delay_days
     attributes:
       label: Delay (days)
-      description: "0 if on schedule, positive number if late"
+      description: "Re-enter every week — 0 if on schedule, positive if late (blank is not allowed; stale delay values mislead the dashboard)."
       placeholder: "0"
+    validations:
+      required: true
   - type: input
     id: delay_note
     attributes:
@@ -123,13 +153,13 @@ body:
     id: delay_impact
     attributes:
       label: Impact of delay
-      description: "If delay days > 0, what's the actual impact? (go-live slip, other teams/projects blocked, etc.) Required whenever there's a delay."
+      description: "⚠️ **Required when \"Delay (days)\" above is greater than 0.** Go-live slip, other teams/projects blocked, etc. Leave blank when delay is 0."
       placeholder: "Pushes go-live by 4 days; blocks MyBKY Phase 2 regression start"
   - type: textarea
     id: delay_mitigation
     attributes:
       label: Mitigation steps taken
-      description: "If delay days > 0, what's already been done (or is being done) to reduce or recover the delay? One per line. Required whenever there's a delay."
+      description: "⚠️ **Required when \"Delay (days)\" above is greater than 0.** One per line — what's already been done (or is being done) to reduce or recover the delay. Leave blank when delay is 0."
       placeholder: |
         Added a second QA resource to parallelize regression testing
         Escalated security re-verification slot with the infra team
@@ -149,7 +179,7 @@ body:
     id: time_saved_note
     attributes:
       label: What did the team do to save that time?
-      description: "One per line. What specifically got faster/parallelized/automated/cut that bought this time back? Required if 'Time saved' above is > 0."
+      description: "⚠️ **Required when \"Time saved this week (days)\" above is greater than 0.** One per line — what specifically got faster, parallelized, automated, or cut. Leave blank when time saved is 0 or empty."
       placeholder: |
         Automated the regression suite instead of running it manually
         Parallelized mobile + web QA instead of doing them sequentially
@@ -166,7 +196,13 @@ body:
     id: dependencies
     attributes:
       label: Dependencies
-      description: "One per line. Include ticket links where you can — that's usually what leadership asks for."
+      description: >-
+        One line per **open** dependency (same order for all dependency fields below).
+        **New** dependencies mid-week? Use the **Add a Dependency** issue form instead —
+        they'll show up here automatically on the dashboard. To edit an existing row, keep
+        the same line order as last week (stable `DEP-*` ids are assigned in the background).
+        Optional: prefix a line with `DEP-101 |` if you need to tie it to a specific id.
+        Include ticket links where you can.
       placeholder: |
         DEVOPS-1082 — SPM production environment setup
         Waiting on Sameep for REQ doc review
@@ -174,7 +210,7 @@ body:
     id: dependency_team
     attributes:
       label: Dependency owning team(s)
-      description: "One per line, in the SAME ORDER as the dependencies above — which team or person owns unblocking this? (e.g. DevOps, Security, GMS Team, Business/Stakeholder). Required for any dependency listed above — this feeds the cross-project Dependencies tab."
+      description: "⚠️ **Required for each dependency listed above** — one line per dependency, **same order**. Who owns unblocking (e.g. DevOps, Security, Business/Stakeholder)? Feeds the Dependencies tab. Leave blank if you listed no dependencies this week."
       placeholder: |
         DevOps
         Business/Stakeholder (Sameep)
@@ -182,10 +218,50 @@ body:
     id: dependency_mitigation
     attributes:
       label: Dependency mitigation plan / impact
-      description: "One per line, in the SAME ORDER as the dependencies above — what's the plan to unblock each one, and what happens if it isn't resolved in time? Required for any dependency listed above."
+      description: "⚠️ **Required for each dependency listed above** — one line per dependency, **same order**. Plan to unblock and impact if not resolved in time. Leave blank if you listed no dependencies this week."
       placeholder: |
         Escalated to DevOps lead, ETA 22-Aug — if missed, UAT start slips by same amount
         Following up with Sameep directly — no fallback reviewer identified yet
+  - type: textarea
+    id: dependency_due_by
+    attributes:
+      label: Dependency needed by (date)
+      description: "One per line, in the SAME ORDER as the dependencies above — format YYYY-MM-DD. When do you actually need this resolved by? Drives the 'due this week / next week' view on the Dependencies tab. Leave a line blank (just a dash) if that one has no hard date."
+      placeholder: |
+        2026-10-05
+        -
+  - type: textarea
+    id: dependency_priority
+    attributes:
+      label: Dependency priority
+      description: "One per line, in the SAME ORDER as the dependencies above — Critical / High / Medium / Low. Leave blank (defaults to Medium) if unsure."
+      placeholder: |
+        Critical
+        High
+  - type: textarea
+    id: dependency_escalated
+    attributes:
+      label: Dependency escalated to leadership?
+      description: >-
+        One per line, in the SAME ORDER as the dependencies above — Yes / No (or leave blank = No).
+        Has this specific dependency ALSO been escalated to leadership as a blocker? This is separate
+        from the general "Escalations to leadership this week" list below; use this only to flag
+        individual dependencies that leadership is already involved on.
+      placeholder: |
+        Yes
+        No
+  - type: textarea
+    id: dependency_resolved
+    attributes:
+      label: Dependency resolved?
+      description: >-
+        One per line, in the SAME ORDER as the open dependencies above — Yes / No (or leave blank = No).
+        Mark Yes when a dependency is unblocked; it drops off the Dependencies tab but stays in history.
+        **Or** simply omit a resolved dependency from the Dependencies list above — that also marks it
+        resolved.
+      placeholder: |
+        No
+        Yes
   - type: textarea
     id: completed
     attributes:
@@ -216,7 +292,7 @@ body:
     id: risk_mitigation
     attributes:
       label: Risk mitigation plan
-      description: "One per line, in the SAME ORDER as the risks above — what's being done about each, and what's the impact if it isn't mitigated? Required for any risk listed above."
+      description: "⚠️ **Required for each risk listed above** — one line per risk, **same order**. What's being done and what's the impact if it isn't mitigated? Leave blank if you listed no risks this week."
       placeholder: |
         Adding load-balancing config before next test cycle — if unresolved, go-live may slip 1 week
         Escalated to security team for re-verification — no impact to current timeline yet

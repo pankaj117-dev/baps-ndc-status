@@ -55,6 +55,11 @@
   let activeOwner = "all";
   let globalProjectFilter = "all";
   let globalTeamFilter = "all";
+  let depsPivotGroupBy = "project"; // "project" | "team" — which rollup the Dependencies tab shows first
+  let depsPivotCompact = false;
+  let depsPortfolioFilter = "all"; // deps-tab project scope (projects with open deps only)
+  let depsCycleFilter = "all"; // calendar year string from dueBy, e.g. "2026"
+  let lastDepsPivotExport = null;
 
   function visibleProjects() {
     let projects = DATA.projects;
@@ -65,7 +70,9 @@
       projects = projects.filter((p) => (p.owner || "Unassigned") === activeOwner);
     }
     if (globalTeamFilter !== "all") {
-      projects = projects.filter((p) => (p.dependencyTeams || []).includes(globalTeamFilter));
+      projects = projects.filter((p) =>
+        getDependencyObjects(p).some((d) => !d.resolved && d.team === globalTeamFilter)
+      );
     }
     return projects;
   }
@@ -218,7 +225,7 @@
     projects.forEach((p) => {
       counts[p.status] = (counts[p.status] || 0) + 1;
       delaySum += p.delayDays || 0;
-      riskCount += (p.risks || []).length;
+      riskCount += countOpenRisks(p);
     });
     const avgDelay = projects.length ? Math.round((delaySum / projects.length) * 10) / 10 : 0;
 
@@ -283,167 +290,6 @@
     "Production Release",
     "Hypercare / Post-Launch",
   ];
-
-  // "42d in stage" pill + (when there's an SLA to compare against) a small
-  // second line spelling out the SLA and how far over/under it is — enough
-  // detail to read straight off the tile without needing a separate list.
-  function stageDurationInfo(info) {
-    if (!info) return null;
-    const flagClass = info.flag ? " is-" + info.flag : "";
-    const label = (info.approxStart ? "≥" : "") + info.days + "d in stage";
-    const title =
-      info.sla != null
-        ? `${info.days} day${info.days === 1 ? "" : "s"} in "${info.stage}" so far (SLA: ${info.sla}d)` +
-          (info.flag === "breach" ? ` — ${info.days - info.sla}d over SLA` : "")
-        : `${info.days} day${info.days === 1 ? "" : "s"} in "${info.stage}" so far`;
-
-    const children = [el("span", { class: "stage-duration-badge" + flagClass }, [label])];
-    if (info.sla != null) {
-      const over = info.days - info.sla;
-      children.push(
-        el("span", { class: "stage-sla-detail" + flagClass }, [
-          `SLA ${info.sla}d · ` + (over > 0 ? `+${over}d over` : `${-over}d left`),
-        ])
-      );
-    }
-    return el("div", { class: "stage-duration-info", title }, children);
-  }
-
-  // Cross-project callout at the top of the Pipeline Stages tab: which
-  // projects have been sitting in their current stage longer than the SLA
-  // (or are getting close), sorted worst-first.
-  function renderStageSlaFlags() {
-    const box = document.getElementById("stageSlaFlags");
-    if (!box) return;
-    box.innerHTML = "";
-
-    const flagged = visibleProjects()
-      .map((p) => ({ p, info: currentStageInfo(p) }))
-      .filter((row) => row.info && (row.info.flag === "breach" || row.info.flag === "warn"))
-      .sort((a, b) => (b.info.days - b.info.sla) - (a.info.days - a.info.sla));
-
-    if (!flagged.length) {
-      box.appendChild(
-        el("div", { class: "stage-sla-flags-ok" }, ["✅ No stage-gate SLA flags — every project is within SLA for its current stage."])
-      );
-      return;
-    }
-
-    const breachCount = flagged.filter((r) => r.info.flag === "breach").length;
-    const warnCount = flagged.length - breachCount;
-    const summaryBits = [];
-    if (breachCount) summaryBits.push(`${breachCount} over SLA`);
-    if (warnCount) summaryBits.push(`${warnCount} approaching`);
-
-    const bar = el("div", { class: "stage-sla-bar" }, [
-      el("span", { class: "stage-sla-bar-label" }, [`⚠️ ${summaryBits.join(" · ")}`]),
-      el("div", { class: "stage-sla-chip-row" }),
-    ]);
-    box.appendChild(bar);
-
-    const chipRow = bar.querySelector(".stage-sla-chip-row");
-    flagged.forEach(({ p, info }) => {
-      const over = info.days - info.sla;
-      const chip = el(
-        "button",
-        {
-          type: "button",
-          class: "stage-sla-chip is-" + info.flag,
-          title: `${p.name}: ${info.approxStart ? "≥" : ""}${info.days}d in "${info.stage}" (SLA ${info.sla}d) — ${
-            over > 0 ? `${over}d over` : `${-over}d left`
-          }. Click to open.`,
-        },
-        [p.name + " " + (over > 0 ? "+" + over + "d" : over + "d")]
-      );
-      chip.addEventListener("click", () => openProjectDetail(p.id));
-      chipRow.appendChild(chip);
-    });
-  }
-
-  function renderStageBoard() {
-    const board = document.getElementById("stageBoard");
-    board.innerHTML = "";
-
-    const byStage = {};
-    PIPELINE_STAGES.forEach((s) => (byStage[s] = []));
-    const unstaged = [];
-    visibleProjects().forEach((p) => {
-      if (p.stage && byStage[p.stage]) byStage[p.stage].push(p);
-      else unstaged.push(p);
-    });
-
-    PIPELINE_STAGES.forEach((stage) => {
-      const projects = byStage[stage];
-      const sla = stageSlaDays(stage);
-      const cardsWrap = el("div", { class: "stage-lane-cards" });
-      if (!projects.length) {
-        cardsWrap.appendChild(el("div", { class: "stage-col-empty" }, ["No projects in this stage"]));
-      } else {
-        projects.forEach((p) => {
-          const info = currentStageInfo(p);
-          const flagClass = info && info.flag && info.flag !== "ok" ? " is-" + info.flag : "";
-          cardsWrap.appendChild(
-            el("div", { class: "stage-card" + flagClass, "data-project-id": p.id, tabindex: "0", role: "button" }, [
-              el("div", { class: "stage-card-top" }, [
-                el("span", { class: "timeline-dot", style: `background:var(--${p.status === "amber" ? "amber" : p.status})` }),
-                el("strong", null, [p.name]),
-              ]),
-              el("div", { class: "stage-card-owner" }, [p.owner || "Unassigned"]),
-              el("div", { class: "progress-row stage-card-progress" }, [
-                el("div", { class: "progress-track" }, [
-                  el("div", { class: "progress-fill status-" + p.status, style: "width:" + p.progress + "%" }),
-                ]),
-                el("div", { class: "progress-pct" }, [p.progress + "%"]),
-              ]),
-              stageDurationInfo(info),
-            ])
-          );
-        });
-      }
-      const lane = el("div", { class: "stage-lane" }, [
-        el("div", { class: "stage-lane-label" }, [
-          el("h3", null, [stage]),
-          el("span", { class: "stage-col-count" }, [String(projects.length)]),
-          sla != null ? el("span", { class: "stage-lane-sla" }, ["SLA " + sla + "d"]) : null,
-        ]),
-        cardsWrap,
-      ]);
-      board.appendChild(lane);
-    });
-
-    if (unstaged.length) {
-      const cardsWrap = el("div", { class: "stage-lane-cards" });
-      unstaged.forEach((p) => {
-        cardsWrap.appendChild(
-          el("div", { class: "stage-card", "data-project-id": p.id, tabindex: "0", role: "button" }, [
-            el("div", { class: "stage-card-top" }, [
-              el("span", { class: "timeline-dot", style: `background:var(--${p.status === "amber" ? "amber" : p.status})` }),
-              el("strong", null, [p.name]),
-            ]),
-            el("div", { class: "stage-card-owner" }, [p.owner || "Unassigned"]),
-          ])
-        );
-      });
-      const lane = el("div", { class: "stage-lane stage-lane-unstaged" }, [
-        el("div", { class: "stage-lane-label" }, [
-          el("h3", null, ["Unstaged"]),
-          el("span", { class: "stage-col-count" }, [String(unstaged.length)]),
-        ]),
-        cardsWrap,
-      ]);
-      board.appendChild(lane);
-    }
-
-    board.querySelectorAll(".stage-card").forEach((card) => {
-      card.addEventListener("click", () => openProjectDetail(card.getAttribute("data-project-id")));
-      card.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          openProjectDetail(card.getAttribute("data-project-id"));
-        }
-      });
-    });
-  }
 
   // Short column headers for the Grid tab — same stages, tighter labels so
   // 6 columns + the project name column fit without too much horizontal
@@ -732,8 +578,8 @@
             : []),
         ]),
         el("div", { class: "card-badges" }, [
-          el("span", { class: "badge" }, [(p.dependencies || []).length + " dependencies"]),
-          el("span", { class: "badge" + ((p.risks || []).length ? " has-risk" : "") }, [(p.risks || []).length + " risks"]),
+          el("span", { class: "badge" }, [countOpenDependencies(p) + " dependencies"]),
+          el("span", { class: "badge" + (countOpenRisks(p) ? " has-risk" : "") }, [countOpenRisks(p) + " risks"]),
           el("span", { class: "badge" + (notes.length ? " has-followup" : "") }, [notes.length + " follow-ups"]),
           ...((p.fastFollowItems || []).length
             ? [el("span", { class: "badge has-fastfollow" }, [(p.fastFollowItems || []).length + " fast-follow"])]
@@ -810,7 +656,11 @@
     const select = document.getElementById("globalTeamFilter");
     const teams = Array.from(
       new Set(
-        DATA.projects.flatMap((p) => (p.dependencyTeams || []).filter(Boolean))
+        DATA.projects.flatMap((p) =>
+          getDependencyObjects(p)
+            .filter((d) => !d.resolved && d.team)
+            .map((d) => d.team)
+        )
       )
     ).sort((a, b) => a.localeCompare(b));
 
@@ -880,7 +730,7 @@
 
   // Builds the full sequence of stage blocks for one project's Hawk-eye
   // row: real start/end dates for stages already passed through (from the
-  // same history reconstruction as Tab 2 / the Grid tab / the per-project
+  // same history reconstruction as the Grid tab / the per-project
   // Stage-gate timeline), the current stage sized to at least its SLA (so
   // it reads as "expected to land around here" even mid-stage), then every
   // remaining stage chained forward using its SLA as a planned-only
@@ -1105,8 +955,6 @@
 
   function renderAllTabs() {
     renderMetrics();
-    renderStageSlaFlags();
-    renderStageBoard();
     renderStageGrid();
     renderHawkeye();
     renderCards();
@@ -1144,43 +992,259 @@
 
   /* ---------------- Tab: Dependencies ---------------- */
 
-  function collectDependencies() {
+  // Due-window buckets for a dependency's "needed by" date, relative to
+  // today — drives card badges and pivot due-window columns. Matches the
+  // leadership mockup (Today → Next Month) plus Overdue as a 7th column so
+  // past-due work is never folded into "Today". Dependencies with no date use
+  // internal key `no-date` (counted in row totals only, not in window cols).
+  const DUE_WINDOWS = [
+    { key: "overdue", label: "Overdue", rank: 0 },
+    { key: "today", label: "Today", rank: 1 },
+    { key: "tomorrow", label: "Tomorrow", rank: 2 },
+    { key: "this-week", label: "This Week", rank: 3 },
+    { key: "next-week", label: "Next Week", rank: 4 },
+    { key: "this-month", label: "This Month", rank: 5 },
+    { key: "next-month", label: "Next Month", rank: 6 },
+  ];
+  const DUE_WINDOW_BY_KEY = {
+    "no-date": { key: "no-date", label: "No date set", rank: 99 },
+  };
+  DUE_WINDOWS.forEach((w) => (DUE_WINDOW_BY_KEY[w.key] = w));
+
+  function endOfWeekSunday(fromIso) {
+    const d = new Date(fromIso + "T00:00:00");
+    const dow = d.getDay();
+    const daysUntilSunday = dow === 0 ? 0 : 7 - dow;
+    return addDaysIso(fromIso, daysUntilSunday);
+  }
+
+  function endOfMonthIso(fromIso) {
+    const d = new Date(fromIso + "T00:00:00");
+    const y = d.getFullYear();
+    const m = d.getMonth();
+    const last = new Date(y, m + 1, 0);
+    const mm = String(last.getMonth() + 1).padStart(2, "0");
+    const dd = String(last.getDate()).padStart(2, "0");
+    return `${last.getFullYear()}-${mm}-${dd}`;
+  }
+
+  function startOfNextMonthIso(fromIso) {
+    const d = new Date(fromIso + "T00:00:00");
+    d.setDate(1);
+    d.setMonth(d.getMonth() + 1);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    return `${y}-${m}-01`;
+  }
+
+  function dueWindowFor(dueBy, today) {
+    if (!dueBy) return DUE_WINDOW_BY_KEY["no-date"];
+    if (dueBy < today) return DUE_WINDOW_BY_KEY.overdue;
+    if (dueBy === today) return DUE_WINDOW_BY_KEY.today;
+    const tomorrow = addDaysIso(today, 1);
+    if (dueBy === tomorrow) return DUE_WINDOW_BY_KEY.tomorrow;
+    const weekEnd = endOfWeekSunday(today);
+    if (dueBy > tomorrow && dueBy <= weekEnd) return DUE_WINDOW_BY_KEY["this-week"];
+    const nextWeekEnd = addDaysIso(weekEnd, 7);
+    if (dueBy <= nextWeekEnd) return DUE_WINDOW_BY_KEY["next-week"];
+    const monthEnd = endOfMonthIso(today);
+    if (dueBy <= monthEnd) return DUE_WINDOW_BY_KEY["this-month"];
+    const nextMonthEnd = endOfMonthIso(startOfNextMonthIso(today));
+    if (dueBy <= nextMonthEnd) return DUE_WINDOW_BY_KEY["next-month"];
+    return DUE_WINDOW_BY_KEY["next-month"];
+  }
+
+  function dueByCalendarYear(dueBy) {
+    if (!dueBy) return null;
+    return String(new Date(dueBy + "T00:00:00").getFullYear());
+  }
+
+  const POST_UAT_STAGES = new Set(["Production Release", "Hypercare / Post-Launch"]);
+
+  const PRIORITY_ORDER = ["Critical", "High", "Medium", "Low"];
+
+  function isPlaceholderDependencyText(text) {
+    return !text || /^(none|no dependency)$/i.test(String(text).trim());
+  }
+
+  /** Read dependencies as objects — supports legacy parallel-array snapshots in history.json. */
+  function getDependencyObjects(source) {
+    const raw = source.dependencies || [];
+    if (!raw.length) return [];
+    if (typeof raw[0] === "object" && raw[0] !== null && "text" in raw[0]) {
+      return raw.map((d) => ({
+        id: d.id || "",
+        text: d.text || "",
+        team: d.team || "",
+        mitigation: d.mitigation || "",
+        dueBy: d.dueBy || "",
+        priority: PRIORITY_ORDER.includes(d.priority) ? d.priority : "Medium",
+        escalated: !!d.escalated,
+        resolved: !!d.resolved,
+      }));
+    }
+    return raw.map((text, i) => ({
+      id: "",
+      text,
+      team: (source.dependencyTeams && source.dependencyTeams[i]) || "",
+      mitigation: (source.dependencyMitigations && source.dependencyMitigations[i]) || "",
+      dueBy: (source.dependencyDueBy && source.dependencyDueBy[i]) || "",
+      priority: PRIORITY_ORDER.includes(
+        (source.dependencyPriority && source.dependencyPriority[i]) || "Medium"
+      )
+        ? (source.dependencyPriority && source.dependencyPriority[i]) || "Medium"
+        : "Medium",
+      escalated: !!(source.dependencyEscalated && source.dependencyEscalated[i]),
+      resolved: false,
+    }));
+  }
+
+  function countOpenDependencies(project) {
+    return getDependencyObjects(project).filter(
+      (d) => !d.resolved && !isPlaceholderDependencyText(d.text)
+    ).length;
+  }
+
+  function isPlaceholderRiskText(text) {
+    return !text || /^(none|no risk|no risks|no blocker|no blockers)$/i.test(String(text).trim());
+  }
+
+  /** Read risks as objects — supports legacy parallel-array snapshots in history.json. */
+  function getRiskObjects(source) {
+    const raw = source.risks || [];
+    if (!raw.length) return [];
+    if (typeof raw[0] === "object" && raw[0] !== null && "text" in raw[0]) {
+      return raw.map((r) => ({
+        id: r.id || "",
+        text: r.text || "",
+        mitigation: r.mitigation || "",
+        resolved: !!r.resolved,
+      }));
+    }
+    const mitigations = source.riskMitigations || [];
+    return raw.map((text, i) => ({
+      id: "",
+      text,
+      mitigation: mitigations[i] || "",
+      resolved: false,
+    }));
+  }
+
+  function countOpenRisks(project) {
+    return getRiskObjects(project).filter(
+      (r) => !r.resolved && !isPlaceholderRiskText(r.text)
+    ).length;
+  }
+
+  function detailSectionIssueLink(template, projectName, label) {
+    return el("a", {
+      class: "btn-ghost btn-small detail-section-link",
+      target: "_blank",
+      rel: "noopener",
+      href: issueUrl(template, { project: projectName }),
+    }, [label + " ↗"]);
+  }
+
+  function collectDependencies(opts) {
+    const skipCycle = opts && opts.skipCycle;
     const rows = [];
+    const today = todayISO();
     visibleProjects().forEach((p) => {
-      (p.dependencies || []).forEach((text, i) => {
-        if (!text || /^(none|no dependency)$/i.test(text.trim())) return;
+      if (depsPortfolioFilter !== "all" && p.id !== depsPortfolioFilter) return;
+      getDependencyObjects(p).forEach((dep) => {
+        if (dep.resolved || isPlaceholderDependencyText(dep.text)) return;
+        const dueBy = dep.dueBy || "";
+        if (!skipCycle && depsCycleFilter !== "all" && dueBy) {
+          if (dueByCalendarYear(dueBy) !== depsCycleFilter) return;
+        }
         rows.push({
           projectId: p.id,
           projectName: p.name,
           status: p.status,
-          text,
-          team: (p.dependencyTeams && p.dependencyTeams[i]) || "",
-          mitigation: (p.dependencyMitigations && p.dependencyMitigations[i]) || "",
+          id: dep.id,
+          text: dep.text,
+          team: dep.team || "",
+          mitigation: dep.mitigation || "",
+          dueBy,
+          priority: dep.priority,
+          dueWindow: dueWindowFor(dueBy, today),
+          escalated: !!dep.escalated,
         });
       });
     });
     return rows;
   }
 
+  function projectsWithOpenDependencies() {
+    return visibleProjects().filter((p) => countOpenDependencies(p) > 0);
+  }
+
+  function dependencyCycleYears(rows) {
+    const years = new Set();
+    rows.forEach((r) => {
+      const y = dueByCalendarYear(r.dueBy);
+      if (y) years.add(y);
+    });
+    return Array.from(years).sort();
+  }
+
+  // Four KPIs aligned to the Dependencies mockup, grounded in this app's data:
+  // active projects/teams from open deps; blocked stages = current stage over SLA
+  // (same breach flag as Grid/Hawk-eye); cumulative delay = summed stage SLA
+  // overage across filtered projects; rollout/hypercare = post-UAT pipeline stages.
   function renderDependenciesMetrics(rows) {
-    const teams = new Set(rows.map((r) => r.team).filter(Boolean));
-    const missingTeam = rows.filter((r) => !r.team).length;
-    const missingMitigation = rows.filter((r) => !r.mitigation).length;
+    const activeProjects = new Set(rows.map((r) => r.projectId)).size;
+    const activeTeams = new Set(rows.map((r) => r.team || "Unlabeled")).size;
+
+    const scopedProjects = projectsWithOpenDependencies().filter(
+      (p) => depsPortfolioFilter === "all" || p.id === depsPortfolioFilter
+    );
+
+    let blockedStages = 0;
+    let cumulativeDelay = 0;
+    let rolloutHypercare = 0;
+    scopedProjects.forEach((p) => {
+      cumulativeDelay += cumulativeStageOverageDays(p);
+      const info = currentStageInfo(p);
+      if (info && info.flag === "breach") blockedStages += 1;
+      if (POST_UAT_STAGES.has(p.stage || "")) rolloutHypercare += 1;
+    });
 
     const metrics = [
-      { label: "Total Dependencies", num: rows.length, tone: "" },
-      { label: "Teams Involved", num: teams.size, tone: "tone-accent" },
-      { label: "Missing Team Label", num: missingTeam, tone: missingTeam ? "tone-amber" : "tone-green" },
-      { label: "Missing Mitigation", num: missingMitigation, tone: missingMitigation ? "tone-amber" : "tone-green" },
+      {
+        label: "Active Projects",
+        num: activeProjects,
+        sub: `across ${activeTeams} team${activeTeams === 1 ? "" : "s"}`,
+        tone: "",
+      },
+      {
+        label: "Blocked Stages",
+        num: blockedStages,
+        sub: blockedStages ? "need escalation" : "none right now",
+        tone: blockedStages ? "tone-red" : "tone-green",
+      },
+      {
+        label: "Cumulative Delay",
+        num: cumulativeDelay + "d",
+        sub: "all stages",
+        tone: cumulativeDelay ? "tone-amber" : "tone-green",
+      },
+      {
+        label: "In Rollout / Hypercare",
+        num: rolloutHypercare,
+        sub: "post-UAT",
+        tone: rolloutHypercare ? "tone-accent" : "",
+      },
     ];
 
     const row = document.getElementById("depsMetricsRow");
     row.innerHTML = "";
     metrics.forEach((m) => {
       row.appendChild(
-        el("div", { class: "metric-card " + m.tone }, [
+        el("div", { class: ["metric-card", m.tone].filter(Boolean).join(" ") }, [
           el("div", { class: "num" }, [String(m.num)]),
           el("div", { class: "label" }, [m.label]),
+          el("div", { class: "stage-grid-metric-sub" }, [m.sub]),
         ])
       );
     });
@@ -1220,6 +1284,15 @@
           el("div", { class: "deps-card-project", "data-project-id": r.projectId }, [
             el("span", { class: "timeline-dot", style: `background:var(--${r.status === "amber" ? "amber" : r.status})` }),
             r.projectName,
+          ]),
+          el("div", { class: "deps-card-badges" }, [
+            el("span", { class: "deps-badge deps-badge-priority is-" + r.priority.toLowerCase() }, [r.priority]),
+            el("span", { class: "deps-badge deps-badge-due is-" + r.dueWindow.key }, [
+              r.dueBy ? `${r.dueWindow.label} · ${fmtDate(r.dueBy)}` : "No date set",
+            ]),
+            ...(r.escalated
+              ? [el("span", { class: "deps-badge deps-badge-escalated" }, ["🚨 Escalated"])]
+              : []),
           ]),
           el("div", { class: "deps-card-text" }, [r.text]),
           el("div", { class: "deps-card-mitigation" + (r.mitigation ? "" : " is-missing") }, [
@@ -1491,10 +1564,424 @@
     });
   }
 
+  // Builds the nested rollup rows for the pivot table: primary group (either
+  // "project" or "team") -> secondary group (the other one) -> counts. A
+  // primary-group subtotal row sits above its secondary rows, mirroring the
+  // mockup's nested Project -> Team pivot (just usable in either direction,
+  // since teams like DevOps need the mirror image of that same table to see
+  // everything they're on the hook for across every project in one place).
+  function buildDependenciesPivot(rows, groupBy) {
+    const primaryKey = groupBy === "team" ? "team" : "projectId";
+    const primaryLabel = groupBy === "team" ? "team" : "projectName";
+    const secondaryLabel = groupBy === "team" ? "projectName" : "team";
+
+    function emptyCounts() {
+      const c = { total: 0, escalated: 0 };
+      PRIORITY_ORDER.forEach((p) => (c[p] = 0));
+      DUE_WINDOWS.forEach((w) => (c[w.key] = 0));
+      return c;
+    }
+
+    function tally(counts, r) {
+      counts.total += 1;
+      counts[r.priority] += 1;
+      if (r.dueWindow.key !== "no-date" && counts[r.dueWindow.key] != null) counts[r.dueWindow.key] += 1;
+      if (r.escalated) counts.escalated += 1;
+    }
+
+    const primaries = {};
+    rows.forEach((r) => {
+      const pKey = r[primaryKey] || "Unlabeled";
+      const pLabel = r[primaryLabel] || "Unlabeled";
+      const group =
+        primaries[pKey] ||
+        (primaries[pKey] = { primaryKey: pKey, label: pLabel, counts: emptyCounts(), secondaries: {} });
+      tally(group.counts, r);
+      const sKey = r[secondaryLabel] || "Unlabeled";
+      const sub =
+        group.secondaries[sKey] ||
+        (group.secondaries[sKey] = { secondaryKey: sKey, label: sKey, counts: emptyCounts() });
+      tally(sub.counts, r);
+    });
+
+    return Object.keys(primaries)
+      .map((k) => primaries[k])
+      .sort((a, b) => b.counts.total - a.counts.total || a.label.localeCompare(b.label))
+      .map((group) => ({
+        ...group,
+        secondaries: Object.keys(group.secondaries)
+          .map((k) => group.secondaries[k])
+          .sort((a, b) => b.counts.total - a.counts.total || a.label.localeCompare(b.label)),
+      }));
+  }
+
+  function depsPivotPrimaryKey(r) {
+    return depsPivotGroupBy === "team" ? r.team || "Unlabeled" : r.projectId;
+  }
+
+  function depsPivotSecondaryKey(r) {
+    return depsPivotGroupBy === "team" ? r.projectName || "Unlabeled" : r.team || "Unlabeled";
+  }
+
+  function filterDepsForDrill(rows, spec) {
+    return rows.filter((r) => {
+      if (spec.primaryKey != null && depsPivotPrimaryKey(r) !== spec.primaryKey) return false;
+      if (spec.secondaryKey != null && depsPivotSecondaryKey(r) !== spec.secondaryKey) return false;
+      if (spec.metric === "total") return true;
+      if (spec.metric === "priority") return r.priority === spec.value;
+      if (spec.metric === "dueWindow") return r.dueWindow.key === spec.value;
+      return true;
+    });
+  }
+
+  function depsPivotCountCellClass(n, kind, key) {
+    let cls = "deps-pivot-num";
+    if (!n) cls += " is-zero";
+    else cls += " is-clickable";
+    if (kind === "priority" && key) cls += " is-priority is-" + key.toLowerCase();
+    if (kind === "dueWindow" && key === "overdue" && n) cls += " is-overdue";
+    if (kind === "dueWindow" && key === "today" && n) cls += " is-due-soon";
+    if (kind === "dueWindow" && key === "tomorrow" && n) cls += " is-due-soon";
+    if (kind === "total" && n) cls += " deps-pivot-total";
+    return cls;
+  }
+
+  function depsPivotCountCell(n, drill) {
+    const attrs = {
+      class: depsPivotCountCellClass(n, drill.kind, drill.value),
+    };
+    if (n) {
+      attrs["data-drill"] = "1";
+      attrs["data-drill-metric"] = drill.metric;
+      if (drill.value) attrs["data-drill-value"] = drill.value;
+      if (drill.primaryKey != null) attrs["data-drill-primary"] = drill.primaryKey;
+      if (drill.secondaryKey != null) attrs["data-drill-secondary"] = drill.secondaryKey;
+    }
+    return el("td", attrs, [n ? String(n) : "—"]);
+  }
+
+  function renderDependenciesPivot(rows) {
+    const wrap = document.getElementById("depsPivotWrap");
+    wrap.innerHTML = "";
+    wrap.classList.toggle("is-compact", depsPivotCompact);
+
+    if (!rows.length) {
+      wrap.appendChild(el("div", { class: "deps-empty-group" }, ["No dependencies recorded yet."]));
+      lastDepsPivotExport = null;
+      return;
+    }
+
+    const groups = buildDependenciesPivot(rows, depsPivotGroupBy);
+    lastDepsPivotExport = { rows, groups, groupBy: depsPivotGroupBy };
+
+    const colPrimary = depsPivotGroupBy === "team" ? "Team" : "Project";
+    const colSecondary = depsPivotGroupBy === "team" ? "Project" : "Team";
+
+    const headRow1 = el("tr", null, [
+      el("th", { rowspan: "2", class: "deps-pivot-group-head" }, [colPrimary]),
+      el("th", { rowspan: "2", class: "deps-pivot-group-head" }, [colSecondary]),
+      el("th", { rowspan: "2" }, ["Total"]),
+      el("th", { colspan: String(PRIORITY_ORDER.length) }, ["By Priority"]),
+      el("th", { colspan: String(DUE_WINDOWS.length) }, ["By Due Window"]),
+    ]);
+    const headRow2 = el("tr", null, [
+      ...PRIORITY_ORDER.map((p) => el("th", { class: "deps-pivot-sub-head is-" + p.toLowerCase() }, [p])),
+      ...DUE_WINDOWS.map((w) => el("th", { class: "deps-pivot-sub-head is-" + w.key }, [w.label])),
+    ]);
+
+    function countCells(counts, drillBase) {
+      return [
+        depsPivotCountCell(counts.total, { ...drillBase, metric: "total", kind: "total" }),
+        ...PRIORITY_ORDER.map((p) =>
+          depsPivotCountCell(counts[p], { ...drillBase, metric: "priority", value: p, kind: "priority" })
+        ),
+        ...DUE_WINDOWS.map((w) =>
+          depsPivotCountCell(counts[w.key], { ...drillBase, metric: "dueWindow", value: w.key, kind: "dueWindow" })
+        ),
+      ];
+    }
+
+    const tbody = el("tbody");
+    groups.forEach((group) => {
+      const primaryKey = group.primaryKey;
+      const subCount = group.secondaries.length;
+      const rowSpan = subCount + 1;
+
+      tbody.appendChild(
+        el("tr", {
+          class: "deps-pivot-primary-row deps-pivot-group-total-row",
+          "data-pivot-row": "group-total",
+        }, [
+          el("td", { class: "deps-pivot-group-cell deps-pivot-primary-label", rowspan: String(rowSpan) }, [
+            group.label,
+            group.counts.escalated
+              ? el("span", { class: "deps-pivot-escalated-flag", title: "Has escalated dependencies" }, [" 🚨"])
+              : null,
+          ]),
+          el("td", { class: "deps-pivot-group-cell deps-pivot-total-meta-cell" }, [
+            el("span", { class: "deps-pivot-total-badge" }, ["Group total"]),
+          ]),
+          ...countCells(group.counts, { primaryKey, secondaryKey: null }),
+        ])
+      );
+
+      group.secondaries.forEach((sub, idx) => {
+        const isLast = idx === subCount - 1;
+        const rowClass =
+          "deps-pivot-secondary-row deps-pivot-breakdown-row" + (isLast ? " deps-pivot-group-end" : "");
+        const tr = el("tr", { class: rowClass, "data-pivot-row": "breakdown" }, [
+          el("td", { class: "deps-pivot-group-cell deps-pivot-sub-cell" }, [
+            el("span", { class: "deps-pivot-breakdown-label" }, [sub.label]),
+          ]),
+          ...countCells(sub.counts, {
+            primaryKey,
+            secondaryKey: sub.secondaryKey,
+          }),
+        ]);
+        tbody.appendChild(tr);
+      });
+    });
+
+    const table = el("table", { class: "deps-pivot" }, [el("thead", null, [headRow1, headRow2]), tbody]);
+    wrap.appendChild(table);
+
+    table.querySelectorAll("[data-drill]").forEach((cell) => {
+      cell.addEventListener("click", () => {
+        const spec = {
+          primaryKey: cell.getAttribute("data-drill-primary"),
+          secondaryKey: cell.getAttribute("data-drill-secondary") || null,
+          metric: cell.getAttribute("data-drill-metric"),
+          value: cell.getAttribute("data-drill-value") || null,
+        };
+        openDepsDrillModal(filterDepsForDrill(rows, spec), spec);
+      });
+    });
+  }
+
+  function openDepsDrillModal(items, spec) {
+    const modal = document.getElementById("depsDrillModal");
+    const title = document.getElementById("depsDrillTitle");
+    const sub = document.getElementById("depsDrillSub");
+    const list = document.getElementById("depsDrillList");
+    list.innerHTML = "";
+
+    const bits = [];
+    if (spec.primaryKey != null) bits.push(depsPivotGroupBy === "team" ? "Team" : "Project");
+    if (spec.secondaryKey != null) bits.push(depsPivotGroupBy === "team" ? "Project" : "Team");
+    if (spec.metric === "priority") bits.push(spec.value + " priority");
+    else if (spec.metric === "dueWindow") bits.push(DUE_WINDOW_BY_KEY[spec.value].label);
+    else if (spec.metric === "total") bits.push("all items in row");
+
+    title.textContent = items.length + (items.length === 1 ? " dependency" : " dependencies");
+    sub.textContent = bits.length ? bits.join(" · ") : "Filtered list";
+
+    if (!items.length) {
+      list.appendChild(el("p", { class: "deps-empty-group" }, ["No matching items."]));
+    } else {
+      const table = el("table", { class: "deps-drill-table" }, [
+        el("thead", null, [
+          el("tr", null, [
+            el("th", null, ["Project"]),
+            el("th", null, ["Team"]),
+            el("th", null, ["Priority"]),
+            el("th", null, ["Needed by"]),
+            el("th", null, ["Escalated"]),
+            el("th", null, ["Description"]),
+          ]),
+        ]),
+        el(
+          "tbody",
+          null,
+          items.map((r) =>
+            el("tr", null, [
+              el("td", null, [r.projectName]),
+              el("td", null, [r.team || "—"]),
+              el("td", null, [
+                el("span", { class: "deps-badge deps-badge-priority is-" + r.priority.toLowerCase() }, [r.priority]),
+              ]),
+              el("td", null, [r.dueBy ? fmtDate(r.dueBy) : "No date"]),
+              el("td", null, [r.escalated ? "Yes" : "—"]),
+              el("td", { class: "deps-drill-desc" }, [r.text]),
+            ])
+          )
+        ),
+      ]);
+      list.appendChild(table);
+    }
+
+    modal.hidden = false;
+  }
+
+  function closeDepsDrillModal() {
+    document.getElementById("depsDrillModal").hidden = true;
+  }
+
+  function csvEscapeField(val) {
+    const s = String(val == null ? "" : val);
+    if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+
+  function exportDependenciesPivotCsv() {
+    if (!lastDepsPivotExport || !lastDepsPivotExport.groups.length) return;
+    const { groups, groupBy } = lastDepsPivotExport;
+    const colPrimary = groupBy === "team" ? "Team" : "Project";
+    const colSecondary = groupBy === "team" ? "Project" : "Team";
+    const headers = [colPrimary, colSecondary, "Total", ...PRIORITY_ORDER, ...DUE_WINDOWS.map((w) => w.label)];
+    const lines = [headers.map(csvEscapeField).join(",")];
+
+    groups.forEach((group) => {
+      group.secondaries.forEach((sub) => {
+        lines.push(
+          [
+            group.label,
+            sub.label,
+            sub.counts.total,
+            ...PRIORITY_ORDER.map((p) => sub.counts[p]),
+            ...DUE_WINDOWS.map((w) => sub.counts[w.key]),
+          ]
+            .map(csvEscapeField)
+            .join(",")
+        );
+      });
+      lines.push(
+        [
+          group.label,
+          "Total · " + group.label,
+          group.counts.total,
+          ...PRIORITY_ORDER.map((p) => group.counts[p]),
+          ...DUE_WINDOWS.map((w) => group.counts[w.key]),
+        ]
+          .map(csvEscapeField)
+          .join(",")
+      );
+    });
+
+    const blob = new Blob([lines.join("\n") + "\n"], { type: "text/csv;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "dependencies-pivot-" + groupBy + "-" + todayISO() + ".csv";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function populateDepsPortfolioFilter() {
+    const select = document.getElementById("depsPortfolioFilter");
+    if (!select) return;
+    const projects = projectsWithOpenDependencies();
+    const prev = depsPortfolioFilter;
+    select.innerHTML = "";
+    select.appendChild(
+      el("option", { value: "all" }, ["All (" + projects.length + ")"])
+    );
+    projects.forEach((p) => {
+      select.appendChild(el("option", { value: p.id }, [p.name]));
+    });
+    if (prev !== "all" && projects.some((p) => p.id === prev)) select.value = prev;
+    else {
+      depsPortfolioFilter = "all";
+      select.value = "all";
+    }
+  }
+
+  function populateDepsCycleFilter(rows) {
+    const select = document.getElementById("depsCycleFilter");
+    if (!select) return;
+    const years = dependencyCycleYears(rows);
+    const prev = depsCycleFilter;
+    select.innerHTML = "";
+    select.appendChild(el("option", { value: "all" }, ["All cycles"]));
+    years.forEach((y) => {
+      select.appendChild(el("option", { value: y }, ["FY " + y]));
+    });
+    if (prev !== "all" && years.includes(prev)) select.value = prev;
+    else {
+      depsCycleFilter = "all";
+      select.value = "all";
+    }
+  }
+
+  function updateDepsPivotSectionTitle() {
+    const node = document.getElementById("depsPivotSectionTitle");
+    if (!node) return;
+    node.textContent =
+      depsPivotGroupBy === "team" ? "Team-wise dependencies" : "Project-wise dependencies";
+  }
+
+  function wireDepsPivotControls() {
+    const toggle = document.getElementById("depsViewToggle");
+    if (toggle && !toggle.dataset.wired) {
+      toggle.dataset.wired = "1";
+      toggle.querySelectorAll(".deps-view-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          depsPivotGroupBy = btn.getAttribute("data-group");
+          toggle.querySelectorAll(".deps-view-btn").forEach((b) => b.classList.toggle("is-active", b === btn));
+          updateDepsPivotSectionTitle();
+          renderDependenciesTab();
+        });
+      });
+    }
+
+    const portfolio = document.getElementById("depsPortfolioFilter");
+    if (portfolio && !portfolio.dataset.wired) {
+      portfolio.dataset.wired = "1";
+      portfolio.addEventListener("change", () => {
+        depsPortfolioFilter = portfolio.value;
+        renderDependenciesTab();
+      });
+    }
+
+    const cycle = document.getElementById("depsCycleFilter");
+    if (cycle && !cycle.dataset.wired) {
+      cycle.dataset.wired = "1";
+      cycle.addEventListener("change", () => {
+        depsCycleFilter = cycle.value;
+        renderDependenciesTab();
+      });
+    }
+
+    const compactBtn = document.getElementById("depsCompactToggle");
+    if (compactBtn && !compactBtn.dataset.wired) {
+      compactBtn.dataset.wired = "1";
+      compactBtn.addEventListener("click", () => {
+        depsPivotCompact = !depsPivotCompact;
+        compactBtn.classList.toggle("is-active", depsPivotCompact);
+        compactBtn.setAttribute("aria-pressed", depsPivotCompact ? "true" : "false");
+        renderDependenciesPivot(collectDependencies());
+      });
+    }
+
+    const exportBtn = document.getElementById("depsExportBtn");
+    if (exportBtn && !exportBtn.dataset.wired) {
+      exportBtn.dataset.wired = "1";
+      exportBtn.addEventListener("click", exportDependenciesPivotCsv);
+    }
+  }
+
+  function wireDepsDrillModal() {
+    const modal = document.getElementById("depsDrillModal");
+    if (!modal || modal.dataset.wired) return;
+    modal.dataset.wired = "1";
+    document.getElementById("depsDrillClose").addEventListener("click", closeDepsDrillModal);
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeDepsDrillModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !modal.hidden) closeDepsDrillModal();
+    });
+  }
+
   function renderDependenciesTab() {
+    populateDepsPortfolioFilter();
+    const rowsPreCycle = collectDependencies({ skipCycle: true });
+    populateDepsCycleFilter(rowsPreCycle);
     const rows = collectDependencies();
     renderDependenciesMetrics(rows);
+    renderDependenciesPivot(rows);
     renderDependenciesBoard(rows);
+    updateDepsPivotSectionTitle();
+    wireDepsPivotControls();
+    wireDepsDrillModal();
   }
 
   /* ---------------- Tab: Escalations ---------------- */
@@ -1702,6 +2189,99 @@
     if (!seg) return null;
     const sla = stageSlaDays(seg.stage);
     return { ...seg, sla, flag: stageFlagLevel(seg.days, sla) };
+  }
+
+  /* ---------------- Stage detail modal (per-stage planned/actual dates,
+     delay attribution, delay log) ---------------- */
+
+  // Diffs `stagePlan[stage].latestStart` / `.latestEnd` across every weekly
+  // history snapshot for this project, building a revision log: the first
+  // time a field is seen is its "Baseline" row, every later change is a
+  // numbered revision with the day-shift from the immediately preceding
+  // value (not the baseline) — same semantics as computeScheduleShifts, just
+  // scoped to one stage's planned dates instead of goLive/milestones.
+  function stagePlanRevisions(p, stage) {
+    const weeks = historyForProject(p.id);
+    const revisions = [];
+    let prevStart = null;
+    let prevEnd = null;
+    let startRevNum = 0;
+    let endRevNum = 0;
+
+    weeks.forEach((w) => {
+      const plan = (w.stagePlan && w.stagePlan[stage]) || null;
+      const start = plan ? plan.latestStart : null;
+      const end = plan ? plan.latestEnd : null;
+
+      if (start && start !== prevStart) {
+        revisions.push({
+          revision: prevStart === null ? "Baseline" : "Rev " + ++startRevNum,
+          changedOn: w.asOf,
+          field: "Planned Start",
+          from: prevStart,
+          to: start,
+          shiftDays: prevStart === null ? null : daysBetweenIso(prevStart, start),
+        });
+        prevStart = start;
+      }
+      if (end && end !== prevEnd) {
+        revisions.push({
+          revision: prevEnd === null ? "Baseline" : "Rev " + ++endRevNum,
+          changedOn: w.asOf,
+          field: "Planned Completion",
+          from: prevEnd,
+          to: end,
+          shiftDays: prevEnd === null ? null : daysBetweenIso(prevEnd, end),
+        });
+        prevEnd = end;
+      }
+    });
+
+    // Live data.json may be ahead of the last captured snapshot (this
+    // week's update hasn't been through a snapshot yet) — include it too.
+    const livePlan = (p.stagePlan && p.stagePlan[stage]) || null;
+    if (livePlan) {
+      if (livePlan.latestStart && livePlan.latestStart !== prevStart) {
+        revisions.push({
+          revision: prevStart === null ? "Baseline" : "Rev " + ++startRevNum,
+          changedOn: DATA.asOf,
+          field: "Planned Start",
+          from: prevStart,
+          to: livePlan.latestStart,
+          shiftDays: prevStart === null ? null : daysBetweenIso(prevStart, livePlan.latestStart),
+        });
+      }
+      if (livePlan.latestEnd && livePlan.latestEnd !== prevEnd) {
+        revisions.push({
+          revision: prevEnd === null ? "Baseline" : "Rev " + ++endRevNum,
+          changedOn: DATA.asOf,
+          field: "Planned Completion",
+          from: prevEnd,
+          to: livePlan.latestEnd,
+          shiftDays: prevEnd === null ? null : daysBetweenIso(prevEnd, livePlan.latestEnd),
+        });
+      }
+    }
+
+    return revisions;
+  }
+
+  function stageDelayLog(p, stage) {
+    return (p.delayLog || []).filter((e) => e.stage === stage);
+  }
+
+  // Groups delay-log entries by a key (team/member/reason) and sums days —
+  // the data behind the stage detail modal's "Delay Analysis" tab. Sorted
+  // by days descending so the biggest contributor leads.
+  function aggregateDelayLog(entries, keyField) {
+    const groups = {};
+    entries.forEach((e) => {
+      const key = e[keyField] || "Unlabeled";
+      const g = groups[key] || (groups[key] = { label: key, days: 0, count: 0 });
+      g.days += e.days || 0;
+      g.count += 1;
+    });
+    return Object.values(groups).sort((a, b) => b.days - a.days || a.label.localeCompare(b.label));
   }
 
   const STATUS_COLOR = { green: "#2f6b4f", amber: "#a6650f", red: "#b5342a", black: "#1c1d24" };
@@ -2117,20 +2697,34 @@
         computeStageSegments(p).map((seg) => {
           const sla = stageSlaDays(seg.stage);
           const flag = stageFlagLevel(seg.days, sla);
-          return el("div", { class: "stage-timeline-row" + (seg.ongoing ? " is-ongoing" : "") }, [
-            el("span", { class: "stage-timeline-stage" }, [seg.stage]),
-            el("span", { class: "stage-timeline-range" }, [
-              (seg.approxStart ? "since before tracking, " : "") +
-                fmtDateShort(seg.start) +
-                (seg.ongoing ? " → now" : " → " + fmtDateShort(seg.end)),
-            ]),
-            el("span", { class: "stage-timeline-duration" + (flag ? " is-" + flag : "") }, [
-              (seg.approxStart ? "≥" : "") + seg.days + "d" + (sla != null ? " / SLA " + sla + "d" : ""),
-            ]),
-          ]);
+          return el(
+            "div",
+            {
+              class: "stage-timeline-row" + (seg.ongoing ? " is-ongoing" : ""),
+              "data-project-id": p.id,
+              "data-stage": seg.stage,
+              title: "Click for stage detail",
+            },
+            [
+              el("span", { class: "stage-timeline-stage" }, [seg.stage]),
+              el("span", { class: "stage-timeline-range" }, [
+                (seg.approxStart ? "since before tracking, " : "") +
+                  fmtDateShort(seg.start) +
+                  (seg.ongoing ? " → now" : " → " + fmtDateShort(seg.end)),
+              ]),
+              el("span", { class: "stage-timeline-duration" + (flag ? " is-" + flag : "") }, [
+                (seg.approxStart ? "≥" : "") + seg.days + "d" + (sla != null ? " / SLA " + sla + "d" : ""),
+              ]),
+            ]
+          );
         })
       )
     );
+    root.querySelectorAll(".stage-timeline-row").forEach((row) => {
+      row.addEventListener("click", () => {
+        openStageDetail(row.getAttribute("data-project-id"), row.getAttribute("data-stage"));
+      });
+    });
 
     if (isLate) {
       root.appendChild(el("h3", { class: "weekly-subhead" }, ["Delay recovery"]));
@@ -2187,7 +2781,7 @@
               ? "Scope is being cut/deferred to hold the current date. Live / in production, but not fully closed out until these ship:"
               : "Live / in production, but not fully closed out until these ship:",
           ]),
-          el("ul", null, listOrDash(p.fastFollowItems)),
+          el("ul", null, listOrDash(p.fastFollowItems || [])),
         ])
       );
     }
@@ -2237,13 +2831,28 @@
         );
       }
 
-      container.appendChild(el("h3", { class: "weekly-subhead" }, ["Dependencies"]));
+      container.appendChild(
+        el("h3", { class: "weekly-subhead detail-section-head" }, [
+          el("span", null, ["Dependencies"]),
+          isLatest
+            ? detailSectionIssueLink("new-dependency.yml", p.name, "+ Add a Dependency")
+            : null,
+        ].filter(Boolean))
+      );
+      const snapDeps = getDependencyObjects(snap).filter(
+        (d) => !d.resolved && !isPlaceholderDependencyText(d.text)
+      );
       container.appendChild(
         el("div", { class: "detail-block deps" }, [
           el(
             "ul",
             { class: "paired-list" },
-            pairedList(snap.dependencies || [], snap.dependencyMitigations || [], "Mitigation / impact", snap.dependencyTeams || [])
+            pairedList(
+              snapDeps.map((d) => d.text),
+              snapDeps.map((d) => d.mitigation),
+              "Mitigation / impact",
+              snapDeps.map((d) => d.team)
+            )
           ),
         ])
       );
@@ -2272,11 +2881,25 @@
         );
       }
 
-      container.appendChild(el("h3", { class: "weekly-subhead" }, ["Risks / blockers"]));
+      const snapRisks = getRiskObjects(snap).filter(
+        (r) => !r.resolved && !isPlaceholderRiskText(r.text)
+      );
+      container.appendChild(
+        el("h3", { class: "weekly-subhead detail-section-head" }, [
+          el("span", null, ["Risks / blockers"]),
+          isLatest
+            ? detailSectionIssueLink("new-risk.yml", p.name, "+ Report a Risk")
+            : null,
+        ].filter(Boolean))
+      );
       container.appendChild(
         el("div", { class: "detail-block risks" }, [
-          snap.risks && snap.risks.length
-            ? el("ul", { class: "paired-list" }, pairedList(snap.risks, snap.riskMitigations || [], "Mitigation plan"))
+          snapRisks.length
+            ? el("ul", { class: "paired-list" }, pairedList(
+                snapRisks.map((r) => r.text),
+                snapRisks.map((r) => r.mitigation),
+                "Mitigation plan"
+              ))
             : el("ul", null, [el("li", null, ["None reported"])]),
         ])
       );
@@ -2395,6 +3018,368 @@
     return root;
   }
 
+  /* ---------------- Stage detail modal ---------------- */
+
+  function openStageDetail(projectId, stage) {
+    const project = DATA.projects.find((p) => p.id === projectId);
+    if (!project) return;
+
+    const overlay = document.getElementById("stageDetail");
+    const content = document.getElementById("stageDetailContent");
+    content.innerHTML = "";
+    content.appendChild(buildStageDetail(project, stage));
+    overlay.hidden = false;
+    overlay.scrollTop = 0;
+  }
+
+  function closeStageDetail() {
+    document.getElementById("stageDetail").hidden = true;
+  }
+
+  function stageStatusBadge(kind) {
+    return { done: "Done", current: "In Progress", future: "Not Started" }[kind] || kind;
+  }
+
+  function buildStageDetail(p, stage) {
+    const stageIndex = PIPELINE_STAGES.indexOf(stage);
+    const segments = computeStageSegments(p);
+    const seg = segments.find((s) => s.stage === stage) || null;
+    const currentIndex = PIPELINE_STAGES.indexOf(p.stage || "Unstaged");
+    const kind = stageIndex < currentIndex ? "done" : stageIndex === currentIndex ? "current" : "future";
+    const sla = stageSlaDays(stage);
+    const days = seg ? seg.days : 0;
+    const flag = seg ? stageFlagLevel(days, sla) : null;
+    const plan = (p.stagePlan && p.stagePlan[stage]) || {};
+    const delayEntries = stageDelayLog(p, stage);
+    const revisions = stagePlanRevisions(p, stage);
+
+    const root = el("div", { class: "stagedetail-root" });
+
+    root.appendChild(
+      el("div", { class: "stagedetail-head" }, [
+        el("div", null, [
+          el("div", { class: "stagedetail-kicker" }, [
+            p.name.toUpperCase() + " · STAGE " + (stageIndex + 1) + " OF " + PIPELINE_STAGES.length,
+          ]),
+          el("h2", null, [stage]),
+          el("div", { class: "stagedetail-sub" }, [
+            stageStatusBadge(kind) + (p.owner ? " · PM " + p.owner : ""),
+          ]),
+        ]),
+      ])
+    );
+
+    root.appendChild(
+      el("div", { class: "stagedetail-tabs", role: "tablist" }, [
+        el("button", { class: "stagedetail-tab-btn is-active", "data-panel": "overview", type: "button" }, ["Overview"]),
+        el("button", { class: "stagedetail-tab-btn", "data-panel": "history", type: "button" }, ["Date History"]),
+        el("button", { class: "stagedetail-tab-btn", "data-panel": "analysis", type: "button" }, ["Delay Analysis"]),
+        el("button", { class: "stagedetail-tab-btn", "data-panel": "log", type: "button" }, ["Delay Log"]),
+      ])
+    );
+
+    const panels = el("div", { class: "stagedetail-panels" }, [
+      el("div", { class: "stagedetail-panel is-active", "data-panel": "overview" }, [
+        buildStageOverviewPanel(p, stage, seg, sla, days, flag, kind, plan, delayEntries),
+      ]),
+      el("div", { class: "stagedetail-panel", "data-panel": "history" }, [buildStageHistoryPanel(revisions)]),
+      el("div", { class: "stagedetail-panel", "data-panel": "analysis" }, [buildStageAnalysisPanel(delayEntries)]),
+      el("div", { class: "stagedetail-panel", "data-panel": "log" }, [buildStageLogPanel(delayEntries)]),
+    ]);
+    root.appendChild(panels);
+
+    root.querySelectorAll(".stagedetail-tab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        root.querySelectorAll(".stagedetail-tab-btn").forEach((b) => b.classList.remove("is-active"));
+        root.querySelectorAll(".stagedetail-panel").forEach((pnl) => pnl.classList.remove("is-active"));
+        btn.classList.add("is-active");
+        root.querySelector('.stagedetail-panel[data-panel="' + btn.getAttribute("data-panel") + '"]').classList.add("is-active");
+      });
+    });
+
+    return root;
+  }
+
+  function dateVarianceCell(initial, latest, actual) {
+    let varianceLabel = "—";
+    let varianceClass = "";
+    if (actual && latest) {
+      const delta = daysBetweenIso(latest, actual);
+      if (delta === 0) {
+        varianceLabel = "On schedule";
+        varianceClass = "is-ontime";
+      } else if (delta > 0) {
+        varianceLabel = "+" + delta + "d late";
+        varianceClass = "is-late";
+      } else {
+        varianceLabel = delta + "d early";
+        varianceClass = "is-early";
+      }
+    } else if (!latest) {
+      varianceLabel = "Not planned yet";
+    } else {
+      varianceLabel = "Pending";
+    }
+    return el("span", { class: "stagedetail-variance" + (varianceClass ? " " + varianceClass : "") }, [varianceLabel]);
+  }
+
+  function buildStageOverviewPanel(p, stage, seg, sla, days, flag, kind, plan, delayEntries) {
+    // `seg` can be null even for a "done" stage — computeStageSegments()
+    // only reconstructs stages actually captured in history.json, so a
+    // project whose tracking began mid-pipeline has no segment for stages
+    // before that point, even though they're clearly in the past by index.
+    const actualStart = seg ? seg.start : null;
+    const actualEnd = kind === "done" && seg ? seg.end : null;
+
+    const pct = kind === "done" ? 100 : kind === "future" ? 0 : sla != null ? Math.max(0, Math.min(100, Math.round((days / sla) * 100))) : null;
+    const cumulativeOverage = cumulativeStageOverageDays(p);
+    const overDays = sla != null ? Math.max(0, days - sla) : 0;
+
+    return el("div", null, [
+      el("div", { class: "stagedetail-datebox-row" }, [
+        el("div", { class: "stagedetail-datebox" }, [
+          el("h4", null, ["Start Date"]),
+          el("dl", null, [
+            el("dt", null, ["Initial Planned Start Date"]),
+            el("dd", null, [fmtDate(plan.initialStart)]),
+            el("dt", null, ["Latest Planned Start Date"]),
+            el("dd", null, [fmtDate(plan.latestStart)]),
+            el("dt", null, ["Actual Start Date"]),
+            el("dd", { class: "stagedetail-actual" }, [fmtDate(actualStart)]),
+          ]),
+          el("div", { class: "stagedetail-variance-row" }, [
+            el("span", { class: "stagedetail-variance-label" }, ["Variance"]),
+            dateVarianceCell(plan.initialStart, plan.latestStart, actualStart),
+          ]),
+        ]),
+        el("div", { class: "stagedetail-datebox" }, [
+          el("h4", null, ["Completion Date"]),
+          el("dl", null, [
+            el("dt", null, ["Initial Planned Completion Date"]),
+            el("dd", null, [fmtDate(plan.initialEnd)]),
+            el("dt", null, ["Latest Planned Completion Date"]),
+            el("dd", null, [fmtDate(plan.latestEnd)]),
+            el("dt", null, ["Actual Completion Date"]),
+            el("dd", { class: "stagedetail-actual" }, [actualEnd ? fmtDate(actualEnd) : "—"]),
+          ]),
+          el("div", { class: "stagedetail-variance-row" }, [
+            el("span", { class: "stagedetail-variance-label" }, ["Variance"]),
+            dateVarianceCell(plan.initialEnd, plan.latestEnd, actualEnd),
+          ]),
+        ]),
+      ]),
+
+      el("div", { class: "stagedetail-completion" }, [
+        el("div", { class: "stagedetail-completion-head" }, [
+          el("h4", null, ["SLA Elapsed"]),
+          el("span", { class: "stagedetail-completion-pct" }, [pct == null ? "—" : pct + "%"]),
+        ]),
+        el("div", { class: "progress-track" }, [
+          el("div", { class: "progress-fill status-" + (flag === "breach" ? "red" : flag === "warn" ? "amber" : "green"), style: "width:" + (pct || 0) + "%" }),
+        ]),
+        el("div", { class: "stagedetail-completion-foot" }, [
+          el("span", null, [kind === "done" ? "Closed out" : kind === "current" ? "In progress" : "Not started"]),
+          el("span", null, ["Status: " + stageStatusBadge(kind)]),
+        ]),
+      ]),
+
+      el("div", { class: "stagedetail-stat-row" }, [
+        el("div", { class: "metric-card" + (flag === "breach" ? " tone-red" : flag === "warn" ? " tone-amber" : " tone-green") }, [
+          el("div", { class: "num" }, [(overDays > 0 ? "+" + overDays : "0") + "d"]),
+          el("div", { class: "label" }, ["Stage delay"]),
+          el("div", { class: "stage-grid-metric-sub" }, [overDays > 0 ? "over SLA" : "on time"]),
+        ]),
+        el("div", { class: "metric-card" }, [
+          el("div", { class: "num" }, [String(delayEntries.length)]),
+          el("div", { class: "label" }, ["Log entries"]),
+          el("div", { class: "stage-grid-metric-sub" }, ["recorded"]),
+        ]),
+        el("div", { class: "metric-card" + (cumulativeOverage ? " tone-amber" : " tone-green") }, [
+          el("div", { class: "num" }, [cumulativeOverage + "d"]),
+          el("div", { class: "label" }, ["Project cumulative"]),
+          el("div", { class: "stage-grid-metric-sub" }, ["all " + PIPELINE_STAGES.length + " stages"]),
+        ]),
+      ]),
+    ]);
+  }
+
+  function buildStageHistoryPanel(revisions) {
+    if (!revisions.length) {
+      return el("div", { class: "deps-empty-group" }, ["No planned-date revisions recorded yet — submit a planned start/completion date on a weekly update for this stage to start tracking."]);
+    }
+    return el("div", null, [
+      el("table", { class: "stagedetail-history-table" }, [
+        el("thead", null, [
+          el("tr", null, [
+            el("th", null, ["Revision"]),
+            el("th", null, ["Changed On"]),
+            el("th", null, ["Field"]),
+            el("th", null, ["From → To"]),
+            el("th", null, ["Shift"]),
+          ]),
+        ]),
+        el(
+          "tbody",
+          null,
+          revisions.map((r) =>
+            el("tr", null, [
+              el("td", { class: "stagedetail-rev-cell" }, [r.revision]),
+              el("td", null, [fmtDate(r.changedOn)]),
+              el("td", null, [r.field]),
+              el("td", null, [(r.from ? fmtDateShort(r.from) : "—") + " → " + fmtDateShort(r.to)]),
+              el("td", { class: "stagedetail-shift-cell" }, [r.shiftDays == null ? "—" : (r.shiftDays > 0 ? "+" : "") + r.shiftDays + "d"]),
+            ])
+          )
+        ),
+      ]),
+      el("ul", { class: "stagedetail-history-notes" }, [
+        el("li", null, ["Baseline is the first planned date submitted for this stage; every later change is tracked as a revision."]),
+        el("li", null, ["Shift is measured against the immediately preceding revision, not the baseline."]),
+      ]),
+    ]);
+  }
+
+  function buildStageAnalysisPanel(entries) {
+    if (!entries.length) {
+      return el("div", { class: "deps-empty-group" }, ["No delay log entries recorded for this stage."]);
+    }
+    const totalDays = entries.reduce((sum, e) => sum + (e.days || 0), 0);
+    const breakdowns = [
+      { title: "By Team", groups: aggregateDelayLog(entries, "team") },
+      { title: "By Member", groups: aggregateDelayLog(entries, "member") },
+      { title: "By Reason", groups: aggregateDelayLog(entries, "reason") },
+    ];
+    return el(
+      "div",
+      { class: "stagedetail-analysis-head" }, [
+      el("div", { class: "stagedetail-analysis-total" }, [
+        el("span", { class: "num" }, [String(totalDays)]),
+        el("span", { class: "label" }, ["days total"]),
+      ]),
+      el(
+        "div",
+        { class: "stagedetail-analysis-cols" },
+        breakdowns.map((b) =>
+          el("div", { class: "stagedetail-analysis-col" }, [
+            el("h4", null, [b.title]),
+            el(
+              "div",
+              { class: "stagedetail-bar-list" },
+              b.groups.map((g, i) =>
+                el("div", { class: "stagedetail-bar-row" }, [
+                  el("span", { class: "stagedetail-bar-dot", style: `background:${BREAKDOWN_COLORS[i % BREAKDOWN_COLORS.length]}` }),
+                  el("span", { class: "stagedetail-bar-label" }, [g.label]),
+                  el("span", { class: "stagedetail-bar-days" }, [g.days + "d"]),
+                ])
+              )
+            ),
+          ])
+        )
+      ),
+    ]);
+  }
+
+  const BREAKDOWN_COLORS = ["#c1502e", "#5a3b30", "#dfa23a", "#3562e8", "#1a9f6b", "#8a5fd6"];
+
+  function buildStageLogPanel(entries) {
+    const wrap = el("div", { class: "stagedetail-log-wrap" });
+
+    const reasons = Array.from(new Set(entries.map((e) => e.reason).filter(Boolean))).sort();
+    const teams = Array.from(new Set(entries.map((e) => e.team).filter(Boolean))).sort();
+
+    const searchInput = el("input", { type: "text", class: "stagedetail-log-search", placeholder: "Search delay log..." });
+    const reasonSelect = el("select", { class: "stagedetail-log-filter" }, [
+      el("option", { value: "all" }, ["All Reasons"]),
+      ...reasons.map((r) => el("option", { value: r }, [r])),
+    ]);
+    const teamSelect = el("select", { class: "stagedetail-log-filter" }, [
+      el("option", { value: "all" }, ["All Teams"]),
+      ...teams.map((t) => el("option", { value: t }, [t])),
+    ]);
+
+    wrap.appendChild(
+      el("div", { class: "stagedetail-log-controls" }, [searchInput, reasonSelect, teamSelect])
+    );
+
+    const tableHolder = el("div");
+    wrap.appendChild(tableHolder);
+
+    let sortDesc = true;
+
+    function render() {
+      const q = searchInput.value.trim().toLowerCase();
+      const reasonFilter = reasonSelect.value;
+      const teamFilter = teamSelect.value;
+      let filtered = entries.filter((e) => {
+        if (reasonFilter !== "all" && e.reason !== reasonFilter) return false;
+        if (teamFilter !== "all" && e.team !== teamFilter) return false;
+        if (q && !(e.reason + " " + e.member + " " + e.team + " " + e.id).toLowerCase().includes(q)) return false;
+        return true;
+      });
+      filtered = filtered.slice().sort((a, b) => (sortDesc ? b.days - a.days : a.days - b.days));
+
+      tableHolder.innerHTML = "";
+      if (!filtered.length) {
+        tableHolder.appendChild(el("div", { class: "deps-empty-group" }, ["No matching delay log entries."]));
+        return;
+      }
+
+      const sortArrow = el("span", { class: "stagedetail-sort-arrow" }, [sortDesc ? "▼" : "▲"]);
+      const daysHeader = el("th", { class: "stagedetail-days-header" }, ["Days ", sortArrow]);
+      daysHeader.addEventListener("click", () => {
+        sortDesc = !sortDesc;
+        render();
+      });
+
+      tableHolder.appendChild(
+        el("table", { class: "stagedetail-log-table" }, [
+          el("thead", null, [
+            el("tr", null, [
+              el("th", null, ["ID"]),
+              el("th", null, ["Date"]),
+              el("th", null, ["Reason"]),
+              el("th", null, ["Member"]),
+              el("th", null, ["Team"]),
+              daysHeader,
+            ]),
+          ]),
+          el(
+            "tbody",
+            null,
+            filtered.map((e) =>
+              el("tr", null, [
+                el("td", { class: "stagedetail-id-cell" }, [e.id || "—"]),
+                el("td", null, [fmtDateShort(e.date)]),
+                el("td", null, [e.reason]),
+                el("td", null, [e.member]),
+                el("td", null, [e.team]),
+                el("td", null, [el("span", { class: "stagedetail-days-pill" }, [e.days + "d"])]),
+              ])
+            )
+          ),
+        ])
+      );
+    }
+
+    [searchInput, reasonSelect, teamSelect].forEach((input) => {
+      input.addEventListener("input", render);
+      input.addEventListener("change", render);
+    });
+    render();
+
+    return wrap;
+  }
+
+  function wireStageDetailModal() {
+    document.getElementById("stageDetailClose").addEventListener("click", closeStageDetail);
+    document.getElementById("stageDetail").addEventListener("click", (e) => {
+      if (e.target.id === "stageDetail") closeStageDetail();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !document.getElementById("stageDetail").hidden) closeStageDetail();
+    });
+  }
+
   function wireProjectDetail() {
     document.getElementById("detailClose").addEventListener("click", closeProjectDetail);
     document.getElementById("projectDetail").addEventListener("click", (e) => {
@@ -2478,8 +3463,7 @@
     populateGlobalTeamFilter();
     wireGlobalTeamFilter();
     renderMetrics();
-    renderStageSlaFlags();
-    renderStageBoard();
+    renderStageGrid();
     renderHawkeye();
     renderCards();
 
@@ -2489,6 +3473,7 @@
     renderStatusHistory();
 
     wireProjectDetail();
+    wireStageDetailModal();
     wireFeedbackModal();
     wireTabs();
   }

@@ -10,8 +10,8 @@ so any PM can update it by editing one JSON file and pushing.
 
 A **"🔎 Project" dropdown** sits right under the tab bar, visible on every
 tab, next to a **"PM" dropdown** and a **"Team" dropdown**. Pick any
-combination and Program Status, Pipeline Stages, Grid, Hawk-eye, Status
-History, Dependencies, and Escalations all narrow down to match (the
+combination and Program Status, Grid, Hawk-eye, Status History,
+Dependencies, and Escalations all narrow down to match (the
 metrics row recomputes for the filtered set too). Clear any one with its
 ✕ button to see everything again. These global filters replace the old
 per-tab Team/Status/PM filter rows — one filter bar, same effect everywhere.
@@ -20,7 +20,7 @@ per-tab Team/Status/PM filter rows — one filter bar, same effect everywhere.
   one PM's projects" filters.
 - **Team** — filters to projects that have a dependency owned by another
   team (DevOps, BAPS ID Team, SSO Team, etc. — populated from whatever's
-  actually been entered in each project's `dependencyTeams`, see the Data
+  actually been entered on each open dependency's `team` field, see the Data
   model section). Handy for someone on one of those teams to jump straight
   to "which of these projects need something from me" without scanning
   every card.
@@ -49,42 +49,7 @@ to scan instead of a 15-slide deck.
   at-risk / critical / non-recoverable, plus a **PM filter dropdown** to
   show only one person's projects.
 
-## Tab 2 — Pipeline Stages (live)
-
-A Kanban-style board grouping every project by its canonical delivery stage
-(Requirements → Design/Estimation → Development → QA/UAT → Production
-Release → Hypercare/Post-Launch), so you can see at a glance where the whole
-portfolio actually sits without opening each card. Click any card to jump
-into its full detail view. Inspired by the stage board on Intuit's internal
-PDLC dashboard.
-
-**Stage-gate SLA flags.** Every stage card shows how many days the project
-has been sitting in its *current* stage plus how that compares to the
-stage's SLA (e.g. "SLA 14d · +15d over"), colored grey/amber/red. Flagged
-tiles also get a colored left edge so they stand out in the board without
-needing to read every card. At the top of the tab there's one compact bar
-— "⚠️ N over SLA · M approaching" — with a small clickable chip per flagged
-project (e.g. "myBKY 2A +19d"); click a chip to jump straight to that
-project. All the detail lives on the tiles themselves, so the page stays
-scannable instead of turning into a long list.
-
-"Days in stage" is reconstructed from the weekly history snapshots (only
-granularity we have): it's the time since the stage last changed, calendar
-days, not business days. The very first stage a project was ever seen in
-is marked with a "≥" since we don't know how long it was in that stage
-before tracking began.
-
-SLAs per stage live in `data.json`'s top-level `stageSlaDays` (defaults:
-Requirements 10d, Design/Estimation 10d, Development 30d, QA/UAT 14d,
-Production Release 5d, Hypercare/Post-Launch 21d) — edit that object
-directly to tune them, no code change needed.
-
-A project's full detail view also has a **"Stage-gate timeline"** section:
-every stage it's ever passed through, with the date range and duration for
-each (including past stages that blew their SLA — useful context even
-after the project has moved on).
-
-## Tab 3 — Grid (live)
+## Tab 2 — Grid (live)
 
 A portfolio-wide matrix: every project as a row, every pipeline stage as a
 column (Requirements → Design/Estimation → Development → QA/UAT →
@@ -108,7 +73,7 @@ as everything else):
 **Each cell:**
 - **Green, "✓ Xd" + a date range** — that stage is done, on time. The date
   range is the actual start → end for that stage (from the same stage-gate
-  reconstruction used in Tab 2 / the per-project timeline).
+  reconstruction used in the per-project Stage-gate timeline).
 - **Green→red, "✓ Xd" + "+Xd over SLA"** — that stage is done, but blew its
   own SLA back when the project was in it. This is tracked per-stage, so a
   project doing fine today can still show a past stage that ran long — the
@@ -119,19 +84,40 @@ as everything else):
 - **Grey "—" cell** — stage not reached yet.
 
 Click any project name or any cell to open that project's full detail view,
-scrolled straight to its Stage-gate timeline section. This was adapted from
+scrolled straight to its Stage-gate timeline section.
+
+**Shared stage-gate computation.** The Grid tab, Hawk-eye, and each
+project's **Stage-gate timeline** (in the detail modal) all use the same
+primitives — `computeStageSegments`, `stageSlaDays`, `stageFlagLevel`,
+`currentStageInfo`, and `cumulativeStageOverageDays` — so they never
+disagree on durations, SLA flags, or cumulative overage. "Days in stage" is
+reconstructed from weekly history snapshots (calendar days, not business
+days); the first segment a project was ever seen in is marked with "≥"
+since we don't know how long it was in that stage before tracking began.
+SLAs per stage live in `data.json`'s top-level `stageSlaDays` (defaults:
+Requirements 10d, Design/Estimation 10d, Development 30d, QA/UAT 14d,
+Production Release 5d, Hypercare/Post-Launch 21d).
+
+The detail view's **Stage-gate timeline** lists every stage the project has
+passed through (same segments as the Grid row). **Click any row** to open a
+**stage detail modal** with four tabs (Overview, Date History, Delay
+Analysis, Delay Log) — see `stagePlan` / `delayLog` in the Data model
+section for how PMs feed planned dates and delay attribution via the
+weekly-update form.
+
+This tab was adapted from
 a "Project × Stage Status" grid concept the team liked in a separate
 internal admin-dashboard mockup, rebuilt here using our own stage-gate SLA
 data and the site's existing visual style instead of copying that mockup's
 own design system.
 
-## Tab 4 — 🦅 Hawk-eye (live)
+## Tab 3 — 🦅 Hawk-eye (live)
 
 A cross-project **stage-gate calendar**: every project on one shared
 timeline, one row each, sorted by go-live date — but instead of a couple of
 milestone dots, each row is the project's actual pipeline stages laid out
 end to end as blocks, built from the same stage-segment reconstruction used
-by Tab 2 / the Grid tab / each project's Stage-gate timeline, so all four
+by the Grid tab / each project's Stage-gate timeline, so all three stage-gate
 views always agree.
 
 - **Solid block, green** — a stage already completed, positioned at its
@@ -153,10 +139,10 @@ views always agree.
 
 Click any row or block to open the full detail view, scrolled straight to
 the Stage-gate timeline. Adapted from the same "Project States in Calendar"
-concept in the internal admin-dashboard mockup mentioned in Tab 3, rebuilt
+concept in the internal admin-dashboard mockup mentioned in Tab 2, rebuilt
 with our real stage-gate data instead of copying its design system.
 
-## Tab 5 — Status History (live)
+## Tab 4 — Status History (live)
 
 A flat, chronological feed that merges **two kinds of events** across the
 whole portfolio, newest first:
@@ -182,18 +168,68 @@ ingested; the same status-change is also highlighted (as colored pills)
 inside each project's own week-over-week change log in its detail view, and
 the same schedule shifts also drive the per-project schedule timeline there.
 
-## Tab 6 — Dependencies (live)
+## Tab 5 — Dependencies (live)
 
-Every dependency across every project, flattened into one cross-project
-board and grouped by the **owning team** (DevOps, Security, GMS Team,
-Business/Stakeholder, etc. — whatever the PM labels it as in their weekly
-update). Each card shows which project it's blocking, the dependency text,
-and its mitigation plan / impact — with anything missing a team label or a
-mitigation plan flagged in amber so it's obvious what to chase down (see the
-metrics row at the top for the counts). Use the global Project/PM filter to
-narrow this to one project or PM; click a project name to jump straight into
-its full detail view. This is the fastest way to answer "what's DevOps
-blocking us on this week?" without reading every project card individually.
+Every dependency across every project, plus **when it's actually needed by**
+and **how urgent it is** — the goal is a team like DevOps being able to tell
+at a glance whether something is due today, this week, next week, or has
+already slipped past its date, without reading every project card.
+
+The tab has three layers, top to bottom:
+
+- **KPI row (four cards)** — aligned to the leadership rollup mockups, computed
+  from real project/dependency data (respecting global and Dependencies-tab
+  filters):
+  - **Active Projects** — distinct projects with at least one open dependency
+    in view; subtext is how many distinct owning teams those deps span.
+  - **Blocked Stages** — count of in-scope projects whose **current** pipeline
+    stage is over SLA (`stageFlagLevel` → breach), same definition as the Grid
+    tab’s “Stages Over SLA”.
+  - **Cumulative Delay** — sum of `cumulativeStageOverageDays()` across those
+    projects (summed SLA overage across all stages lived so far).
+  - **In Rollout / Hypercare** — projects in **Production Release** or
+    **Hypercare / Post-Launch** (post-UAT), among projects with open deps in
+    scope.
+- **Rollup pivot table**, toggled **By Project** or **By Team**, with header
+  controls:
+  - **Portfolio** — narrows to one project that has open dependencies (`All (N)`
+    lists every such project after global filters). There is no separate
+    portfolio dimension in `data.json`; this is an honest project pick-list,
+    not a fabricated grouping. Page-level **Project / PM / Team** filters still
+    apply everywhere.
+  - **Cycle** — optional filter by **calendar year** of each dependency’s
+    `dueBy` (`FY 2026`, etc., derived from dates in the data). Dependencies
+    with no `dueBy` stay visible regardless of cycle.
+  - **Compact** — toggles denser pivot row height/font (`.deps-pivot-wrap.is-compact`).
+  - **Export** — downloads a CSV of the current pivot (grouping, portfolio,
+    cycle, and global filters applied).
+  Columns: **Project** + **Team** (order swaps with the toggle), **Total**, **By
+  Priority** (Critical/High/Medium/Low), **By Due Window** (Overdue, Today,
+  Tomorrow, This Week, Next Week, This Month, Next Month). Overdue is a seventh
+  window column so past-due items are not hidden when the mockup’s six forward
+  buckets are used. Dependencies with **no date** count toward row **Total**
+  only (not toward a due-window column). Each primary group lists secondary
+  rows, then a **Total · …** subtotal row. **Click any non-zero count** to open
+  a modal list of matching dependencies (project, team, description, priority,
+  due date, escalated flag).
+- **Detail cards**, still grouped by owning team. Priority and needed-by badges
+  use the same due-window buckets as the pivot. **🚨 Escalated** when flagged on
+  the weekly form. Missing mitigation still flagged in amber.
+
+Use the global Project/PM/Team filter to narrow any of this; click a project
+name on a detail card to open its full detail view.
+
+Needed-by date, priority, escalated-to-leadership, and resolved status are
+optional per-dependency fields on the weekly-update issue form (`Dependency
+needed by (date)` / `Dependency priority` / `Dependency escalated to
+leadership?` / `Dependency resolved?`, one line each, same order as open
+`Dependencies`) — see the `dependencies` object array in the Data model
+section below. **New** dependencies mid-week go through the **Add a Dependency**
+issue form (`.github/ISSUE_TEMPLATE/new-dependency.yml`); the bot assigns a
+stable `DEP-*` id. Older dependencies with no date/priority/escalated flag
+recorded just show "No Date" / default to "Medium" / no escalated badge
+rather than breaking the rollup. Resolved dependencies are hidden from this
+tab but kept on the project for history.
 
 Week-over-week history for an individual project (progress-over-time chart,
 a **schedule timeline** tracking every time the go-live or next-milestone
@@ -224,7 +260,7 @@ timeline / Date change log**, and as a green "⏱ Time saved" row in the
 **Status History** tab (Tab 4) alongside status transitions and date
 shifts, every week it's reported.
 
-## Tab 7 — 🚨 Escalations (live)
+## Tab 6 — 🚨 Escalations (live)
 
 Every current escalation to leadership, rolled up across every project —
 the go-to view for walking through the weekly review meeting. Grouped by
@@ -244,7 +280,7 @@ leadership this week"** field on the weekly update form — unlike most
 fields, leaving it blank clears it (it means "nothing to escalate this
 week"), it doesn't carry last week's escalation forward.
 
-## Tab 8 — Team Performance (skeleton only)
+## Tab 7 — Team Performance (skeleton only)
 
 Placeholder tab for engineering execution metrics (PR velocity, review
 turnaround, commit activity, deploy cadence) once we wire up GitHub data per
@@ -266,7 +302,7 @@ filling out the form.
 
 A scheduled GitHub Action (`.github/workflows/ingest.yml`, weekdays at noon
 UTC — adjust the cron to your meeting cadence, or just run it manually from
-the Actions tab) reads all open "weekly-update" issues, merges them into
+the Actions tab) reads all open "weekly-update", "new-dependency", and "new-risk" issues, merges them into
 `data.json`, snapshots the result into `history.json`, and **closes each
 issue** with a confirmation comment. You can also trigger it on demand via
 `workflow_dispatch` right before a meeting if someone submitted late.
@@ -282,6 +318,32 @@ the PM to edit the issue and add the reason. The next scheduled (or manual)
 run automatically picks it back up once the reason is filled in — no reason
 is ever silently dropped. Once merged, the reason shows up with its date on
 the **Status History** tab and is highlighted (amber) if it's ever missing.
+
+## Adding a dependency mid-week
+
+When a new cross-team blocker comes up between weekly cycles, open a **Add a
+Dependency** issue (repo Issues → New issue → that template). Pick the
+project, describe the dependency, owning team, optional needed-by date /
+priority / mitigation, and whether it's already escalated. The same ingest
+Action picks up open issues labeled `new-dependency`, appends one object to
+that project's `dependencies` array with the next `DEP-*` id, and closes the
+issue. Edit or resolve it later on the normal weekly update (list every
+**open** dependency there, same one-line-per-field order as before).
+
+## Reporting a risk mid-week
+
+When a new risk or blocker comes up between weekly cycles, open a **Report a
+Risk** issue (repo Issues → New issue → that template). Pick the project,
+describe the risk, and optionally add a mitigation plan. The same ingest
+Action picks up open issues labeled `new-risk`, appends one object to
+that project's `risks` array with the next `RISK-*` id, and closes the
+issue. Edit or clear it later on the normal weekly update (list every
+**open** risk there, same one-line-per-field order as before).
+
+From a project's **full detail view** (opened from a project card), use
+**"+ Add a Dependency ↗"** or **"+ Report a Risk ↗"** in the Dependencies
+and Risks / blockers sections — each opens the matching GitHub issue form
+with the project pre-filled.
 
 ## How live meeting feedback works
 
@@ -332,7 +394,7 @@ Everything lives in three files:
 
 - **`data.json`** — current live state, one object per project in the
   `projects` array, plus a top-level `stageSlaDays` object (SLA, in calendar
-  days, per pipeline stage — used for the Stage-gate SLA flags on Tab 2).
+  days, per pipeline stage — used for the Grid tab and Stage-gate timeline).
 - **`history.json`** — one snapshot per `asOf` date, keyed by date, used by
   the Week-over-Week tab and to reconstruct each project's stage-gate
   timeline (how long it's spent in each stage).
@@ -373,16 +435,33 @@ Everything lives in three files:
   "scopeReduced": false,       // true if scope is being cut/deferred this week to hold the go-live
                                 // date — flags a "✂️ scope cut" badge on the card; what's being
                                 // deferred should be listed in fastFollowItems below
-  "dependencies": ["..."],
-  "dependencyTeams": ["..."],       // same length/order as dependencies — which team owns unblocking it
-  "dependencyMitigations": ["..."], // same length/order as dependencies — plan + impact for each
+  "dependencies": [                 // id-based objects (ingest migrates legacy parallel arrays on load)
+    {
+      "id": "DEP-101",              // SYSTEM-MANAGED — minted from dependencySeq (starts at 100+)
+      "text": "Waiting on SSO team for prod credentials",
+      "team": "SSO Team",           // owning team(s) — drives Team filter + card grouping
+      "mitigation": "Escalated to SSO lead 9/20",
+      "dueBy": "2026-10-05",        // "" if no hard date; invalid dates dropped at ingest
+      "priority": "High",           // Critical | High | Medium | Low
+      "escalated": false,           // per-dependency leadership escalation (🚨 badge on Tab 5)
+      "resolved": false             // true = hidden from Dependencies tab, kept for history
+    }
+  ],
+  "dependencySeq": 101,             // SYSTEM-MANAGED — counter for next DEP-* id (like delayLogSeq)
   "sprintStatus": {
     "completed": ["..."],
     "inProgress": ["..."],
     "nextPlan": ["..."]
   },
-  "risks": ["..."],
-  "riskMitigations": ["..."],  // same length/order as risks — mitigation plan + impact for each
+  "risks": [                        // id-based objects (ingest migrates legacy parallel arrays on load)
+    {
+      "id": "RISK-101",             // SYSTEM-MANAGED — minted from riskSeq (starts at 100+)
+      "text": "Security re-verification may miss UAT window",
+      "mitigation": "Escalated to security lead — ~1 week slip if missed",
+      "resolved": false             // true = hidden from risk counts/detail, kept for history
+    }
+  ],
+  "riskSeq": 101,                   // SYSTEM-MANAGED — counter for next RISK-* id
   "fastFollowItems": ["..."],  // one per line — scope being deferred (see scopeReduced above) and/or
                                 // remaining work to fully close out a live/in-production project;
                                 // shows a badge on the card and a block in the detail view so it's
@@ -394,30 +473,81 @@ Everything lives in three files:
                                 // detail view's escalations block.
   "milestones": [              // OPTIONAL — full schedule for the mini Gantt in a project's own
                                 // detail view. If omitted, that view falls back to plotting just
-                                // `nextMilestone` + `goLive`. (Hawk-eye/Tab 4 plots pipeline stages
+                                // `nextMilestone` + `goLive`. (Hawk-eye/Tab 3 plots pipeline stages
                                 // instead, built entirely from history — doesn't read this field.)
     { "name": "Requirements sign-off", "date": "2026-08-01", "status": "green" }
-  ]
+  ],
+  "stagePlan": {                // OPTIONAL — per-stage planned dates, keyed by pipeline stage name.
+                                 // Only the CURRENT stage gets written to on a given weekly update
+                                 // (see "Current stage — planned start/completion date" on the form);
+                                 // once a project moves to the next stage, this stage's entry is
+                                 // frozen and its history lives on in history.json snapshots. Feeds
+                                 // the stage detail modal's Overview (planned vs actual + variance)
+                                 // and Date History (revision log, diffed across history.json) tabs.
+    "Development": {
+      "initialStart": "2026-01-05",  // locked the first time a start date is submitted for this stage
+      "initialEnd": "2026-01-20",    // locked the first time an end date is submitted for this stage
+      "latestStart": "2026-01-05",   // moves every time a later submission changes it
+      "latestEnd": "2026-01-28"      // moves every time a later submission changes it
+    }
+  },
+  "delayLog": [                 // OPTIONAL, append-only (unlike every other array field, which is
+                                 // wholesale-replaced on submit) — every individual delay incident
+                                 // ever logged, across every stage, accumulated week over week from
+                                 // the "Delay log entries (this week)" field. Feeds the stage detail
+                                 // modal's Delay Analysis (by team/member/reason) and Delay Log
+                                 // (searchable/sortable table) tabs — both filtered to `stage`.
+    { "id": "DL-101", "date": "2026-01-10", "stage": "Development", "reason": "Review defects resolution", "team": "Team2", "member": "V. Mehta", "days": 2 }
+  ],
+  "delayLogSeq": 101             // SYSTEM-MANAGED — running counter scripts/ingest.py uses to mint
+                                  // each new delayLog entry's sequential "DL-NNN" id. Don't hand-edit.
 }
 ```
 
-Risks and dependencies are tracked as **parallel arrays**: `risks[i]` pairs
-with `riskMitigations[i]`, `dependencies[i]` pairs with `dependencyTeams[i]`
-and `dependencyMitigations[i]`. The weekly-update issue form asks for all of
-these in the same order so PMs can just add a matching line. The dashboard
-flags any risk, dependency, or delay that's missing its team label / mitigation
-/ impact in amber so it's visible at a glance who still needs to fill it in.
-The Dependencies tab uses `dependencyTeams` to group every project's
-dependencies into one cross-project board. Meeting feedback issues also
-carry an optional `mitigationImpact` field for when leadership flags a
-risk/dependency live in the meeting.
+Risks are a single **array of objects** with stable `RISK-*` ids (same pattern
+as dependencies). PMs add brand-new risks anytime via the **Report a Risk**
+issue form; the scheduled ingest appends one object and bumps `riskSeq`. On the
+weekly update, list every **open** risk (one line per field, same order as
+before) — rows keep their ids by line position (or an optional `RISK-101 |`
+prefix). Omitting a row from the re-submitted list sets `resolved: true`
+without deleting history. Partial weekly updates (e.g. only re-submitting
+mitigation lines) still apply by index to open risks.
+Dependencies are a single **array of objects** with stable `DEP-*` ids. PMs add
+brand-new dependencies anytime via the **Add a Dependency** issue form; the
+scheduled ingest appends one object and bumps `dependencySeq`. On the weekly
+update, list every **open** dependency (one line per field, same order as
+before) — rows keep their ids by line position (or an optional `DEP-101 |`
+prefix). Omitting a row or marking **Dependency resolved?** = Yes sets
+`resolved: true` without deleting history. Partial weekly updates (e.g. only
+re-submitting mitigation lines) still apply by index to open dependencies.
+`scripts/ingest.py` transparently upgrades legacy five-array projects when it
+runs, so old open issues and stale `data.json` shapes stay safe. The dashboard
+flags any risk or open dependency that's missing its team label / mitigation /
+impact in amber. The Dependencies tab reads `team`, `dueBy`, `priority`, and
+`escalated` on each unresolved object for rollups and cards.
+Meeting feedback issues also carry an optional `mitigationImpact` field for
+when leadership flags a risk/dependency live in the meeting.
 
 `originalGoLive` is system-managed: `scripts/ingest.py` sets it the first time
 a PM submits a go-live date for a project and never overwrites it after that,
 so it always reflects the original baseline even as `goLive` moves.
+`stagePlan[stage].initialStart`/`initialEnd` follow the exact same
+lock-on-first-write pattern, just per-stage instead of once per project — see
+`is_valid_iso_date` in `scripts/ingest.py`, which both `goLive` and
+`stagePlan` dates run through before being written (a typo'd month/day is
+dropped rather than silently corrupting the field, the same fix that came out
+of the GMS 1.4 goLive incident, issue #6).
+
+`delayLog` is the one array field that's **appended to, not replaced** on
+each submit — every other array field (dependencies, risks, etc.) is
+wholesale-overwritten by whatever's in that week's issue, but delay log
+entries accumulate indefinitely so the Delay Log/Delay Analysis tabs can show
+the full history for a stage, not just this week's. `delayLogSeq` is the
+system-managed counter behind each entry's `DL-NNN` id.
 
 Adding a brand-new project: add a matching option to the `project` dropdown
-in both `.github/ISSUE_TEMPLATE/*.yml` files, add the id/name mapping in
+in `.github/ISSUE_TEMPLATE/weekly-update.yml`, `new-dependency.yml`, `new-risk.yml`, and
+`meeting-feedback.yml`, add the id/name mapping in
 `scripts/lib.py`'s `PROJECT_NAME_TO_ID`, and add the initial project object
 to `data.json`. Retiring one: reverse of the above (or just leave it in
 `data.json` with no further updates — it'll simply stop moving in the
@@ -438,9 +568,9 @@ the app code.
 
 ## Roadmap
 
-- [ ] Wire Tab 8 (Team Performance) up to real GitHub data (PRs, reviews,
+- [ ] Wire Tab 7 (Team Performance) up to real GitHub data (PRs, reviews,
       commits, deploys) per project repo.
-- [x] Hawk-eye (Tab 4) now plots each project's full pipeline-stage history
+- [x] Hawk-eye (Tab 3) now plots each project's full pipeline-stage history
       built from `history.json` — no per-project `milestones` array needed
       for that anymore. `milestones` is still useful for the finer-grained
       mini Gantt in a project's own detail view, if you want to hand-track
@@ -451,3 +581,10 @@ the app code.
       `notes.json`/git history, just drops off the open list).
 - [ ] Consider a GitHub Action that auto-resolves a follow-up when the next
       weekly update for that project explicitly references it.
+- [x] Per-stage detail modal (click a Stage-gate timeline row) with
+      planned-vs-actual dates, a Date History revision log, and delay
+      attribution/log tabs, fed by new `stagePlan`/`delayLog` fields on the
+      weekly-update form.
+- [x] Dependencies tab (Tab 5) now tracks a "needed by" date and a priority
+      per dependency, with a by-project / by-team pivot rollup on top of the
+      existing team-grouped card board.

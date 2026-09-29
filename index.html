@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=38">
+<link rel="stylesheet" href="styles.css?v=45">
 </head>
 <body>
   <div class="wrap">
@@ -27,7 +27,6 @@
 
     <nav class="tabbar" role="tablist">
       <button class="tab-btn is-active" data-tab="status" role="tab" aria-selected="true">Program Status</button>
-      <button class="tab-btn" data-tab="stages" role="tab" aria-selected="false">Pipeline Stages</button>
       <button class="tab-btn" data-tab="grid" role="tab" aria-selected="false">Grid</button>
       <button class="tab-btn" data-tab="hawkeye" role="tab" aria-selected="false">🦅 Hawk-eye</button>
       <button class="tab-btn" data-tab="statushistory" role="tab" aria-selected="false">Status History</button>
@@ -76,13 +75,6 @@
       <div id="cards" class="cards"></div>
     </section>
 
-    <section id="panel-stages" class="tab-panel">
-      <h2 class="section-heading">Pipeline stages</h2>
-      <p class="section-subhead">Every project, grouped by where it actually sits in the delivery pipeline right now — click a card to open the full detail view. Each card shows how long it's been in that stage against the stage's SLA.</p>
-      <div id="stageSlaFlags" class="stage-sla-flags"></div>
-      <div id="stageBoard" class="stage-board stage-board-expanded"></div>
-    </section>
-
     <section id="panel-grid" class="tab-panel">
       <h2 class="section-heading">Project × stage grid</h2>
       <p class="section-subhead">Every project against every pipeline stage in one view. Green = done (with the date range and whether it blew its SLA at the time), the highlighted column = where the project is right now (days in stage vs. SLA, colored if it's approaching or over), grey = not reached yet. Click a project or cell to open the full detail view.</p>
@@ -104,8 +96,35 @@
     </section>
 
     <section id="panel-deps" class="tab-panel">
+      <h2 class="section-heading">Dependencies</h2>
+      <p class="section-subhead">Every open cross-team dependency, when it's actually needed by, and how urgent it is — rolled up two ways: by project (what's each project waiting on) and by team (what's on each team's plate across every project).</p>
       <div id="depsMetricsRow" class="metrics-row"></div>
 
+      <div class="deps-pivot-head">
+        <div class="deps-pivot-head-left">
+          <h3 class="deps-pivot-title" id="depsPivotSectionTitle">Project-wise dependencies</h3>
+          <p class="deps-pivot-hint">Open dependency items · click any count to open the list</p>
+        </div>
+        <div class="deps-pivot-head-right">
+          <div class="deps-view-toggle" id="depsViewToggle" role="tablist">
+            <button class="deps-view-btn is-active" data-group="project" type="button">By Project</button>
+            <button class="deps-view-btn" data-group="team" type="button">By Team</button>
+          </div>
+          <label class="deps-control">
+            <span class="deps-control-label">Portfolio</span>
+            <select id="depsPortfolioFilter" class="deps-control-select" title="Narrow to one project (among those with open dependencies)"></select>
+          </label>
+          <label class="deps-control">
+            <span class="deps-control-label">Cycle</span>
+            <select id="depsCycleFilter" class="deps-control-select" title="Filter by calendar year of needed-by date"></select>
+          </label>
+          <button id="depsCompactToggle" class="deps-view-btn deps-compact-toggle" type="button" aria-pressed="false">Compact</button>
+          <button id="depsExportBtn" class="btn-primary btn-small deps-export-btn" type="button">Export</button>
+        </div>
+      </div>
+      <div id="depsPivotWrap" class="deps-pivot-wrap"></div>
+
+      <h3 class="deps-pivot-title deps-detail-title">Detail</h3>
       <div id="depsBoard" class="deps-board"></div>
     </section>
 
@@ -162,6 +181,24 @@
     </div>
   </div>
 
+  <div id="stageDetail" class="detail-overlay" hidden>
+    <div class="detail-panel stagedetail-panel-outer">
+      <button id="stageDetailClose" class="detail-close" aria-label="Close">✕</button>
+      <div id="stageDetailContent"></div>
+    </div>
+  </div>
+
+  <div id="depsDrillModal" class="modal-overlay" hidden>
+    <div class="modal deps-drill-modal">
+      <div class="deps-drill-modal-head">
+        <h3 id="depsDrillTitle">Dependencies</h3>
+        <button id="depsDrillClose" class="detail-close deps-drill-close" type="button" aria-label="Close">✕</button>
+      </div>
+      <p id="depsDrillSub" class="modal-sub"></p>
+      <div id="depsDrillList" class="deps-drill-list"></div>
+    </div>
+  </div>
+
   <div id="feedbackModal" class="modal-overlay" hidden>
     <div class="modal">
       <h3>Log feedback / a follow-up</h3>
@@ -184,6 +221,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=36"></script>
+  <script src="app.js?v=45"></script>
 </body>
 </html>

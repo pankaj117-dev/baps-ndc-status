@@ -1,0 +1,84 @@
+name: "Add a Dependency"
+description: "Log a new cross-team dependency as soon as it comes up — no need to wait for the weekly update."
+title: "[New Dependency] "
+labels: ["new-dependency"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this when a new blocker or cross-team ask appears mid-week. It appends one
+        dependency to the project in `data.json` with a stable `DEP-*` id. You can still
+        edit or resolve it on the weekly update form (list every **open** dependency there,
+        same order as today — one line per field).
+  - type: dropdown
+    id: project
+    attributes:
+      label: Project
+      options:
+        - WebNext
+        - WebNext 2.0
+        - Pledge – 1.0
+        - Pledge - 1.x
+        - EMM
+        - MyBKY (Phase 1)
+        - myBKY 2A
+        - myMandir 1B
+        - myMandir 1C
+        - GMS 1.4
+        - SSO V2
+        - SPM
+        - BKMS
+        - MIS
+        - mySatsang – BAPS ID Integration
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Dependency description
+      description: "What are you waiting on? Include ticket links where you can."
+      placeholder: |
+        DEVOPS-1082 — SPM production environment setup
+    validations:
+      required: true
+  - type: textarea
+    id: team
+    attributes:
+      label: Owning team(s)
+      description: "Who owns unblocking this (e.g. DevOps, Security, Business/Stakeholder)?"
+      placeholder: |
+        DevOps
+    validations:
+      required: true
+  - type: input
+    id: due_by
+    attributes:
+      label: Needed by date
+      description: "Format YYYY-MM-DD — when you actually need this resolved by. Leave blank if no hard date."
+      placeholder: "2026-10-05"
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Critical
+        - High
+        - Medium
+        - Low
+      default: 2
+  - type: textarea
+    id: mitigation
+    attributes:
+      label: Mitigation plan
+      description: "Optional — plan to unblock and impact if this slips."
+      placeholder: |
+        Escalated to DevOps lead — if missed, UAT start slips by same amount
+  - type: dropdown
+    id: escalated
+    attributes:
+      label: Escalated to leadership already?
+      description: "Has this specific dependency already been escalated to leadership as a blocker?"
+      options:
+        - "No"
+        - "Yes"
+      default: 0
