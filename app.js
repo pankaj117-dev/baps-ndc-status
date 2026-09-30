@@ -881,9 +881,16 @@
       return;
     }
 
+    // Only "done"/"current" blocks are date-accurate, so only they should
+    // stretch the calendar range — future/not-started stages are rendered
+    // as a compact fixed-size chip strip (see below), not plotted by date,
+    // so including their chained placeholder end dates here would just
+    // pointlessly widen the whole board (worse now that there are up to 6
+    // remaining future stages instead of 3, post 9-stage migration).
     const allDates = [todayIso];
     withBlocks.forEach(({ blocks }) => {
       blocks.forEach((b) => {
+        if (b.kind === "future") return;
         allDates.push(b.start);
         allDates.push(b.end);
       });
@@ -982,28 +989,42 @@
 
         const track = el("div", { class: "hawkeye-row-track" });
 
-        blocks.forEach((b) => {
+        // "done" and "current" blocks are real date ranges, plotted
+        // absolutely by %. "future" (not-yet-reached) blocks are just
+        // planned-order placeholders — with 9 stages now instead of 6,
+        // chaining up to 6 of them by their (often tiny, 5-14d) SLA width
+        // squeezed individual date-positioned boxes down to unreadable,
+        // overlapping slivers. Instead, render them as one compact
+        // fixed-size chip strip anchored right after the last
+        // date-positioned block ends, sized by content, not by date math.
+        const datedBlocks = blocks.filter((b) => b.kind !== "future");
+        const futureBlocks = blocks.filter((b) => b.kind === "future");
+
+        datedBlocks.forEach((b) => {
           const left = xPct(b.start);
           const width = Math.max(xPct(b.end) - left, 0.6);
-          const kindClass =
-            b.kind === "done"
-              ? "is-done"
-              : b.kind === "future"
-              ? "is-future"
-              : "is-current" + (b.flag && b.flag !== "ok" ? " is-" + b.flag : "");
+          const kindClass = b.kind === "done" ? "is-done" : "is-current" + (b.flag && b.flag !== "ok" ? " is-" + b.flag : "");
           const code = STAGE_SHORT_CODE[b.stage] || b.stage;
           const label = code + (b.overDays ? ` +${b.overDays}d` : "");
           const title =
             `${p.name} — ${b.stage}: ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)}` +
-            (b.overDays ? ` (+${b.overDays}d over SLA)` : b.kind === "future" ? " (planned, not started)" : "");
+            (b.overDays ? ` (+${b.overDays}d over SLA)` : "");
           track.appendChild(
-            el(
-              "div",
-              { class: "hawkeye-stage-block " + kindClass, style: `left:${left}%;width:${width}%`, title },
-              [label]
-            )
+            el("div", { class: "hawkeye-stage-block " + kindClass, style: `left:${left}%;width:${width}%`, title }, [label])
           );
         });
+
+        if (futureBlocks.length) {
+          const anchor = datedBlocks.length ? datedBlocks[datedBlocks.length - 1].end : todayIso;
+          const strip = el("div", { class: "hawkeye-future-strip", style: `left:${xPct(anchor)}%` });
+          futureBlocks.forEach((b) => {
+            const code = STAGE_SHORT_CODE[b.stage] || b.stage;
+            strip.appendChild(
+              el("div", { class: "hawkeye-stage-block is-future", title: `${p.name} — ${b.stage}: planned, not started` }, [code])
+            );
+          });
+          track.appendChild(strip);
+        }
 
         row.appendChild(track);
         rowsWrap.appendChild(row);

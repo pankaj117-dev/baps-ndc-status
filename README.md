@@ -170,12 +170,16 @@ views always agree.
   by its SLA flag (on track / approaching / over). Sized to at least that
   stage's SLA even mid-stage, so it visually reads as "expected to land
   around here."
-- **Outlined block (dashed border, grey)** — a stage the project hasn't
-  reached yet. Purely a **planned placeholder**: chained forward from the
-  end of the current stage, each sized to that stage's configured SLA — not
-  a real commitment, just "if things ran to SLA from here."
-- Any block gets a small red **"+Xd"** appended to its label if that stage
-  ran (or is running) over its own SLA.
+- **Dashed outlined chip strip (grey)** — every stage the project hasn't
+  reached yet, grouped into one compact strip right after the current
+  stage's block, in pipeline order. These are **not date-plotted** — with
+  9 possible stages, chaining each remaining one individually by its own
+  (often tiny, 5-14d) SLA width at a multi-month calendar zoom made them
+  squeeze into unreadable, overlapping slivers, so they're rendered as
+  fixed-size chips sized by content instead. Purely "what's still ahead, in
+  order" — not a real date commitment.
+- Any *dated* block (done/current) gets a small red **"+Xd"** appended to
+  its label if that stage ran (or is running) over its own SLA.
 - A per-row **"Xd cumulative delay"** line under each project's name sums
   the SLA overage across every stage it's been through — the per-project
   version of the Grid tab's portfolio-wide "Cumulative SLA Overage" KPI.

@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=54">
+<link rel="stylesheet" href="styles.css?v=55">
 </head>
 <body>
   <div class="wrap">
@@ -84,7 +84,7 @@
 
     <section id="panel-hawkeye" class="tab-panel">
       <h2 class="section-heading">Hawk-eye</h2>
-      <p class="section-subhead">Every project's pipeline stages plotted on one shared calendar — solid blocks are stages already lived through (or being lived through now), colored by SLA status; outlined blocks are what's still ahead, sized to each stage's SLA as a planned placeholder. A blue "Today" line runs through every row. Click a row or block to open the full detail view, scrolled to the Stage-gate timeline.</p>
+      <p class="section-subhead">Every project's pipeline stages plotted on one shared calendar — solid blocks are stages already lived through (or being lived through now), colored by SLA status and sized to their real dates; the dashed chips after them are what's still ahead, grouped into one compact strip (not date-plotted — just planned order). A blue "Today" line runs through every row. Click a row or block to open the full detail view, scrolled to the Stage-gate timeline.</p>
       <div id="hawkeyeGantt" class="hawkeye-gantt"></div>
     </section>
 
@@ -226,6 +226,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=57"></script>
+  <script src="app.js?v=58"></script>
 </body>
 </html>

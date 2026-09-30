@@ -1791,6 +1791,29 @@ table.deps-drill-table th {
   font-weight: 500;
 }
 
+/* Future/not-started stages are chained by planned SLA days, which can be
+   as little as 5 days each — plotting them individually by date % at a
+   multi-month zoom level squeezed them into unreadable, overlapping
+   slivers (worse now that there are up to 6 remaining stages instead of
+   3). Render them instead as one compact chip strip, sized by content via
+   normal flex flow, anchored at a single % position rather than each
+   chip having its own tiny date-derived width. */
+.hawkeye-future-strip {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 3px;
+}
+
+.hawkeye-future-strip .hawkeye-stage-block {
+  position: static;
+  height: 22px;
+  padding: 0 5px;
+  font-size: 9px;
+  flex: 0 0 auto;
+}
+
 .hawkeye-stage-block:hover {
   box-shadow: 0 0 0 2px var(--accent);
 }
