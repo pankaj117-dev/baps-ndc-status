@@ -47,7 +47,13 @@ body {
 }
 
 .wrap {
-  max-width: 1160px;
+  /* Bumped from 1160px — the Grid tab's table needs min-width: 1190px
+     (9 stage columns, see .stage-grid) plus this container's own 28px×2
+     padding, so at the old max-width the table was wider than its own
+     page container and got clipped with no scrollbar space to reveal the
+     rest, instead of the intended horizontal-scroll-on-narrow-screens
+     behavior (.stage-grid-wrap already has overflow-x: auto for that). */
+  max-width: 1320px;
   margin: 0 auto;
   padding: 40px 28px 80px;
 }
@@ -316,6 +322,15 @@ body {
   margin: -8px 0 16px;
 }
 
+/* Clarifies that the auto-detected schedule-shift log is a per-event list,
+   not an additive total — sits right under that log instead of the usual
+   -8px-top-margin "subhead" position (that negative margin is meant to
+   hug a heading right above it; here it follows a list of rows instead). */
+.stagedetail-log-note {
+  margin: 10px 0 16px;
+  font-style: italic;
+}
+
 /* ---------- Global project + PM filter (applies to every tab) ---------- */
 
 .global-filter-bar {
@@ -438,6 +453,15 @@ body {
   margin: 4px 2px;
 }
 
+/* Wraps the Team filter's label/select/clear-button so the whole group
+   can be hidden together (as one unit, keeping the 10px gap consistent)
+   on tabs where filtering by team has no effect — see wireTabs(). */
+.global-filter-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
 @media (max-width: 640px) {
   .global-filter-bar {
     flex-wrap: wrap;
@@ -446,52 +470,180 @@ body {
   .global-filter-hint { display: none; }
 }
 
-/* Per-project stage-gate timeline (project detail view) — same stage-segment
-   / SLA computation as the Grid tab (computeStageSegments, stageSlaDays,
-   stageFlagLevel). */
-.stage-timeline {
+/* Per-project stage-gate timeline (project detail view) — same visual
+   language as the cross-project Hawk-eye tab (real date axis, blocks
+   colored by status, dashed for not-yet-reached stages, a "Today" line),
+   rebuilt 2026-09-30 from a flat list of rows into this single-project
+   visual timeline. Reuses the same stage-segment / SLA computation as the
+   Grid tab and Hawk-eye (computeStageSegments, buildHawkeyeBlocks,
+   stageSlaDays, stageFlagLevel) — see `buildStageGateTimeline()`. */
+.stagegantt-legend {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--ink-soft);
 }
 
-.stage-timeline-row {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
+.stagegantt-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stagegantt-legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+  border: 1.5px solid var(--line);
+}
+.stagegantt-legend-swatch.is-done { background: var(--green-bg); border-color: var(--green); }
+.stagegantt-legend-swatch.is-current { background: var(--accent-soft); border-color: var(--accent); }
+.stagegantt-legend-swatch.is-warn { background: var(--amber-bg); border-color: var(--amber); }
+.stagegantt-legend-swatch.is-breach { background: var(--red-bg); border-color: var(--red); }
+.stagegantt-legend-swatch.is-future { background: var(--bg); border-color: #7c8ba8; border-style: dashed; }
+
+.stagegantt-scroll {
   background: var(--bg-panel);
   border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 12.5px;
-  cursor: pointer;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-.stage-timeline-row:hover { border-color: var(--accent); box-shadow: var(--shadow); }
-.stage-timeline-row.is-ongoing { border-color: var(--accent); }
-
-.stage-timeline-stage {
-  flex: 0 0 170px;
-  font-weight: 600;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  overflow-x: auto;
 }
 
-.stage-timeline-range {
-  flex: 1 1 auto;
-  color: var(--ink-faint);
+.stagegantt-months {
+  position: relative;
+  height: 20px;
+  border-bottom: 1px solid var(--line-strong);
+  margin-bottom: 6px;
+}
+
+.stagegantt-month-mark {
+  position: absolute;
+  top: 0;
+  transform: translateX(-2px);
+  border-left: 1px solid var(--line-strong);
+  padding-left: 5px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  white-space: nowrap;
 }
 
-.stage-timeline-duration {
-  flex: 0 0 auto;
+/* Tall enough for the block itself (top ~34px) plus its single caption
+   row underneath it (~38px) — see `.stagegantt-caption`. Block spacing is
+   computed in JS to always reserve room for the caption text, so there's
+   never a need for a second staggered tier. */
+.stagegantt-track {
+  position: relative;
+  height: 76px;
+}
+
+.stagegantt-grid-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line);
+}
+
+.stagegantt-today-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--accent);
+  z-index: 2;
+}
+
+.stagegantt-today-label {
+  position: absolute;
+  top: -18px;
+  left: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.stagegantt-block {
+  position: absolute;
+  top: 0;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
+  cursor: pointer;
+  transition: box-shadow 0.12s ease;
+  z-index: 1;
+}
+.stagegantt-block:hover { box-shadow: 0 0 0 2px var(--accent); }
+
+.stagegantt-block.is-done {
+  background: var(--green-bg);
+  border: 1px solid var(--green);
+  color: var(--green);
+}
+.stagegantt-block.is-current {
+  background: var(--accent-soft);
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  box-shadow: var(--shadow);
+}
+.stagegantt-block.is-current.is-warn {
+  background: var(--amber-bg);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+.stagegantt-block.is-current.is-breach {
+  background: var(--red-bg);
+  border-color: var(--red);
+  color: var(--red);
+}
+.stagegantt-block.is-future {
+  background: var(--bg);
+  border: 1.5px dashed #7c8ba8;
+  color: #4a5878;
+  font-weight: 600;
+}
+
+.stagegantt-caption {
+  position: absolute;
+  top: 38px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  white-space: nowrap;
+}
+.stagegantt-caption-stage {
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.stagegantt-caption-date {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-faint);
+}
+
+.stagegantt-caption-meta {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
   color: var(--ink-soft);
 }
-.stage-timeline-duration.is-warn { color: var(--amber); }
-.stage-timeline-duration.is-breach { color: var(--red); }
+.stagegantt-caption-meta.is-breach { color: var(--red); }
 
 /* ---------- Project × Stage grid tab ---------- */
 
@@ -1401,135 +1553,6 @@ table.deps-drill-table th {
   font-weight: 600;
 }
 
-/* ---------- Per-project detailed Gantt (inside the detail overlay) ---------- */
-
-.project-gantt {
-  background: var(--bg-panel);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 16px 20px;
-  margin-bottom: 16px;
-  overflow-x: auto;
-}
-
-.project-gantt-months {
-  position: relative;
-  height: 20px;
-  border-bottom: 1px solid var(--line-strong);
-  margin-bottom: 4px;
-  min-width: 560px;
-}
-
-.project-gantt-month-mark {
-  position: absolute;
-  top: 0;
-  transform: translateX(-2px);
-  border-left: 1px solid var(--line-strong);
-  padding-left: 5px;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  color: var(--ink-faint);
-  white-space: nowrap;
-}
-
-.project-gantt-track {
-  position: relative;
-  min-height: 130px;
-  min-width: 560px;
-}
-
-.project-gantt-grid-line {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  background: var(--line);
-}
-
-.project-gantt-baseline {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--line-strong);
-}
-
-.project-gantt-today-line {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--accent);
-  z-index: 2;
-}
-
-.project-gantt-today-label {
-  position: absolute;
-  top: -2px;
-  left: 4px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--accent);
-  white-space: nowrap;
-}
-
-.project-gantt-slip-line {
-  position: absolute;
-  top: 50%;
-  height: 0;
-  border-top: 2px dashed var(--ink-faint);
-}
-
-.project-gantt-marker {
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
-  border: 2.5px solid #fff;
-  box-shadow: 0 0 0 1px var(--line-strong), 0 2px 6px rgba(20, 28, 45, 0.15);
-  z-index: 1;
-}
-
-.project-gantt-marker.milestone {
-  border-radius: 4px;
-  width: 13px;
-  height: 13px;
-}
-
-.project-gantt-marker.ghost {
-  background: var(--ink-faint);
-  opacity: 0.55;
-  width: 11px;
-  height: 11px;
-}
-
-.project-gantt-marker.status-green { background: var(--green); }
-.project-gantt-marker.status-amber { background: var(--amber); }
-.project-gantt-marker.status-red { background: var(--red); }
-.project-gantt-marker.status-black { background: var(--black); }
-
-.project-gantt-marker-label {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 600;
-  color: var(--ink-soft);
-  white-space: nowrap;
-  background: var(--bg-panel);
-  padding: 1px 4px;
-  border-radius: 4px;
-}
-
-.project-gantt-marker-label.above { bottom: 16px; }
-.project-gantt-marker-label.below { top: 16px; }
-
 .schedule-changelog-subhead {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -1537,6 +1560,53 @@ table.deps-drill-table th {
   letter-spacing: 0.04em;
   color: var(--ink-faint);
   margin: 4px 0 8px;
+}
+
+/* Collapsible "Date change log" — collapsed by default (see
+   buildCollapsibleChangelog()) so a project with a long CR history
+   doesn't push everything below it in the project detail view down by a
+   full screen's worth of rows. */
+.schedule-changelog-wrap { margin-top: 4px; }
+.schedule-changelog-toggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 4px 0 8px;
+  margin: 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+.schedule-changelog-chevron {
+  font-size: 10px;
+  color: var(--ink-faint);
+  transition: transform 0.12s ease;
+  width: 10px;
+}
+.schedule-changelog-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+}
+.schedule-changelog-toggle:hover .schedule-changelog-title { color: var(--ink-soft); }
+.schedule-changelog-count {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+.schedule-changelog-body { overflow: hidden; }
+.schedule-changelog-wrap.is-collapsed .schedule-changelog-body {
+  display: none;
 }
 
 /* ---------- Per-project schedule timeline (CR / date-shift tracking) ---------- */
@@ -1624,16 +1694,65 @@ table.deps-drill-table th {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 16px 20px 8px;
+}
+
+/* Toolbar (legend + Month|Week zoom toggle) lives OUTSIDE the scrollable
+   timeline area (.hawkeye-scroll-inner below) — it's always visible at
+   its natural width, never scrolls out of reach the way it would if it
+   were just another child of the wide scrolling content. */
+.hawkeye-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 14px 220px;
+}
+
+.hawkeye-zoom-toggle {
+  display: inline-flex;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 2px;
+  gap: 2px;
+  flex: 0 0 auto;
+}
+
+.hawkeye-zoom-btn {
+  appearance: none;
+  border: none;
+  background: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-faint);
+  padding: 4px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+.hawkeye-zoom-btn:hover { color: var(--ink-soft); }
+.hawkeye-zoom-btn.is-active {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* The actual horizontally-scrollable area — everything that needs to be
+   plotted on a real date axis (header marks, gridlines, today-line,
+   every row's stage blocks) lives in here, all sized in real pixels
+   (see renderHawkeye()'s pxPerDay), which is what makes scrolling
+   meaningful instead of everything just being squeezed to fit. */
+.hawkeye-scroll-inner {
   overflow-x: auto;
+  position: relative;
 }
 
 .hawkeye-months {
   position: relative;
   height: 22px;
-  margin-left: 220px;
   border-bottom: 1px solid var(--line-strong);
   margin-bottom: 6px;
-  min-width: 600px;
 }
 
 .hawkeye-month-mark {
@@ -1650,8 +1769,6 @@ table.deps-drill-table th {
 
 .hawkeye-rows {
   position: relative;
-  margin-left: 220px;
-  min-width: 600px;
 }
 
 .hawkeye-grid-line {
@@ -1694,15 +1811,25 @@ table.deps-drill-table th {
 
 .hawkeye-row:last-child { border-bottom: none; }
 .hawkeye-row:hover, .hawkeye-row:focus-visible { background: var(--bg); outline: none; }
+.hawkeye-row:hover .hawkeye-row-label, .hawkeye-row:focus-visible .hawkeye-row-label { background: var(--bg); }
 
+/* Sticks to the left edge of .hawkeye-scroll-inner as the timeline
+   content scrolls horizontally underneath/beside it — an opaque
+   background + z-index above the row tracks is what makes scrolled-under
+   content actually disappear behind it instead of showing through. */
 .hawkeye-row-label {
-  position: absolute;
-  left: -220px;
-  width: 210px;
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  flex: 0 0 220px;
+  width: 220px;
+  background: var(--bg-panel);
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 13px;
+  padding-right: 8px;
+  box-shadow: 4px 0 8px -6px rgba(20, 28, 45, 0.15);
 }
 
 .hawkeye-row-label strong {
@@ -1723,7 +1850,7 @@ table.deps-drill-table th {
 
 .hawkeye-row-track {
   position: relative;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   height: 58px;
 }
 
@@ -1785,10 +1912,16 @@ table.deps-drill-table th {
 }
 
 .hawkeye-stage-block.is-future {
-  background: transparent;
-  border: 1.5px dashed var(--line-strong);
-  color: var(--ink-faint);
-  font-weight: 500;
+  /* Was transparent + var(--line-strong) (#d2ddec, very light) + faint
+     text — nearly invisible against the panel's white/light background,
+     especially at the future-strip's small chip size. Tinted fill +
+     darker dashed border + darker text keeps the "outline-only, this is
+     just a plan not a real date range" meaning while actually being
+     legible. */
+  background: var(--bg);
+  border: 1.5px dashed #7c8ba8;
+  color: #4a5878;
+  font-weight: 600;
 }
 
 /* Future/not-started stages are chained by planned SLA days, which can be
@@ -1808,9 +1941,9 @@ table.deps-drill-table th {
 
 .hawkeye-future-strip .hawkeye-stage-block {
   position: static;
-  height: 22px;
-  padding: 0 5px;
-  font-size: 9px;
+  height: 24px;
+  padding: 0 7px;
+  font-size: 10px;
   flex: 0 0 auto;
 }
 
@@ -1822,7 +1955,6 @@ table.deps-drill-table th {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
-  margin: 0 0 14px 220px;
   font-size: 12px;
   color: var(--ink-soft);
 }
@@ -1845,14 +1977,13 @@ table.deps-drill-table th {
 .hawkeye-legend-swatch.is-current { background: var(--accent-soft); border-color: var(--accent); }
 .hawkeye-legend-swatch.is-warn { background: var(--amber-bg); border-color: var(--amber); }
 .hawkeye-legend-swatch.is-breach { background: var(--red-bg); border-color: var(--red); }
-.hawkeye-legend-swatch.is-future { background: transparent; border-color: var(--line-strong); border-style: dashed; }
+.hawkeye-legend-swatch.is-future { background: var(--bg); border-color: #7c8ba8; border-style: dashed; }
 
-@media (max-width: 720px) {
-  .hawkeye-months, .hawkeye-rows { margin-left: 130px; }
-  .hawkeye-legend { margin-left: 130px; }
-  .hawkeye-row-label { left: -130px; width: 122px; }
-  .hawkeye-row-label strong { max-width: 100px; }
-}
+/* No small-screen label-column narrowing needed anymore — the label
+   column is a fixed 220px sticky sidebar regardless of viewport, and the
+   timeline area (which is real-pixel-wide, not squeeze-to-fit) already
+   scrolls horizontally on any screen size too narrow to show it all at
+   once. That's the whole point of this being scrollable now. */
 
 /* ---------- Shared status dot (used on cards, stage board, go-live tracker) ---------- */
 
@@ -2076,6 +2207,22 @@ table.deps-drill-table th {
   border: 1px solid var(--line-strong);
   color: var(--ink-soft);
 }
+
+/* Dependencies/risks/escalated (and follow-ups, when there are any) jump
+   straight to their source section in the project detail view instead of
+   just opening it scrolled to the top — cursor + hover/focus ring signal
+   that, distinct from the plain informational badges (fast-follow, scope
+   cut, time-saved) that have nothing to jump to. */
+.badge.is-jump-link {
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.badge.is-jump-link:hover,
+.badge.is-jump-link:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent-soft);
+  transform: translateY(-1px);
+}
+.badge.is-jump-link:focus-visible { outline: none; }
 
 .badge.has-risk {
   background: var(--red-bg);
@@ -2493,6 +2640,50 @@ body.no-scroll { overflow: hidden; }
   padding: 14px 16px;
 }
 
+/* Project detail view tabs — replaces the old flat stack of every
+   `.weekly-subhead` section stacked vertically. Only the active
+   `.detail-tab-panel` is shown; switching tabs is a pure class toggle
+   (see `activateDetailTab()`), no re-render/re-fetch needed. */
+.detail-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 26px 0 4px;
+  border-bottom: 1.5px solid var(--line);
+  padding-bottom: 0;
+}
+
+.detail-tab-btn {
+  appearance: none;
+  border: none;
+  background: none;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-faint);
+  padding: 9px 14px;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  transition: color 0.12s ease, background 0.12s ease;
+  position: relative;
+  top: 1.5px;
+}
+.detail-tab-btn:hover { color: var(--ink-soft); background: var(--bg); }
+.detail-tab-btn.is-active {
+  color: var(--accent);
+  background: var(--bg);
+  border: 1.5px solid var(--line);
+  border-bottom-color: var(--bg);
+}
+
+.detail-tab-panel { display: none; }
+.detail-tab-panel.is-active { display: block; }
+
+/* First heading inside a freshly-switched-to panel shouldn't repeat the
+   same big top margin every `.weekly-subhead` normally gets — the tab
+   strip above it already provides that visual separation. */
+.detail-tab-panel > .weekly-subhead:first-child { margin-top: 18px; }
+
 .weekly-subhead {
   font-family: var(--font-display);
   font-size: 16px;
@@ -2729,6 +2920,26 @@ body.no-scroll { overflow: hidden; }
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--accent);
+  vertical-align: middle;
+}
+
+/* Surfaces which of a project's (rare, multi-table) source deck sections
+   a dependency/risk came from — e.g. SSO V2's dependencies/risks are a
+   merge of its separate "(Development)" and "(Implementation)" tables
+   into one project record; this makes that origin visible instead of
+   silently flattening it. Only rendered when `item.track` is set. */
+.track-tag {
+  display: inline-block;
+  margin-left: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--amber-bg);
+  color: var(--amber);
+  border: 1px solid var(--amber);
   vertical-align: middle;
 }
 
@@ -3126,6 +3337,102 @@ dd.is-missing {
   font-weight: 700;
   color: var(--ink);
 }
+
+.stagedetail-analysis-total .kicker {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
+  margin-right: 4px;
+}
+
+/* Reusable donut chart (buildDonutChart()) — an SVG ring with the total
+   printed in the hole. Used both here (per-stage delay attribution) and
+   on the Grid tab's portfolio-wide "Cumulative Delay by Project" chart. */
+.donut-chart {
+  position: relative;
+  margin: 0 auto 14px;
+  display: block;
+}
+.donut-chart-svg { display: block; }
+.donut-chart-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.donut-chart-num { font-size: 22px; font-weight: 800; color: var(--ink); line-height: 1; }
+.donut-chart-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  margin-top: 2px;
+}
+
+/* Grid tab — "Cumulative Delay by Project" section */
+.cumdelay-section { margin-bottom: 22px; }
+.cumdelay-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+.cumdelay-empty {
+  color: var(--ink-faint);
+  font-size: 13px;
+  text-align: center;
+}
+.cumdelay-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+.cumdelay-head .kicker {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+}
+.cumdelay-sub { font-size: 12px; color: var(--ink-faint); }
+.cumdelay-body {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.cumdelay-body .donut-chart { margin: 0; flex: 0 0 auto; }
+.cumdelay-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  flex: 1 1 240px;
+  min-width: 200px;
+}
+.cumdelay-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 3px 6px;
+  border-radius: 6px;
+  transition: background 0.12s ease;
+}
+.cumdelay-legend-row:hover,
+.cumdelay-legend-row:focus-visible {
+  background: var(--accent-soft);
+  outline: none;
+}
+.cumdelay-legend-row .stagedetail-bar-label { flex: 1 1 auto; }
 
 .stagedetail-log-controls {
   display: flex;

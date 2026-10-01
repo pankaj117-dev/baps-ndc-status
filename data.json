@@ -47,7 +47,9 @@
       "timeSavedNote": [],
       "scopeReduced": false,
       "dependencySeq": 100,
-      "riskSeq": 100
+      "riskSeq": 100,
+      "hidden": true,
+      "hiddenNote": "No individual project status section in the 15-Sep-2026 or 22-Sep-2026 weekly decks. Hidden 2026-09-30, not deleted."
     },
     {
       "id": "webnext-2",
@@ -55,7 +57,7 @@
       "owner": "Jeet Savani",
       "status": "green",
       "progress": 80,
-      "stage": "Requirements",
+      "stage": "Tech. Design",
       "phase": "Requirements complete 17-Sep; TDD 17-Sep to 29-Sep-2026",
       "nextMilestone": {
         "name": "TDD",
@@ -162,7 +164,9 @@
       "timeSavedNote": [],
       "scopeReduced": false,
       "dependencySeq": 100,
-      "riskSeq": 100
+      "riskSeq": 100,
+      "hidden": true,
+      "hiddenNote": "No individual project status section in the 15-Sep-2026 or 22-Sep-2026 weekly decks. Hidden 2026-09-30, not deleted."
     },
     {
       "id": "pledge-1a",
@@ -170,8 +174,8 @@
       "owner": "Jeet Savani",
       "status": "amber",
       "progress": 35,
-      "stage": "Tech. Design",
-      "phase": "Requirement complete (05-Aug to 07-Sep); TDD in progress (09-Sep to 25-Sep)",
+      "stage": "Development",
+      "phase": "Requirement + TDD complete per 22-Sep deck's own plan (05-Aug\u201325-Sep); Development & QA in progress (28-Sep\u201321-Oct, no delay reported) \u2014 stage advanced to Development on 2026-09-30 based on the deck's own un-delayed schedule, not a newer confirmed report.",
       "nextMilestone": {
         "name": "TDD",
         "date": "2026-09-25"
@@ -253,7 +257,51 @@
       "scopeReduced": false,
       "statusChangeReason": "22-Sep deck Amber: new cross-track dependencies (INBOX vs GMS decision, DevOps UAT access, data import resourcing).",
       "dependencySeq": 104,
-      "riskSeq": 101
+      "riskSeq": 101,
+      "stagePlan": {
+        "Requirements": {
+          "initialStart": "2026-08-05",
+          "latestStart": "2026-08-05",
+          "initialEnd": "2026-09-07",
+          "latestEnd": "2026-09-07"
+        },
+        "Tech. Design": {
+          "initialStart": "2026-09-09",
+          "latestStart": "2026-09-09",
+          "initialEnd": "2026-09-25",
+          "latestEnd": "2026-09-25"
+        },
+        "Development": {
+          "initialStart": "2026-09-28",
+          "latestStart": "2026-09-28",
+          "initialEnd": "2026-10-21",
+          "latestEnd": "2026-10-21"
+        },
+        "VAPT": {
+          "initialStart": "2026-10-14",
+          "latestStart": "2026-10-14",
+          "initialEnd": "2026-10-28",
+          "latestEnd": "2026-10-28"
+        },
+        "UAT": {
+          "initialStart": "2026-10-22",
+          "latestStart": "2026-10-22",
+          "initialEnd": "2026-10-28",
+          "latestEnd": "2026-10-28"
+        },
+        "Rollout": {
+          "initialStart": "2026-10-28",
+          "latestStart": "2026-10-28",
+          "initialEnd": "2026-10-29",
+          "latestEnd": "2026-10-29"
+        },
+        "Hypercare": {
+          "initialStart": "2026-10-30",
+          "latestStart": "2026-10-30",
+          "initialEnd": "2026-11-20",
+          "latestEnd": "2026-11-20"
+        }
+      }
     },
     {
       "id": "emm",
@@ -528,7 +576,7 @@
         "Web/mobile VAPT remediation completed \u2014 awaiting validation sign-offs"
       ],
       "delayTradeoffs": "3 CRs already approved \u2014 CR1 added 10 working days, CR2 added 6 working days, CR3 no impact on Go-Live; no new CRs this week",
-      "stage": "UAT",
+      "stage": "VAPT",
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
@@ -557,8 +605,8 @@
         "UAT": {
           "initialStart": "2026-08-18",
           "latestStart": "2026-08-18",
-          "initialEnd": "2026-09-16",
-          "latestEnd": "2026-09-24"
+          "initialEnd": "2026-09-09",
+          "latestEnd": "2026-09-21"
         },
         "Rollout": {
           "initialStart": "2026-09-16",
@@ -571,6 +619,12 @@
           "latestStart": "2026-10-06",
           "initialEnd": "2026-11-06",
           "latestEnd": "2026-11-06"
+        },
+        "VAPT": {
+          "initialStart": "2026-08-18",
+          "latestStart": "2026-08-18",
+          "initialEnd": "2026-09-16",
+          "latestEnd": "2026-09-24"
         }
       },
       "riskSeq": 105
@@ -699,7 +753,7 @@
         "name": "TDD completion",
         "date": "2026-09-25"
       },
-      "goLive": "2026-10-31",
+      "goLive": "2026-10-30",
       "originalGoLive": "2026-10-30",
       "delayDays": 2,
       "delayNote": "TDD end revised from 22-Sep to 25-Sep (+2 days) per 22-Sep deck; Amber status.",
@@ -775,16 +829,22 @@
           "latestEnd": "2026-10-22"
         },
         "UAT": {
-          "initialStart": "2026-10-16",
-          "latestStart": "2026-10-16",
+          "initialStart": "2026-10-23",
+          "latestStart": "2026-10-23",
           "initialEnd": "2026-10-26",
-          "latestEnd": "2026-10-28"
+          "latestEnd": "2026-10-26"
         },
         "Rollout": {
           "initialStart": "2026-10-28",
           "latestStart": "2026-10-28",
           "initialEnd": "2026-10-30",
           "latestEnd": "2026-10-30"
+        },
+        "VAPT": {
+          "initialStart": "2026-10-16",
+          "latestStart": "2026-10-16",
+          "initialEnd": "2026-10-28",
+          "latestEnd": "2026-10-28"
         }
       },
       "riskSeq": 102
@@ -910,8 +970,8 @@
         "name": "UAT",
         "date": "2026-12-21"
       },
-      "goLive": "2027-01-04",
-      "originalGoLive": "2027-01-04",
+      "goLive": "2026-11-06",
+      "originalGoLive": "2026-11-06",
       "delayDays": 0,
       "delayNote": "Renamed to SSO V2 this week. Karyakar deployment was blocked on SID; session 1 scheduled 9/17 with Vishal Patel (Tampa) for ASM/GSS.",
       "dependencies": [
@@ -923,7 +983,8 @@
           "dueBy": "2026-10-05",
           "priority": "Critical",
           "escalated": false,
-          "resolved": false
+          "resolved": false,
+          "track": "Implementation"
         },
         {
           "id": "DEP-102",
@@ -933,7 +994,8 @@
           "dueBy": "2026-09-25",
           "priority": "High",
           "escalated": false,
-          "resolved": true
+          "resolved": true,
+          "track": "Implementation"
         },
         {
           "id": "DEP-103",
@@ -943,7 +1005,8 @@
           "dueBy": "2026-09-25",
           "priority": "High",
           "escalated": false,
-          "resolved": false
+          "resolved": false,
+          "track": "Implementation"
         }
       ],
       "sprintStatus": {
@@ -968,49 +1031,57 @@
           "id": "RISK-101",
           "text": "Not getting clarity on when QA resource can test Karyakar in dev (Dev, Critical)",
           "mitigation": "",
-          "resolved": false
+          "resolved": false,
+          "track": "Development"
         },
         {
           "id": "RISK-102",
           "text": "Need to create users (QA, High)",
           "mitigation": "",
-          "resolved": false
+          "resolved": false,
+          "track": "Development"
         },
         {
           "id": "RISK-103",
           "text": "Karyakar flow still not on UAT \u2014 pending long time (Dev, Critical)",
           "mitigation": "",
-          "resolved": false
+          "resolved": false,
+          "track": "Development"
         },
         {
           "id": "RISK-104",
           "text": "QA will test on Dev or UAT? Multiple dev env changes expected (FPO, Critical)",
           "mitigation": "",
-          "resolved": false
+          "resolved": false,
+          "track": "Development"
         },
         {
           "id": "RISK-105",
           "text": "Karyakar deployment blocked due to SID OTP issue (Hitesh Patel, Critical)",
           "mitigation": "",
-          "resolved": false
+          "resolved": false,
+          "track": "Implementation"
         },
         {
           "id": "RISK-106",
           "text": "Waiting on other apps' implementation plans / session 2 dates \u2014 Inbox/MSD (Vasu, High)",
           "mitigation": "",
-          "resolved": false
+          "resolved": false,
+          "track": "Implementation"
         },
         {
           "id": "RISK-107",
           "text": "Waiting on other apps' implementation plans / session 2 dates \u2014 MIS (Sandeep, High)",
           "mitigation": "",
-          "resolved": false
+          "resolved": false,
+          "track": "Implementation"
         },
         {
           "id": "RISK-108",
           "text": "Phase 2 app owner availability for session 1 (PM track, Medium)",
           "mitigation": "",
-          "resolved": false
+          "resolved": false,
+          "track": "Implementation"
         }
       ],
       "delayImpact": "",
@@ -1040,6 +1111,10 @@
           "latestStart": "2026-06-15",
           "initialEnd": "2026-06-30",
           "latestEnd": "2026-06-30"
+        },
+        "Development": {
+          "initialStart": "2026-07-01",
+          "latestStart": "2026-07-01"
         }
       },
       "riskSeq": 108
@@ -1156,7 +1231,9 @@
       "timeSavedNote": [],
       "scopeReduced": false,
       "dependencySeq": 101,
-      "riskSeq": 100
+      "riskSeq": 100,
+      "hidden": true,
+      "hiddenNote": "No individual project status section in the 15-Sep-2026 or 22-Sep-2026 weekly decks. Hidden 2026-09-30, not deleted."
     },
     {
       "id": "mis",
@@ -1208,7 +1285,9 @@
       "timeSavedNote": [],
       "scopeReduced": false,
       "dependencySeq": 101,
-      "riskSeq": 100
+      "riskSeq": 100,
+      "hidden": true,
+      "hiddenNote": "No individual project status section in the 15-Sep-2026 or 22-Sep-2026 weekly decks. Hidden 2026-09-30, not deleted."
     },
     {
       "id": "mysatsang-bapsid",
@@ -1314,7 +1393,9 @@
       "timeSavedNote": [],
       "scopeReduced": false,
       "dependencySeq": 105,
-      "riskSeq": 102
+      "riskSeq": 102,
+      "hidden": true,
+      "hiddenNote": "No individual project status section in the 15-Sep-2026 or 22-Sep-2026 weekly decks. Hidden 2026-09-30, not deleted."
     },
     {
       "id": "mymandir-1c",

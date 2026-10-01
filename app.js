@@ -59,9 +59,18 @@
   let depsPivotCompact = false;
   let depsCycleFilter = "all"; // calendar year string from dueBy, e.g. "2026"
   let lastDepsPivotExport = null;
+  let hawkeyeZoom = "month"; // "month" | "week" — Hawk-eye's horizontal timeline density toggle
+
+  // Projects flagged `hidden: true` in data.json are kept in the underlying
+  // data (nothing's deleted) but excluded from every view/filter/dropdown —
+  // used for projects that don't have their own status section in the
+  // current weekly deck anymore, without losing their historical record.
+  function activeProjects() {
+    return DATA.projects.filter((p) => !p.hidden);
+  }
 
   function visibleProjects() {
-    let projects = DATA.projects;
+    let projects = activeProjects();
     if (globalProjectFilter !== "all") {
       projects = projects.filter((p) => p.id === globalProjectFilter);
     }
@@ -409,6 +418,81 @@
     });
   }
 
+  // Donut breakdown of the "Cumulative SLA Overage" KPI above — same
+  // per-project total (cumulativeStageOverageDays), just showing WHICH
+  // projects are contributing to it instead of one summed number. Reuses
+  // buildDonutChart() (defined below, near the stage detail modal's own
+  // Delay Analysis donuts) so both views render identically. Clicking a
+  // legend row jumps straight to that project's Stage-gate timeline —
+  // same click-through the Hawk-eye rows and cumulative-delay card badges
+  // already use.
+  function renderCumulativeDelayChart() {
+    const box = document.getElementById("cumulativeDelayChart");
+    if (!box) return;
+    box.innerHTML = "";
+
+    const projects = visibleProjects();
+    const groups = projects
+      .map((p) => ({ label: p.name, days: cumulativeStageOverageDays(p), id: p.id }))
+      .filter((g) => g.days > 0)
+      .sort((a, b) => b.days - a.days);
+
+    if (!groups.length) {
+      box.appendChild(
+        el("div", { class: "cumdelay-card cumdelay-empty" }, [
+          "No cumulative SLA overage right now across the filtered projects. 🎉",
+        ])
+      );
+      return;
+    }
+
+    box.appendChild(
+      el("div", { class: "cumdelay-card" }, [
+        el("div", { class: "cumdelay-head" }, [
+          el("span", { class: "kicker" }, ["Cumulative Delay by Project"]),
+          el("span", { class: "cumdelay-sub" }, [
+            "Same total as \u201cCumulative SLA Overage\u201d above, broken down by who's contributing to it. Click a project to jump to its Stage-gate timeline.",
+          ]),
+        ]),
+        el("div", { class: "cumdelay-body" }, [
+          buildDonutChart(groups, { size: 180, strokeWidth: 26 }),
+          el(
+            "div",
+            { class: "cumdelay-legend" },
+            groups.map((g, i) =>
+              el(
+                "div",
+                {
+                  class: "cumdelay-legend-row",
+                  "data-project-id": g.id,
+                  tabindex: "0",
+                  role: "button",
+                  title: "Open " + g.label,
+                },
+                [
+                  el("span", { class: "stagedetail-bar-dot", style: `background:${BREAKDOWN_COLORS[i % BREAKDOWN_COLORS.length]}` }),
+                  el("span", { class: "stagedetail-bar-label" }, [g.label]),
+                  el("span", { class: "stagedetail-bar-days" }, [g.days + "d"]),
+                ]
+              )
+            )
+          ),
+        ]),
+      ])
+    );
+
+    box.querySelectorAll(".cumdelay-legend-row").forEach((row) => {
+      const open = () => openProjectDetail(row.getAttribute("data-project-id"), "stage-gate-timeline-section");
+      row.addEventListener("click", open);
+      row.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          open();
+        }
+      });
+    });
+  }
+
   // Portfolio-wide matrix: every visible project as a row, every pipeline
   // stage as a column. Reuses the same stage-segment reconstruction and SLA
   // logic as the per-project "Stage-gate timeline" (see computeStageSegments
@@ -418,6 +502,7 @@
   // picture, not just a status dot.
   function renderStageGrid() {
     renderStageGridMetrics();
+    renderCumulativeDelayChart();
     renderStageGridLegend();
     const wrap = document.getElementById("stageGrid");
     if (!wrap) return;
@@ -654,9 +739,19 @@
             : []),
         ]),
         el("div", { class: "card-badges" }, [
-          el("span", { class: "badge" }, [countOpenDependencies(p) + " dependencies"]),
-          el("span", { class: "badge" + (countOpenRisks(p) ? " has-risk" : "") }, [countOpenRisks(p) + " risks"]),
-          el("span", { class: "badge" + (notes.length ? " has-followup" : "") }, [notes.length + " follow-ups"]),
+          el("span", { class: "badge is-jump-link", "data-focus-section": "detail-deps-section" }, [
+            countOpenDependencies(p) + " dependencies",
+          ]),
+          el(
+            "span",
+            { class: "badge is-jump-link" + (countOpenRisks(p) ? " has-risk" : ""), "data-focus-section": "detail-risks-section" },
+            [countOpenRisks(p) + " risks"]
+          ),
+          el(
+            "span",
+            { class: "badge" + (notes.length ? " has-followup is-jump-link" : ""), "data-focus-section": notes.length ? "detail-followups-section" : "" },
+            [notes.length + " follow-ups"]
+          ),
           ...((p.fastFollowItems || []).length
             ? [el("span", { class: "badge has-fastfollow" }, [(p.fastFollowItems || []).length + " fast-follow"])]
             : []),
@@ -667,7 +762,13 @@
             ? [el("span", { class: "badge has-timesaved" }, ["⏱ +" + p.timeSavedDays + "d saved"])]
             : []),
           ...((p.escalations || []).length
-            ? [el("span", { class: "badge has-escalation" }, ["🚨 " + (p.escalations || []).length + " escalated"])]
+            ? [
+                el(
+                  "span",
+                  { class: "badge has-escalation is-jump-link", "data-focus-section": "detail-escalations-section" },
+                  ["🚨 " + (p.escalations || []).length + " escalated"]
+                ),
+              ]
             : []),
         ]),
         el("button", { class: "card-expand" }, ["View full details →"]),
@@ -685,12 +786,36 @@
         }
       });
     });
+
+    // Dependencies/risks/follow-ups/escalated badges jump straight to
+    // their source section in the project detail view (instead of just
+    // opening the detail scrolled to the top and making someone hunt for
+    // it) — stopPropagation so clicking a badge doesn't also fire the
+    // whole card's click handler above it.
+    box.querySelectorAll(".badge.is-jump-link").forEach((badge) => {
+      badge.setAttribute("tabindex", "0");
+      badge.setAttribute("role", "button");
+      const open = (e) => {
+        e.stopPropagation();
+        const card = badge.closest(".card");
+        if (!card) return;
+        const section = badge.getAttribute("data-focus-section");
+        openProjectDetail(card.getAttribute("data-project-id"), section || undefined);
+      };
+      badge.addEventListener("click", open);
+      badge.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          open(e);
+        }
+      });
+    });
   }
 
   function populateGlobalOwnerFilter() {
     const select = document.getElementById("globalOwnerFilter");
     const owners = Array.from(
-      new Set(DATA.projects.map((p) => p.owner || "Unassigned"))
+      new Set(activeProjects().map((p) => p.owner || "Unassigned"))
     ).sort((a, b) => {
       if (a === "Unassigned") return 1;
       if (b === "Unassigned") return -1;
@@ -732,7 +857,7 @@
     const select = document.getElementById("globalTeamFilter");
     const teams = Array.from(
       new Set(
-        DATA.projects.flatMap((p) =>
+        activeProjects().flatMap((p) =>
           getDependencyObjects(p)
             .filter((d) => !d.resolved && d.team)
             .map((d) => d.team)
@@ -852,14 +977,251 @@
           overDays: sla != null ? Math.max(0, seg.days - sla) : 0,
         });
       } else {
-        const sla = stageSlaDays(stage) || DEFAULT_FUTURE_STAGE_DAYS;
+        // Potential target for a not-yet-reached stage: prefer a REAL
+        // recorded stagePlan date for that stage when one's already on
+        // record (decks sometimes have forward-looking planned dates for
+        // stages the project hasn't reached yet), falling back to a blind
+        // SLA-chain estimate (start right after the previous block ends,
+        // run for that stage's configured SLA) only when nothing better
+        // is known. `planned: true` marks the former so callers can show
+        // "planned target" vs. "potential target (estimated)".
         const prev = blocks[blocks.length - 1];
-        const start = prev ? prev.end : today;
-        blocks.push({ stage, start, end: addDaysIso(start, sla), kind: "future" });
+        const plan = p.stagePlan && p.stagePlan[stage];
+        const planStart = plan && (plan.latestStart || plan.initialStart);
+        const planEnd = plan && (plan.latestEnd || plan.initialEnd);
+        let start, end, planned;
+        if (planStart && planEnd) {
+          start = planStart;
+          end = planEnd;
+          planned = true;
+        } else {
+          const sla = stageSlaDays(stage) || DEFAULT_FUTURE_STAGE_DAYS;
+          start = prev ? prev.end : today;
+          end = addDaysIso(start, sla);
+          planned = false;
+        }
+        blocks.push({ stage, start, end, kind: "future", planned });
       }
     });
     return blocks;
   }
+
+  // Single-project version of the Hawk-eye visual timeline, embedded in
+  // the project detail view's Stage-gate tab (2026-09-30, replacing a
+  // flat list of rows) — same visual language as the cross-project
+  // Hawk-eye tab (blocks on a real date axis, dashed for not-yet-reached
+  // stages, a "Today" line, click-through to stage detail), but with two
+  // things Hawk-eye can't afford once it's showing every project at once:
+  //  1. Every future stage is positioned by its own real planned/potential
+  //     date instead of being squeezed into a fixed-size chip strip —
+  //     there's only one row here, so there's room to actually plot it.
+  //  2. Every block's real date range (and day-count/SLA) is written out
+  //     directly underneath it, not just on hover — "easy to see" was the
+  //     whole point of rebuilding this.
+  function buildStageGateTimeline(p) {
+    const DAY = 86400000;
+    const blocks = buildHawkeyeBlocks(p);
+    if (!blocks.length) {
+      return el("p", { class: "empty-note" }, ["No pipeline stage data to plot yet."]);
+    }
+
+    // Done/current day-counts and "since before tracking"/"→ now" wording
+    // come from the same `computeStageSegments()` the old flat list used
+    // (accurate real elapsed days) — `buildHawkeyeBlocks()`'s own `end`
+    // for the current stage is deliberately padded out to at least that
+    // stage's SLA for VISUAL sizing (so it reads as "expected to land
+    // around here" even mid-stage), which would overstate real elapsed
+    // time if used for the day-count text too.
+    const segByStage = {};
+    computeStageSegments(p).forEach((seg) => {
+      segByStage[seg.stage] = seg;
+    });
+
+    const todayIso = todayISO();
+    const times = [];
+    blocks.forEach((b) => {
+      times.push(new Date(b.start + "T00:00:00").getTime());
+      times.push(new Date(b.end + "T00:00:00").getTime());
+    });
+    times.push(new Date(todayIso + "T00:00:00").getTime());
+    const minTime = Math.min(...times) - 4 * DAY;
+    let maxTime = Math.max(...times) + 4 * DAY;
+    if (maxTime - minTime < 20 * DAY) maxTime = minTime + 20 * DAY;
+
+    const PX_PER_DAY = 6;
+    const MIN_BLOCK_PX = 10;
+    const xPx = (iso) => ((new Date(iso + "T00:00:00").getTime() - minTime) / DAY) * PX_PER_DAY;
+
+    // Quarter gridlines — same snap logic as Hawk-eye's month view.
+    const marks = [];
+    const cursor = new Date(minTime);
+    cursor.setDate(1);
+    cursor.setHours(0, 0, 0, 0);
+    cursor.setMonth(Math.floor(cursor.getMonth() / 3) * 3);
+    while (cursor.getTime() <= maxTime) {
+      if (cursor.getTime() >= minTime) {
+        marks.push({
+          px: ((cursor.getTime() - minTime) / DAY) * PX_PER_DAY,
+          label: `Q${Math.floor(cursor.getMonth() / 3) + 1} ${cursor.getFullYear()}`,
+        });
+      }
+      cursor.setMonth(cursor.getMonth() + 3);
+    }
+
+    // Build each block's caption text up front so its real pixel width
+    // can be reserved during layout — this is what keeps captions from
+    // ever overlapping, instead of guessing with a fixed tier stagger.
+    const CAPTION_GAP_PX = 14;
+    const STAGE_CHAR_PX = 7.1; // --font-display, 11.5px, 700 weight
+    const META_CHAR_PX = 6.3; // --font-mono, 10.5px
+    function textWidthPx(text, perCharPx) {
+      return text.length * perCharPx;
+    }
+    const captioned = blocks.map((b) => {
+      const seg = segByStage[b.stage];
+      const sla = stageSlaDays(b.stage);
+      const dateLabel =
+        b.kind === "future"
+          ? (b.planned ? "Planned: " : "Potential (est.): ") + fmtDateShort(b.start) + " → " + fmtDateShort(b.end)
+          : seg
+          ? (seg.approxStart ? "since before tracking, " : "") +
+            fmtDateShort(seg.start) +
+            (seg.ongoing ? " → now" : " → " + fmtDateShort(seg.end))
+          : fmtDateShort(b.start) + (b.kind === "current" ? " → now" : " → " + fmtDateShort(b.end));
+      let metaText = "Not started";
+      let metaBreach = false;
+      if (b.kind !== "future" && seg) {
+        const days = seg.days;
+        metaText = (seg.approxStart ? "≥" : "") + days + "d" + (sla != null ? " / SLA " + sla + "d" : "");
+        metaBreach = sla != null && days > sla;
+      }
+      const capWidth = Math.max(
+        textWidthPx(b.stage, STAGE_CHAR_PX),
+        textWidthPx(dateLabel, META_CHAR_PX),
+        textWidthPx(metaText, META_CHAR_PX)
+      );
+      return { b, dateLabel, metaText, metaBreach, capWidth };
+    });
+
+    // Sequential collision-avoiding layout — same idea as Hawk-eye's
+    // `cursorPx`, but every stage (including future ones) gets placed by
+    // its own real date here, and each slot reserves whichever is wider:
+    // the block itself, or the caption text that goes directly beneath
+    // it. That guarantees captions never overlap without needing a
+    // staggered tier (which breaks down once several short, back-to-back
+    // future stages are involved) — the tradeoff is that two
+    // calendar-adjacent stages with long captions get visually spread a
+    // little further apart than their raw dates alone would place them.
+    let cursorPx = 0;
+    const placed = captioned.map(({ b, dateLabel, metaText, metaBreach, capWidth }) => {
+      const rawLeft = xPx(b.start);
+      // Width comes from the stage's OWN real date span, measured before
+      // any rightward shift — not from `end - left`. Using the shifted
+      // `left` here was the bug: once a long caption pushed `left` far
+      // enough right, `end - left` could go negative and collapse to
+      // `MIN_BLOCK_PX`, turning every block into a same-size tiny dot and
+      // destroying the one thing a timeline is supposed to show
+      // (relative stage duration).
+      const width = Math.max(xPx(b.end) - rawLeft, MIN_BLOCK_PX);
+      const left = Math.max(rawLeft, cursorPx);
+      cursorPx = left + Math.max(width, capWidth + CAPTION_GAP_PX);
+      return { b, left, width, dateLabel, metaText, metaBreach };
+    });
+    const timelineWidthPx = Math.max(cursorPx, xPx(todayIso)) + 24;
+
+    const wrap = el("div", { class: "stagegantt-scroll" });
+    const inner = el("div", { class: "stagegantt-inner", style: `width:${timelineWidthPx}px` });
+
+    const header = el("div", { class: "stagegantt-months" });
+    marks.forEach((m) => {
+      header.appendChild(el("div", { class: "stagegantt-month-mark", style: `left:${m.px}px` }, [m.label]));
+    });
+    inner.appendChild(header);
+
+    const track = el("div", { class: "stagegantt-track" });
+    marks.forEach((m) => {
+      track.appendChild(el("div", { class: "stagegantt-grid-line", style: `left:${m.px}px` }));
+    });
+    track.appendChild(
+      el("div", { class: "stagegantt-today-line", style: `left:${xPx(todayIso)}px` }, [
+        el("span", { class: "stagegantt-today-label" }, ["Today"]),
+      ])
+    );
+
+    placed.forEach(({ b, left, width, dateLabel, metaText, metaBreach }) => {
+      const kindClass =
+        b.kind === "done"
+          ? "is-done"
+          : b.kind === "current"
+          ? "is-current" + (b.flag && b.flag !== "ok" ? " is-" + b.flag : "")
+          : "is-future";
+      const code = STAGE_SHORT_CODE[b.stage] || b.stage;
+
+      track.appendChild(
+        el(
+          "div",
+          {
+            class: "stagegantt-block " + kindClass,
+            style: `left:${left}px;width:${width}px`,
+            "data-project-id": p.id,
+            "data-stage": b.stage,
+            tabindex: "0",
+            role: "button",
+            title: "Click for stage detail",
+          },
+          [width >= 32 ? code : ""]
+        )
+      );
+
+      // Caption directly below the block, left-anchored to it — always
+      // real dates, no hover required. The layout pass above already
+      // reserved enough horizontal room for this exact text, so a single
+      // tier is guaranteed not to collide with its neighbors.
+      track.appendChild(
+        el("div", { class: "stagegantt-caption", style: `left:${left}px` }, [
+          el("span", { class: "stagegantt-caption-stage" }, [b.stage]),
+          el("span", { class: "stagegantt-caption-date" }, [dateLabel]),
+          el("span", { class: "stagegantt-caption-meta" + (metaBreach ? " is-breach" : "") }, [metaText]),
+        ])
+      );
+    });
+
+    inner.appendChild(track);
+    wrap.appendChild(inner);
+
+    wrap.querySelectorAll(".stagegantt-block").forEach((blockEl) => {
+      const open = () => openStageDetail(blockEl.getAttribute("data-project-id"), blockEl.getAttribute("data-stage"));
+      blockEl.addEventListener("click", open);
+      blockEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          open();
+        }
+      });
+    });
+
+    // Default scroll position: land with "today" a little in from the
+    // left edge, same reasoning as Hawk-eye's own default scroll.
+    requestAnimationFrame(() => {
+      wrap.scrollLeft = Math.max(0, xPx(todayIso) - 60);
+    });
+
+    return wrap;
+  }
+
+  // Fixed left column width for the project name/cumulative-delay label —
+  // kept in one place since both the JS (row/header layout math) and the
+  // CSS (.hawkeye-row-label's sticky positioning) need to agree on it.
+  const HAWKEYE_LABEL_WIDTH = 220;
+
+  // Two timeline densities. Month = the original "quarter gridlines"
+  // zoom, now just wide enough to read easily rather than being forced to
+  // fit a fixed board width. Week = a real zoom-in for anyone who wants
+  // week-level precision, at the cost of more horizontal scrolling.
+  const HAWKEYE_ZOOM = {
+    month: { pxPerDay: 5, grid: "quarter" },
+    week: { pxPerDay: 16, grid: "week" },
+  };
 
   function renderHawkeye() {
     const board = document.getElementById("hawkeyeGantt");
@@ -885,8 +1247,7 @@
     // stretch the calendar range — future/not-started stages are rendered
     // as a compact fixed-size chip strip (see below), not plotted by date,
     // so including their chained placeholder end dates here would just
-    // pointlessly widen the whole board (worse now that there are up to 6
-    // remaining future stages instead of 3, post 9-stage migration).
+    // pointlessly widen the whole board.
     const allDates = [todayIso];
     withBlocks.forEach(({ blocks }) => {
       blocks.forEach((b) => {
@@ -897,140 +1258,295 @@
     });
 
     const times = allDates.map((d) => new Date(d + "T00:00:00").getTime());
-    let minTime = Math.min(...times) - 7 * DAY;
+    // No more clipping the left edge to force everything into a fixed
+    // board width — that used to hide an outlier project's early stages
+    // entirely (only a sliver of its bar rendered, tooltip or not, since
+    // xPct clamped anything before the cutoff to 0%). The timeline is now
+    // a horizontally SCROLLABLE track sized in real pixels, so every real
+    // dated block gets genuine room — an outlier's early history is
+    // reachable by scrolling left instead of being clamped away.
+    const minTime = Math.min(...times) - 7 * DAY;
     let maxTime = Math.max(...times) + 7 * DAY;
     if (maxTime - minTime < 30 * DAY) maxTime = minTime + 30 * DAY;
 
-    const xPct = (iso) => {
-      const t = new Date(iso + "T00:00:00").getTime();
-      return Math.max(0, Math.min(100, ((t - minTime) / (maxTime - minTime)) * 100));
-    };
+    const zoom = HAWKEYE_ZOOM[hawkeyeZoom] || HAWKEYE_ZOOM.month;
+    const pxPerDay = zoom.pxPerDay;
+    const xPx = (iso) => ((new Date(iso + "T00:00:00").getTime() - minTime) / DAY) * pxPerDay;
 
     board.appendChild(
-      el("div", { class: "hawkeye-legend" }, [
-        el("span", { class: "hawkeye-legend-item" }, [el("span", { class: "hawkeye-legend-swatch is-done" }), "Done"]),
-        el("span", { class: "hawkeye-legend-item" }, [
-          el("span", { class: "hawkeye-legend-swatch is-current" }),
-          "Current — on track",
+      el("div", { class: "hawkeye-toolbar" }, [
+        el("div", { class: "hawkeye-legend" }, [
+          el("span", { class: "hawkeye-legend-item" }, [el("span", { class: "hawkeye-legend-swatch is-done" }), "Done"]),
+          el("span", { class: "hawkeye-legend-item" }, [
+            el("span", { class: "hawkeye-legend-swatch is-current" }),
+            "Current — on track",
+          ]),
+          el("span", { class: "hawkeye-legend-item" }, [el("span", { class: "hawkeye-legend-swatch is-warn" }), "At risk"]),
+          el("span", { class: "hawkeye-legend-item" }, [
+            el("span", { class: "hawkeye-legend-swatch is-breach" }),
+            "Blocked / over SLA",
+          ]),
+          el("span", { class: "hawkeye-legend-item" }, [
+            el("span", { class: "hawkeye-legend-swatch is-future" }),
+            "Not started (planned)",
+          ]),
         ]),
-        el("span", { class: "hawkeye-legend-item" }, [el("span", { class: "hawkeye-legend-swatch is-warn" }), "At risk"]),
-        el("span", { class: "hawkeye-legend-item" }, [
-          el("span", { class: "hawkeye-legend-swatch is-breach" }),
-          "Blocked / over SLA",
-        ]),
-        el("span", { class: "hawkeye-legend-item" }, [
-          el("span", { class: "hawkeye-legend-swatch is-future" }),
-          "Not started (planned)",
+        el("div", { class: "hawkeye-zoom-toggle", role: "tablist", title: "Timeline zoom" }, [
+          el(
+            "button",
+            {
+              class: "hawkeye-zoom-btn" + (hawkeyeZoom === "month" ? " is-active" : ""),
+              type: "button",
+              "data-zoom": "month",
+              role: "tab",
+              "aria-selected": hawkeyeZoom === "month" ? "true" : "false",
+            },
+            ["Month"]
+          ),
+          el(
+            "button",
+            {
+              class: "hawkeye-zoom-btn" + (hawkeyeZoom === "week" ? " is-active" : ""),
+              type: "button",
+              "data-zoom": "week",
+              role: "tab",
+              "aria-selected": hawkeyeZoom === "week" ? "true" : "false",
+            },
+            ["Week"]
+          ),
         ]),
       ])
     );
+    board.querySelectorAll(".hawkeye-zoom-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const z = btn.getAttribute("data-zoom");
+        if (z === hawkeyeZoom) return;
+        hawkeyeZoom = z;
+        renderHawkeye();
+      });
+    });
 
-    // Month gridlines spanning the whole board
-    const monthMarks = [];
-    const cursor = new Date(minTime);
-    cursor.setDate(1);
-    cursor.setHours(0, 0, 0, 0);
-    while (cursor.getTime() <= maxTime) {
-      if (cursor.getTime() >= minTime) {
-        monthMarks.push({
-          pct: ((cursor.getTime() - minTime) / (maxTime - minTime)) * 100,
-          label: cursor.toLocaleDateString("en-US", { month: "short", year: "numeric" }),
-        });
+    // Gridline marks: quarters in Month view, individual weeks (Monday
+    // start) in Week view — the actual "break to a week view" zoom-in.
+    const marks = [];
+    if (zoom.grid === "week") {
+      const cursor = new Date(minTime);
+      cursor.setHours(0, 0, 0, 0);
+      cursor.setDate(cursor.getDate() - ((cursor.getDay() + 6) % 7)); // snap to Monday on/before minTime
+      while (cursor.getTime() <= maxTime) {
+        if (cursor.getTime() >= minTime) {
+          marks.push({
+            px: ((cursor.getTime() - minTime) / DAY) * pxPerDay,
+            label: cursor.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+          });
+        }
+        cursor.setDate(cursor.getDate() + 7);
       }
-      cursor.setMonth(cursor.getMonth() + 1);
+    } else {
+      const cursor = new Date(minTime);
+      cursor.setDate(1);
+      cursor.setHours(0, 0, 0, 0);
+      cursor.setMonth(Math.floor(cursor.getMonth() / 3) * 3); // snap to quarter start
+      while (cursor.getTime() <= maxTime) {
+        if (cursor.getTime() >= minTime) {
+          marks.push({
+            px: ((cursor.getTime() - minTime) / DAY) * pxPerDay,
+            label: `Q${Math.floor(cursor.getMonth() / 3) + 1} ${cursor.getFullYear()}`,
+          });
+        }
+        cursor.setMonth(cursor.getMonth() + 3);
+      }
     }
 
-    const header = el("div", { class: "hawkeye-months" });
-    monthMarks.forEach((m) => {
-      header.appendChild(el("div", { class: "hawkeye-month-mark", style: `left:${m.pct}%` }, [m.label]));
-    });
-    board.appendChild(header);
+    // Monospace font at 10.5px — ~6.5px/char is a safe (slightly
+    // generous) estimate; plus the block's own horizontal padding/border.
+    // No more "measure a probe element's rendered width" trick — block
+    // widths are computed directly in real pixels now (pxPerDay is fixed
+    // per zoom level, not squeezed to fit a variable container width), so
+    // there's nothing to measure; the number IS the pixel width.
+    const CHAR_PX = 6.5;
+    const BLOCK_CHROME_PX = 12;
+    const fitsPx = (text) => text.length * CHAR_PX + BLOCK_CHROME_PX;
+    const FUTURE_CHAR_PX = 6.2; // 10px mono font is still slightly narrower than the 10.5px dated-block font
+    const FUTURE_CHIP_CHROME_PX = 18; // 7px+7px padding + ~4px border/rounding
+    const FUTURE_CHIP_GAP_PX = 3;
+    const MIN_BLOCK_PX = 4;
 
-    const rowsWrap = el("div", { class: "hawkeye-rows" });
+    // Pass 1: lay out every row's blocks in real pixels (independent of
+    // final board width), while tracking the widest a row's content
+    // actually needs to be (nominal date-range width, or further out if
+    // some row's future-strip chips need more room past the last dated
+    // block) — then EVERY row's track gets built at that same shared
+    // width, so nothing is ever clipped/hidden and every row still lines
+    // up under the same gridlines.
+    let timelineWidthPx = ((maxTime - minTime) / DAY) * pxPerDay;
 
-    monthMarks.forEach((m) => {
-      rowsWrap.appendChild(el("div", { class: "hawkeye-grid-line", style: `left:${m.pct}%` }));
-    });
-
-    rowsWrap.appendChild(
-      el("div", { class: "hawkeye-today-line", style: `left:${xPct(todayIso)}%` }, [
-        el("span", { class: "hawkeye-today-label" }, ["Today"]),
-      ])
-    );
-
-    rows
+    const rowPlans = rows
       .slice()
       .sort((a, b) => {
         const ta = a.p.goLive ? new Date(a.p.goLive).getTime() : Infinity;
         const tb = b.p.goLive ? new Date(b.p.goLive).getTime() : Infinity;
         return ta - tb;
       })
-      .forEach(({ p, blocks }) => {
-        const cumulativeDelay = cumulativeStageOverageDays(p);
-        const row = el("div", { class: "hawkeye-row", "data-project-id": p.id, tabindex: "0", role: "button" }, [
-          el("div", { class: "hawkeye-row-label" }, [
-            el("span", { class: "timeline-dot", style: `background:var(--${p.status})` }),
-            el("div", null, [
-              el("strong", null, [p.name]),
-              el("div", { class: "hawkeye-row-sub" }, [
-                cumulativeDelay > 0 ? `${cumulativeDelay}d cumulative delay` : "On pace — no SLA overage",
-              ]),
-            ]),
-          ]),
-        ]);
+      .map(({ p, blocks }) => {
+        if (!blocks.length) return { p, empty: true };
 
-        if (!blocks.length) {
-          row.appendChild(
-            el("div", { class: "hawkeye-row-track hawkeye-row-track-empty" }, ["No pipeline stage set yet"])
-          );
-          rowsWrap.appendChild(row);
-          return;
-        }
-
-        const track = el("div", { class: "hawkeye-row-track" });
-
-        // "done" and "current" blocks are real date ranges, plotted
-        // absolutely by %. "future" (not-yet-reached) blocks are just
-        // planned-order placeholders — with 9 stages now instead of 6,
-        // chaining up to 6 of them by their (often tiny, 5-14d) SLA width
-        // squeezed individual date-positioned boxes down to unreadable,
-        // overlapping slivers. Instead, render them as one compact
-        // fixed-size chip strip anchored right after the last
-        // date-positioned block ends, sized by content, not by date math.
         const datedBlocks = blocks.filter((b) => b.kind !== "future");
         const futureBlocks = blocks.filter((b) => b.kind === "future");
 
-        datedBlocks.forEach((b) => {
-          const left = xPct(b.start);
-          const width = Math.max(xPct(b.end) - left, 0.6);
-          const kindClass = b.kind === "done" ? "is-done" : "is-current" + (b.flag && b.flag !== "ok" ? " is-" + b.flag : "");
-          const code = STAGE_SHORT_CODE[b.stage] || b.stage;
-          const label = code + (b.overDays ? ` +${b.overDays}d` : "");
-          const title =
-            `${p.name} — ${b.stage}: ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)}` +
-            (b.overDays ? ` (+${b.overDays}d over SLA)` : "");
-          track.appendChild(
-            el("div", { class: "hawkeye-stage-block " + kindClass, style: `left:${left}%;width:${width}%`, title }, [label])
-          );
+        // Sequential collision-avoiding layout — same reasoning as
+        // before, just in px instead of %: `cursorPx` tracks where the
+        // previous block visually ended so each subsequent block's left
+        // is clamped forward if needed (dates stay accurate for blocks
+        // with real room; only blocks that would've overlapped get
+        // nudged).
+        let cursorPx = 0;
+        const placedDated = datedBlocks.map((b) => {
+          const rawLeft = xPx(b.start);
+          const left = Math.max(rawLeft, cursorPx);
+          const width = Math.max(xPx(b.end) - left, MIN_BLOCK_PX);
+          cursorPx = left + width;
+          return { b, left, width };
         });
 
+        let stripAnchorPx = null;
+        let stripWidthPx = 0;
         if (futureBlocks.length) {
-          const anchor = datedBlocks.length ? datedBlocks[datedBlocks.length - 1].end : todayIso;
-          const strip = el("div", { class: "hawkeye-future-strip", style: `left:${xPct(anchor)}%` });
-          futureBlocks.forEach((b) => {
-            const code = STAGE_SHORT_CODE[b.stage] || b.stage;
-            strip.appendChild(
-              el("div", { class: "hawkeye-stage-block is-future", title: `${p.name} — ${b.stage}: planned, not started` }, [code])
-            );
-          });
-          track.appendChild(strip);
+          // Anchor right after the last dated block ends (its clamped
+          // visual position, not its raw date) — or at "today" if there
+          // are no dated blocks at all yet.
+          stripAnchorPx = datedBlocks.length ? cursorPx : xPx(todayIso);
+          stripWidthPx =
+            futureBlocks.reduce((sum, b) => {
+              const code = STAGE_SHORT_CODE[b.stage] || b.stage;
+              return sum + code.length * FUTURE_CHAR_PX + FUTURE_CHIP_CHROME_PX;
+            }, 0) + FUTURE_CHIP_GAP_PX * Math.max(futureBlocks.length - 1, 0);
+          timelineWidthPx = Math.max(timelineWidthPx, stripAnchorPx + stripWidthPx + 16);
+        } else if (placedDated.length) {
+          timelineWidthPx = Math.max(timelineWidthPx, cursorPx + 16);
         }
 
-        row.appendChild(track);
-        rowsWrap.appendChild(row);
+        return { p, placedDated, futureBlocks, stripAnchorPx };
       });
 
-    board.appendChild(rowsWrap);
+    // Pass 2: build the DOM at the final shared timelineWidthPx. Header +
+    // gridlines + today-line live in a separate wide "scroll" wrapper
+    // (not the toolbar above, which stays put) so the project-name label
+    // column can stick to the left edge of THAT wrapper while its
+    // timeline content scrolls underneath/beside it.
+    const scrollInner = el("div", { class: "hawkeye-scroll-inner" });
+    const fullWidthPx = HAWKEYE_LABEL_WIDTH + timelineWidthPx;
+
+    const header = el("div", { class: "hawkeye-months", style: `width:${fullWidthPx}px` });
+    marks.forEach((m) => {
+      header.appendChild(
+        el("div", { class: "hawkeye-month-mark", style: `left:${HAWKEYE_LABEL_WIDTH + m.px}px` }, [m.label])
+      );
+    });
+    scrollInner.appendChild(header);
+
+    const rowsWrap = el("div", { class: "hawkeye-rows", style: `width:${fullWidthPx}px` });
+    marks.forEach((m) => {
+      rowsWrap.appendChild(el("div", { class: "hawkeye-grid-line", style: `left:${HAWKEYE_LABEL_WIDTH + m.px}px` }));
+    });
+    rowsWrap.appendChild(
+      el("div", { class: "hawkeye-today-line", style: `left:${HAWKEYE_LABEL_WIDTH + xPx(todayIso)}px` }, [
+        el("span", { class: "hawkeye-today-label" }, ["Today"]),
+      ])
+    );
+
+    rowPlans.forEach((plan) => {
+      const { p } = plan;
+      const cumulativeDelay = cumulativeStageOverageDays(p);
+      const row = el("div", { class: "hawkeye-row", "data-project-id": p.id, tabindex: "0", role: "button" }, [
+        el("div", { class: "hawkeye-row-label" }, [
+          el("span", { class: "timeline-dot", style: `background:var(--${p.status})` }),
+          el("div", null, [
+            el("strong", null, [p.name]),
+            el("div", { class: "hawkeye-row-sub" }, [
+              cumulativeDelay > 0 ? `${cumulativeDelay}d cumulative delay` : "On pace — no SLA overage",
+            ]),
+          ]),
+        ]),
+      ]);
+
+      if (plan.empty) {
+        row.appendChild(
+          el("div", { class: "hawkeye-row-track hawkeye-row-track-empty", style: `width:${timelineWidthPx}px` }, [
+            "No pipeline stage set yet",
+          ])
+        );
+        rowsWrap.appendChild(row);
+        return;
+      }
+
+      const track = el("div", { class: "hawkeye-row-track", style: `width:${timelineWidthPx}px` });
+
+      plan.placedDated.forEach(({ b, left, width }) => {
+        const kindClass = b.kind === "done" ? "is-done" : "is-current" + (b.flag && b.flag !== "ok" ? " is-" + b.flag : "");
+        const code = STAGE_SHORT_CODE[b.stage] || b.stage;
+        // Only ever render text that's actually measured (in real px) to
+        // fit, so it's never partial/illegible. Full "CODE +Xd" if it
+        // fits, just "CODE" if that's all that fits, blank (color/border
+        // + tooltip only) if not even that fits.
+        const fullLabel = code + (b.overDays ? ` +${b.overDays}d` : "");
+        const label = width >= fitsPx(fullLabel) ? fullLabel : width >= fitsPx(code) ? code : "";
+        const title =
+          `${p.name} — ${b.stage}: ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)}` +
+          (b.overDays ? ` (+${b.overDays}d over SLA)` : "");
+        track.appendChild(
+          el("div", { class: "hawkeye-stage-block " + kindClass, style: `left:${left}px;width:${width}px`, title }, [label])
+        );
+      });
+
+      if (plan.futureBlocks.length) {
+        const strip = el("div", { class: "hawkeye-future-strip", style: `left:${plan.stripAnchorPx}px` });
+        plan.futureBlocks.forEach((b) => {
+          const code = STAGE_SHORT_CODE[b.stage] || b.stage;
+          const targetLabel = b.planned
+            ? `planned target ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)}`
+            : `potential target ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)} (estimated from SLA — not yet planned)`;
+          strip.appendChild(
+            el(
+              "div",
+              {
+                class: "hawkeye-stage-block is-future",
+                title: `${p.name} — ${b.stage}: ${targetLabel}`,
+                "data-project-id": p.id,
+                "data-stage": b.stage,
+                tabindex: "0",
+                role: "button",
+              },
+              [code]
+            )
+          );
+        });
+        track.appendChild(strip);
+        // Clicking a specific future chip opens that stage's own detail
+        // (with the potential-target date front and center) instead of
+        // just the row's general project detail — one click straight to
+        // "what's the target for this specific upcoming stage."
+        strip.querySelectorAll(".hawkeye-stage-block").forEach((chip) => {
+          chip.addEventListener("click", (e) => {
+            e.stopPropagation();
+            openStageDetail(chip.getAttribute("data-project-id"), chip.getAttribute("data-stage"));
+          });
+          chip.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              e.stopPropagation();
+              openStageDetail(chip.getAttribute("data-project-id"), chip.getAttribute("data-stage"));
+            }
+          });
+        });
+      }
+
+      row.appendChild(track);
+      rowsWrap.appendChild(row);
+    });
+
+    scrollInner.appendChild(rowsWrap);
+    board.appendChild(scrollInner);
 
     board.querySelectorAll(".hawkeye-row").forEach((row) => {
       row.addEventListener("click", () => openProjectDetail(row.getAttribute("data-project-id"), "stage-gate-timeline-section"));
@@ -1041,13 +1557,26 @@
         }
       });
     });
+
+    // Default scroll position: land with a sensible lead-in before
+    // "today" (roughly what the old fixed span cap used to show by
+    // default) rather than dumping the user at the very left edge — which
+    // could now be months/years before anything relevant for an outlier
+    // project — or the very right edge, which would hide "today" itself
+    // off-screen on first load. Everything before/after is still just a
+    // scroll away, never clipped out of existence.
+    requestAnimationFrame(() => {
+      const leadInDays = zoom.grid === "week" ? 21 : 90;
+      const target = xPx(todayIso) - leadInDays * pxPerDay;
+      scrollInner.scrollLeft = Math.max(0, target);
+    });
   }
 
   /* ---------------- Global project filter (applies to every tab) ---------------- */
 
   function populateGlobalProjectFilter() {
     const select = document.getElementById("globalProjectFilter");
-    const names = DATA.projects.slice().sort((a, b) => a.name.localeCompare(b.name));
+    const names = activeProjects().sort((a, b) => a.name.localeCompare(b.name));
     names.forEach((p) => {
       select.appendChild(el("option", { value: p.id }, [p.name]));
     });
@@ -1305,6 +1834,12 @@
           dep.id ? el("span", { class: "dep-id-tag" }, [dep.id]) : null,
           dep.text,
           dep.escalated ? el("span", { class: "deps-badge deps-badge-escalated" }, ["🚨 Escalated"]) : null,
+          // Some projects (e.g. SSO V2) fold two conceptually distinct
+          // deck tables — with their own separate dependency/risk lists —
+          // into one project record. `track` (only set where the source
+          // deck actually had more than one such table) surfaces which
+          // one this item came from instead of silently merging them.
+          dep.track ? el("span", { class: "track-tag" }, [dep.track]) : null,
           el("span", { class: "team-tag" + (dep.team ? "" : " is-missing") }, [dep.team || "No team labeled"]),
         ].filter(Boolean)),
         el("div", { class: "paired-item-mitigation" + (mitigation ? "" : " is-missing") }, [
@@ -1341,6 +1876,7 @@
         el("div", { class: "paired-item-text" }, [
           risk.id ? el("span", { class: "dep-id-tag" }, [risk.id]) : null,
           risk.text,
+          risk.track ? el("span", { class: "track-tag" }, [risk.track]) : null,
         ].filter(Boolean)),
         el("div", { class: "paired-item-mitigation" + (mitigation ? "" : " is-missing") }, [
           el("span", { class: "mitigation-label" }, ["Mitigation plan: "]),
@@ -2395,7 +2931,11 @@
     const today = todayISO();
     const points = historyForProject(p.id).map((w) => ({ asOf: w.asOf, stage: w.stage || "Unstaged" }));
     const currentStage = p.stage || "Unstaged";
-    if (!points.length || points[points.length - 1].stage !== currentStage) {
+    // Track this explicitly (rather than re-deriving it later) — needed
+    // below to know whether the final segment boundary is a REAL snapshot
+    // date or one we just made up because there's no fresher data yet.
+    const injectedFinalPoint = !points.length || points[points.length - 1].stage !== currentStage;
+    if (injectedFinalPoint) {
       points.push({ asOf: today, stage: currentStage });
     }
 
@@ -2414,6 +2954,25 @@
       finalSeg.ongoing = true;
     }
     if (segments.length) segments[0].approxStart = true;
+
+    // If `currentStage` doesn't match the last real weekly snapshot (e.g.
+    // the last snapshot is a few weeks old and `stagePlan` says the
+    // project should have moved on by now, per its own un-delayed
+    // schedule), the segment we just closed out above — the one
+    // immediately before the synthetic "today" point — got `end: today`
+    // purely by construction. That's almost certainly not when the real
+    // transition happened; we just don't have a fresher snapshot to prove
+    // the exact date. Prefer a real stagePlan end date for that stage when
+    // one's on record and falls on/before today, instead of "whenever we
+    // happened to check."
+    if (injectedFinalPoint && segments.length >= 2) {
+      const closedSeg = segments[segments.length - 2];
+      const plan = p.stagePlan && p.stagePlan[closedSeg.stage];
+      const planEnd = plan && (plan.latestEnd || plan.initialEnd);
+      if (planEnd && planEnd <= today && planEnd > closedSeg.start) {
+        closedSeg.end = planEnd;
+      }
+    }
 
     const withDays = segments.map((seg) => ({ ...seg, days: Math.max(0, daysBetweenIso(seg.start, seg.end)) }));
 
@@ -2765,150 +3324,33 @@
     return box;
   }
 
-  // Keeps marker labels from spilling past the left/right edge of the Gantt
-  // track (which would otherwise get clipped since there's nothing to
-  // scroll to beyond the track boundaries).
-  function ganttLabelEdgeStyle(pct) {
-    if (pct < 14) return "left:0;transform:translateX(0);";
-    if (pct > 86) return "left:auto;right:0;transform:translateX(0);";
-    return "";
-  }
-
-  function buildSingleProjectGantt(p) {
-    const DAY = 86400000;
-    const todayIso = todayISO();
-    const dates = [todayIso];
-    if (p.originalGoLive) dates.push(p.originalGoLive);
-    if (p.goLive) dates.push(p.goLive);
-    if (p.nextMilestone && p.nextMilestone.date) dates.push(p.nextMilestone.date);
-    (p.milestones || []).forEach((m) => {
-      if (m.date) dates.push(m.date);
-    });
-
-    if (dates.length < 2) {
-      return el("p", { class: "empty-note" }, ["No dates to plot yet for this project's timeline."]);
-    }
-
-    const times = dates.map((d) => new Date(d + "T00:00:00").getTime());
-    let minTime = Math.min(...times) - 10 * DAY;
-    let maxTime = Math.max(...times) + 14 * DAY;
-    if (maxTime - minTime < 30 * DAY) maxTime = minTime + 30 * DAY;
-
-    const xPct = (iso) => {
-      const t = new Date(iso + "T00:00:00").getTime();
-      return Math.max(0, Math.min(100, ((t - minTime) / (maxTime - minTime)) * 100));
-    };
-
-    const monthMarks = [];
-    const cursor = new Date(minTime);
-    cursor.setDate(1);
-    cursor.setHours(0, 0, 0, 0);
-    while (cursor.getTime() <= maxTime) {
-      if (cursor.getTime() >= minTime) {
-        monthMarks.push({
-          pct: ((cursor.getTime() - minTime) / (maxTime - minTime)) * 100,
-          label: cursor.toLocaleDateString("en-US", { month: "short", year: "numeric" }),
-        });
-      }
-      cursor.setMonth(cursor.getMonth() + 1);
-    }
-
-    const wrap = el("div", { class: "project-gantt" });
-
-    const header = el("div", { class: "project-gantt-months" });
-    monthMarks.forEach((m) => {
-      header.appendChild(el("div", { class: "project-gantt-month-mark", style: `left:${m.pct}%` }, [m.label]));
-    });
-    wrap.appendChild(header);
-
-    const track = el("div", { class: "project-gantt-track" });
-    monthMarks.forEach((m) => {
-      track.appendChild(el("div", { class: "project-gantt-grid-line", style: `left:${m.pct}%` }));
-    });
-    track.appendChild(
-      el("div", { class: "project-gantt-today-line", style: `left:${xPct(todayIso)}%` }, [
-        el("span", { class: "project-gantt-today-label" }, ["Today"]),
-      ])
+  // The Date change log used to always render fully expanded — with
+  // several projects racking up 5+ entries, it was one of the bigger
+  // single contributors to the project detail view feeling too
+  // long/dense. Collapsed by default; clicking the header expands it in
+  // place. The entry count stays visible either way, so "is there
+  // anything here worth opening" doesn't require opening it.
+  function buildCollapsibleChangelog(events) {
+    const wrap = el("div", { class: "schedule-changelog-wrap is-collapsed" });
+    const toggle = el(
+      "button",
+      { class: "schedule-changelog-toggle", type: "button", "aria-expanded": "false" },
+      [
+        el("span", { class: "schedule-changelog-chevron" }, ["▸"]),
+        el("span", { class: "schedule-changelog-title" }, ["Date change log"]),
+        el("span", { class: "schedule-changelog-count" }, [
+          events.length + (events.length === 1 ? " entry" : " entries"),
+        ]),
+      ]
     );
-    track.appendChild(el("div", { class: "project-gantt-baseline" }));
-
-    if (p.originalGoLive && p.goLive && p.originalGoLive !== p.goLive) {
-      const a = xPct(p.originalGoLive);
-      const b = xPct(p.goLive);
-      track.appendChild(
-        el("div", { class: "project-gantt-slip-line", style: `left:${Math.min(a, b)}%;width:${Math.abs(b - a)}%` })
-      );
-      track.appendChild(
-        el(
-          "div",
-          {
-            class: "project-gantt-marker ghost",
-            style: `left:${a}%`,
-            title: `Original Go-Live · ${fmtDate(p.originalGoLive)}`,
-          },
-          [
-            el(
-              "span",
-              { class: "project-gantt-marker-label above", style: ganttLabelEdgeStyle(a) },
-              ["Original · " + fmtDateShort(p.originalGoLive)]
-            ),
-          ]
-        )
-      );
-    }
-
-    const milestones =
-      p.milestones && p.milestones.length
-        ? p.milestones
-        : p.nextMilestone && p.nextMilestone.date
-        ? [{ name: p.nextMilestone.name || "Milestone", date: p.nextMilestone.date, status: p.status }]
-        : [];
-
-    milestones.forEach((m, i) => {
-      if (!m.date) return;
-      const above = i % 2 === 0;
-      const pct = xPct(m.date);
-      track.appendChild(
-        el(
-          "div",
-          {
-            class: `project-gantt-marker milestone status-${m.status || p.status}`,
-            style: `left:${pct}%`,
-            title: `${m.name} · ${fmtDate(m.date)}`,
-          },
-          [
-            el(
-              "span",
-              { class: "project-gantt-marker-label " + (above ? "above" : "below"), style: ganttLabelEdgeStyle(pct) },
-              [m.name + " · " + fmtDateShort(m.date)]
-            ),
-          ]
-        )
-      );
+    const body = el("div", { class: "schedule-changelog-body" }, [renderScheduleTimeline(events)]);
+    toggle.addEventListener("click", () => {
+      const nowCollapsed = wrap.classList.toggle("is-collapsed");
+      toggle.setAttribute("aria-expanded", nowCollapsed ? "false" : "true");
+      toggle.querySelector(".schedule-changelog-chevron").textContent = nowCollapsed ? "▸" : "▾";
     });
-
-    if (p.goLive) {
-      const golivePct = xPct(p.goLive);
-      track.appendChild(
-        el(
-          "div",
-          {
-            class: `project-gantt-marker golive status-${p.status}`,
-            style: `left:${golivePct}%`,
-            title: `Go-Live · ${fmtDate(p.goLive)}`,
-          },
-          [
-            el(
-              "span",
-              { class: "project-gantt-marker-label below", style: ganttLabelEdgeStyle(golivePct) },
-              ["Go-Live · " + fmtDateShort(p.goLive)]
-            ),
-          ]
-        )
-      );
-    }
-
-    wrap.appendChild(track);
+    wrap.appendChild(toggle);
+    wrap.appendChild(body);
     return wrap;
   }
 
@@ -2919,11 +3361,13 @@
     const overlay = document.getElementById("projectDetail");
     const content = document.getElementById("detailContent");
     content.innerHTML = "";
-    content.appendChild(buildProjectDetail(project));
+    const detailRoot = buildProjectDetail(project);
+    content.appendChild(detailRoot);
     overlay.hidden = false;
     document.body.classList.add("no-scroll");
 
     if (focusSectionId) {
+      activateDetailTab(detailRoot, DETAIL_SECTION_TAB_MAP[focusSectionId] || "stagegate");
       requestAnimationFrame(() => {
         const target = document.getElementById(focusSectionId);
         if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -3012,49 +3456,103 @@
       ])
     );
 
-    // Stage-gate timeline — how long the project has spent in each pipeline
-    // stage, reconstructed from weekly history snapshots, flagged against
-    // each stage's SLA (from data.json's stageSlaDays, tunable per stage).
-    root.appendChild(el("h3", { class: "weekly-subhead" }, ["Stage-gate timeline"]));
-    root.appendChild(
-      el(
-        "div",
-        { id: "stage-gate-timeline-section", class: "stage-timeline" },
-        computeStageSegments(p).map((seg) => {
-          const sla = stageSlaDays(seg.stage);
-          const flag = stageFlagLevel(seg.days, sla);
-          return el(
-            "div",
-            {
-              class: "stage-timeline-row" + (seg.ongoing ? " is-ongoing" : ""),
-              "data-project-id": p.id,
-              "data-stage": seg.stage,
-              title: "Click for stage detail",
-            },
-            [
-              el("span", { class: "stage-timeline-stage" }, [seg.stage]),
-              el("span", { class: "stage-timeline-range" }, [
-                (seg.approxStart ? "since before tracking, " : "") +
-                  fmtDateShort(seg.start) +
-                  (seg.ongoing ? " → now" : " → " + fmtDateShort(seg.end)),
-              ]),
-              el("span", { class: "stage-timeline-duration" + (flag ? " is-" + flag : "") }, [
-                (seg.approxStart ? "≥" : "") + seg.days + "d" + (sla != null ? " / SLA " + sla + "d" : ""),
-              ]),
-            ]
-          );
-        })
+    // Detail-view tabs — everything below the header/progress/facts used to
+    // be one long flat stack of `<h3>` sections (Stage-gate timeline, Delay
+    // recovery, Follow-ups, Schedule, Dependencies/Risks/Escalations, Week
+    // -over-week, Feedback history), which meant scrolling past everything
+    // you didn't care about to find the one thing you clicked for. Tabbed
+    // instead: each button shows/hides its own panel via `.is-active`, and
+    // jump-links (the card badges, `openProjectDetail`'s `focusSectionId`)
+    // now switch to the right tab first, then scroll to the anchor inside
+    // it — see `DETAIL_SECTION_TAB_MAP` / `activateDetailTab` below.
+    // Order here is purely display order in the tab strip (and which one
+    // defaults to active, below) — doesn't affect anything functional, so
+    // it's just this one array to reorder. First entry is the default-open
+    // tab (2026-09-30: Schedule, since that's what a user wanted to land
+    // on first).
+    const DETAIL_TABS = [
+      { id: "schedule", label: "Schedule" },
+      { id: "weekoverweek", label: "Week-over-week" },
+      { id: "stagegate", label: "Stage-gate" },
+      { id: "depsrisks", label: "Dependencies & Risks" },
+      { id: "followups", label: "Follow-ups" },
+      { id: "feedback", label: "Feedback" },
+    ];
+    const tabStrip = el(
+      "div",
+      { class: "detail-tabs", role: "tablist" },
+      DETAIL_TABS.map((t, i) =>
+        el(
+          "button",
+          {
+            class: "detail-tab-btn" + (i === 0 ? " is-active" : ""),
+            "data-tab": t.id,
+            role: "tab",
+            type: "button",
+          },
+          [t.label]
+        )
       )
     );
-    root.querySelectorAll(".stage-timeline-row").forEach((row) => {
-      row.addEventListener("click", () => {
-        openStageDetail(row.getAttribute("data-project-id"), row.getAttribute("data-stage"));
+    root.appendChild(tabStrip);
+
+    // Panels are created independent of display order, then appended in
+    // whatever order `DETAIL_TABS` says — only the first one in that order
+    // starts active, no matter which variable it happens to be.
+    const stagegatePanel = el("div", { class: "detail-tab-panel", "data-tab": "stagegate" });
+    const depsRisksPanel = el("div", { class: "detail-tab-panel", "data-tab": "depsrisks" });
+    const weekOverWeekPanel = el("div", { class: "detail-tab-panel", "data-tab": "weekoverweek" });
+    const followupsPanel = el("div", { class: "detail-tab-panel", "data-tab": "followups" });
+    const schedulePanel = el("div", { class: "detail-tab-panel", "data-tab": "schedule" });
+    const feedbackPanel = el("div", { class: "detail-tab-panel", "data-tab": "feedback" });
+    const PANELS_BY_TAB = {
+      stagegate: stagegatePanel,
+      depsrisks: depsRisksPanel,
+      weekoverweek: weekOverWeekPanel,
+      followups: followupsPanel,
+      schedule: schedulePanel,
+      feedback: feedbackPanel,
+    };
+    DETAIL_TABS.forEach((t, i) => {
+      const panel = PANELS_BY_TAB[t.id];
+      if (i === 0) panel.classList.add("is-active");
+      root.appendChild(panel);
+    });
+
+    tabStrip.querySelectorAll(".detail-tab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        activateDetailTab(root, btn.getAttribute("data-tab"));
+        const overlay = document.getElementById("projectDetail");
+        if (overlay) overlay.scrollTop = 0;
       });
     });
 
+    // Stage-gate timeline — same visual language as the cross-project
+    // Hawk-eye tab (real date axis, blocks colored by status, dashed for
+    // not-yet-reached stages, a "Today" line), rebuilt from the old flat
+    // list of rows (2026-09-30) per explicit request — see
+    // `buildStageGateTimeline()` for the full reasoning. Real stagePlan
+    // dates win over a blind SLA-chain estimate for future stages when on
+    // record, same source (`buildHawkeyeBlocks`) Hawk-eye itself uses, so
+    // a clicked-through "potential target" here always matches what's
+    // shown there.
+    stagegatePanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Stage-gate timeline"]));
+    stagegatePanel.appendChild(
+      el("div", { class: "stagegantt-legend" }, [
+        el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "stagegantt-legend-swatch is-done" }), "Done"]),
+        el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "stagegantt-legend-swatch is-current" }), "Current — on track"]),
+        el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "stagegantt-legend-swatch is-warn" }), "At risk"]),
+        el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "stagegantt-legend-swatch is-breach" }), "Blocked / over SLA"]),
+        el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "stagegantt-legend-swatch is-future" }), "Not started (planned)"]),
+      ])
+    );
+    stagegatePanel.appendChild(
+      el("div", { id: "stage-gate-timeline-section" }, [buildStageGateTimeline(p)])
+    );
+
     if (isLate) {
-      root.appendChild(el("h3", { class: "weekly-subhead" }, ["Delay recovery"]));
-      root.appendChild(
+      stagegatePanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Delay recovery"]));
+      stagegatePanel.appendChild(
         el("div", { class: "detail-block delay-recovery" }, [
           el("h4", null, ["Mitigation steps taken"]),
           p.delayMitigation && p.delayMitigation.length
@@ -3069,8 +3567,8 @@
     }
 
     if ((p.timeSavedDays || 0) > 0) {
-      root.appendChild(el("h3", { class: "weekly-subhead" }, ["Time saved"]));
-      root.appendChild(
+      stagegatePanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Time saved"]));
+      stagegatePanel.appendChild(
         el("div", { class: "detail-block time-saved" }, [
           el("h4", null, ["+" + p.timeSavedDays + " day" + (p.timeSavedDays === 1 ? "" : "s") + " ahead of plan"]),
           p.timeSavedNote && p.timeSavedNote.length
@@ -3080,9 +3578,26 @@
       );
     }
 
+    if ((p.fastFollowItems || []).length || p.scopeReduced) {
+      stagegatePanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Fast-follow items (planned or remaining)"]));
+      stagegatePanel.appendChild(
+        el("div", { class: "detail-block fast-follow" }, [
+          el("p", { class: "empty-note" }, [
+            p.scopeReduced
+              ? "Scope is being cut/deferred to hold the current date. Live / in production, but not fully closed out until these ship:"
+              : "Live / in production, but not fully closed out until these ship:",
+          ]),
+          el("ul", null, listOrDash(p.fastFollowItems || [])),
+        ])
+      );
+    }
+
+    // Follow-ups tab always exists (even with none open) so a stable set
+    // of tabs is available no matter what — clicking the "0 follow-ups"
+    // badge would otherwise have nowhere sensible to land.
+    followupsPanel.appendChild(el("h3", { class: "weekly-subhead", id: "detail-followups-section" }, ["Open follow-ups"]));
     if (openFollowUps.length) {
-      root.appendChild(el("h3", { class: "weekly-subhead" }, ["Open follow-ups"]));
-      root.appendChild(
+      followupsPanel.appendChild(
         el("div", { class: "detail-block followups" }, [
           el(
             "ul",
@@ -3096,50 +3611,54 @@
           ),
         ])
       );
-    }
-
-    if ((p.fastFollowItems || []).length || p.scopeReduced) {
-      root.appendChild(el("h3", { class: "weekly-subhead" }, ["Fast-follow items (planned or remaining)"]));
-      root.appendChild(
-        el("div", { class: "detail-block fast-follow" }, [
-          el("p", { class: "empty-note" }, [
-            p.scopeReduced
-              ? "Scope is being cut/deferred to hold the current date. Live / in production, but not fully closed out until these ship:"
-              : "Live / in production, but not fully closed out until these ship:",
-          ]),
-          el("ul", null, listOrDash(p.fastFollowItems || [])),
-        ])
-      );
+    } else {
+      followupsPanel.appendChild(el("p", { class: "empty-note" }, ["No open follow-ups."]));
     }
 
     // Progress trend chart
-    root.appendChild(el("h3", { class: "weekly-subhead" }, ["Progress over time"]));
+    schedulePanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Progress over time"]));
     if (!weeks.length) {
-      root.appendChild(el("p", { class: "empty-note" }, ["No history yet — it'll build up week over week as updates get ingested."]));
+      schedulePanel.appendChild(el("p", { class: "empty-note" }, ["No history yet — it'll build up week over week as updates get ingested."]));
     } else {
-      root.appendChild(buildTrendGraph(weeks));
+      schedulePanel.appendChild(buildTrendGraph(weeks));
     }
 
-    // Schedule timeline — visual Gantt for this project, plus a log of every date move (e.g. a CR)
+    // Schedule timeline — a log of every date move (e.g. a CR pushing the
+    // timeline). Used to also render a per-project calendar/Gantt above
+    // this (`buildSingleProjectGantt()`) — removed 2026-09-30 per explicit
+    // request, for every project, not just one.
     const scheduleSection = el("div", { id: "detailScheduleSection" });
     scheduleSection.appendChild(el("h3", { class: "weekly-subhead" }, ["Schedule timeline"]));
     scheduleSection.appendChild(
       el("p", { class: "section-subhead" }, [
-        "This project's milestones and go-live plotted on a calendar, plus a log of every time a date moved — e.g. a CR pushing the timeline.",
+        "A log of every time this project's go-live or a milestone date moved — e.g. a CR pushing the timeline.",
       ])
     );
-    scheduleSection.appendChild(buildSingleProjectGantt(p));
     const scheduleEvents = buildScheduleTimeline(weeks);
-    if (scheduleEvents.length) {
-      scheduleSection.appendChild(el("h4", { class: "schedule-changelog-subhead" }, ["Date change log"]));
-    }
-    scheduleSection.appendChild(renderScheduleTimeline(scheduleEvents));
-    root.appendChild(scheduleSection);
+    scheduleSection.appendChild(
+      scheduleEvents.length ? buildCollapsibleChangelog(scheduleEvents) : renderScheduleTimeline(scheduleEvents)
+    );
+    schedulePanel.appendChild(scheduleSection);
 
     // Renders the Dependencies / Weekly Status / Risks blocks for a given
     // week's data (either the live project `p` or a historical snapshot),
-    // into the shared container below the change log.
-    function renderSnapshotSections(container, snap, label, isLatest) {
+    // into whichever container is passed in. Used twice, in two different
+    // tabs, for two different purposes:
+    //  - The "Dependencies & Risks" tab calls this once, always with the
+    //    live project `p` (never changes), in interactive mode — real
+    //    jump-link ids (`detail-deps-section` etc.) and actionable list
+    //    items (edit/escalate/resolve) and "+ Add" links.
+    //  - The "Week-over-week" tab calls this every time a different week
+    //    gets clicked, in read-only mode (`opts.readOnly`) — no ids (there
+    //    can only be one `detail-deps-section` in the DOM, and that's the
+    //    live one above), always the plain non-interactive paired-list
+    //    rendering regardless of which week is selected (even the latest),
+    //    and no "+ Add" links, since this tab is explicitly a historical
+    //    viewer, not a place to make live edits.
+    function renderSnapshotSections(container, snap, label, isLatest, opts) {
+      opts = opts || {};
+      const readOnly = !!opts.readOnly;
+      const interactive = isLatest && !readOnly;
       container.innerHTML = "";
 
       container.appendChild(
@@ -3149,7 +3668,9 @@
       );
 
       if (snap.escalations && snap.escalations.length) {
-        container.appendChild(el("h3", { class: "weekly-subhead" }, ["🚨 Escalated to leadership"]));
+        container.appendChild(
+          el("h3", readOnly ? { class: "weekly-subhead" } : { class: "weekly-subhead", id: "detail-escalations-section" }, ["🚨 Escalated to leadership"])
+        );
         container.appendChild(
           el("div", { class: "detail-block escalations" }, [
             el("ul", null, snap.escalations.map((text) => el("li", null, [text]))),
@@ -3158,12 +3679,14 @@
       }
 
       container.appendChild(
-        el("h3", { class: "weekly-subhead detail-section-head" }, [
-          el("span", null, ["Dependencies"]),
-          isLatest
-            ? detailSectionIssueLink("new-dependency.yml", p.name, "+ Add a Dependency")
-            : null,
-        ].filter(Boolean))
+        el(
+          "h3",
+          readOnly ? { class: "weekly-subhead detail-section-head" } : { class: "weekly-subhead detail-section-head", id: "detail-deps-section" },
+          [
+            el("span", null, ["Dependencies"]),
+            interactive ? detailSectionIssueLink("new-dependency.yml", p.name, "+ Add a Dependency") : null,
+          ].filter(Boolean)
+        )
       );
       const snapDeps = getDependencyObjects(snap).filter(
         (d) => !d.resolved && !isPlaceholderDependencyText(d.text)
@@ -3173,7 +3696,7 @@
           el(
             "ul",
             { class: "paired-list" },
-            isLatest
+            interactive
               ? dependencyListItems(snapDeps, p)
               : pairedList(
                   snapDeps.map((d) => d.text),
@@ -3213,12 +3736,14 @@
         (r) => !r.resolved && !isPlaceholderRiskText(r.text)
       );
       container.appendChild(
-        el("h3", { class: "weekly-subhead detail-section-head" }, [
-          el("span", null, ["Risks / blockers"]),
-          isLatest
-            ? detailSectionIssueLink("new-risk.yml", p.name, "+ Report a Risk")
-            : null,
-        ].filter(Boolean))
+        el(
+          "h3",
+          readOnly ? { class: "weekly-subhead detail-section-head" } : { class: "weekly-subhead detail-section-head", id: "detail-risks-section" },
+          [
+            el("span", null, ["Risks / blockers"]),
+            interactive ? detailSectionIssueLink("new-risk.yml", p.name, "+ Report a Risk") : null,
+          ].filter(Boolean)
+        )
       );
       container.appendChild(
         el("div", { class: "detail-block risks" }, [
@@ -3226,7 +3751,7 @@
             ? el(
                 "ul",
                 { class: "paired-list" },
-                isLatest
+                interactive
                   ? riskListItems(snapRisks, p)
                   : pairedList(
                       snapRisks.map((r) => r.text),
@@ -3239,13 +3764,28 @@
       );
     }
 
-    const snapshotSections = el("div", { class: "snapshot-sections" });
+    // "Dependencies & Risks" tab — always the live project's current data,
+    // interactive (real jump-link ids + add/edit/escalate/resolve actions).
+    // No time-travel here anymore; that moved to its own "Week-over-week"
+    // tab below, which gets its own separate (read-only) copy of this same
+    // rendering so there's only ever one `id="detail-deps-section"` etc. in
+    // the DOM for jump-links to find.
+    const liveSnapshotSections = el("div", { class: "snapshot-sections" });
+    renderSnapshotSections(liveSnapshotSections, p, null, true);
+    depsRisksPanel.appendChild(liveSnapshotSections);
 
-    // Change log — click a week to load its Dependencies / Weekly Status /
-    // Risks below as they were that week, instead of always showing current.
-    if (weeks.length) {
-      root.appendChild(el("h3", { class: "weekly-subhead" }, ["Week-over-week changes"]));
-      root.appendChild(el("p", { class: "section-subhead", style: "margin:-6px 0 12px;" }, ["Click a week to see dependencies, sprint status, and risks as they stood that week."]));
+    // "Week-over-week" tab — click a week to load its Dependencies /
+    // Weekly Status / Risks as they stood that week. Its own snapshot
+    // preview is always read-only (even when the latest week is selected)
+    // since this tab is explicitly a historical viewer, not a place to
+    // make live edits — that's what the "Dependencies & Risks" tab is for.
+    weekOverWeekPanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Week-over-week changes"]));
+    if (!weeks.length) {
+      weekOverWeekPanel.appendChild(
+        el("p", { class: "empty-note" }, ["No history yet — it'll build up week over week as updates get ingested."])
+      );
+    } else {
+      weekOverWeekPanel.appendChild(el("p", { class: "section-subhead", style: "margin:-6px 0 12px;" }, ["Click a week to see dependencies, sprint status, and risks as they stood that week."]));
       const changeLog = el("div", { class: "changelog" });
       for (let i = weeks.length - 1; i >= 0; i--) {
         const cur = weeks[i];
@@ -3288,7 +3828,10 @@
         );
         changeLog.appendChild(rowEl);
       }
-      root.appendChild(changeLog);
+      weekOverWeekPanel.appendChild(changeLog);
+
+      const historySnapshotSections = el("div", { class: "snapshot-sections" });
+      weekOverWeekPanel.appendChild(historySnapshotSections);
 
       changeLog.querySelectorAll(".changelog-row").forEach((rowEl) => {
         const selectWeek = () => {
@@ -3296,7 +3839,7 @@
           const isLatest = idx === weeks.length - 1;
           changeLog.querySelectorAll(".changelog-row").forEach((r) => r.classList.remove("is-selected"));
           rowEl.classList.add("is-selected");
-          renderSnapshotSections(snapshotSections, isLatest ? p : weeks[idx], weeks[idx].asOf, isLatest);
+          renderSnapshotSections(historySnapshotSections, isLatest ? p : weeks[idx], weeks[idx].asOf, isLatest, { readOnly: true });
         };
         rowEl.addEventListener("click", selectWeek);
         rowEl.addEventListener("keydown", (e) => {
@@ -3306,16 +3849,16 @@
           }
         });
       });
+
+      // Defaults to the latest week (same data the "Dependencies & Risks"
+      // tab is already showing); click an older row above to rewind.
+      renderSnapshotSections(historySnapshotSections, p, weeks[weeks.length - 1].asOf, true, { readOnly: true });
     }
 
-    // Current details (defaults to the latest week; click a row above to change)
-    renderSnapshotSections(snapshotSections, p, weeks.length ? weeks[weeks.length - 1].asOf : null, true);
-    root.appendChild(snapshotSections);
-
     // Full feedback history
-    root.appendChild(el("h3", { class: "weekly-subhead" }, ["Feedback history"]));
+    feedbackPanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Feedback history"]));
     if (!allNotes.length) {
-      root.appendChild(el("p", { class: "empty-note" }, ["No feedback logged for this project yet."]));
+      feedbackPanel.appendChild(el("p", { class: "empty-note" }, ["No feedback logged for this project yet."]));
     } else {
       const notesList = el("div", { class: "notes-list" });
       allNotes
@@ -3346,10 +3889,32 @@
             ])
           );
         });
-      root.appendChild(notesList);
+      feedbackPanel.appendChild(notesList);
     }
 
     return root;
+  }
+
+  // Maps every jump-linkable anchor id inside the project detail view to
+  // the tab panel that now contains it, so `openProjectDetail`'s
+  // `focusSectionId` can switch to the right tab before scrolling to the
+  // anchor (scrollIntoView on a still-hidden `.detail-tab-panel` is a
+  // no-op, so the tab switch has to happen first).
+  const DETAIL_SECTION_TAB_MAP = {
+    "stage-gate-timeline-section": "stagegate",
+    "detail-deps-section": "depsrisks",
+    "detail-risks-section": "depsrisks",
+    "detail-escalations-section": "depsrisks",
+    "detail-followups-section": "followups",
+  };
+
+  function activateDetailTab(root, tabId) {
+    root.querySelectorAll(".detail-tab-btn").forEach((btn) => {
+      btn.classList.toggle("is-active", btn.getAttribute("data-tab") === tabId);
+    });
+    root.querySelectorAll(".detail-tab-panel").forEach((panel) => {
+      panel.classList.toggle("is-active", panel.getAttribute("data-tab") === tabId);
+    });
   }
 
   /* ---------------- Stage detail modal ---------------- */
@@ -3403,6 +3968,10 @@
     );
 
     const fields = [el("dt", null, ["Description"]), el("dd", null, [item.text || "—"])];
+
+    if (item.track) {
+      fields.push(el("dt", null, ["Source track"]), el("dd", null, [item.track]));
+    }
 
     if (isDep) {
       fields.push(
@@ -3556,6 +4125,16 @@
     const cumulativeOverage = cumulativeStageOverageDays(p);
     const overDays = sla != null ? Math.max(0, days - sla) : 0;
 
+    // For a not-yet-reached stage with no real stagePlan entry, `plan` is
+    // empty and every date row below would just show "—" — not useful
+    // when the whole point of clicking through here was "what's the
+    // potential target for this." Fall back to the same SLA-chain
+    // estimate the Hawk-eye future-chip strip uses (buildHawkeyeBlocks),
+    // clearly suffixed "(estimated)" so it's never mistaken for a real
+    // planned date.
+    const estBlock = kind === "future" ? buildHawkeyeBlocks(p).find((b) => b.stage === stage) : null;
+    const showEstimate = !!(estBlock && !estBlock.planned);
+
     return el("div", null, [
       el("div", { class: "stagedetail-datebox-row" }, [
         el("div", { class: "stagedetail-datebox" }, [
@@ -3564,7 +4143,13 @@
             el("dt", null, ["Initial Planned Start Date"]),
             el("dd", null, [fmtDate(plan.initialStart)]),
             el("dt", null, ["Latest Planned Start Date"]),
-            el("dd", null, [fmtDate(plan.latestStart)]),
+            el("dd", null, [
+              plan.latestStart
+                ? fmtDate(plan.latestStart)
+                : showEstimate
+                ? fmtDate(estBlock.start) + " (estimated)"
+                : fmtDate(plan.latestStart),
+            ]),
             el("dt", null, ["Actual Start Date"]),
             el("dd", { class: "stagedetail-actual" }, [fmtDate(actualStart)]),
           ]),
@@ -3579,7 +4164,13 @@
             el("dt", null, ["Initial Planned Completion Date"]),
             el("dd", null, [fmtDate(plan.initialEnd)]),
             el("dt", null, ["Latest Planned Completion Date"]),
-            el("dd", null, [fmtDate(plan.latestEnd)]),
+            el("dd", null, [
+              plan.latestEnd
+                ? fmtDate(plan.latestEnd)
+                : showEstimate
+                ? fmtDate(estBlock.end) + " (estimated)"
+                : fmtDate(plan.latestEnd),
+            ]),
             el("dt", null, ["Actual Completion Date"]),
             el("dd", { class: "stagedetail-actual" }, [actualEnd ? fmtDate(actualEnd) : "—"]),
           ]),
@@ -3674,6 +4265,7 @@
       "div",
       { class: "stagedetail-analysis-head" }, [
       el("div", { class: "stagedetail-analysis-total" }, [
+        el("span", { class: "kicker" }, ["Delay Attribution"]),
         el("span", { class: "num" }, [String(totalDays)]),
         el("span", { class: "label" }, ["days total"]),
       ]),
@@ -3683,6 +4275,7 @@
         breakdowns.map((b) =>
           el("div", { class: "stagedetail-analysis-col" }, [
             el("h4", null, [b.title]),
+            buildDonutChart(b.groups),
             el(
               "div",
               { class: "stagedetail-bar-list" },
@@ -3702,6 +4295,52 @@
 
   const BREAKDOWN_COLORS = ["#c1502e", "#5a3b30", "#dfa23a", "#3562e8", "#1a9f6b", "#8a5fd6"];
 
+  // Reusable SVG donut chart — `groups` is [{label, days, color?}], already
+  // sorted by whatever the caller wants (biggest slice first, typically).
+  // Renders as concentric arc segments via stroke-dasharray/-dashoffset on
+  // stacked <circle>s (rotated -90° so the first segment starts at 12
+  // o'clock, matching the internal admin-dashboard mockup this was modeled
+  // on), with the total printed in the hole in the middle. Falls back to a
+  // plain grey ring + "0" when every group is 0 days (nothing to show a
+  // proportion of) rather than dividing by zero.
+  function buildDonutChart(groups, opts) {
+    opts = opts || {};
+    const size = opts.size || 140;
+    const strokeWidth = opts.strokeWidth || 20;
+    const r = (size - strokeWidth) / 2;
+    const cx = size / 2;
+    const cy = size / 2;
+    const circumference = 2 * Math.PI * r;
+    const total = groups.reduce((sum, g) => sum + (g.days || 0), 0);
+
+    let circlesSvg;
+    if (total <= 0) {
+      circlesSvg = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--line-strong)" stroke-width="${strokeWidth}" />`;
+    } else {
+      let offsetAcc = 0;
+      circlesSvg = groups
+        .filter((g) => (g.days || 0) > 0)
+        .map((g, i) => {
+          const frac = g.days / total;
+          const dash = frac * circumference;
+          const gap = circumference - dash;
+          const dashoffset = -offsetAcc;
+          offsetAcc += dash;
+          const color = g.color || BREAKDOWN_COLORS[i % BREAKDOWN_COLORS.length];
+          return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-dasharray="${dash} ${gap}" stroke-dashoffset="${dashoffset}" stroke-linecap="butt" transform="rotate(-90 ${cx} ${cy})" />`;
+        })
+        .join("");
+    }
+
+    const svg = `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" class="donut-chart-svg">${circlesSvg}</svg>`;
+    return el("div", { class: "donut-chart", style: `width:${size}px;height:${size}px`, html: svg }, [
+      el("div", { class: "donut-chart-center" }, [
+        el("span", { class: "donut-chart-num" }, [String(total)]),
+        el("span", { class: "donut-chart-label" }, [opts.centerLabel || "days"]),
+      ]),
+    ]);
+  }
+
   function buildStageLogPanel(entries, autoShifts) {
     const wrap = el("div", { class: "stagedetail-log-wrap" });
 
@@ -3718,6 +4357,21 @@
       wrap.appendChild(el("p", { class: "empty-note" }, ["No schedule-driven delays detected for this stage yet."]));
     } else {
       wrap.appendChild(renderScheduleTimeline(autoShifts));
+      // The "+Nd" on each row is just that one row's own delta — don't add
+      // them up. Go-Live and the next-milestone target are two different
+      // dates interleaved in the same list, and the milestone's label
+      // itself sometimes gets reworded as scope gets refined (e.g.
+      // "TDD" → "Requirement + TDD" → "Requirements completion"), so even
+      // two consecutive milestone rows aren't always "the same date
+      // slipping again." None of this feeds the Stage delay / Project
+      // cumulative numbers above either — those come from real elapsed
+      // calendar time in a stage versus its SLA, independent of how many
+      // times a target got re-planned.
+      wrap.appendChild(
+        el("p", { class: "section-subhead stagedetail-log-note" }, [
+          "Note: each row above is its own change, not a running total — Go-Live and milestone-target shifts are tracked separately and shouldn't be summed together, and they're unrelated to the Stage delay / Project cumulative figures above.",
+        ])
+      );
     }
 
     wrap.appendChild(el("h4", { class: "weekly-subhead stagedetail-manual-log-head" }, ["Manually reported delay log"]));
@@ -3843,7 +4497,7 @@
   function wireFeedbackModal() {
     const modal = document.getElementById("feedbackModal");
     const projectSelect = document.getElementById("fbProject");
-    DATA.projects.forEach((p) => {
+    activeProjects().forEach((p) => {
       projectSelect.appendChild(el("option", { value: p.name }, [p.name]));
     });
 
@@ -3881,6 +4535,37 @@
 
   /* ---------------- Tabs ---------------- */
 
+  // Which tabs the global filter bar's controls actually affect. The bar
+  // used to claim "Applies to every tab" unconditionally, but:
+  // - Status History (renderStatusHistory) only ever checks
+  //   globalProjectFilter/activeOwner — it never reads globalTeamFilter,
+  //   so picking a team there silently did nothing.
+  // - Team Performance is a disconnected placeholder stub (no data wired
+  //   up at all yet) — none of the three filters affect it.
+  const TEAM_FILTER_TABS = new Set(["status", "grid", "hawkeye", "deps"]);
+  const NO_FILTER_TABS = new Set(["team"]);
+
+  function updateGlobalFilterBarForTab(tabKey) {
+    const bar = document.getElementById("globalFilterBar");
+    const teamGroup = document.getElementById("globalTeamFilterGroup");
+    const teamSep = document.getElementById("globalTeamFilterSep");
+    const hint = document.getElementById("globalFilterHint");
+    if (!bar) return;
+
+    if (NO_FILTER_TABS.has(tabKey)) {
+      bar.hidden = true;
+      return;
+    }
+    bar.hidden = false;
+
+    const teamApplies = TEAM_FILTER_TABS.has(tabKey);
+    teamGroup.hidden = !teamApplies;
+    teamSep.hidden = !teamApplies;
+    hint.textContent = teamApplies
+      ? "Applies to every tab"
+      : "Project & PM filters apply here — Team doesn't (Status History isn't grouped by team)";
+  }
+
   function wireTabs() {
     document.querySelectorAll(".tab-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -3891,9 +4576,16 @@
         document.querySelectorAll(".tab-panel").forEach((p) => p.classList.remove("is-active"));
         btn.classList.add("is-active");
         btn.setAttribute("aria-selected", "true");
-        document.getElementById("panel-" + btn.getAttribute("data-tab")).classList.add("is-active");
+        const tabKey = btn.getAttribute("data-tab");
+        document.getElementById("panel-" + tabKey).classList.add("is-active");
+        updateGlobalFilterBarForTab(tabKey);
       });
     });
+    // Set the correct state for whichever tab starts active (Program
+    // Status), rather than assuming the bar's static HTML default is
+    // already right for it.
+    const activeBtn = document.querySelector(".tab-btn.is-active");
+    updateGlobalFilterBarForTab(activeBtn ? activeBtn.getAttribute("data-tab") : "status");
   }
 
   /* ---------------- Init ---------------- */

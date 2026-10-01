@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=55">
+<link rel="stylesheet" href="styles.css?v=70">
 </head>
 <body>
   <div class="wrap">
@@ -54,17 +54,19 @@
       </div>
       <button id="globalOwnerClear" class="global-filter-clear" type="button" title="Clear PM filter" hidden>✕</button>
 
-      <span class="global-filter-sep"></span>
+      <span class="global-filter-sep" id="globalTeamFilterSep"></span>
 
-      <label class="global-filter-label" for="globalTeamFilter" title="Filter to projects with a dependency on this team">Team</label>
-      <div class="global-filter-select-wrap">
-        <select id="globalTeamFilter" class="global-filter-select">
-          <option value="all">All teams</option>
-        </select>
-      </div>
-      <button id="globalTeamClear" class="global-filter-clear" type="button" title="Clear team filter" hidden>✕</button>
+      <span class="global-filter-group" id="globalTeamFilterGroup">
+        <label class="global-filter-label" for="globalTeamFilter" title="Filter to projects with a dependency on this team">Team</label>
+        <div class="global-filter-select-wrap">
+          <select id="globalTeamFilter" class="global-filter-select">
+            <option value="all">All teams</option>
+          </select>
+        </div>
+        <button id="globalTeamClear" class="global-filter-clear" type="button" title="Clear team filter" hidden>✕</button>
+      </span>
 
-      <span class="global-filter-hint">Applies to every tab</span>
+      <span class="global-filter-hint" id="globalFilterHint">Applies to every tab</span>
     </div>
 
     <section id="panel-status" class="tab-panel is-active">
@@ -78,6 +80,7 @@
       <h2 class="section-heading">Project × stage grid</h2>
       <p class="section-subhead">Every project against every pipeline stage in one view. Green = done (with the date range and whether it blew its SLA at the time), the highlighted column = where the project is right now (days in stage vs. SLA, colored if it's approaching or over), grey = not reached yet. Click a project or cell to open the full detail view.</p>
       <div id="stageGridMetrics" class="metrics-row"></div>
+      <div id="cumulativeDelayChart" class="cumdelay-section"></div>
       <div id="stageGridLegend" class="stage-grid-legend"></div>
       <div id="stageGrid" class="stage-grid-wrap"></div>
     </section>
@@ -226,6 +229,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=58"></script>
+  <script src="app.js?v=81"></script>
 </body>
 </html>
