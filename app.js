@@ -5,6 +5,20 @@
   const STATUS_LABEL = { green: "On Track", amber: "At Risk", red: "Critical", black: "Non-Recoverable" };
   const STATUS_RANK = { green: 0, amber: 1, red: 2, black: 3 };
 
+  // Display color/label is driven by the project's actual schedule delay
+  // (p.delayDays), not the PM's free-text status field, so the dashboard
+  // reflects real on-schedule/at-risk/critical state consistently
+  // everywhere (2026-10-06): on schedule (<=0d) -> green, 1-10d late ->
+  // amber, 10+d late -> red. "black" (Non-Recoverable) is a distinct
+  // manual call that isn't about schedule delay, so it's preserved as-is.
+  function effectiveStatus(p) {
+    if (p.status === "black") return "black";
+    const d = p.delayDays || 0;
+    if (d > 10) return "red";
+    if (d > 0) return "amber";
+    return "green";
+  }
+
   let DATA = null;
   let HISTORY = {};
   let NOTES = [];
@@ -271,7 +285,7 @@
     let delaySum = 0;
     let riskCount = 0;
     projects.forEach((p) => {
-      counts[p.status] = (counts[p.status] || 0) + 1;
+      counts[effectiveStatus(p)] = (counts[effectiveStatus(p)] || 0) + 1;
       delaySum += p.delayDays || 0;
       riskCount += countOpenRisks(p);
     });
@@ -366,14 +380,15 @@
     // stage name was flagging giant-but-on-plan projects as wildly "over
     // SLA" when they weren't actually delayed against their own approved
     // plan at all (see the project-level `delayDays`/Go-Live slip for the
-    // real, meaningful delay number). "Current stage" color now just
-    // reflects the project's own overall status, same signal as
-    // everywhere else in the app.
+    // real, meaningful delay number). "Current stage" color (2026-10-06)
+    // is now yellow by default ("in progress") and only turns red when
+    // THAT stage has run past its own committed stagePlan end date — see
+    // currentStageOverdue() — not a flat SLA and not just "is the whole
+    // project red."
     [
       { cls: "is-done", label: "Done" },
-      { cls: "is-current", label: "Current stage — on track" },
-      { cls: "is-current is-warn", label: "Current stage — at risk" },
-      { cls: "is-current is-breach", label: "Current stage — critical" },
+      { cls: "is-current is-warn", label: "Current stage — in progress" },
+      { cls: "is-current is-breach", label: "Current stage — past planned end date" },
       { cls: "is-none", label: "Not reached yet" },
     ].forEach((it) => {
       box.appendChild(
@@ -447,12 +462,13 @@
     box.innerHTML = "";
 
     const projects = visibleProjects();
-    const groups = projects
+    const projectGroups = projects
       .map((p) => ({ label: p.name, days: p.delayDays || 0, id: p.id }))
       .filter((g) => g.days > 0)
-      .sort((a, b) => b.days - a.days);
+      .sort((a, b) => b.days - a.days)
+      .map((g, i) => ({ ...g, color: BREAKDOWN_COLORS[i % BREAKDOWN_COLORS.length] }));
 
-    if (!groups.length) {
+    if (!projectGroups.length) {
       box.appendChild(
         el("div", { class: "cumdelay-card cumdelay-empty" }, [
           "No project delays right now across the filtered projects. 🎉",
@@ -461,42 +477,109 @@
       return;
     }
 
+    // Three genuinely different numbers, not three cuts of the same one
+    // (2026-10-06) — ring 1 is cumulative delay by project (as before);
+    // ring 2 is a completely different metric, total real elapsed days
+    // per pipeline stage across the whole portfolio (same figures as the
+    // Grid tab's "Portfolio total" row, via computeStageCostTotals — this
+    // is NOT delay, just how long each stage-gate has taken everywhere
+    // it's been run); ring 3 is cumulative delay again, this time by
+    // overall status, as the "which severity bucket is this coming from"
+    // rollup of ring 1's total.
+    const statusMap = new Map();
+    projects.forEach((p) => {
+      const days = p.delayDays || 0;
+      if (days <= 0) return;
+      const status = effectiveStatus(p);
+      statusMap.set(status, (statusMap.get(status) || 0) + days);
+    });
+    const STATUS_ORDER = ["red", "amber", "green", "black"];
+    const statusGroups = STATUS_ORDER.filter((s) => statusMap.has(s)).map((s) => ({
+      label: STATUS_LABEL[s] || s,
+      days: statusMap.get(s),
+      color: `var(--${s})`,
+    }));
+
+    const stageTotals = computeStageCostTotals(projects);
+    const stageGroups = PIPELINE_STAGES.map((stage) => ({ label: stage, days: stageTotals[stage].totalDays }))
+      .filter((g) => g.days > 0)
+      .sort((a, b) => b.days - a.days)
+      .map((g, i) => ({ ...g, color: PM_RING_COLORS[i % PM_RING_COLORS.length] }));
+
     box.appendChild(
       el("div", { class: "cumdelay-card" }, [
         el("div", { class: "cumdelay-head" }, [
-          el("span", { class: "kicker" }, ["Cumulative Delay by Project"]),
+          el("span", { class: "kicker" }, ["Portfolio Totals — Project Delays / Stage-Gate Days / Overall Delays"]),
           el("span", { class: "cumdelay-sub" }, [
-            "Same total as \u201cCumulative Delay\u201d above, broken down by who's contributing to it — each project's real slip against its committed go-live. Click a project to jump to its Stage-gate timeline.",
+            "Three separate numbers: cumulative delay by project, total elapsed days per stage-gate across the whole portfolio, and that same cumulative delay rolled up by overall status. Click a project row to jump to its Stage-gate timeline.",
           ]),
         ]),
-        el("div", { class: "cumdelay-body" }, [
-          buildDonutChart(groups, { size: 180, strokeWidth: 26 }),
-          el(
-            "div",
-            { class: "cumdelay-legend" },
-            groups.map((g, i) =>
-              el(
-                "div",
-                {
-                  class: "cumdelay-legend-row",
-                  "data-project-id": g.id,
-                  tabindex: "0",
-                  role: "button",
-                  title: "Open " + g.label,
-                },
-                [
-                  el("span", { class: "stagedetail-bar-dot", style: `background:${BREAKDOWN_COLORS[i % BREAKDOWN_COLORS.length]}` }),
+        // Three standalone donuts side by side (2026-10-06, replacing an
+        // earlier concentric-rings version) — each cut is its own full
+        // circle with its own legend underneath, rather than three bands
+        // nested inside one shared circle, since nested rings read as
+        // "one ring" at a glance and made it hard to tell the cuts apart.
+        el("div", { class: "cumdelay-body cumdelay-rings-row" }, [
+          el("div", { class: "cumdelay-ring-panel" }, [
+            el("span", { class: "cumdelay-ring-title" }, ["Cumulative project delays"]),
+            buildDonutChart(projectGroups, { size: 150, strokeWidth: 18 }),
+            el(
+              "div",
+              { class: "cumdelay-legend" },
+              projectGroups.map((g) =>
+                el(
+                  "div",
+                  {
+                    class: "cumdelay-legend-row",
+                    "data-project-id": g.id,
+                    tabindex: "0",
+                    role: "button",
+                    title: "Open " + g.label,
+                  },
+                  [
+                    el("span", { class: "stagedetail-bar-dot", style: `background:${g.color}` }),
+                    el("span", { class: "stagedetail-bar-label" }, [g.label]),
+                    el("span", { class: "stagedetail-bar-days" }, [g.days + "d"]),
+                  ]
+                )
+              )
+            ),
+          ]),
+          el("div", { class: "cumdelay-ring-panel" }, [
+            el("span", { class: "cumdelay-ring-title" }, ["By stage-gate"]),
+            buildDonutChart(stageGroups, { size: 150, strokeWidth: 18, centerLabel: "stage days" }),
+            el(
+              "div",
+              { class: "cumdelay-legend" },
+              stageGroups.map((g) =>
+                el("div", { class: "cumdelay-legend-row cumdelay-legend-row-static" }, [
+                  el("span", { class: "stagedetail-bar-dot", style: `background:${g.color}` }),
                   el("span", { class: "stagedetail-bar-label" }, [g.label]),
                   el("span", { class: "stagedetail-bar-days" }, [g.days + "d"]),
-                ]
+                ])
               )
-            )
-          ),
+            ),
+          ]),
+          el("div", { class: "cumdelay-ring-panel" }, [
+            el("span", { class: "cumdelay-ring-title" }, ["Overall project delays"]),
+            buildDonutChart(statusGroups, { size: 150, strokeWidth: 18 }),
+            el(
+              "div",
+              { class: "cumdelay-legend" },
+              statusGroups.map((g) =>
+                el("div", { class: "cumdelay-legend-row cumdelay-legend-row-static" }, [
+                  el("span", { class: "stagedetail-bar-dot", style: `background:${g.color}` }),
+                  el("span", { class: "stagedetail-bar-label" }, [g.label]),
+                  el("span", { class: "stagedetail-bar-days" }, [g.days + "d"]),
+                ])
+              )
+            ),
+          ]),
         ]),
       ])
     );
 
-    box.querySelectorAll(".cumdelay-legend-row").forEach((row) => {
+    box.querySelectorAll(".cumdelay-legend-row[data-project-id]").forEach((row) => {
       const open = () => openProjectDetail(row.getAttribute("data-project-id"), "stage-gate-timeline-section");
       row.addEventListener("click", open);
       row.addEventListener("keydown", (e) => {
@@ -566,6 +649,13 @@
         ])
       );
     });
+    // "Total" column — how long the WHOLE project lifecycle has been so
+    // far, horizontally, at a glance (sum of every stage it's passed
+    // through, including the current one), right alongside the per-stage
+    // breakdown instead of needing to add the row up by hand.
+    headerRow.appendChild(
+      el("div", { class: "stage-grid-cell stage-grid-col-head stage-grid-total-col", title: "Total days in the pipeline so far" }, ["Total"])
+    );
     grid.appendChild(headerRow);
 
     // "How much time has each stage-gate taken overall" — a bolded summary
@@ -602,11 +692,26 @@
       }
       totalsRow.appendChild(cell);
     });
+    const grandTotalDays = PIPELINE_STAGES.reduce((sum, stage) => sum + ((stageTotals[stage] && stageTotals[stage].totalDays) || 0), 0);
+    totalsRow.appendChild(
+      el(
+        "div",
+        {
+          class: "stage-grid-cell stage-grid-status-cell stage-grid-totals-cell stage-grid-total-cell is-done",
+          title: `${grandTotalDays}d — sum of every stage, every project`,
+        },
+        [
+          el("span", { class: "stage-grid-days" }, [grandTotalDays + "d total"]),
+          el("span", { class: "stage-grid-daterange" }, ["whole portfolio"]),
+        ]
+      )
+    );
     grid.appendChild(totalsRow);
 
     projects.forEach((p) => {
+      const segments = computeStageSegments(p);
       const segByStage = {};
-      computeStageSegments(p).forEach((seg) => {
+      segments.forEach((seg) => {
         segByStage[seg.stage] = seg;
       });
       const currentIndex = PIPELINE_STAGES.indexOf(p.stage || "Unstaged");
@@ -617,7 +722,7 @@
         "div",
         { class: "stage-grid-name-cell stage-grid-cell", "data-project-id": p.id, tabindex: "0", role: "button" },
         [
-          el("span", { class: "timeline-dot", style: `background:var(--${p.status === "amber" ? "amber" : p.status})` }),
+          el("span", { class: "timeline-dot", style: `background:var(--${effectiveStatus(p)})` }),
           el("div", { class: "stage-grid-name-text" }, [
             el("strong", null, [p.name]),
             el("span", { class: "stage-grid-name-meta" }, [
@@ -660,11 +765,14 @@
             ]
           );
         } else {
-          // Current stage — colored by the project's own overall status
-          // (green/amber/red), the same signal used everywhere else in the
-          // app, rather than a generic per-stage SLA threshold.
+          // Current stage — yellow ("in progress") by default, red only
+          // if this SPECIFIC stage has run past its own committed
+          // stagePlan end date (see currentStageOverdue) — not the
+          // project's overall status, which can be red for reasons
+          // unrelated to this particular stage running long.
           const seg = segByStage[stage];
-          const flagClass = p.status === "red" ? " is-breach" : p.status === "amber" ? " is-warn" : "";
+          const overdue = currentStageOverdue(p, stage);
+          const flagClass = overdue ? " is-breach" : " is-warn";
           const days = seg ? seg.days : null;
           cell = el(
             "div",
@@ -677,7 +785,9 @@
               title:
                 (days != null
                   ? `${stage}: ${seg.approxStart ? "≥" : ""}${days}d so far (since ${fmtDateShort(seg.start)})`
-                  : `${stage}: in progress`) + " — click for full detail",
+                  : `${stage}: in progress`) +
+                (overdue ? " — past its planned end date" : "") +
+                " — click for full detail",
             },
             [
               el("span", { class: "stage-grid-days" }, [
@@ -689,6 +799,29 @@
         }
         row.appendChild(cell);
       });
+
+      // Horizontal "whole lifecycle so far" total — sum of every stage
+      // segment this project has actually been through (including the
+      // one it's in right now), plus how far back that stretches. Not a
+      // delay judgment (that's `delayDays`, shown on the project cards) —
+      // just "how long has this project's pipeline run been, total."
+      const lifecycleDays = segments.reduce((sum, seg) => sum + seg.days, 0);
+      const firstStart = segments.length ? segments[0].start : null;
+      row.appendChild(
+        el(
+          "div",
+          {
+            class: "stage-grid-cell stage-grid-status-cell stage-grid-total-cell",
+            title:
+              `${p.name}: ${lifecycleDays}d total in the pipeline so far` +
+              (firstStart ? ` (since ${fmtDateShort(firstStart)})` : ""),
+          },
+          [
+            el("span", { class: "stage-grid-days" }, [lifecycleDays + "d"]),
+            firstStart ? el("span", { class: "stage-grid-daterange" }, ["since " + fmtDateShort(firstStart)]) : null,
+          ]
+        )
+      );
 
       grid.appendChild(row);
     });
@@ -753,7 +886,7 @@
   function renderCards() {
     const box = document.getElementById("cards");
     box.innerHTML = "";
-    const projects = visibleProjects().filter((p) => activeFilter === "all" || p.status === activeFilter);
+    const projects = visibleProjects().filter((p) => activeFilter === "all" || effectiveStatus(p) === activeFilter);
 
     if (!projects.length) {
       box.appendChild(el("div", { class: "empty-note" }, ["No projects match this filter."]));
@@ -766,16 +899,17 @@
       const isLate = p.delayDays > 0;
       const notes = openNotesFor(p.id);
 
-      const card = el("div", { class: "card status-" + p.status, "data-project-id": p.id, tabindex: "0", role: "button" }, [
+      const eStatus = effectiveStatus(p);
+      const card = el("div", { class: "card status-" + eStatus, "data-project-id": p.id, tabindex: "0", role: "button" }, [
         el("div", { class: "card-head" }, [
           el("h3", null, [p.name]),
-          el("span", { class: "pill pill-" + p.status }, [STATUS_LABEL[p.status]]),
+          el("span", { class: "pill pill-" + eStatus }, [STATUS_LABEL[eStatus]]),
         ]),
         el("div", { class: "card-owner" }, [p.owner ? "PM: " + p.owner : "PM: unassigned"]),
         cardRecentChangeNode(recentChanges[p.id]),
         el("div", { class: "progress-row" }, [
           el("div", { class: "progress-track" }, [
-            el("div", { class: "progress-fill status-" + p.status, style: "width:" + p.progress + "%" }),
+            el("div", { class: "progress-fill status-" + eStatus, style: "width:" + p.progress + "%" }),
           ]),
           el("div", { class: "progress-pct" }, [p.progress + "%"]),
         ]),
@@ -1000,8 +1134,6 @@
     const currentIndex = PIPELINE_STAGES.indexOf(p.stage || "Unstaged");
     if (currentIndex === -1) return [];
 
-    const statusFlag = p.status === "red" ? "breach" : p.status === "amber" ? "warn" : "ok";
-
     const blocks = [];
     PIPELINE_STAGES.forEach((stage, i) => {
       if (i < currentIndex) {
@@ -1016,12 +1148,15 @@
       } else if (i === currentIndex) {
         const seg = segByStage[stage] || { start: today, days: 0 };
         const end = seg.end && seg.end > today ? seg.end : today;
+        // Yellow ("in progress") by default, red only if THIS stage has
+        // run past its own committed stagePlan end date — see
+        // currentStageOverdue.
         blocks.push({
           stage,
           start: seg.start,
           end,
           kind: "current",
-          flag: statusFlag,
+          flag: currentStageOverdue(p, stage) ? "breach" : "warn",
         });
       } else {
         // Potential target for a not-yet-reached stage: prefer a REAL
@@ -1048,7 +1183,15 @@
           end = addDaysIso(start, estDuration);
           planned = false;
         }
-        blocks.push({ stage, start, end, kind: "future", planned });
+        // A real planned window that's already fully in the past (2026-10-06)
+        // means the project hasn't reported moving into this stage yet even
+        // though its OWN plan says it should already be done — e.g. myBKY 2A
+        // is still reported as "Requirements" today even though its Tech.
+        // Design plan window (Aug 10 → Oct 23) started two months ago.
+        // Surfacing that as an ordinary "upcoming" chip would be actively
+        // misleading, so it gets its own `overdue` flag for a distinct look.
+        const overdue = planned && end < today;
+        blocks.push({ stage, start, end, kind: "future", planned, overdue });
       }
     });
     return blocks;
@@ -1139,7 +1282,7 @@
       const seg = segByStage[b.stage];
       const dateLabel =
         b.kind === "future"
-          ? (b.planned ? "Planned: " : "Potential (est.): ") + fmtDateShort(b.start) + " → " + fmtDateShort(b.end)
+          ? (b.overdue ? "Planned: " : b.planned ? "Planned: " : "Potential (est.): ") + fmtDateShort(b.start) + " → " + fmtDateShort(b.end)
           : seg
           ? (seg.approxStart ? "since before tracking, " : "") +
             fmtDateShort(seg.start) +
@@ -1148,8 +1291,15 @@
       // Plain elapsed-day count, no per-stage SLA comparison (see the
       // note on renderStageGridLegend) — the project's own overall delay
       // is shown once, consistently, in the project header/cards instead.
+      // A "future" stage whose own real plan window has already fully
+      // passed (the project hasn't reported moving into it yet) gets its
+      // own callout instead of a plain "Not started" — e.g. myBKY 2A is
+      // still reported as "Requirements" though its Tech. Design window
+      // closed months ago.
       let metaText = "Not started";
-      if (b.kind !== "future" && seg) {
+      if (b.kind === "future" && b.overdue) {
+        metaText = "Plan passed — not yet reported started";
+      } else if (b.kind !== "future" && seg) {
         metaText = (seg.approxStart ? "≥" : "") + seg.days + "d";
       }
       const capWidth = Math.max(
@@ -1211,7 +1361,7 @@
           ? "is-done"
           : b.kind === "current"
           ? "is-current" + (b.flag && b.flag !== "ok" ? " is-" + b.flag : "")
-          : "is-future";
+          : "is-future" + (b.overdue ? " is-plan-overdue" : "");
       const code = STAGE_SHORT_CODE[b.stage] || b.stage;
 
       track.appendChild(
@@ -1238,7 +1388,7 @@
         el("div", { class: "stagegantt-caption", style: `left:${left}px` }, [
           el("span", { class: "stagegantt-caption-stage" }, [b.stage]),
           el("span", { class: "stagegantt-caption-date" }, [dateLabel]),
-          el("span", { class: "stagegantt-caption-meta" }, [metaText]),
+          el("span", { class: "stagegantt-caption-meta" + (b.kind === "future" && b.overdue ? " is-plan-overdue" : "") }, [metaText]),
         ])
       );
     });
@@ -1340,18 +1490,18 @@
       el("div", { class: "hawkeye-toolbar" }, [
         el("div", { class: "hawkeye-legend" }, [
           el("span", { class: "hawkeye-legend-item" }, [el("span", { class: "hawkeye-legend-swatch is-done" }), "Done"]),
-          el("span", { class: "hawkeye-legend-item" }, [
-            el("span", { class: "hawkeye-legend-swatch is-current" }),
-            "Current — on track",
-          ]),
-          el("span", { class: "hawkeye-legend-item" }, [el("span", { class: "hawkeye-legend-swatch is-warn" }), "Current — at risk"]),
+          el("span", { class: "hawkeye-legend-item" }, [el("span", { class: "hawkeye-legend-swatch is-warn" }), "Current — in progress"]),
           el("span", { class: "hawkeye-legend-item" }, [
             el("span", { class: "hawkeye-legend-swatch is-breach" }),
-            "Current — critical",
+            "Current — past planned end date",
           ]),
           el("span", { class: "hawkeye-legend-item" }, [
             el("span", { class: "hawkeye-legend-swatch is-future" }),
             "Not started (planned)",
+          ]),
+          el("span", { class: "hawkeye-legend-item" }, [
+            el("span", { class: "hawkeye-legend-swatch is-future is-plan-overdue" }),
+            "Plan passed, not yet reported started",
           ]),
         ]),
         el("div", { class: "hawkeye-zoom-toggle", role: "tablist", title: "Timeline zoom" }, [
@@ -1534,7 +1684,7 @@
       const projectDelay = p.delayDays || 0;
       const row = el("div", { class: "hawkeye-row", "data-project-id": p.id, tabindex: "0", role: "button" }, [
         el("div", { class: "hawkeye-row-label" }, [
-          el("span", { class: "timeline-dot", style: `background:var(--${p.status})` }),
+          el("span", { class: "timeline-dot", style: `background:var(--${effectiveStatus(p)})` }),
           el("div", null, [
             el("strong", null, [p.name]),
             el("div", { class: "hawkeye-row-sub" }, [
@@ -1573,14 +1723,16 @@
         const strip = el("div", { class: "hawkeye-future-strip", style: `left:${plan.stripAnchorPx}px` });
         plan.futureBlocks.forEach((b) => {
           const code = STAGE_SHORT_CODE[b.stage] || b.stage;
-          const targetLabel = b.planned
+          const targetLabel = b.overdue
+            ? `planned ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)} — already past, but not yet reported started`
+            : b.planned
             ? `planned target ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)}`
             : `potential target ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)} (estimated — not yet planned)`;
           strip.appendChild(
             el(
               "div",
               {
-                class: "hawkeye-stage-block is-future",
+                class: "hawkeye-stage-block is-future" + (b.overdue ? " is-plan-overdue" : ""),
                 title: `${p.name} — ${b.stage}: ${targetLabel}`,
                 "data-project-id": p.id,
                 "data-stage": b.stage,
@@ -1979,7 +2131,7 @@
         rows.push({
           projectId: p.id,
           projectName: p.name,
-          status: p.status,
+          status: effectiveStatus(p),
           id: dep.id,
           text: dep.text,
           team: dep.team || "",
@@ -2830,7 +2982,7 @@
     visibleProjects().forEach((p) => {
       (p.escalations || []).forEach((text) => {
         if (!text) return;
-        rows.push({ projectId: p.id, projectName: p.name, owner: p.owner || "Unassigned", status: p.status, text });
+        rows.push({ projectId: p.id, projectName: p.name, owner: p.owner || "Unassigned", status: effectiveStatus(p), text });
       });
     });
     return rows;
@@ -2989,6 +3141,23 @@
   function daysBetweenIso(aIso, bIso) {
     const DAY = 86400000;
     return Math.round((new Date(bIso + "T00:00:00") - new Date(aIso + "T00:00:00")) / DAY);
+  }
+
+  // Is the CURRENT stage running past its own committed end date (2026-10-06)?
+  // Compares today against THIS project's own stagePlan.latestEnd for the
+  // stage it's actually in right now — not a flat per-stage-name constant
+  // (that's the SLA approach removed earlier) and not just "is the overall
+  // project red" (a project can be red for reasons unrelated to the
+  // specific stage it's sitting in, e.g. myBKY 2A was still reporting
+  // "Requirements" as current a week after its own plan said Requirements
+  // would be done — that's the real, data-grounded signal for "this stage
+  // is now overdue"). No stagePlan on record yet → can't say overdue,
+  // defaults to false (still "in progress").
+  function currentStageOverdue(p, stage) {
+    const plan = p.stagePlan && p.stagePlan[stage];
+    const plannedEnd = plan && (plan.latestEnd || plan.initialEnd);
+    if (!plannedEnd) return false;
+    return todayISO() > plannedEnd;
   }
 
   // Reconstructs how long a project has spent in each pipeline stage, using
@@ -3446,6 +3615,7 @@
 
   function buildProjectDetail(p) {
     const isLate = p.delayDays > 0;
+    const eStatus = effectiveStatus(p);
     const openFollowUps = openNotesFor(p.id);
     const allNotes = NOTES.filter((n) => n.projectId === p.id);
     const weeks = historyForProject(p.id);
@@ -3456,7 +3626,7 @@
     root.appendChild(
       el("div", { class: "detail-head" }, [
         el("div", null, [
-          el("span", { class: "pill pill-" + p.status }, [STATUS_LABEL[p.status]]),
+          el("span", { class: "pill pill-" + eStatus }, [STATUS_LABEL[eStatus]]),
           el("h1", null, [p.name]),
           el("div", { class: "card-owner" }, [p.owner ? "PM: " + p.owner : "PM: unassigned"]),
         ]),
@@ -3480,7 +3650,7 @@
     root.appendChild(
       el("div", { class: "progress-row detail-progress" }, [
         el("div", { class: "progress-track" }, [
-          el("div", { class: "progress-fill status-" + p.status, style: "width:" + p.progress + "%" }),
+          el("div", { class: "progress-fill status-" + eStatus, style: "width:" + p.progress + "%" }),
         ]),
         el("div", { class: "progress-pct" }, [p.progress + "%"]),
       ])
@@ -3602,10 +3772,10 @@
     stagegatePanel.appendChild(
       el("div", { class: "stagegantt-legend" }, [
         el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "stagegantt-legend-swatch is-done" }), "Done"]),
-        el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "stagegantt-legend-swatch is-current" }), "Current — on track"]),
-        el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "stagegantt-legend-swatch is-warn" }), "Current — at risk"]),
-        el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "stagegantt-legend-swatch is-breach" }), "Current — critical"]),
+        el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "stagegantt-legend-swatch is-warn" }), "Current — in progress"]),
+        el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "stagegantt-legend-swatch is-breach" }), "Current — past planned end date"]),
         el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "stagegantt-legend-swatch is-future" }), "Not started (planned)"]),
+        el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "stagegantt-legend-swatch is-future is-plan-overdue" }), "Plan passed, not yet reported started"]),
       ])
     );
     stagegatePanel.appendChild(
@@ -3724,11 +3894,16 @@
     //    & Risks" tab right next to this one), not historical, so showing
     //    them again per-week here was just a duplicate of that tab, not a
     //    real "as it stood that week" view. Only Weekly Status (which
-    //    genuinely did change week to week) stays in this tab.
+    //    genuinely did change week to week) stays in this tab — the live
+    //    "Dependencies & Risks" tab passes `opts.weeklyStatus = false`
+    //    (2026-10-06) so that block only ever shows up here, not
+    //    duplicated into the tab that's supposed to be just
+    //    dependencies/risks.
     function renderSnapshotSections(container, snap, label, isLatest, opts) {
       opts = opts || {};
       const readOnly = !!opts.readOnly;
       const showDepsAndRisks = opts.depsAndRisks !== false;
+      const showWeeklyStatus = opts.weeklyStatus !== false;
       const interactive = isLatest && !readOnly;
       container.innerHTML = "";
 
@@ -3781,28 +3956,30 @@
         );
       }
 
-      container.appendChild(el("h3", { class: "weekly-subhead" }, ["Weekly Status"]));
-      if (!snap.sprintStatus) {
-        container.appendChild(
-          el("p", { class: "empty-note" }, ["Sprint work detail wasn't captured for this week's snapshot yet."])
-        );
-      } else {
-        container.appendChild(
-          el("div", { class: "sprint-grid" }, [
-            el("div", { class: "detail-block" }, [
-              el("h4", null, ["Completed"]),
-              el("ul", null, listOrDash(snap.sprintStatus.completed || [])),
-            ]),
-            el("div", { class: "detail-block" }, [
-              el("h4", null, ["In progress"]),
-              el("ul", null, listOrDash(snap.sprintStatus.inProgress || [])),
-            ]),
-            el("div", { class: "detail-block" }, [
-              el("h4", null, ["Next plan"]),
-              el("ul", null, listOrDash(snap.sprintStatus.nextPlan || [])),
-            ]),
-          ])
-        );
+      if (showWeeklyStatus) {
+        container.appendChild(el("h3", { class: "weekly-subhead" }, ["Weekly Status"]));
+        if (!snap.sprintStatus) {
+          container.appendChild(
+            el("p", { class: "empty-note" }, ["Sprint work detail wasn't captured for this week's snapshot yet."])
+          );
+        } else {
+          container.appendChild(
+            el("div", { class: "sprint-grid" }, [
+              el("div", { class: "detail-block" }, [
+                el("h4", null, ["Completed"]),
+                el("ul", null, listOrDash(snap.sprintStatus.completed || [])),
+              ]),
+              el("div", { class: "detail-block" }, [
+                el("h4", null, ["In progress"]),
+                el("ul", null, listOrDash(snap.sprintStatus.inProgress || [])),
+              ]),
+              el("div", { class: "detail-block" }, [
+                el("h4", null, ["Next plan"]),
+                el("ul", null, listOrDash(snap.sprintStatus.nextPlan || [])),
+              ]),
+            ])
+          );
+        }
       }
 
       if (showDepsAndRisks) {
@@ -3846,7 +4023,7 @@
     // rendering so there's only ever one `id="detail-deps-section"` etc. in
     // the DOM for jump-links to find.
     const liveSnapshotSections = el("div", { class: "snapshot-sections" });
-    renderSnapshotSections(liveSnapshotSections, p, null, true);
+    renderSnapshotSections(liveSnapshotSections, p, null, true, { weeklyStatus: false });
     depsRisksPanel.appendChild(liveSnapshotSections);
 
     // "Week-over-week" tab — click a week to load its Dependencies /
@@ -4273,7 +4450,12 @@
           el("span", { class: "stagedetail-completion-pct" }, [pct == null ? "—" : pct + "%"]),
         ]),
         el("div", { class: "progress-track" }, [
-          el("div", { class: "progress-fill status-" + (p.status === "amber" ? "amber" : p.status), style: "width:" + (pct || 0) + "%" }),
+          el("div", {
+            class:
+              "progress-fill status-" +
+              (kind === "done" ? "green" : kind === "future" ? "grey" : currentStageOverdue(p, stage) ? "red" : "amber"),
+            style: "width:" + (pct || 0) + "%",
+          }),
         ]),
         el("div", { class: "stagedetail-completion-foot" }, [
           el("span", null, [kind === "done" ? "Closed out" : kind === "current" ? "In progress" : "Not started"]),
@@ -4380,6 +4562,11 @@
   }
 
   const BREAKDOWN_COLORS = ["#c1502e", "#5a3b30", "#dfa23a", "#3562e8", "#1a9f6b", "#8a5fd6"];
+  // Separate palette for the "by stage-gate" donut next to the
+  // "cumulative project delays" donut (2026-10-06) — kept visually
+  // distinct from BREAKDOWN_COLORS (used for the project-delay ring) so
+  // the two side-by-side circles never land on the exact same colors.
+  const PM_RING_COLORS = ["#2f6fed", "#7c3aed", "#0ea5a5", "#d97706", "#64748b", "#be185d"];
 
   // Reusable SVG donut chart — `groups` is [{label, days, color?}], already
   // sorted by whatever the caller wants (biggest slice first, typically).

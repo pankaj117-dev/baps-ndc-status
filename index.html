@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=73">
+<link rel="stylesheet" href="styles.css?v=78">
 </head>
 <body>
   <div class="wrap">
@@ -29,8 +29,8 @@
       <button class="tab-btn is-active" data-tab="status" role="tab" aria-selected="true">Program Status</button>
       <button class="tab-btn" data-tab="grid" role="tab" aria-selected="false">Grid</button>
       <button class="tab-btn" data-tab="hawkeye" role="tab" aria-selected="false">🦅 Hawk-eye</button>
-      <button class="tab-btn" data-tab="statushistory" role="tab" aria-selected="false">Status History</button>
       <button class="tab-btn" data-tab="deps" role="tab" aria-selected="false">Dependencies</button>
+      <button class="tab-btn" data-tab="statushistory" role="tab" aria-selected="false">Status History</button>
       <button class="tab-btn" data-tab="team" role="tab" aria-selected="false">Team Performance</button>
     </nav>
 
@@ -78,7 +78,7 @@
 
     <section id="panel-grid" class="tab-panel">
       <h2 class="section-heading">Project × stage grid</h2>
-      <p class="section-subhead">Every project against every pipeline stage in one view. Green = done (with the real date range), the highlighted column = where the project is right now (days in stage so far, colored by the project's overall status), grey = not reached yet. Click a project or cell to open the full detail view.</p>
+      <p class="section-subhead">Every project against every pipeline stage in one view. Green = done, yellow = the stage the project is in right now (days in stage so far), red = that stage has run past its own planned end date, grey = not reached yet. Click a project or cell to open the full detail view.</p>
       <div id="stageGridMetrics" class="metrics-row"></div>
       <div id="cumulativeDelayChart" class="cumdelay-section"></div>
       <div id="stageGridLegend" class="stage-grid-legend"></div>
@@ -87,14 +87,8 @@
 
     <section id="panel-hawkeye" class="tab-panel">
       <h2 class="section-heading">Hawk-eye</h2>
-      <p class="section-subhead">Every project's pipeline stages plotted on one shared calendar — solid blocks are stages already lived through (or being lived through now), colored by the project's overall status and sized to their real dates; the dashed chips after them are what's still ahead, grouped into one compact strip (not date-plotted — just planned order). A blue "Today" line runs through every row. Click a row or block to open the full detail view, scrolled to the Stage-gate timeline.</p>
+      <p class="section-subhead">Every project's pipeline stages plotted on one shared calendar — solid blocks are stages already lived through (green) or being lived through now (yellow, red if that stage has run past its own planned end date), sized to their real dates; the dashed chips after them are what's still ahead, grouped into one compact strip (not date-plotted — just planned order). A blue "Today" line runs through every row. Click a row or block to open the full detail view, scrolled to the Stage-gate timeline.</p>
       <div id="hawkeyeGantt" class="hawkeye-gantt"></div>
-    </section>
-
-    <section id="panel-statushistory" class="tab-panel">
-      <h2 class="section-heading">Status history</h2>
-      <p class="section-subhead">Every status change (On Track ↔ At Risk / Delay ↔ Critical) and every go-live / milestone date shift, across every project, newest first — with dates, what changed, and the why. Click a project name to open its full detail view. Use the Project filter above to see just one project's story: how it got delayed, when its timeline shifted, and why.</p>
-      <div id="statusHistoryList" class="status-history-list"></div>
     </section>
 
     <section id="panel-deps" class="tab-panel">
@@ -136,6 +130,12 @@
       </div>
       <div id="escalationsMetricsRow" class="metrics-row"></div>
       <div id="escalationsBoard" class="deps-board"></div>
+    </section>
+
+    <section id="panel-statushistory" class="tab-panel">
+      <h2 class="section-heading">Status history</h2>
+      <p class="section-subhead">Every status change (On Track ↔ At Risk / Delay ↔ Critical) and every go-live / milestone date shift, across every project, newest first — with dates, what changed, and the why. Click a project name to open its full detail view. Use the Project filter above to see just one project's story: how it got delayed, when its timeline shifted, and why.</p>
+      <div id="statusHistoryList" class="status-history-list"></div>
     </section>
 
     <section id="panel-team" class="tab-panel">
@@ -229,6 +229,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=84"></script>
+  <script src="app.js?v=93"></script>
 </body>
 </html>
