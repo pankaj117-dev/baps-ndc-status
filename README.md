@@ -392,6 +392,30 @@ never got the visual chart for.
   with "Xd" and "SLA Xd · +Xd over" shown directly in the cell.
 - **Grey "—" cell** — stage not reached yet.
 
+**"Portfolio total" row (2026-10-04)** — a bolded summary row pinned right
+under the column headers, before any project rows, answering "how much has
+each stage-gate cost me overall, across every project that's been through
+it?" (a user asked for exactly this, aggregated per stage-gate column
+rather than per project). Each cell shows the total real elapsed days spent
+in that stage summed across every project that's reached it, plus — if any
+of them went over — the combined SLA overage ("+Xd over, combined"); a
+grey "—" if no visible project has reached that stage yet. Built from
+`computeStageCostTotals()`, which sums the exact same per-project
+`computeStageSegments()` output each individual cell above it is built
+from, so the totals row and the column of cells beneath it always
+reconcile. Visually distinguished from project rows with a bolder bottom
+border and a tinted name cell, and intentionally not clickable (it's a
+sum across projects, not a single project's cell) — hover/focus styles are
+suppressed on it for that reason.
+
+Verified against a fully independent re-derivation (summing raw
+`computeStageSegments()` output directly, bypassing both the totals-row
+code and the grid-cell rendering) for all 9 stage columns against the real
+portfolio — every column's total days, overage, and project count matched
+exactly (e.g. Requirements: 545d total / 475d over across 7 projects;
+Development: 316d / 212d across 5; the two most expensive stage-gates in
+the current portfolio).
+
 Click a project name to open its full detail view, scrolled straight to its
 **Schedule timeline** section (the Grid tab is fundamentally a scheduling /
 "what moved" view, so that's the more relevant landing spot). Click an

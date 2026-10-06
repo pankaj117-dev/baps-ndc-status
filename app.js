@@ -493,6 +493,29 @@
     });
   }
 
+  // Per-stage portfolio totals — "how much has each stage-gate cost me
+  // overall, across every project that's been through it" — summed real
+  // elapsed days plus summed SLA overage, both built from the exact same
+  // computeStageSegments()/stageSlaDays() each individual grid cell uses,
+  // so the totals row below always reconciles with the cells above it.
+  function computeStageCostTotals(projects) {
+    const totals = {};
+    PIPELINE_STAGES.forEach((stage) => {
+      totals[stage] = { stage, totalDays: 0, overDays: 0, projectCount: 0 };
+    });
+    projects.forEach((p) => {
+      computeStageSegments(p).forEach((seg) => {
+        const t = totals[seg.stage];
+        if (!t) return;
+        const sla = stageSlaDays(seg.stage);
+        t.totalDays += seg.days;
+        t.projectCount += 1;
+        if (sla != null) t.overDays += Math.max(0, seg.days - sla);
+      });
+    });
+    return totals;
+  }
+
   // Portfolio-wide matrix: every visible project as a row, every pipeline
   // stage as a column. Reuses the same stage-segment reconstruction and SLA
   // logic as the per-project "Stage-gate timeline" (see computeStageSegments
@@ -529,6 +552,46 @@
       );
     });
     grid.appendChild(headerRow);
+
+    // "How much has each stage-gate cost me overall" — a bolded summary
+    // row, pinned right under the header so it's visible without
+    // scrolling past every project, showing total real days spent in
+    // that stage plus total SLA overage summed across every project
+    // that's reached it (same numbers the individual cells below are
+    // built from — see computeStageCostTotals()).
+    const stageTotals = computeStageCostTotals(projects);
+    const totalsRow = el("div", { class: "stage-grid-row stage-grid-totals-row" }, [
+      el("div", { class: "stage-grid-cell stage-grid-name-cell stage-grid-totals-label" }, [
+        el("div", { class: "stage-grid-name-text" }, [
+          el("strong", null, ["Portfolio total"]),
+          el("span", { class: "stage-grid-name-meta" }, [`across ${projects.length} project${projects.length === 1 ? "" : "s"}`]),
+        ]),
+      ]),
+    ]);
+    PIPELINE_STAGES.forEach((stage) => {
+      const t = stageTotals[stage];
+      let cell;
+      if (!t || t.projectCount === 0) {
+        cell = el("div", { class: "stage-grid-cell stage-grid-status-cell stage-grid-totals-cell is-none" }, ["—"]);
+      } else {
+        const overLabel = t.overDays > 0 ? `+${t.overDays}d over, combined` : `${t.projectCount} project${t.projectCount === 1 ? "" : "s"}`;
+        cell = el(
+          "div",
+          {
+            class: "stage-grid-cell stage-grid-status-cell stage-grid-totals-cell" + (t.overDays > 0 ? " is-was-breach" : " is-done"),
+            title:
+              `${stage}: ${t.totalDays}d total across ${t.projectCount} project${t.projectCount === 1 ? "" : "s"}` +
+              (t.overDays > 0 ? `, ${t.overDays}d over SLA combined` : ", none over SLA"),
+          },
+          [
+            el("span", { class: "stage-grid-days" }, [t.totalDays + "d total"]),
+            el("span", { class: "stage-grid-daterange" + (t.overDays > 0 ? " is-was-breach" : "") }, [overLabel]),
+          ]
+        );
+      }
+      totalsRow.appendChild(cell);
+    });
+    grid.appendChild(totalsRow);
 
     projects.forEach((p) => {
       const segByStage = {};
