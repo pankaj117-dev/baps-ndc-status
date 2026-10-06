@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=71">
+<link rel="stylesheet" href="styles.css?v=73">
 </head>
 <body>
   <div class="wrap">
@@ -78,7 +78,7 @@
 
     <section id="panel-grid" class="tab-panel">
       <h2 class="section-heading">Project × stage grid</h2>
-      <p class="section-subhead">Every project against every pipeline stage in one view. Green = done (with the date range and whether it blew its SLA at the time), the highlighted column = where the project is right now (days in stage vs. SLA, colored if it's approaching or over), grey = not reached yet. Click a project or cell to open the full detail view.</p>
+      <p class="section-subhead">Every project against every pipeline stage in one view. Green = done (with the real date range), the highlighted column = where the project is right now (days in stage so far, colored by the project's overall status), grey = not reached yet. Click a project or cell to open the full detail view.</p>
       <div id="stageGridMetrics" class="metrics-row"></div>
       <div id="cumulativeDelayChart" class="cumdelay-section"></div>
       <div id="stageGridLegend" class="stage-grid-legend"></div>
@@ -87,7 +87,7 @@
 
     <section id="panel-hawkeye" class="tab-panel">
       <h2 class="section-heading">Hawk-eye</h2>
-      <p class="section-subhead">Every project's pipeline stages plotted on one shared calendar — solid blocks are stages already lived through (or being lived through now), colored by SLA status and sized to their real dates; the dashed chips after them are what's still ahead, grouped into one compact strip (not date-plotted — just planned order). A blue "Today" line runs through every row. Click a row or block to open the full detail view, scrolled to the Stage-gate timeline.</p>
+      <p class="section-subhead">Every project's pipeline stages plotted on one shared calendar — solid blocks are stages already lived through (or being lived through now), colored by the project's overall status and sized to their real dates; the dashed chips after them are what's still ahead, grouped into one compact strip (not date-plotted — just planned order). A blue "Today" line runs through every row. Click a row or block to open the full detail view, scrolled to the Stage-gate timeline.</p>
       <div id="hawkeyeGantt" class="hawkeye-gantt"></div>
     </section>
 
@@ -229,6 +229,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=82"></script>
+  <script src="app.js?v=84"></script>
 </body>
 </html>

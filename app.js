@@ -59,7 +59,7 @@
   let depsPivotCompact = false;
   let depsCycleFilter = "all"; // calendar year string from dueBy, e.g. "2026"
   let lastDepsPivotExport = null;
-  let hawkeyeZoom = "month"; // "month" | "week" — Hawk-eye's horizontal timeline density toggle
+  let hawkeyeZoom = "month"; // "quarter" | "month" | "week" — Hawk-eye's horizontal timeline density toggle
 
   // Projects flagged `hidden: true` in data.json are kept in the underlying
   // data (nothing's deleted) but excluded from every view/filter/dropdown —
@@ -361,12 +361,19 @@
     const box = document.getElementById("stageGridLegend");
     if (!box) return;
     box.innerHTML = "";
+    // SLA-vs-generic-threshold judgments removed (2026-10-05) — comparing
+    // a project's real stage duration against one flat SLA constant per
+    // stage name was flagging giant-but-on-plan projects as wildly "over
+    // SLA" when they weren't actually delayed against their own approved
+    // plan at all (see the project-level `delayDays`/Go-Live slip for the
+    // real, meaningful delay number). "Current stage" color now just
+    // reflects the project's own overall status, same signal as
+    // everywhere else in the app.
     [
-      { cls: "is-done", label: "Done — on time" },
-      { cls: "is-done is-was-breach", label: "Done — blew its SLA" },
+      { cls: "is-done", label: "Done" },
       { cls: "is-current", label: "Current stage — on track" },
-      { cls: "is-current is-warn", label: "Current stage — approaching SLA" },
-      { cls: "is-current is-breach", label: "Current stage — over SLA" },
+      { cls: "is-current is-warn", label: "Current stage — at risk" },
+      { cls: "is-current is-breach", label: "Current stage — critical" },
       { cls: "is-none", label: "Not reached yet" },
     ].forEach((it) => {
       box.appendChild(
@@ -389,21 +396,27 @@
     const projects = visibleProjects();
     const pmCount = new Set(projects.map((p) => p.owner || "Unassigned")).size;
 
-    let breachCount = 0;
+    // Delay-based, not SLA-based (2026-10-05) — "Stages Over SLA" and
+    // "Cumulative SLA Overage" used to compare each stage's real duration
+    // against a flat generic constant per stage name, which flagged
+    // large-but-on-plan projects as wildly delayed when they weren't.
+    // These now use the same `delayDays` every other view in the app
+    // already treats as the real, meaningful delay — overall slip against
+    // the committed go-live date.
+    let delayedCount = 0;
     let hypercareCount = 0;
-    let cumulativeSlaOverage = 0;
+    let cumulativeDelay = 0;
 
     projects.forEach((p) => {
-      cumulativeSlaOverage += cumulativeStageOverageDays(p);
-      const info = currentStageInfo(p);
-      if (info && info.flag === "breach") breachCount += 1;
+      cumulativeDelay += p.delayDays || 0;
+      if ((p.delayDays || 0) > 0) delayedCount += 1;
       if ((p.stage || "") === "Hypercare") hypercareCount += 1;
     });
 
     const metrics = [
       { label: "Active Projects", num: projects.length, sub: `across ${pmCount} PM${pmCount === 1 ? "" : "s"}`, tone: "" },
-      { label: "Stages Over SLA", num: breachCount, sub: breachCount ? "need escalation" : "none right now", tone: breachCount ? "tone-red" : "tone-green" },
-      { label: "Cumulative SLA Overage", num: cumulativeSlaOverage + "d", sub: "summed across every stage", tone: cumulativeSlaOverage ? "tone-amber" : "tone-green" },
+      { label: "Projects Delayed", num: delayedCount, sub: delayedCount ? "vs. committed go-live" : "none right now", tone: delayedCount ? "tone-red" : "tone-green" },
+      { label: "Cumulative Delay", num: cumulativeDelay + "d", sub: "summed across every project", tone: cumulativeDelay ? "tone-amber" : "tone-green" },
       { label: "In Hypercare", num: hypercareCount, sub: "live, post go-live", tone: "tone-accent" },
     ];
 
@@ -418,14 +431,16 @@
     });
   }
 
-  // Donut breakdown of the "Cumulative SLA Overage" KPI above — same
-  // per-project total (cumulativeStageOverageDays), just showing WHICH
-  // projects are contributing to it instead of one summed number. Reuses
-  // buildDonutChart() (defined below, near the stage detail modal's own
-  // Delay Analysis donuts) so both views render identically. Clicking a
-  // legend row jumps straight to that project's Stage-gate timeline —
-  // same click-through the Hawk-eye rows and cumulative-delay card badges
-  // already use.
+  // Donut breakdown of the "Cumulative Delay" KPI above — same per-project
+  // total (`delayDays`, the real slip against each project's committed
+  // go-live — 2026-10-05, replacing a per-stage SLA-overage sum that
+  // could flag a large-but-on-plan project as wildly delayed), just
+  // showing WHICH projects are contributing to it instead of one summed
+  // number. Reuses buildDonutChart() (defined below, near the stage
+  // detail modal's own Delay Analysis donuts) so both views render
+  // identically. Clicking a legend row jumps straight to that project's
+  // Stage-gate timeline — same click-through the Hawk-eye rows and
+  // cumulative-delay card badges already use.
   function renderCumulativeDelayChart() {
     const box = document.getElementById("cumulativeDelayChart");
     if (!box) return;
@@ -433,14 +448,14 @@
 
     const projects = visibleProjects();
     const groups = projects
-      .map((p) => ({ label: p.name, days: cumulativeStageOverageDays(p), id: p.id }))
+      .map((p) => ({ label: p.name, days: p.delayDays || 0, id: p.id }))
       .filter((g) => g.days > 0)
       .sort((a, b) => b.days - a.days);
 
     if (!groups.length) {
       box.appendChild(
         el("div", { class: "cumdelay-card cumdelay-empty" }, [
-          "No cumulative SLA overage right now across the filtered projects. 🎉",
+          "No project delays right now across the filtered projects. 🎉",
         ])
       );
       return;
@@ -451,7 +466,7 @@
         el("div", { class: "cumdelay-head" }, [
           el("span", { class: "kicker" }, ["Cumulative Delay by Project"]),
           el("span", { class: "cumdelay-sub" }, [
-            "Same total as \u201cCumulative SLA Overage\u201d above, broken down by who's contributing to it. Click a project to jump to its Stage-gate timeline.",
+            "Same total as \u201cCumulative Delay\u201d above, broken down by who's contributing to it — each project's real slip against its committed go-live. Click a project to jump to its Stage-gate timeline.",
           ]),
         ]),
         el("div", { class: "cumdelay-body" }, [
@@ -493,36 +508,38 @@
     });
   }
 
-  // Per-stage portfolio totals — "how much has each stage-gate cost me
+  // Per-stage portfolio totals — "how much time has each stage-gate taken
   // overall, across every project that's been through it" — summed real
-  // elapsed days plus summed SLA overage, both built from the exact same
-  // computeStageSegments()/stageSlaDays() each individual grid cell uses,
-  // so the totals row below always reconciles with the cells above it.
+  // elapsed days, built from the same computeStageSegments() each
+  // individual grid cell uses, so the totals row below always reconciles
+  // with the cells above it. (2026-10-05: dropped the summed SLA-overage
+  // figure that used to sit alongside this — see the "SLA removal" note
+  // on renderStageGridLegend above.)
   function computeStageCostTotals(projects) {
     const totals = {};
     PIPELINE_STAGES.forEach((stage) => {
-      totals[stage] = { stage, totalDays: 0, overDays: 0, projectCount: 0 };
+      totals[stage] = { stage, totalDays: 0, projectCount: 0 };
     });
     projects.forEach((p) => {
       computeStageSegments(p).forEach((seg) => {
         const t = totals[seg.stage];
         if (!t) return;
-        const sla = stageSlaDays(seg.stage);
         t.totalDays += seg.days;
         t.projectCount += 1;
-        if (sla != null) t.overDays += Math.max(0, seg.days - sla);
       });
     });
     return totals;
   }
 
   // Portfolio-wide matrix: every visible project as a row, every pipeline
-  // stage as a column. Reuses the same stage-segment reconstruction and SLA
-  // logic as the per-project "Stage-gate timeline" (see computeStageSegments
-  // / stageSlaDays / stageFlagLevel above) so the two views never disagree.
-  // Each cell carries the actual date range it covered plus whether that
-  // stage blew its SLA (not just the current one) — the fuller "stage-gate"
-  // picture, not just a status dot.
+  // stage as a column. Reuses the same stage-segment reconstruction as the
+  // per-project "Stage-gate timeline" (see computeStageSegments above) so
+  // the two views never disagree. Each cell carries the actual date range
+  // it covered — the fuller "stage-gate" picture, not just a status dot.
+  // Colors on the current stage reflect the project's own overall status
+  // (same signal as everywhere else in the app), not a generic per-stage
+  // SLA threshold — see the note on renderStageGridLegend for why that was
+  // removed.
   function renderStageGrid() {
     renderStageGridMetrics();
     renderCumulativeDelayChart();
@@ -543,22 +560,19 @@
       el("div", { class: "stage-grid-cell stage-grid-name-cell" }, ["Project"]),
     ]);
     PIPELINE_STAGES.forEach((stage) => {
-      const sla = stageSlaDays(stage);
       headerRow.appendChild(
         el("div", { class: "stage-grid-cell stage-grid-col-head", title: stage }, [
           STAGE_GRID_SHORT[stage] || stage,
-          sla != null ? el("span", { class: "stage-grid-col-sla" }, ["SLA " + sla + "d"]) : null,
         ])
       );
     });
     grid.appendChild(headerRow);
 
-    // "How much has each stage-gate cost me overall" — a bolded summary
+    // "How much time has each stage-gate taken overall" — a bolded summary
     // row, pinned right under the header so it's visible without
-    // scrolling past every project, showing total real days spent in
-    // that stage plus total SLA overage summed across every project
-    // that's reached it (same numbers the individual cells below are
-    // built from — see computeStageCostTotals()).
+    // scrolling past every project, showing total real days spent in that
+    // stage across every project that's reached it (same numbers the
+    // individual cells below are built from — see computeStageCostTotals()).
     const stageTotals = computeStageCostTotals(projects);
     const totalsRow = el("div", { class: "stage-grid-row stage-grid-totals-row" }, [
       el("div", { class: "stage-grid-cell stage-grid-name-cell stage-grid-totals-label" }, [
@@ -574,18 +588,15 @@
       if (!t || t.projectCount === 0) {
         cell = el("div", { class: "stage-grid-cell stage-grid-status-cell stage-grid-totals-cell is-none" }, ["—"]);
       } else {
-        const overLabel = t.overDays > 0 ? `+${t.overDays}d over, combined` : `${t.projectCount} project${t.projectCount === 1 ? "" : "s"}`;
         cell = el(
           "div",
           {
-            class: "stage-grid-cell stage-grid-status-cell stage-grid-totals-cell" + (t.overDays > 0 ? " is-was-breach" : " is-done"),
-            title:
-              `${stage}: ${t.totalDays}d total across ${t.projectCount} project${t.projectCount === 1 ? "" : "s"}` +
-              (t.overDays > 0 ? `, ${t.overDays}d over SLA combined` : ", none over SLA"),
+            class: "stage-grid-cell stage-grid-status-cell stage-grid-totals-cell is-done",
+            title: `${stage}: ${t.totalDays}d total across ${t.projectCount} project${t.projectCount === 1 ? "" : "s"}`,
           },
           [
             el("span", { class: "stage-grid-days" }, [t.totalDays + "d total"]),
-            el("span", { class: "stage-grid-daterange" + (t.overDays > 0 ? " is-was-breach" : "") }, [overLabel]),
+            el("span", { class: "stage-grid-daterange" }, [`${t.projectCount} project${t.projectCount === 1 ? "" : "s"}`]),
           ]
         );
       }
@@ -622,26 +633,21 @@
         if (currentIndex === -1 || i > currentIndex) {
           cell = el("div", { class: "stage-grid-cell stage-grid-status-cell is-none" }, ["—"]);
         } else if (i < currentIndex) {
-          // Already passed through this stage — show how long it took, the
-          // actual date range, and (the part the old version was missing)
-          // whether THIS stage blew its own SLA back when it was current,
-          // regardless of how the project is doing today.
+          // Already passed through this stage — show how long it took and
+          // the actual date range. (No more per-stage SLA judgment here —
+          // see the note on renderStageGridLegend. Whether the PROJECT as a
+          // whole is delayed is tracked once, overall, via `delayDays`.)
           const seg = segByStage[stage];
-          const sla = stageSlaDays(stage);
-          const over = seg && sla != null ? seg.days - sla : null;
-          const wasBreach = over != null && over > 0;
           cell = el(
             "div",
             {
-              class: "stage-grid-cell stage-grid-status-cell is-done is-clickable" + (wasBreach ? " is-was-breach" : ""),
+              class: "stage-grid-cell stage-grid-status-cell is-done is-clickable",
               "data-project-id": p.id,
               "data-stage": stage,
               tabindex: "0",
               role: "button",
               title: seg
-                ? `${stage}: ${seg.approxStart ? "≥" : ""}${seg.days}d (${fmtDateShort(seg.start)} \u2192 ${fmtDateShort(seg.end)})` +
-                  (sla != null ? ` — SLA ${sla}d${wasBreach ? `, ${over}d over` : ""}` : "") +
-                  " — click for full detail"
+                ? `${stage}: ${seg.approxStart ? "≥" : ""}${seg.days}d (${fmtDateShort(seg.start)} \u2192 ${fmtDateShort(seg.end)}) — click for full detail`
                 : `${stage}: done — click for full detail`,
             },
             [
@@ -649,21 +655,17 @@
                 "✓ " + (seg ? (seg.approxStart ? "≥" : "") + seg.days + "d" : "Done"),
               ]),
               seg
-                ? el("span", { class: "stage-grid-daterange" + (wasBreach ? " is-was-breach" : "") }, [
-                    wasBreach
-                      ? `+${over}d over SLA`
-                      : `${fmtDateShort(seg.start)} → ${fmtDateShort(seg.end)}`,
-                  ])
+                ? el("span", { class: "stage-grid-daterange" }, [`${fmtDateShort(seg.start)} → ${fmtDateShort(seg.end)}`])
                 : null,
             ]
           );
         } else {
+          // Current stage — colored by the project's own overall status
+          // (green/amber/red), the same signal used everywhere else in the
+          // app, rather than a generic per-stage SLA threshold.
           const seg = segByStage[stage];
-          const sla = stageSlaDays(stage);
-          const flag = seg ? stageFlagLevel(seg.days, sla) : null;
-          const flagClass = flag && flag !== "ok" ? " is-" + flag : "";
+          const flagClass = p.status === "red" ? " is-breach" : p.status === "amber" ? " is-warn" : "";
           const days = seg ? seg.days : null;
-          const over = days != null && sla != null ? days - sla : null;
           cell = el(
             "div",
             {
@@ -674,21 +676,14 @@
               role: "button",
               title:
                 (days != null
-                  ? `${stage}: ${seg.approxStart ? "≥" : ""}${days}d so far (since ${fmtDateShort(seg.start)})` +
-                    (sla != null ? ` — SLA ${sla}d${over > 0 ? `, ${over}d over` : ""}` : "")
+                  ? `${stage}: ${seg.approxStart ? "≥" : ""}${days}d so far (since ${fmtDateShort(seg.start)})`
                   : `${stage}: in progress`) + " — click for full detail",
             },
             [
               el("span", { class: "stage-grid-days" }, [
                 days != null ? (seg.approxStart ? "≥" : "") + days + "d" : "In progress",
               ]),
-              sla != null
-                ? el("span", { class: "stage-grid-sla" }, [
-                    "SLA " + sla + "d" + (over > 0 ? ` · +${over}d over` : ""),
-                  ])
-                : seg
-                ? el("span", { class: "stage-grid-daterange" }, ["since " + fmtDateShort(seg.start)])
-                : null,
+              seg ? el("span", { class: "stage-grid-daterange" }, ["since " + fmtDateShort(seg.start)]) : null,
             ]
           );
         }
@@ -984,25 +979,17 @@
     return `${y}-${m}-${day}`;
   }
 
-  // Total days a project has spent over-SLA, summed across every stage
-  // segment it's been through (including its current one) — the
-  // per-project version of the Grid tab's portfolio-wide "Cumulative SLA
-  // Overage" KPI.
-  function cumulativeStageOverageDays(p) {
-    return computeStageSegments(p).reduce((sum, seg) => {
-      const sla = stageSlaDays(seg.stage);
-      return sum + (sla != null ? Math.max(0, seg.days - sla) : 0);
-    }, 0);
-  }
-
   // Builds the full sequence of stage blocks for one project's Hawk-eye
   // row: real start/end dates for stages already passed through (from the
   // same history reconstruction as the Grid tab / the per-project
-  // Stage-gate timeline), the current stage sized to at least its SLA (so
-  // it reads as "expected to land around here" even mid-stage), then every
-  // remaining stage chained forward using its SLA as a planned-only
-  // placeholder width. Returns [] for a project with no recognized stage
-  // (e.g. "Unstaged") — nothing real to plot yet.
+  // Stage-gate timeline), the current stage running to today, then every
+  // remaining stage chained forward using a generic placeholder width
+  // (DEFAULT_FUTURE_STAGE_DAYS, or that stage's configured duration
+  // estimate when no real plan date is on record yet) purely for VISUAL
+  // sizing — not a deadline or SLA judgment. Returns [] for a project with
+  // no recognized stage (e.g. "Unstaged") — nothing real to plot yet.
+  // (2026-10-05: coloring is driven by the project's own overall status,
+  // not a per-stage SLA breach — see the note on renderStageGridLegend.)
   function buildHawkeyeBlocks(p) {
     const today = todayISO();
     const segments = computeStageSegments(p);
@@ -1013,41 +1000,39 @@
     const currentIndex = PIPELINE_STAGES.indexOf(p.stage || "Unstaged");
     if (currentIndex === -1) return [];
 
+    const statusFlag = p.status === "red" ? "breach" : p.status === "amber" ? "warn" : "ok";
+
     const blocks = [];
     PIPELINE_STAGES.forEach((stage, i) => {
       if (i < currentIndex) {
         const seg = segByStage[stage];
         if (!seg) return;
-        const sla = stageSlaDays(stage);
         blocks.push({
           stage,
           start: seg.start,
           end: seg.end,
           kind: "done",
-          overDays: sla != null ? Math.max(0, seg.days - sla) : 0,
         });
       } else if (i === currentIndex) {
         const seg = segByStage[stage] || { start: today, days: 0 };
-        const sla = stageSlaDays(stage);
-        const plannedEnd = sla != null ? addDaysIso(seg.start, sla) : null;
-        const end = plannedEnd && plannedEnd > today ? plannedEnd : today;
+        const end = seg.end && seg.end > today ? seg.end : today;
         blocks.push({
           stage,
           start: seg.start,
           end,
           kind: "current",
-          flag: stageFlagLevel(seg.days, sla),
-          overDays: sla != null ? Math.max(0, seg.days - sla) : 0,
+          flag: statusFlag,
         });
       } else {
         // Potential target for a not-yet-reached stage: prefer a REAL
         // recorded stagePlan date for that stage when one's already on
         // record (decks sometimes have forward-looking planned dates for
-        // stages the project hasn't reached yet), falling back to a blind
-        // SLA-chain estimate (start right after the previous block ends,
-        // run for that stage's configured SLA) only when nothing better
-        // is known. `planned: true` marks the former so callers can show
-        // "planned target" vs. "potential target (estimated)".
+        // stages the project hasn't reached yet), falling back to a
+        // generic placeholder-width chain (start right after the previous
+        // block ends, run for a generic estimated duration) purely for
+        // visual sizing when nothing better is known — not a deadline.
+        // `planned: true` marks the former so callers can show "planned
+        // target" vs. "potential target (estimated)".
         const prev = blocks[blocks.length - 1];
         const plan = p.stagePlan && p.stagePlan[stage];
         const planStart = plan && (plan.latestStart || plan.initialStart);
@@ -1058,9 +1043,9 @@
           end = planEnd;
           planned = true;
         } else {
-          const sla = stageSlaDays(stage) || DEFAULT_FUTURE_STAGE_DAYS;
+          const estDuration = stageSlaDays(stage) || DEFAULT_FUTURE_STAGE_DAYS;
           start = prev ? prev.end : today;
-          end = addDaysIso(start, sla);
+          end = addDaysIso(start, estDuration);
           planned = false;
         }
         blocks.push({ stage, start, end, kind: "future", planned });
@@ -1078,7 +1063,7 @@
   //  1. Every future stage is positioned by its own real planned/potential
   //     date instead of being squeezed into a fixed-size chip strip —
   //     there's only one row here, so there's room to actually plot it.
-  //  2. Every block's real date range (and day-count/SLA) is written out
+  //  2. Every block's real date range and day-count is written out
   //     directly underneath it, not just on hover — "easy to see" was the
   //     whole point of rebuilding this.
   function buildStageGateTimeline(p) {
@@ -1090,11 +1075,9 @@
 
     // Done/current day-counts and "since before tracking"/"→ now" wording
     // come from the same `computeStageSegments()` the old flat list used
-    // (accurate real elapsed days) — `buildHawkeyeBlocks()`'s own `end`
-    // for the current stage is deliberately padded out to at least that
-    // stage's SLA for VISUAL sizing (so it reads as "expected to land
-    // around here" even mid-stage), which would overstate real elapsed
-    // time if used for the day-count text too.
+    // (accurate real elapsed days), kept separate from
+    // `buildHawkeyeBlocks()`'s own block `end` dates in case the two ever
+    // diverge.
     const segByStage = {};
     computeStageSegments(p).forEach((seg) => {
       segByStage[seg.stage] = seg;
@@ -1111,7 +1094,19 @@
     let maxTime = Math.max(...times) + 4 * DAY;
     if (maxTime - minTime < 20 * DAY) maxTime = minTime + 20 * DAY;
 
-    const PX_PER_DAY = 6;
+    // Scale adapts to the project's real span instead of a fixed 6px/day —
+    // a project with one 229d stage used to render a ~1400px block (plus
+    // everything after it), forcing endless horizontal scrolling just to
+    // see "the rest of the chart exists." Target a total width that needs
+    // a little scrolling on a normal screen, not several screens' worth;
+    // short spans still get the old, more-zoomed-in 6px/day (clamped at
+    // MAX), long ones compress proportionally down to MIN so nothing
+    // collapses into an unreadable sliver.
+    const TARGET_TIMELINE_PX = 900;
+    const MAX_PX_PER_DAY = 6;
+    const MIN_PX_PER_DAY = 0.45;
+    const totalSpanDays = (maxTime - minTime) / DAY;
+    const PX_PER_DAY = Math.min(MAX_PX_PER_DAY, Math.max(MIN_PX_PER_DAY, TARGET_TIMELINE_PX / totalSpanDays));
     const MIN_BLOCK_PX = 10;
     const xPx = (iso) => ((new Date(iso + "T00:00:00").getTime() - minTime) / DAY) * PX_PER_DAY;
 
@@ -1142,7 +1137,6 @@
     }
     const captioned = blocks.map((b) => {
       const seg = segByStage[b.stage];
-      const sla = stageSlaDays(b.stage);
       const dateLabel =
         b.kind === "future"
           ? (b.planned ? "Planned: " : "Potential (est.): ") + fmtDateShort(b.start) + " → " + fmtDateShort(b.end)
@@ -1151,19 +1145,19 @@
             fmtDateShort(seg.start) +
             (seg.ongoing ? " → now" : " → " + fmtDateShort(seg.end))
           : fmtDateShort(b.start) + (b.kind === "current" ? " → now" : " → " + fmtDateShort(b.end));
+      // Plain elapsed-day count, no per-stage SLA comparison (see the
+      // note on renderStageGridLegend) — the project's own overall delay
+      // is shown once, consistently, in the project header/cards instead.
       let metaText = "Not started";
-      let metaBreach = false;
       if (b.kind !== "future" && seg) {
-        const days = seg.days;
-        metaText = (seg.approxStart ? "≥" : "") + days + "d" + (sla != null ? " / SLA " + sla + "d" : "");
-        metaBreach = sla != null && days > sla;
+        metaText = (seg.approxStart ? "≥" : "") + seg.days + "d";
       }
       const capWidth = Math.max(
         textWidthPx(b.stage, STAGE_CHAR_PX),
         textWidthPx(dateLabel, META_CHAR_PX),
         textWidthPx(metaText, META_CHAR_PX)
       );
-      return { b, dateLabel, metaText, metaBreach, capWidth };
+      return { b, dateLabel, metaText, capWidth };
     });
 
     // Sequential collision-avoiding layout — same idea as Hawk-eye's
@@ -1176,7 +1170,7 @@
     // calendar-adjacent stages with long captions get visually spread a
     // little further apart than their raw dates alone would place them.
     let cursorPx = 0;
-    const placed = captioned.map(({ b, dateLabel, metaText, metaBreach, capWidth }) => {
+    const placed = captioned.map(({ b, dateLabel, metaText, capWidth }) => {
       const rawLeft = xPx(b.start);
       // Width comes from the stage's OWN real date span, measured before
       // any rightward shift — not from `end - left`. Using the shifted
@@ -1188,7 +1182,7 @@
       const width = Math.max(xPx(b.end) - rawLeft, MIN_BLOCK_PX);
       const left = Math.max(rawLeft, cursorPx);
       cursorPx = left + Math.max(width, capWidth + CAPTION_GAP_PX);
-      return { b, left, width, dateLabel, metaText, metaBreach };
+      return { b, left, width, dateLabel, metaText };
     });
     const timelineWidthPx = Math.max(cursorPx, xPx(todayIso)) + 24;
 
@@ -1211,7 +1205,7 @@
       ])
     );
 
-    placed.forEach(({ b, left, width, dateLabel, metaText, metaBreach }) => {
+    placed.forEach(({ b, left, width, dateLabel, metaText }) => {
       const kindClass =
         b.kind === "done"
           ? "is-done"
@@ -1244,7 +1238,7 @@
         el("div", { class: "stagegantt-caption", style: `left:${left}px` }, [
           el("span", { class: "stagegantt-caption-stage" }, [b.stage]),
           el("span", { class: "stagegantt-caption-date" }, [dateLabel]),
-          el("span", { class: "stagegantt-caption-meta" + (metaBreach ? " is-breach" : "") }, [metaText]),
+          el("span", { class: "stagegantt-caption-meta" }, [metaText]),
         ])
       );
     });
@@ -1277,11 +1271,17 @@
   // CSS (.hawkeye-row-label's sticky positioning) need to agree on it.
   const HAWKEYE_LABEL_WIDTH = 220;
 
-  // Two timeline densities. Month = the original "quarter gridlines"
-  // zoom, now just wide enough to read easily rather than being forced to
+  // Three timeline densities. Quarter = the most zoomed-out view
+  // (2026-10-05, added alongside Month/Week) — for a portfolio with
+  // projects spanning a year or more, Month's 5px/day still means a lot
+  // of horizontal scrolling just to see the whole roadmap at once; this
+  // trades per-day precision for being able to see far more of the
+  // calendar in one screen. Month = the original "quarter gridlines"
+  // zoom, just wide enough to read easily rather than being forced to
   // fit a fixed board width. Week = a real zoom-in for anyone who wants
   // week-level precision, at the cost of more horizontal scrolling.
   const HAWKEYE_ZOOM = {
+    quarter: { pxPerDay: 1.8, grid: "quarter" },
     month: { pxPerDay: 5, grid: "quarter" },
     week: { pxPerDay: 16, grid: "week" },
   };
@@ -1344,10 +1344,10 @@
             el("span", { class: "hawkeye-legend-swatch is-current" }),
             "Current — on track",
           ]),
-          el("span", { class: "hawkeye-legend-item" }, [el("span", { class: "hawkeye-legend-swatch is-warn" }), "At risk"]),
+          el("span", { class: "hawkeye-legend-item" }, [el("span", { class: "hawkeye-legend-swatch is-warn" }), "Current — at risk"]),
           el("span", { class: "hawkeye-legend-item" }, [
             el("span", { class: "hawkeye-legend-swatch is-breach" }),
-            "Blocked / over SLA",
+            "Current — critical",
           ]),
           el("span", { class: "hawkeye-legend-item" }, [
             el("span", { class: "hawkeye-legend-swatch is-future" }),
@@ -1355,6 +1355,17 @@
           ]),
         ]),
         el("div", { class: "hawkeye-zoom-toggle", role: "tablist", title: "Timeline zoom" }, [
+          el(
+            "button",
+            {
+              class: "hawkeye-zoom-btn" + (hawkeyeZoom === "quarter" ? " is-active" : ""),
+              type: "button",
+              "data-zoom": "quarter",
+              role: "tab",
+              "aria-selected": hawkeyeZoom === "quarter" ? "true" : "false",
+            },
+            ["Quarter"]
+          ),
           el(
             "button",
             {
@@ -1520,14 +1531,14 @@
 
     rowPlans.forEach((plan) => {
       const { p } = plan;
-      const cumulativeDelay = cumulativeStageOverageDays(p);
+      const projectDelay = p.delayDays || 0;
       const row = el("div", { class: "hawkeye-row", "data-project-id": p.id, tabindex: "0", role: "button" }, [
         el("div", { class: "hawkeye-row-label" }, [
           el("span", { class: "timeline-dot", style: `background:var(--${p.status})` }),
           el("div", null, [
             el("strong", null, [p.name]),
             el("div", { class: "hawkeye-row-sub" }, [
-              cumulativeDelay > 0 ? `${cumulativeDelay}d cumulative delay` : "On pace — no SLA overage",
+              projectDelay > 0 ? `${projectDelay}d delayed` : "On pace",
             ]),
           ]),
         ]),
@@ -1549,14 +1560,10 @@
         const kindClass = b.kind === "done" ? "is-done" : "is-current" + (b.flag && b.flag !== "ok" ? " is-" + b.flag : "");
         const code = STAGE_SHORT_CODE[b.stage] || b.stage;
         // Only ever render text that's actually measured (in real px) to
-        // fit, so it's never partial/illegible. Full "CODE +Xd" if it
-        // fits, just "CODE" if that's all that fits, blank (color/border
-        // + tooltip only) if not even that fits.
-        const fullLabel = code + (b.overDays ? ` +${b.overDays}d` : "");
-        const label = width >= fitsPx(fullLabel) ? fullLabel : width >= fitsPx(code) ? code : "";
-        const title =
-          `${p.name} — ${b.stage}: ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)}` +
-          (b.overDays ? ` (+${b.overDays}d over SLA)` : "");
+        // fit, so it's never partial/illegible. Just the stage code — no
+        // more per-stage SLA overage number (see renderStageGridLegend).
+        const label = width >= fitsPx(code) ? code : "";
+        const title = `${p.name} — ${b.stage}: ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)}`;
         track.appendChild(
           el("div", { class: "hawkeye-stage-block " + kindClass, style: `left:${left}px;width:${width}px`, title }, [label])
         );
@@ -1568,7 +1575,7 @@
           const code = STAGE_SHORT_CODE[b.stage] || b.stage;
           const targetLabel = b.planned
             ? `planned target ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)}`
-            : `potential target ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)} (estimated from SLA — not yet planned)`;
+            : `potential target ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)} (estimated — not yet planned)`;
           strip.appendChild(
             el(
               "div",
@@ -1629,7 +1636,7 @@
     // off-screen on first load. Everything before/after is still just a
     // scroll away, never clipped out of existence.
     requestAnimationFrame(() => {
-      const leadInDays = zoom.grid === "week" ? 21 : 90;
+      const leadInDays = zoom.grid === "week" ? 21 : hawkeyeZoom === "quarter" ? 240 : 90;
       const target = xPx(todayIso) - leadInDays * pxPerDay;
       scrollInner.scrollLeft = Math.max(0, target);
     });
@@ -2001,22 +2008,23 @@
   }
 
   // Four KPIs aligned to the Dependencies mockup, grounded in this app's data:
-  // active projects/teams from open deps; blocked stages = current stage over SLA
-  // (same breach flag as Grid/Hawk-eye); cumulative delay = summed stage SLA
-  // overage across filtered projects; rollout/hypercare = post-UAT pipeline stages.
+  // active projects/teams from open deps; delayed projects = overall
+  // `delayDays` > 0 (2026-10-05: previously "blocked stages" based on a
+  // per-stage SLA-breach flag — see the note on renderStageGridLegend);
+  // cumulative delay = summed `delayDays` across filtered projects;
+  // rollout/hypercare = post-UAT pipeline stages.
   function renderDependenciesMetrics(rows) {
     const activeProjects = new Set(rows.map((r) => r.projectId)).size;
     const activeTeams = new Set(rows.map((r) => r.team || "Unlabeled")).size;
 
     const scopedProjects = projectsWithOpenDependencies();
 
-    let blockedStages = 0;
+    let delayedProjects = 0;
     let cumulativeDelay = 0;
     let rolloutHypercare = 0;
     scopedProjects.forEach((p) => {
-      cumulativeDelay += cumulativeStageOverageDays(p);
-      const info = currentStageInfo(p);
-      if (info && info.flag === "breach") blockedStages += 1;
+      cumulativeDelay += p.delayDays || 0;
+      if ((p.delayDays || 0) > 0) delayedProjects += 1;
       if (POST_UAT_STAGES.has(p.stage || "")) rolloutHypercare += 1;
     });
 
@@ -2028,15 +2036,15 @@
         tone: "",
       },
       {
-        label: "Blocked Stages",
-        num: blockedStages,
-        sub: blockedStages ? "need escalation" : "none right now",
-        tone: blockedStages ? "tone-red" : "tone-green",
+        label: "Projects Delayed",
+        num: delayedProjects,
+        sub: delayedProjects ? "need escalation" : "none right now",
+        tone: delayedProjects ? "tone-red" : "tone-green",
       },
       {
         label: "Cumulative Delay",
         num: cumulativeDelay + "d",
-        sub: "all stages",
+        sub: "vs. committed go-live",
         tone: cumulativeDelay ? "tone-amber" : "tone-green",
       },
       {
@@ -2947,11 +2955,19 @@
       .filter(Boolean);
   }
 
-  /* ---------------- Stage-gate timeline + SLA ---------------- */
+  /* ---------------- Stage-gate timeline ---------------- */
 
-  // Fallback SLAs (business days aren't tracked here, just calendar days —
-  // close enough for a weekly cadence). data.json's top-level `stageSlaDays`
-  // always wins if present, so these can be tuned without touching code.
+  // Generic per-stage duration estimates — used ONLY as a placeholder
+  // width when drawing a not-yet-reached future stage that has no real
+  // stagePlan date on record yet (Hawk-eye future chips, the per-project
+  // Stage-gate timeline). NOT used as an SLA/breach threshold against real
+  // elapsed time anymore (2026-10-05 — comparing a project's real stage
+  // duration against one flat constant per stage name, regardless of
+  // project size, was flagging large-but-on-plan projects as wildly
+  // "delayed" when they weren't; see renderStageGridLegend for the full
+  // note). The project's own overall `delayDays` is the one real delay
+  // number surfaced everywhere now. data.json's top-level `stageSlaDays`
+  // still wins if present, so these can be tuned without touching code.
   const DEFAULT_STAGE_SLA_DAYS = {
     "Proposal": 7,
     "Requirements": 10,
@@ -2973,15 +2989,6 @@
   function daysBetweenIso(aIso, bIso) {
     const DAY = 86400000;
     return Math.round((new Date(bIso + "T00:00:00") - new Date(aIso + "T00:00:00")) / DAY);
-  }
-
-  // "ok" | "warn" (>=80% of SLA) | "breach" (over SLA) | null (no SLA tracked
-  // for this stage, e.g. "Unstaged").
-  function stageFlagLevel(days, sla) {
-    if (sla == null) return null;
-    if (days > sla) return "breach";
-    if (days >= sla * 0.8) return "warn";
-    return "ok";
   }
 
   // Reconstructs how long a project has spent in each pipeline stage, using
@@ -3109,14 +3116,6 @@
       return ai - bi;
     });
     return combined;
-  }
-
-  function currentStageInfo(p) {
-    const segments = computeStageSegments(p);
-    const seg = segments[segments.length - 1];
-    if (!seg) return null;
-    const sla = stageSlaDays(seg.stage);
-    return { ...seg, sla, flag: stageFlagLevel(seg.days, sla) };
   }
 
   /* ---------------- Stage detail modal (per-stage planned/actual dates,
@@ -3595,17 +3594,17 @@
     // not-yet-reached stages, a "Today" line), rebuilt from the old flat
     // list of rows (2026-09-30) per explicit request — see
     // `buildStageGateTimeline()` for the full reasoning. Real stagePlan
-    // dates win over a blind SLA-chain estimate for future stages when on
-    // record, same source (`buildHawkeyeBlocks`) Hawk-eye itself uses, so
-    // a clicked-through "potential target" here always matches what's
-    // shown there.
+    // dates win over a generic placeholder-width estimate for future
+    // stages when on record, same source (`buildHawkeyeBlocks`) Hawk-eye
+    // itself uses, so a clicked-through "potential target" here always
+    // matches what's shown there.
     stagegatePanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Stage-gate timeline"]));
     stagegatePanel.appendChild(
       el("div", { class: "stagegantt-legend" }, [
         el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "stagegantt-legend-swatch is-done" }), "Done"]),
         el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "stagegantt-legend-swatch is-current" }), "Current — on track"]),
-        el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "stagegantt-legend-swatch is-warn" }), "At risk"]),
-        el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "stagegantt-legend-swatch is-breach" }), "Blocked / over SLA"]),
+        el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "stagegantt-legend-swatch is-warn" }), "Current — at risk"]),
+        el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "stagegantt-legend-swatch is-breach" }), "Current — critical"]),
         el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "stagegantt-legend-swatch is-future" }), "Not started (planned)"]),
       ])
     );
@@ -3710,17 +3709,26 @@
     //  - The "Dependencies & Risks" tab calls this once, always with the
     //    live project `p` (never changes), in interactive mode — real
     //    jump-link ids (`detail-deps-section` etc.) and actionable list
-    //    items (edit/escalate/resolve) and "+ Add" links.
+    //    items (edit/escalate/resolve) and "+ Add" links. This is the only
+    //    caller that renders Dependencies/Risks at all (see
+    //    `opts.depsAndRisks` below).
     //  - The "Week-over-week" tab calls this every time a different week
     //    gets clicked, in read-only mode (`opts.readOnly`) — no ids (there
     //    can only be one `detail-deps-section` in the DOM, and that's the
     //    live one above), always the plain non-interactive paired-list
     //    rendering regardless of which week is selected (even the latest),
     //    and no "+ Add" links, since this tab is explicitly a historical
-    //    viewer, not a place to make live edits.
+    //    viewer, not a place to make live edits. It also passes
+    //    `opts.depsAndRisks = false` (2026-10-05) — Dependencies and
+    //    Risks/blockers are always the LIVE/current ones (the "Dependencies
+    //    & Risks" tab right next to this one), not historical, so showing
+    //    them again per-week here was just a duplicate of that tab, not a
+    //    real "as it stood that week" view. Only Weekly Status (which
+    //    genuinely did change week to week) stays in this tab.
     function renderSnapshotSections(container, snap, label, isLatest, opts) {
       opts = opts || {};
       const readOnly = !!opts.readOnly;
+      const showDepsAndRisks = opts.depsAndRisks !== false;
       const interactive = isLatest && !readOnly;
       container.innerHTML = "";
 
@@ -3730,7 +3738,7 @@
         ])
       );
 
-      if (snap.escalations && snap.escalations.length) {
+      if (showDepsAndRisks && snap.escalations && snap.escalations.length) {
         container.appendChild(
           el("h3", readOnly ? { class: "weekly-subhead" } : { class: "weekly-subhead", id: "detail-escalations-section" }, ["🚨 Escalated to leadership"])
         );
@@ -3741,35 +3749,37 @@
         );
       }
 
-      container.appendChild(
-        el(
-          "h3",
-          readOnly ? { class: "weekly-subhead detail-section-head" } : { class: "weekly-subhead detail-section-head", id: "detail-deps-section" },
-          [
-            el("span", null, ["Dependencies"]),
-            interactive ? detailSectionIssueLink("new-dependency.yml", p.name, "+ Add a Dependency") : null,
-          ].filter(Boolean)
-        )
-      );
-      const snapDeps = getDependencyObjects(snap).filter(
-        (d) => !d.resolved && !isPlaceholderDependencyText(d.text)
-      );
-      container.appendChild(
-        el("div", { class: "detail-block deps" }, [
+      if (showDepsAndRisks) {
+        container.appendChild(
           el(
-            "ul",
-            { class: "paired-list" },
-            interactive
-              ? dependencyListItems(snapDeps, p)
-              : pairedList(
-                  snapDeps.map((d) => d.text),
-                  snapDeps.map((d) => d.mitigation),
-                  "Mitigation / impact",
-                  snapDeps.map((d) => d.team)
-                )
-          ),
-        ])
-      );
+            "h3",
+            readOnly ? { class: "weekly-subhead detail-section-head" } : { class: "weekly-subhead detail-section-head", id: "detail-deps-section" },
+            [
+              el("span", null, ["Dependencies"]),
+              interactive ? detailSectionIssueLink("new-dependency.yml", p.name, "+ Add a Dependency") : null,
+            ].filter(Boolean)
+          )
+        );
+        const snapDeps = getDependencyObjects(snap).filter(
+          (d) => !d.resolved && !isPlaceholderDependencyText(d.text)
+        );
+        container.appendChild(
+          el("div", { class: "detail-block deps" }, [
+            el(
+              "ul",
+              { class: "paired-list" },
+              interactive
+                ? dependencyListItems(snapDeps, p)
+                : pairedList(
+                    snapDeps.map((d) => d.text),
+                    snapDeps.map((d) => d.mitigation),
+                    "Mitigation / impact",
+                    snapDeps.map((d) => d.team)
+                  )
+            ),
+          ])
+        );
+      }
 
       container.appendChild(el("h3", { class: "weekly-subhead" }, ["Weekly Status"]));
       if (!snap.sprintStatus) {
@@ -3795,36 +3805,38 @@
         );
       }
 
-      const snapRisks = getRiskObjects(snap).filter(
-        (r) => !r.resolved && !isPlaceholderRiskText(r.text)
-      );
-      container.appendChild(
-        el(
-          "h3",
-          readOnly ? { class: "weekly-subhead detail-section-head" } : { class: "weekly-subhead detail-section-head", id: "detail-risks-section" },
-          [
-            el("span", null, ["Risks / blockers"]),
-            interactive ? detailSectionIssueLink("new-risk.yml", p.name, "+ Report a Risk") : null,
-          ].filter(Boolean)
-        )
-      );
-      container.appendChild(
-        el("div", { class: "detail-block risks" }, [
-          snapRisks.length
-            ? el(
-                "ul",
-                { class: "paired-list" },
-                interactive
-                  ? riskListItems(snapRisks, p)
-                  : pairedList(
-                      snapRisks.map((r) => r.text),
-                      snapRisks.map((r) => r.mitigation),
-                      "Mitigation plan"
-                    )
-              )
-            : el("ul", null, [el("li", null, ["None reported"])]),
-        ])
-      );
+      if (showDepsAndRisks) {
+        const snapRisks = getRiskObjects(snap).filter(
+          (r) => !r.resolved && !isPlaceholderRiskText(r.text)
+        );
+        container.appendChild(
+          el(
+            "h3",
+            readOnly ? { class: "weekly-subhead detail-section-head" } : { class: "weekly-subhead detail-section-head", id: "detail-risks-section" },
+            [
+              el("span", null, ["Risks / blockers"]),
+              interactive ? detailSectionIssueLink("new-risk.yml", p.name, "+ Report a Risk") : null,
+            ].filter(Boolean)
+          )
+        );
+        container.appendChild(
+          el("div", { class: "detail-block risks" }, [
+            snapRisks.length
+              ? el(
+                  "ul",
+                  { class: "paired-list" },
+                  interactive
+                    ? riskListItems(snapRisks, p)
+                    : pairedList(
+                        snapRisks.map((r) => r.text),
+                        snapRisks.map((r) => r.mitigation),
+                        "Mitigation plan"
+                      )
+                )
+              : el("ul", null, [el("li", null, ["None reported"])]),
+          ])
+        );
+      }
     }
 
     // "Dependencies & Risks" tab — always the live project's current data,
@@ -3848,7 +3860,7 @@
         el("p", { class: "empty-note" }, ["No history yet — it'll build up week over week as updates get ingested."])
       );
     } else {
-      weekOverWeekPanel.appendChild(el("p", { class: "section-subhead", style: "margin:-6px 0 12px;" }, ["Click a week to see dependencies, sprint status, and risks as they stood that week."]));
+      weekOverWeekPanel.appendChild(el("p", { class: "section-subhead", style: "margin:-6px 0 12px;" }, ["Click a week to see what changed and that week's sprint status. Dependencies and risks are always current — see the \"Dependencies & Risks\" tab for those."]));
       const changeLog = el("div", { class: "changelog" });
       for (let i = weeks.length - 1; i >= 0; i--) {
         const cur = weeks[i];
@@ -3902,7 +3914,7 @@
           const isLatest = idx === weeks.length - 1;
           changeLog.querySelectorAll(".changelog-row").forEach((r) => r.classList.remove("is-selected"));
           rowEl.classList.add("is-selected");
-          renderSnapshotSections(historySnapshotSections, isLatest ? p : weeks[idx], weeks[idx].asOf, isLatest, { readOnly: true });
+          renderSnapshotSections(historySnapshotSections, isLatest ? p : weeks[idx], weeks[idx].asOf, isLatest, { readOnly: true, depsAndRisks: false });
         };
         rowEl.addEventListener("click", selectWeek);
         rowEl.addEventListener("keydown", (e) => {
@@ -3915,7 +3927,7 @@
 
       // Defaults to the latest week (same data the "Dependencies & Risks"
       // tab is already showing); click an older row above to rewind.
-      renderSnapshotSections(historySnapshotSections, p, weeks[weeks.length - 1].asOf, true, { readOnly: true });
+      renderSnapshotSections(historySnapshotSections, p, weeks[weeks.length - 1].asOf, true, { readOnly: true, depsAndRisks: false });
     }
 
     // Full feedback history
@@ -4098,9 +4110,7 @@
     const seg = segments.find((s) => s.stage === stage) || null;
     const currentIndex = PIPELINE_STAGES.indexOf(p.stage || "Unstaged");
     const kind = stageIndex < currentIndex ? "done" : stageIndex === currentIndex ? "current" : "future";
-    const sla = stageSlaDays(stage);
     const days = seg ? seg.days : 0;
-    const flag = seg ? stageFlagLevel(days, sla) : null;
     const plan = (p.stagePlan && p.stagePlan[stage]) || {};
     const delayEntries = stageDelayLog(p, stage);
     const autoShifts = stageAutoScheduleShifts(p, stage);
@@ -4133,7 +4143,7 @@
 
     const panels = el("div", { class: "stagedetail-panels" }, [
       el("div", { class: "stagedetail-panel is-active", "data-panel": "overview" }, [
-        buildStageOverviewPanel(p, stage, seg, sla, days, flag, kind, plan, delayEntries),
+        buildStageOverviewPanel(p, stage, seg, days, kind, plan, delayEntries),
       ]),
       el("div", { class: "stagedetail-panel", "data-panel": "history" }, [buildStageHistoryPanel(revisions)]),
       el("div", { class: "stagedetail-panel", "data-panel": "analysis" }, [buildStageAnalysisPanel(delayEntries)]),
@@ -4176,7 +4186,7 @@
     return el("span", { class: "stagedetail-variance" + (varianceClass ? " " + varianceClass : "") }, [varianceLabel]);
   }
 
-  function buildStageOverviewPanel(p, stage, seg, sla, days, flag, kind, plan, delayEntries) {
+  function buildStageOverviewPanel(p, stage, seg, days, kind, plan, delayEntries) {
     // `seg` can be null even for a "done" stage — computeStageSegments()
     // only reconstructs stages actually captured in history.json, so a
     // project whose tracking began mid-pipeline has no segment for stages
@@ -4184,14 +4194,27 @@
     const actualStart = seg ? seg.start : null;
     const actualEnd = kind === "done" && seg ? seg.end : null;
 
-    const pct = kind === "done" ? 100 : kind === "future" ? 0 : sla != null ? Math.max(0, Math.min(100, Math.round((days / sla) * 100))) : null;
-    const cumulativeOverage = cumulativeStageOverageDays(p);
-    const overDays = sla != null ? Math.max(0, days - sla) : 0;
+    // Progress is measured against THIS project's own planned duration for
+    // the stage (stagePlan's latest approved dates), not a flat per-stage
+    // constant (2026-10-05 — see the note on renderStageGridLegend for why
+    // that was removed). Falls back to null (no bar) when no plan is on
+    // record for this stage yet.
+    const plannedDays =
+      plan.latestStart && plan.latestEnd ? daysBetweenIso(plan.latestStart, plan.latestEnd) : null;
+    const pct =
+      kind === "done"
+        ? 100
+        : kind === "future"
+        ? 0
+        : plannedDays
+        ? Math.max(0, Math.min(100, Math.round((days / plannedDays) * 100)))
+        : null;
+    const projectDelay = p.delayDays || 0;
 
     // For a not-yet-reached stage with no real stagePlan entry, `plan` is
     // empty and every date row below would just show "—" — not useful
     // when the whole point of clicking through here was "what's the
-    // potential target for this." Fall back to the same SLA-chain
+    // potential target for this." Fall back to the same placeholder-width
     // estimate the Hawk-eye future-chip strip uses (buildHawkeyeBlocks),
     // clearly suffixed "(estimated)" so it's never mistaken for a real
     // planned date.
@@ -4246,11 +4269,11 @@
 
       el("div", { class: "stagedetail-completion" }, [
         el("div", { class: "stagedetail-completion-head" }, [
-          el("h4", null, ["SLA Elapsed"]),
+          el("h4", null, ["Stage Progress"]),
           el("span", { class: "stagedetail-completion-pct" }, [pct == null ? "—" : pct + "%"]),
         ]),
         el("div", { class: "progress-track" }, [
-          el("div", { class: "progress-fill status-" + (flag === "breach" ? "red" : flag === "warn" ? "amber" : "green"), style: "width:" + (pct || 0) + "%" }),
+          el("div", { class: "progress-fill status-" + (p.status === "amber" ? "amber" : p.status), style: "width:" + (pct || 0) + "%" }),
         ]),
         el("div", { class: "stagedetail-completion-foot" }, [
           el("span", null, [kind === "done" ? "Closed out" : kind === "current" ? "In progress" : "Not started"]),
@@ -4259,20 +4282,20 @@
       ]),
 
       el("div", { class: "stagedetail-stat-row" }, [
-        el("div", { class: "metric-card" + (flag === "breach" ? " tone-red" : flag === "warn" ? " tone-amber" : " tone-green") }, [
-          el("div", { class: "num" }, [(overDays > 0 ? "+" + overDays : "0") + "d"]),
-          el("div", { class: "label" }, ["Stage delay"]),
-          el("div", { class: "stage-grid-metric-sub" }, [overDays > 0 ? "over SLA" : "on time"]),
+        el("div", { class: "metric-card" }, [
+          el("div", { class: "num" }, [days + "d"]),
+          el("div", { class: "label" }, ["Stage duration"]),
+          el("div", { class: "stage-grid-metric-sub" }, [kind === "done" ? "total" : "elapsed so far"]),
         ]),
         el("div", { class: "metric-card" }, [
           el("div", { class: "num" }, [String(delayEntries.length)]),
           el("div", { class: "label" }, ["Log entries"]),
           el("div", { class: "stage-grid-metric-sub" }, ["recorded"]),
         ]),
-        el("div", { class: "metric-card" + (cumulativeOverage ? " tone-amber" : " tone-green") }, [
-          el("div", { class: "num" }, [cumulativeOverage + "d"]),
-          el("div", { class: "label" }, ["Project cumulative"]),
-          el("div", { class: "stage-grid-metric-sub" }, ["all " + PIPELINE_STAGES.length + " stages"]),
+        el("div", { class: "metric-card" + (projectDelay > 0 ? " tone-amber" : " tone-green") }, [
+          el("div", { class: "num" }, [(projectDelay > 0 ? "+" : "") + projectDelay + "d"]),
+          el("div", { class: "label" }, ["Project delay"]),
+          el("div", { class: "stage-grid-metric-sub" }, ["overall, vs. committed go-live"]),
         ]),
       ]),
     ]);
@@ -4426,13 +4449,13 @@
       // itself sometimes gets reworded as scope gets refined (e.g.
       // "TDD" → "Requirement + TDD" → "Requirements completion"), so even
       // two consecutive milestone rows aren't always "the same date
-      // slipping again." None of this feeds the Stage delay / Project
-      // cumulative numbers above either — those come from real elapsed
-      // calendar time in a stage versus its SLA, independent of how many
-      // times a target got re-planned.
+      // slipping again." None of this feeds the Stage duration / Project
+      // delay numbers above either — those come from real elapsed calendar
+      // time and the project's overall committed-go-live slip,
+      // independent of how many times a target got re-planned.
       wrap.appendChild(
         el("p", { class: "section-subhead stagedetail-log-note" }, [
-          "Note: each row above is its own change, not a running total — Go-Live and milestone-target shifts are tracked separately and shouldn't be summed together, and they're unrelated to the Stage delay / Project cumulative figures above.",
+          "Note: each row above is its own change, not a running total — Go-Live and milestone-target shifts are tracked separately and shouldn't be summed together, and they're unrelated to the Stage duration / Project delay figures above.",
         ])
       );
     }

@@ -213,14 +213,28 @@ body {
 
 /* ---------- Metrics row ---------- */
 
+/* Shared by three different KPI strips with three different card counts
+   (Program Status: 6, Grid tab: 4, Dependencies tab: 4) — a fixed
+   `repeat(6, 1fr)` grid only ever looked right for the one with exactly 6
+   cards; everyone else's 4 cards occupied 4 of 6 columns and left a dead
+   gap on the right instead of stretching to fill the row (2026-10-05).
+   Flex instead of grid makes this count-agnostic: any number of cards
+   always stretches evenly across the full width, and `flex-wrap` + a
+   `min-width` floor (see `.metric-card`) still wraps to fewer per row on
+   narrow screens without needing a breakpoint per card-count. */
 .metrics-row {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 34px;
 }
 
 .metric-card {
+  /* Percentage basis (not a fixed px width) so the same wrap point works
+     regardless of card count: below it, flex-wrap kicks in; above it,
+     flex-grow stretches every card — 4-card and 6-card rows alike — out
+     to fill whatever room is left on their row. */
+  flex: 1 1 15%;
   display: flex;
   flex-direction: column;
   background: var(--bg-panel);
@@ -871,6 +885,15 @@ body {
 }
 .stage-grid-totals-row .stage-grid-cell {
   border-bottom: 2px solid var(--line);
+  /* A touch taller + more line-height than a regular grid cell — this row
+     stacks two lines of text ("Xd total" / "+Xd over, combined") and is
+     meant to read as an easy-to-scan summary, not a cramped data cell. */
+  padding-top: 13px;
+  padding-bottom: 13px;
+}
+.stage-grid-totals-row .stage-grid-status-cell {
+  gap: 4px;
+  line-height: 1.3;
 }
 .stage-grid-totals-label {
   background: var(--bg);
@@ -3045,7 +3068,7 @@ dd.is-missing {
 }
 
 @media (max-width: 900px) {
-  .metrics-row { grid-template-columns: repeat(3, 1fr); }
+  .metric-card { flex-basis: 30%; }
   .cards { grid-template-columns: 1fr; }
   .stub-grid { grid-template-columns: repeat(2, 1fr); }
 }
@@ -3053,7 +3076,7 @@ dd.is-missing {
 @media (max-width: 560px) {
   .masthead { flex-direction: column; align-items: flex-start; }
   .masthead-meta { text-align: left; }
-  .metrics-row { grid-template-columns: repeat(2, 1fr); }
+  .metric-card { flex-basis: 45%; }
   .card-facts { grid-template-columns: 1fr; }
   .sprint-grid { grid-template-columns: 1fr; }
   .detail-panel { padding: 24px 20px 32px; }
