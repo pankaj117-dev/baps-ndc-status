@@ -1,6 +1,6 @@
 {
-  "asOf": "2026-09-22",
-  "lastUpdated": "2026-09-29T17:14:38.236960Z",
+  "asOf": "2026-10-05",
+  "lastUpdated": "2026-10-06T04:47:12.209908Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -462,21 +462,21 @@
       "id": "mybky-phase1",
       "name": "MyBKY (Phase 1)",
       "owner": "Satish Buddhadev",
-      "status": "red",
-      "progress": 80,
-      "phase": "Regression / Performance / Security / UAT",
+      "status": "green",
+      "progress": 97,
+      "phase": "Hypercare",
       "nextMilestone": {
-        "name": "Go-Live",
-        "date": "2026-10-05"
+        "name": "Project Closure",
+        "date": "2026-11-06"
       },
-      "goLive": "2026-10-05",
+      "goLive": "2026-10-01",
       "originalGoLive": "2026-09-21",
-      "delayDays": 14,
+      "delayDays": 0,
       "delayNote": "22-Sep review: UAT/VAPT/Load stages slipped (UAT +7d, VAPT +6d, Load +6d per deck); go-live planned 05-Oct-2026; blocked on mobile VAPT sign-off and DevOps/NAHQ production readiness.",
       "dependencies": [
         {
           "id": "DEP-101",
-          "text": "UAT sign-off received; 25% of the items still need to be updated in the tracking sheet. \u2014 Dharmadev Trivedi",
+          "text": "1. SSO (Single Sign-On) user accounts still need to be created - Janakbhai: ETA 11th Oct 2026",
           "team": "RGC",
           "mitigation": "",
           "dueBy": "2026-09-24",
@@ -492,7 +492,7 @@
           "dueBy": "2026-09-25",
           "priority": "High",
           "escalated": false,
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "DEP-103",
@@ -502,7 +502,7 @@
           "dueBy": "2026-09-24",
           "priority": "Critical",
           "escalated": false,
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "DEP-104",
@@ -512,7 +512,7 @@
           "dueBy": "2026-09-24",
           "priority": "Critical",
           "escalated": false,
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "DEP-105",
@@ -522,19 +522,19 @@
           "dueBy": "2026-09-25",
           "priority": "Medium",
           "escalated": false,
-          "resolved": false
+          "resolved": true
         }
       ],
       "sprintStatus": {
         "completed": [
-          "Web Application development"
+          "Go-Live"
         ],
         "inProgress": [
-          "Mobile VAPT sign-off pending",
-          "UAT testcase tracking sheet updates (~25% remaining)",
-          "Production readiness \u2014 DevOps/NAHQ items (keys, MIS, Maps, Stripe, n8n, SSO accounts)"
+          "Hypercare"
         ],
-        "nextPlan": []
+        "nextPlan": [
+          "Hypercare support and project closure"
+        ]
       },
       "risks": [
         {
@@ -576,12 +576,12 @@
         "Web/mobile VAPT remediation completed \u2014 awaiting validation sign-offs"
       ],
       "delayTradeoffs": "3 CRs already approved \u2014 CR1 added 10 working days, CR2 added 6 working days, CR3 no impact on Go-Live; no new CRs this week",
-      "stage": "VAPT",
+      "stage": "Hypercare",
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
-      "statusChangeReason": "Weekly 22-Sep review: RED \u2014 mobile VAPT sign-off pending, UAT tracking sheet incomplete, and multiple critical DevOps/NAHQ production-readiness items (keys, MIS read-only, Maps API, Stripe Apple Pay, n8n, SSO accounts).",
+      "statusChangeReason": "Project Go-Live completed on 1st Oct 2026 against the planned Go-Live date of 5th Oct 2026",
       "dependencySeq": 105,
       "stagePlan": {
         "Requirements": {
@@ -616,7 +616,7 @@
         },
         "Hypercare": {
           "initialStart": "2026-10-06",
-          "latestStart": "2026-10-06",
+          "latestStart": "2026-10-02",
           "initialEnd": "2026-11-06",
           "latestEnd": "2026-11-06"
         },
@@ -627,7 +627,9 @@
           "latestEnd": "2026-09-24"
         }
       },
-      "riskSeq": 105
+      "riskSeq": 105,
+      "delayLog": [],
+      "delayLogSeq": 100
     },
     {
       "id": "mybky-phase2",
@@ -747,22 +749,22 @@
       "name": "myMandir 1B",
       "owner": "Aniket Udgaonkar",
       "status": "amber",
-      "progress": 10,
-      "phase": "TDD (17-Sep to 25-Sep, +2d slip)",
+      "progress": 30,
+      "phase": "Development",
       "nextMilestone": {
-        "name": "TDD completion",
-        "date": "2026-09-25"
+        "name": "QA",
+        "date": "2026-10-20"
       },
-      "goLive": "2026-10-30",
+      "goLive": "2026-12-31",
       "originalGoLive": "2026-10-30",
-      "delayDays": 2,
+      "delayDays": 1,
       "delayNote": "TDD end revised from 22-Sep to 25-Sep (+2 days) per 22-Sep deck; Amber status.",
       "dependencies": [
         {
           "id": "DEP-101",
-          "text": "Need confirmation that GMS will be used instead of SMTP. \u2014 Vasu",
-          "team": "GMS",
-          "mitigation": "",
+          "text": "We have dependency on GSM project. its about GSM integration so for that required pointers already shared and taken follow up for the same for  GSM application owner.",
+          "team": "GSM team",
+          "mitigation": "We have a dependency on the GMS project for integration activities. The required information and integration prerequisites have already been communicated, and regular follow-ups are being conducted with the GMS Application Owner to track progress and obtain the necessary inputs.",
           "dueBy": "2026-09-28",
           "priority": "Critical",
           "escalated": false,
@@ -771,30 +773,36 @@
       ],
       "sprintStatus": {
         "completed": [
-          "Sign-off received from Sameep"
+          "Majority of TDD completed with creation and approval.",
+          "Majority of test cases are prepared now.",
+          "front end development done for independent user stories and we have sheduled dev demo to QA on 6 oct 2026"
         ],
         "inProgress": [
-          "TDD (17-Sep to 22-Sep)"
+          "For the milestone 1- OCt 2026 release- development is in progress from back end and front end ."
         ],
         "nextPlan": [
-          "Development & QA (22-Sep to 22-Oct)",
-          "UAT (23-Oct to 26-Oct)",
-          "VAPT / Load (16-Oct to 28-Oct)",
-          "Go-Live (28-Oct to 30-Oct)"
+          "from next week,",
+          "we will continue development with testing in milestone1 as well as we will doing grooming sessions for milestone 2 whcih is for Nov 2026 release."
         ]
       },
       "risks": [
         {
           "id": "RISK-101",
-          "text": "Need one more front-end (mobile) developer (RGC, Critical)",
-          "mitigation": "",
+          "text": "API blocker-",
+          "mitigation": "we can complete story-575 in October,  user have to generate QR by themselves. our system will not be able to generate QR due to this technical blocker. Other than that, whole flow of Tap/Scan to create request will work as it is.",
           "resolved": false
         },
         {
           "id": "RISK-102",
-          "text": "Oct/Nov timeline is tight \u2014 need to keep driving project pace (Aniket Udgaonkar, High)",
+          "text": "API blocker which developer  raised for User Story 575.Below are the  findings from that discussion below:",
           "mitigation": "Aniket driving weekly pace checks to hold the Oct/Nov timeline",
           "resolved": false
+        },
+        {
+          "id": "RISK-103",
+          "resolved": false,
+          "text": "The QR Code utility currently used to generate ZIP files for  assets is hosted on the Project Tree server currently  and is no longer available for use. Replicating the same functionality on the FMS server will require additional development effort and time. We can treat this as a known issue.",
+          "mitigation": ""
         }
       ],
       "delayImpact": "TDD +2d slip may impact downstream development start (22-Sep deck)",
@@ -807,7 +815,7 @@
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
-      "statusChangeReason": "I can see there will be delay in TDD preparation as grooming session with dev team in ongoing.",
+      "statusChangeReason": "",
       "dependencySeq": 101,
       "stagePlan": {
         "Tech. Design": {
@@ -824,9 +832,9 @@
         },
         "Development": {
           "initialStart": "2026-09-22",
-          "latestStart": "2026-09-22",
+          "latestStart": "2026-10-02",
           "initialEnd": "2026-10-22",
-          "latestEnd": "2026-10-22"
+          "latestEnd": "2026-10-16"
         },
         "UAT": {
           "initialStart": "2026-10-23",
@@ -847,7 +855,7 @@
           "latestEnd": "2026-10-28"
         }
       },
-      "riskSeq": 102
+      "riskSeq": 103
     },
     {
       "id": "gms",
