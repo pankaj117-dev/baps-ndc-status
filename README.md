@@ -1341,10 +1341,14 @@ don't need to change when that's ready.
 ## How PMs submit their weekly update
 
 No more editing JSON by hand. Each PM opens a **GitHub Issue** using the
-"Weekly Project Update" template — either from the repo's Issues tab, or by
-clicking **"Submit weekly update"** on their project's card in the dashboard
-(it opens the form pre-filled with the project name and today's `asOf`
-date). Leave any field blank to keep last week's value for that field.
+"Weekly Project Update" template, from the repo's Issues tab. (The
+dashboard's own **"Submit weekly update"** button was removed 2026-10-16
+per explicit request — *"remove all the buttons for weekly updates. Except
+for feedback and risks and dependencies and escalations"* — the
+`pm-weekly-update` skill below is the dashboard-side path now; the issue
+form still exists and still works if you'd rather file it by hand or you're
+not using the skill.) Leave any field blank to keep last week's value for
+that field.
 
 The moment the issue is opened, a bot comments with any **open follow-ups**
 for that project from previous meetings (see below) — so the PM sees "hey,

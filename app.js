@@ -4192,14 +4192,13 @@
           el("div", { class: "card-owner" }, [p.owner ? "PM: " + p.owner : "PM: unassigned"]),
         ]),
         el("div", { class: "detail-action-row" }, [
+          // "Submit weekly update ↗" (weekly-update.yml issue form) removed
+          // 2026-10-16 per explicit request — only Feedback/Risks/
+          // Dependencies/Escalations issue-form buttons stay; weekly
+          // updates now go through the pm-weekly-update skill instead
+          // (see README.md).
           el("a", {
             class: "btn-primary btn-small",
-            target: "_blank",
-            rel: "noopener",
-            href: issueUrl("weekly-update.yml", { project: p.name, as_of: todayISO(), owner: p.owner || "" }),
-          }, ["Submit weekly update ↗"]),
-          el("a", {
-            class: "btn-ghost btn-small",
             target: "_blank",
             rel: "noopener",
             href: issueUrl("meeting-feedback.yml", { project: p.name }),
