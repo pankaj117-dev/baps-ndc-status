@@ -1,6 +1,6 @@
 {
-  "asOf": "2026-10-05",
-  "lastUpdated": "2026-10-06T04:47:12.209908Z",
+  "asOf": "2026-10-14",
+  "lastUpdated": "2026-10-14T16:09:20.678409Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -1202,13 +1202,13 @@
       "name": "SPM",
       "owner": "Sandeep Pistolwala",
       "status": "green",
-      "progress": 97,
+      "progress": 100,
       "phase": "Production go-live completed; Hypercare started 14-Sep (2 days early vs. revised plan)",
       "nextMilestone": {
         "name": "Hypercare completion",
         "date": "2026-10-31"
       },
-      "goLive": "2026-09-12",
+      "goLive": "2026-08-31",
       "originalGoLive": "2026-08-29",
       "delayDays": 12,
       "delayNote": "UAT/VAPT/Load/Go-Live all slipped from original plan (UAT +3d, VAPT/Load +15d, Go-Live +12d) but production deployment is now complete and stable.",
@@ -1226,13 +1226,13 @@
       ],
       "sprintStatus": {
         "completed": [
-          "Production go-live completed"
+          "SPM Hypercare Duration has been completed and No open points on Production Deployed SPM Web and My Seva Sampark Application."
         ],
         "inProgress": [
-          "Dashboard minimal feature \u2014 TDD in progress"
+          "No Work"
         ],
         "nextPlan": [
-          "Support needed from DevOps, VAPT and Performance Testing teams to complete pending activities on priority"
+          "No Work"
         ]
       },
       "risks": [
@@ -1259,6 +1259,12 @@
       "statusChangeReason": "",
       "dependencySeq": 101,
       "riskSeq": 101,
+      "stagePlan": {
+        "Hypercare": {
+          "initialEnd": "2026-09-30",
+          "latestEnd": "2026-09-30"
+        }
+      },
       "changeRequests": [],
       "decisions": [],
       "goLiveChecklist": [],
