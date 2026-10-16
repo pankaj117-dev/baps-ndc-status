@@ -2288,6 +2288,21 @@ table.deps-drill-table th {
   color: var(--ink-faint);
 }
 
+/* Grid card only (not the full detail view's `.detail-facts` variant) —
+   clamp a long free-text `phase` to 2 lines so one verbose project
+   (e.g. an audit-trail-style rationale instead of a short label like
+   "Hypercare (90% complete)") can't blow up the card's height and make
+   it feel cluttered. Full text is still available via the native
+   `title` tooltip on hover, and the un-clamped detail view shows it in
+   full (2026-10-16, "this card needs to be clean and clear"). */
+.card-facts:not(.detail-facts) .phase-fact-detail {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  cursor: help;
+}
+
 .delay-flag {
   font-weight: 600;
 }
@@ -2709,17 +2724,50 @@ body.no-scroll { overflow: hidden; }
   margin-top: 4px;
 }
 
-.detail-progress { margin-top: 20px; }
-.detail-progress .progress-track { height: 10px; }
-.detail-progress .progress-fill { background-image: linear-gradient(90deg, rgba(255,255,255,0.25), rgba(255,255,255,0)); }
-.detail-progress .progress-pct { font-size: 14px; font-weight: 700; }
-
 .detail-facts {
   margin-top: 18px;
   background: var(--bg);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 16px 18px;
+}
+
+/* ---------- Milestones list (Schedule tab) ---------- */
+
+.milestones-list {
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.milestones-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+.milestones-row.is-past {
+  opacity: 0.6;
+}
+
+.milestones-name {
+  flex: 1;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.milestones-date {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-faint);
 }
 
 .sprint-grid {
@@ -2744,47 +2792,135 @@ body.no-scroll { overflow: hidden; }
   padding: 14px 16px;
 }
 
-/* Project detail view tabs — replaces the old flat stack of every
-   `.weekly-subhead` section stacked vertically. Only the active
-   `.detail-tab-panel` is shown; switching tabs is a pure class toggle
-   (see `activateDetailTab()`), no re-render/re-fetch needed. */
-.detail-tabs {
+/* Project detail view — single-open accordion driven by a HORIZONTAL
+   icon-tile strip (2026-10-16, replacing a same-day vertical accordion
+   list: "make these horizontal and I want icons like these [Five Logs
+   banner] horizontally" — same circular-badge-icon-above-label look the
+   now-removed Five Logs banner used, reused here deliberately so this
+   is the one icon strip in this view instead of two near-identical
+   ones; see app.js's note by the old `buildFiveLogsBanner()` definition
+   for why that banner was deleted outright the same day).
+   `.detail-tab-tile` is a flat row of buttons (icon circle + label +
+   one-line `tabTeaser()` summary underneath); `.detail-tab-panel` is a
+   flat stack of panels below the whole strip, shown one at a time.
+   Clicking a tile is a pure class toggle on both lists, matched by
+   `data-tab` (see `activateDetailTab()`) — no re-render/re-fetch
+   needed, and opening one tile closes any other open tile. */
+/* All 9 tiles stay in ONE row (2026-10-16, "I want all icons in one
+   row") — `flex-wrap: nowrap` plus `flex: 1 1 0` lets tiles shrink
+   evenly to fit the strip's width; `overflow-x: auto` is just a safety
+   net for very narrow viewports where even the `min-width` floor can't
+   fit all 9 (scrolls instead of wrapping to a second row). */
+.detail-tabs-h {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
   gap: 6px;
-  margin: 26px 0 4px;
-  border-bottom: 1.5px solid var(--line);
-  padding-bottom: 0;
+  margin: 18px 0 4px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
 }
 
-.detail-tab-btn {
+.detail-tab-tile {
   appearance: none;
-  border: none;
+  border: 1px solid transparent;
   background: none;
   font-family: var(--font-display);
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ink-faint);
-  padding: 9px 14px;
-  border-radius: 8px 8px 0 0;
+  flex: 1 1 0;
+  min-width: 82px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 4px;
+  border-radius: var(--radius);
   cursor: pointer;
-  transition: color 0.12s ease, background 0.12s ease;
-  position: relative;
-  top: 1.5px;
+  text-align: center;
+  transition: background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
 }
-.detail-tab-btn:hover { color: var(--ink-soft); background: var(--bg); }
-.detail-tab-btn.is-active {
-  color: var(--accent);
+.detail-tab-tile:hover,
+.detail-tab-tile:focus-visible {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-hover);
+}
+.detail-tab-tile:focus-visible { outline: none; }
+.detail-tab-tile.is-open {
+  border-color: var(--line);
   background: var(--bg);
-  border: 1.5px solid var(--line);
-  border-bottom-color: var(--bg);
+  box-shadow: var(--shadow-hover);
 }
 
-.detail-tab-panel { display: none; }
+.detail-tab-tile-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.detail-tab-tile.is-open .detail-tab-tile-icon {
+  background: var(--accent);
+  color: #fff;
+}
+
+.detail-tab-tile-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-faint);
+  line-height: 1.25;
+}
+.detail-tab-tile.is-open .detail-tab-tile-label { color: var(--ink); }
+
+/* One-line teaser (count/status, or the mini progress bar for Schedule)
+   — sits under the label, truncated so a long teaser can never force a
+   tile to grow taller than its neighbors. */
+.detail-tab-tile-teaser {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--ink-faint);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detail-tab-tile-teaser .detail-tab-btn-progress {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+}
+.detail-tab-tile-teaser .detail-tab-btn-progress .progress-track {
+  width: 46px;
+  height: 5px;
+}
+.detail-tab-tile-teaser .detail-tab-btn-progress .progress-pct {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 720px) {
+  .detail-tab-tile { min-width: 64px; }
+}
+
+.detail-tab-panels {
+  margin-top: 4px;
+}
+
+.detail-tab-panel {
+  display: none;
+  padding: 4px 10px 14px;
+}
 .detail-tab-panel.is-active { display: block; }
 
 /* First heading inside a freshly-switched-to panel shouldn't repeat the
-   same big top margin every `.weekly-subhead` normally gets — the tab
+   same big top margin every `.weekly-subhead` normally gets — the tile
    strip above it already provides that visual separation. */
 .detail-tab-panel > .weekly-subhead:first-child { margin-top: 18px; }
 
@@ -3211,6 +3347,65 @@ dd.is-missing {
 
 .stagedetail-tab-btn:hover { color: var(--ink); }
 
+/* Current-stage overview card, embedded in the Stage-gate panel
+   (2026-10-16) — a wrapper around a reused `buildStageOverviewPanel()`
+   render (same `.stagedetail-datebox-row`/`.stagedetail-completion`/
+   `.stagedetail-stat-row` classes as the per-stage modal, styled above)
+   plus a kicker/title header and a "View full stage history" link. */
+.current-stage-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+  padding: 16px;
+  margin-bottom: 18px;
+  /* Whole card is one click target → full stage detail modal (2026-10-16,
+     "when i click on the boxes the top pop up shows up anyways. make it
+     such a way that people know they can click on it") — cursor +
+     hover highlight are the "you can click this" affordance. */
+  cursor: pointer;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.current-stage-card:hover,
+.current-stage-card:focus-visible {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-hover);
+}
+.current-stage-card:focus-visible { outline: none; }
+
+.current-stage-card-head {
+  margin-bottom: 14px;
+}
+
+.current-stage-card-kicker {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  margin-bottom: 4px;
+}
+
+.current-stage-card-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+/* Plain visual cue now (2026-10-16) — the whole `.current-stage-card`
+   is the actual click target, so this is just a `<span>`, not its own
+   button/listener. */
+.current-stage-card-link {
+  display: block;
+  margin-top: 14px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
 .stagedetail-tab-btn.is-active {
   color: var(--accent);
   border-bottom-color: var(--accent);
@@ -3626,4 +3821,303 @@ dd.is-missing {
   border-radius: 999px;
   background: var(--red-bg);
   color: var(--red);
+}
+
+/* ---------- RACI reference (Stage-gate tab) ---------- */
+
+.raci-ref {
+  margin: 16px 0 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+.raci-ref-head {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  margin: 0 0 10px;
+}
+
+.raci-ref-table {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.raci-ref-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 12.5px;
+  flex-wrap: wrap;
+}
+
+.raci-ref-stage {
+  flex: 0 0 170px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.raci-ref-lead {
+  flex: 0 0 110px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-align: center;
+}
+
+.raci-ref-with {
+  color: var(--ink-faint);
+  font-size: 11.5px;
+}
+
+/* "Five logs" banner CSS (.five-logs-*) removed 2026-10-16 — see the
+   note by the old `buildFiveLogsBanner()` definition in app.js: every
+   icon it had duplicated a tile already in the main horizontal
+   icon-tile strip, so the whole banner was deleted rather than kept. */
+
+/* ---------- Go-Live readiness checklist (Stage-gate tab) ---------- */
+
+.golive-checklist-progress {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+  margin-bottom: 8px;
+}
+
+.golive-checklist-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.golive-checklist-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.golive-checklist-row:last-child { border-bottom: none; }
+
+.golive-checklist-icon {
+  flex: 0 0 16px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.golive-checklist-row.is-complete .golive-checklist-icon { color: var(--green); }
+.golive-checklist-row.is-inprogress .golive-checklist-icon { color: var(--amber); }
+.golive-checklist-row.is-notstarted .golive-checklist-icon { color: var(--ink-faint); }
+
+.golive-checklist-item { flex: 1 1 auto; color: var(--ink); }
+
+.golive-checklist-status {
+  flex: 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.golive-checklist-row.is-complete .golive-checklist-status { background: var(--green-bg); color: var(--green); }
+.golive-checklist-row.is-inprogress .golive-checklist-status { background: var(--amber-bg); color: var(--amber); }
+.golive-checklist-row.is-notstarted .golive-checklist-status { background: var(--bg); color: var(--ink-faint); }
+
+.golive-checklist-notes {
+  flex: 0 0 100%;
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  padding-left: 26px;
+}
+
+/* ---------- Change Request Log / Decision Log (Change & Decisions tab) ----------
+   Both rebuilt (2026-10-15) as wide <table>s (see .wide-log-* below) to
+   match the deck's own sample tables exactly; only the approval-status
+   pill styling is still needed from here. */
+
+.cr-log-status {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  display: inline-block;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.cr-log-status.is-approved { background: var(--green-bg); color: var(--green); }
+.cr-log-status.is-pending { background: var(--amber-bg); color: var(--amber); }
+
+/* ---------- Wide log tables (Delay, RAID, Change Request, Decision logs)
+   — a real <table> + horizontal scroll wrapper, used for every log that
+   was rebuilt (2026-10-15) to match the deck's own sample tables exactly,
+   column for column, instead of condensing several fields into shared
+   cells. Shared base classes (.wide-log-table-scroll / .wide-log-full-
+   table / .wide-log-title-cell / .wide-log-status); each log's own
+   call site decides its exact column list and which cells get which of
+   these classes. */
+
+.wide-log-table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.wide-log-full-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  min-width: 1200px;
+}
+
+.wide-log-full-table th,
+.wide-log-full-table td {
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+  max-width: 220px;
+}
+
+.wide-log-full-table th {
+  background: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+.wide-log-full-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.wide-log-full-table .wide-log-title-cell {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.wide-log-status {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  display: inline-block;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.wide-log-status.is-closed { background: var(--green-bg); color: var(--green); }
+.wide-log-status.is-open { background: var(--red-bg); color: var(--red); }
+
+/* ---------- RAID Log (Dependencies & Risks tab) — reuses the shared
+   wide-log-table scaffolding above, plus its own Type pill since RAID
+   rows are tagged Risk/Assumption/Issue/Dependency. */
+
+.raid-type-pill {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  display: inline-block;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.raid-type-risk { background: var(--red-bg); color: var(--red); }
+.raid-type-assumption { background: var(--accent-soft); color: var(--accent); }
+.raid-type-issue { background: var(--amber-bg); color: var(--amber); }
+.raid-type-dependency { background: var(--black-bg); color: var(--black); }
+
+/* ---------- Feature / sprint tracker (Features tab) ----------
+   Table rebuilt (2026-10-15) onto the shared .wide-log-* scaffolding —
+   see "Wide log tables" above — with 7 distinct columns (SP, Type,
+   Feature/Capability, Status, Notes, Planned/Actual, Delay Reason)
+   instead of the original merged-cell card layout. */
+
+.feature-kpi-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.feature-kpi-sub {
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+.feature-type-tag {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-soft);
+}
+
+.feature-status {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  display: inline-block;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.feature-status.is-done { background: var(--green-bg); color: var(--green); }
+.feature-status.is-inprogress { background: var(--amber-bg); color: var(--amber); }
+.feature-status.is-excluded { background: var(--bg); color: var(--ink-faint); }
+.feature-status.is-blocked { background: var(--red-bg); color: var(--red); }
+.feature-status.is-upcoming { background: var(--accent-soft); color: var(--accent); }
+
+.feature-reference-note {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border: 1px solid var(--red-bg);
+  border-left: 3px solid var(--red);
+  border-radius: var(--radius);
+  background: var(--red-bg);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.feature-reference-note-head {
+  font-weight: 700;
+  color: var(--red);
+  margin-bottom: 6px;
+}
+
+.feature-reference-note ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.feature-reference-note li {
+  margin-bottom: 4px;
+}
+
+.feature-reference-note li:last-child {
+  margin-bottom: 0;
 }

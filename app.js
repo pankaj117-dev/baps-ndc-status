@@ -137,6 +137,45 @@
   // falling back to the original plan if nothing's slipped. Returns null
   // when there's no stagePlan entry for the current stage (most projects
   // don't have this backfilled — the fact row just omits the date then).
+  // The full Current Stage / Next Milestone / Go-Live / Delay (/ Impact of
+  // delay / Time saved) fact list — originally only rendered once, inline,
+  // at the top of the project detail view. Extracted into its own function
+  // (2026-10-16) so the Weekly Status Report widget's Progress row can
+  // reuse the exact same facts instead of just a bar + percentage ("I want
+  // to see the full progress of how I see the weekly here").
+  function buildProgressFactsList(p) {
+    const isLate = p.delayDays > 0;
+    return el("dl", { class: "card-facts detail-facts" }, [
+      ...currentStageFactNodes(p),
+      el("dt", null, ["Next milestone"]),
+      el("dd", null, [(p.nextMilestone && p.nextMilestone.name || "—") + (p.nextMilestone && p.nextMilestone.date ? " · " + fmtDateShort(p.nextMilestone.date) : "")]),
+      el("dt", null, ["Go-live"]),
+      el("dd", null, [
+        p.originalGoLive && p.originalGoLive !== p.goLive
+          ? `${fmtDate(p.originalGoLive)} → ${fmtDate(p.goLive)}`
+          : fmtDate(p.goLive),
+      ]),
+      el("dt", null, ["Status"]),
+      el("dd", { class: "delay-flag " + (isLate ? "is-late" : "is-ontime") }, [
+        isLate ? "+" + p.delayDays + " days" : "On schedule",
+      ]),
+      ...(isLate
+        ? [
+            el("dt", null, ["Impact of delay"]),
+            el("dd", { class: p.delayImpact ? "" : "is-missing" }, [
+              p.delayImpact || "Not yet documented",
+            ]),
+          ]
+        : []),
+      ...((p.timeSavedDays || 0) > 0
+        ? [
+            el("dt", null, ["Time saved"]),
+            el("dd", { class: "delay-flag is-saved" }, ["-" + p.timeSavedDays + " days"]),
+          ]
+        : []),
+    ]);
+  }
+
   function currentStageTargetDate(p) {
     const stage = p.stage;
     const plan = stage && p.stagePlan && p.stagePlan[stage];
@@ -165,7 +204,7 @@
             targetDate ? el("span", { class: "phase-fact-target" }, [" — target " + fmtDateShort(targetDate)]) : null,
           ].filter(Boolean)
         ),
-        p.phase ? el("div", { class: "phase-fact-detail" }, [p.phase]) : null,
+        p.phase ? el("div", { class: "phase-fact-detail", title: p.phase }, [p.phase]) : null,
       ].filter(Boolean)),
     ];
   }
@@ -371,6 +410,62 @@
     "Hypercare": "Hypercare",
   };
 
+  // Canonical Go-Live approval package — from the IT App Dev Project
+  // Management playbook (slide 13, "Go-Live - Approval Package"): the
+  // fixed set of sign-offs every project needs before RGC grants a Permit
+  // to Rollout. A project's `goLiveChecklist` in data.json only needs to
+  // list the items that have moved off "Not started" — anything missing
+  // is assumed not started yet, so adding this list cost nothing to any
+  // existing project's data.
+  const GOLIVE_CHECKLIST_ITEMS = [
+    "System Integration Testing (SIT)",
+    "Regression Testing",
+    "User Acceptance Testing (UAT)",
+    "Cyber Security Testing",
+    "Performance Load Testing",
+    "Change Management (plan, material, execution)",
+    "RGC Approval — Permit to Rollout",
+  ];
+  const GOLIVE_STATUS_ORDER = ["Not started", "In progress", "Complete"];
+
+  // Who leads / contributes to each stage of the lifecycle — a static
+  // reference, not project data (slides 6, 11 and 12 of the same
+  // playbook). The playbook's own stage names ("Planning",
+  // "Architecture / Design", "Testing", "Security Validation",
+  // "Deployment", "Production Readiness") are kept as-is rather than
+  // force-mapped onto this dashboard's 9 PIPELINE_STAGES one-for-one —
+  // the two models are close but not identical (e.g. this dashboard
+  // splits "Development" out from "Build", the playbook doesn't have a
+  // separate "Proposal" stage), so relabeling them would imply a false
+  // precision this deck never claimed.
+  const RACI_STAGES = [
+    { stage: "Requirements", lead: "BA", with: "PM, Architecture, Development, QA, Cyber Security" },
+    { stage: "Planning", lead: "PM", with: "All tracks" },
+    { stage: "Architecture / Design", lead: "Architecture", with: "Development, Cyber Security, DevOps" },
+    { stage: "Development", lead: "Development", with: "QA, DevOps, BA" },
+    { stage: "Testing", lead: "QA", with: "BA, Development, DevOps" },
+    { stage: "Security Validation", lead: "Cyber Security", with: "Development, Architecture, DevOps" },
+    { stage: "Deployment", lead: "DevOps / Infra", with: "Development, QA, BA" },
+    { stage: "Production Readiness", lead: "PM", with: "All tracks" },
+  ];
+
+  // "Five logs every project maintains" (slide 15) banner — REMOVED
+  // 2026-10-16. It used to sit above the Change & Decisions and Delay
+  // tabs' content as a 5-icon strip (Change/Delay/Decision/Risk/Issue
+  // log, each clickable when the project had entries) jumping to that
+  // log's section. Once the whole 9-tab accordion became a horizontal
+  // icon-tile strip (same day) covering ALL of Schedule/Delay/
+  // Week-over-week/Stage-gate/Change & Decisions/Features/Dependencies &
+  // Risks/Follow-ups/Feedback up top, every single icon in this banner
+  // became a duplicate of a tile already in that strip — Change log and
+  // Decision log duplicated the very "Change & Decisions" tile this
+  // banner lived inside, Risk log and Issue log duplicated "Dependencies
+  // & Risks," Delay log duplicated "Delay." A user flagged this
+  // explicitly ("the icon below takes them to risks again - don't need
+  // duplicates") and the banner (`buildFiveLogsBanner()`, `FIVE_LOGS`)
+  // was deleted outright, along with its `.five-logs-*` CSS and its two
+  // call sites in `changeDecisionsPanel`/`delayPanel`.
+
   function renderStageGridLegend() {
     const box = document.getElementById("stageGridLegend");
     if (!box) return;
@@ -422,7 +517,7 @@
     let hypercareCount = 0;
     let cumulativeDelay = 0;
 
-    projects.forEach((p) => {
+        projects.forEach((p) => {
       cumulativeDelay += p.delayDays || 0;
       if ((p.delayDays || 0) > 0) delayedCount += 1;
       if ((p.stage || "") === "Hypercare") hypercareCount += 1;
@@ -575,9 +670,9 @@
               )
             ),
           ]),
-        ]),
-      ])
-    );
+              ]),
+            ])
+          );
 
     box.querySelectorAll(".cumdelay-legend-row[data-project-id]").forEach((row) => {
       const open = () => openProjectDetail(row.getAttribute("data-project-id"), "stage-gate-timeline-section");
@@ -724,7 +819,7 @@
         [
           el("span", { class: "timeline-dot", style: `background:var(--${effectiveStatus(p)})` }),
           el("div", { class: "stage-grid-name-text" }, [
-            el("strong", null, [p.name]),
+              el("strong", null, [p.name]),
             el("span", { class: "stage-grid-name-meta" }, [
               (p.owner || "Unassigned") + (currentIndex === -1 ? " · Unstaged" : ""),
             ]),
@@ -919,7 +1014,7 @@
           el("dd", null, [(p.nextMilestone && p.nextMilestone.name || "—") + (p.nextMilestone && p.nextMilestone.date ? " · " + fmtDateShort(p.nextMilestone.date) : "")]),
           el("dt", null, ["Go-live"]),
           el("dd", null, [fmtDate(p.goLive)]),
-          el("dt", null, ["Delay"]),
+          el("dt", null, ["Status"]),
           el("dd", { class: "delay-flag " + (isLate ? "is-late" : "is-ontime") }, [
             isLate ? "+" + p.delayDays + " days" : "On schedule",
           ]),
@@ -1416,6 +1511,386 @@
     return wrap;
   }
 
+  // "Who leads each stage" — static reference, not project data (see
+  // RACI_STAGES above). Rendered once per project detail view, right
+  // alongside the Stage-gate legend, since both answer "how do I read
+  // this timeline" questions.
+  function buildRaciReference() {
+    const wrap = el("div", { class: "raci-ref" });
+    wrap.appendChild(el("h4", { class: "raci-ref-head" }, ["Who leads each stage"]));
+    const table = el("div", { class: "raci-ref-table" });
+    RACI_STAGES.forEach((row) => {
+      table.appendChild(
+        el("div", { class: "raci-ref-row" }, [
+          el("span", { class: "raci-ref-stage" }, [row.stage]),
+          el("span", { class: "raci-ref-lead" }, [row.lead]),
+          el("span", { class: "raci-ref-with" }, ["with: " + row.with]),
+        ])
+      );
+    });
+    wrap.appendChild(table);
+    return wrap;
+  }
+
+  // Go-Live Readiness checklist — the fixed "Go-Live - Approval Package"
+  // (slide 13) every project needs signed off before RGC grants a Permit
+  // to Rollout. `p.goLiveChecklist` only needs to carry entries that have
+  // moved off "Not started"; anything in GOLIVE_CHECKLIST_ITEMS not found
+  // there renders as "Not started" by default.
+  function buildGoLiveChecklist(p) {
+    const byItem = {};
+    (p.goLiveChecklist || []).forEach((entry) => {
+      byItem[entry.item] = entry;
+    });
+    const wrap = el("div", { class: "golive-checklist" });
+    const list = el("div", { class: "golive-checklist-list" });
+    let doneCount = 0;
+    GOLIVE_CHECKLIST_ITEMS.forEach((item) => {
+      const entry = byItem[item];
+      const status = entry && entry.status ? entry.status : "Not started";
+      if (status === "Complete") doneCount += 1;
+      const statusClass =
+        status === "Complete" ? "is-complete" : status === "In progress" ? "is-inprogress" : "is-notstarted";
+      list.appendChild(
+        el("div", { class: "golive-checklist-row " + statusClass }, [
+          el("span", { class: "golive-checklist-icon" }, [status === "Complete" ? "✓" : status === "In progress" ? "●" : "○"]),
+          el("span", { class: "golive-checklist-item" }, [item]),
+          el("span", { class: "golive-checklist-status" }, [status]),
+          entry && entry.notes ? el("span", { class: "golive-checklist-notes" }, [entry.notes]) : null,
+        ])
+      );
+    });
+    wrap.appendChild(
+      el("div", { class: "golive-checklist-progress" }, [
+        `${doneCount} of ${GOLIVE_CHECKLIST_ITEMS.length} signed off`,
+      ])
+    );
+    wrap.appendChild(list);
+    return wrap;
+  }
+
+  // Change Request Log — structured per-project log of every change
+  // request (slide 8's CR process + slide 15's "five logs every project
+  // maintains"). Previously CRs were only ever mentioned informally
+  // inside the freeform `delayTradeoffs` text; this is the first
+  // structured place to track them.
+  // Full column set, matching the deck's own sample "Change Request"
+  // table exactly (slide 19, same slide as the Decision Metrix table
+  // below — 2026-10-15, per explicit request: "same for these... these
+  // and the last two are templates on how things should be added"):
+  // Change Request, Description, Submitted Date, By whom, Action Item,
+  // Approved for current phase / Moved to next phase, Impact — 7
+  // distinct columns, none merged into another cell (the first version
+  // of this table condensed Description/Action Item into one cell).
+  function buildChangeRequestLog(p) {
+    const items = p.changeRequests || [];
+    if (!items.length) {
+      return el("p", { class: "empty-note" }, ["No change requests logged yet."]);
+    }
+    const cols = ["Change Request", "Description", "Submitted Date", "By Whom", "Action Item", "Approved for current phase / Moved to next phase", "Impact"];
+    const wrap = el("div", { class: "wide-log-table-scroll" });
+    wrap.appendChild(
+      el("table", { class: "wide-log-full-table" }, [
+        el("thead", null, [el("tr", null, cols.map((c) => el("th", null, [c])))]),
+        el(
+          "tbody",
+          null,
+          items.map((cr) => {
+            const statusClass =
+              /approved/i.test(cr.approvalStatus || "") ? "is-approved" : /pending|tbd/i.test(cr.approvalStatus || "") ? "is-pending" : "";
+            return el("tr", null, [
+              el("td", { class: "wide-log-title-cell" }, [cr.title || "—"]),
+              el("td", null, [cr.description || "—"]),
+              el("td", null, [cr.submittedDate ? fmtDateShort(cr.submittedDate) : "—"]),
+              el("td", null, [cr.by || "—"]),
+              el("td", null, [cr.actionItem || "—"]),
+              el("td", null, [el("span", { class: "cr-log-status " + statusClass }, [cr.approvalStatus || "TBD"])]),
+              el("td", null, [cr.impact || "—"]),
+            ]);
+          })
+        ),
+      ])
+    );
+    return wrap;
+  }
+
+  // Decision Log — structured per-project log of key decisions (slide 15
+  // "five logs"). Distinct from Dependencies/Risks: a decision is a
+  // closed-door call that was made, not an open item being tracked to
+  // resolution. Full column set matching the deck's own "Decision
+  // Metrix" table exactly (slide 19 — 2026-10-15, per explicit request):
+  // Decision, Description, Date Taken, By whom — Description now its own
+  // column instead of being merged under the Decision title.
+  function buildDecisionLog(p) {
+    const items = p.decisions || [];
+    if (!items.length) {
+      return el("p", { class: "empty-note" }, ["No decisions logged yet."]);
+    }
+    const cols = ["Decision", "Description", "Date Taken", "By Whom"];
+    const wrap = el("div", { class: "wide-log-table-scroll" });
+    wrap.appendChild(
+      el("table", { class: "wide-log-full-table" }, [
+        el("thead", null, [el("tr", null, cols.map((c) => el("th", null, [c])))]),
+        el(
+          "tbody",
+          null,
+          items.map((d) =>
+            el("tr", null, [
+              el("td", { class: "wide-log-title-cell" }, [d.decision || "—"]),
+              el("td", null, [d.description || "—"]),
+              el("td", null, [d.dateTaken ? fmtDateShort(d.dateTaken) : "—"]),
+              el("td", null, [d.by || "—"]),
+            ])
+          )
+        ),
+      ])
+    );
+    return wrap;
+  }
+
+  // Delay Log — the narrative, manually-maintained companion to the
+  // auto-detected schedule-shift log: root cause, who owns the follow-up,
+  // what's actually been done, and whether it's closed (slide 15 "five
+  // logs" + the sample Delay Log table). The auto-detected log elsewhere
+  // in this tab answers "what moved and by how much"; this answers "why,
+  // and who's on it." Stored under `delayItemLog`, NOT `delayLog` — that
+  // name is already taken by a pre-existing, differently-shaped field
+  // (per-stage incident log: date/stage/reason/team/member/days) that
+  // feeds the stage detail modal's Delay Analysis/Delay Log tabs; reusing
+  // it here would have silently corrupted that feature the moment either
+  // field got real data.
+  // Full column set, matching the deck's own sample Delay Log table
+  // exactly (2026-10-15, per explicit request after seeing that table's
+  // screenshot): Delayed Item, Description, Reported Date, Impacted
+  // phase, Impact (Time/Cost/Scope), Root Cause, Responsible, Action
+  // Item, Action Taken, Status, Closure Remarks — 11 distinct columns,
+  // none merged into another cell (the first version of this table
+  // condensed several of these together, and never showed Reported Date
+  // at all). Real `<table>` + horizontal scroll wrapper rather than the
+  // grid-row card layout used by the Change/Decision logs, since 11
+  // columns side by side genuinely needs a wide table, not a card list.
+  function buildDelayLogTable(p) {
+    const items = p.delayItemLog || [];
+    if (!items.length) {
+      return el("p", { class: "empty-note" }, ["No delay log entries recorded yet."]);
+    }
+    const cols = [
+      "Delayed Item",
+      "Description",
+      "Reported Date",
+      "Impacted Phase",
+      "Impact (Time/Cost/Scope)",
+      "Root Cause",
+      "Responsible",
+      "Action Item",
+      "Action Taken",
+      "Status",
+      "Closure Remarks",
+    ];
+    const wrap = el("div", { class: "wide-log-table-scroll" });
+    wrap.appendChild(
+      el("table", { class: "wide-log-full-table" }, [
+        el("thead", null, [el("tr", null, cols.map((c) => el("th", null, [c])))]),
+        el(
+          "tbody",
+          null,
+          items.map((d) => {
+            const statusClass = /closed|resolved/i.test(d.status || "") ? "is-closed" : "is-open";
+            return el("tr", null, [
+              el("td", { class: "wide-log-title-cell" }, [d.delayedItem || "—"]),
+              el("td", null, [d.description || "—"]),
+              el("td", null, [d.reportedDate ? fmtDateShort(d.reportedDate) : "—"]),
+              el("td", null, [d.impactedPhase || "—"]),
+              el("td", null, [d.impact || "—"]),
+              el("td", null, [d.rootCause || "—"]),
+              el("td", null, [d.responsible || "—"]),
+              el("td", null, [d.actionItem || "—"]),
+              el("td", null, [d.actionTaken || "—"]),
+              el("td", null, [el("span", { class: "wide-log-status " + statusClass }, [d.status || "Open"])]),
+              el("td", null, [d.closureRemarks || "—"]),
+            ]);
+          })
+        ),
+      ])
+    );
+    return wrap;
+  }
+
+  // RAID Log (Dependencies & Risks tab, 2026-10-15) — Risks, Assumptions,
+  // Issues, Dependencies, as one consolidated log, matching slide 18's
+  // sample table ("Weekly Status Updates" series, same slides the Delay
+  // Log table came from): Item, Description, Reported Date, Action Item,
+  // Targeted Completion Date, Responsible, Status, Closure Remarks.
+  // Deliberately a NEW, separate field (`raidLog`) rather than
+  // synthesized from the existing `risks`/`dependencies`/`escalations`
+  // fields: those three stay exactly as they are (different shape, feed
+  // different existing sections), and this is the first place
+  // "Assumptions" can be tracked at all. The deck's own sample table has
+  // no per-row Risk/Assumption/Issue/Dependency column — added one anyway
+  // (`type`) per explicit request, since without it "RAID" is just a
+  // label with no way to tell which letter a given row actually is.
+  const RAID_TYPES = ["Risk", "Assumption", "Issue", "Dependency"];
+
+  function buildRaidLogTable(p) {
+    const items = p.raidLog || [];
+    if (!items.length) {
+      return el("p", { class: "empty-note" }, ["No RAID log entries recorded yet."]);
+    }
+    const cols = ["Type", "Item", "Description", "Reported Date", "Action Item", "Targeted Completion", "Responsible", "Status", "Closure Remarks"];
+    const wrap = el("div", { class: "wide-log-table-scroll" });
+    wrap.appendChild(
+      el("table", { class: "wide-log-full-table raid-log-full-table" }, [
+        el("thead", null, [el("tr", null, cols.map((c) => el("th", null, [c])))]),
+        el(
+          "tbody",
+          null,
+          items.map((d) => {
+            const statusClass = /closed|resolved/i.test(d.status || "") ? "is-closed" : "is-open";
+            const typeClass = "raid-type-" + (d.type || "risk").toLowerCase();
+            return el("tr", null, [
+              el("td", null, [el("span", { class: "raid-type-pill " + typeClass }, [d.type || "Risk"])]),
+              el("td", { class: "wide-log-title-cell" }, [d.item || "—"]),
+              el("td", null, [d.description || "—"]),
+              el("td", null, [d.reportedDate ? fmtDateShort(d.reportedDate) : "—"]),
+              el("td", null, [d.actionItem || "—"]),
+              el("td", null, [d.targetedCompletionDate ? fmtDateShort(d.targetedCompletionDate) : "—"]),
+              el("td", null, [d.responsible || "—"]),
+              el("td", null, [el("span", { class: "wide-log-status " + statusClass }, [d.status || "Open"])]),
+              el("td", null, [d.closureRemarks || "—"]),
+            ]);
+          })
+        ),
+      ])
+    );
+    return wrap;
+  }
+
+  // Feature/sprint tracker — the most granular view in the deck (slide
+  // 20's live MyBKY example): every feature/capability as a row instead
+  // of every project, with its own status, planned/actual dates and
+  // delay reason, plus the same 7 KPI cards the deck itself leads with.
+  //
+  // Removed, then brought back the same day (2026-10-15): the "Features"
+  // tab was pulled shortly after being added ("dont know if we need
+  // features"), left dormant per the `milestones`-field precedent, then
+  // explicitly restored a few turns later ("Also bring the features back
+  // - lets keep those"). These functions and `data.json`'s `features`
+  // field were never actually touched during the removal — only the tab
+  // button/panel/jump-link wiring was removed and is now reinstated.
+  // Subtitle under a KPI card — the deck's own cards all have a second
+  // line of context (e.g. "Sprints 1, 2, 3 & 4" under Completed, "→
+  // Phase 2" under Excluded, "→ UIUX Revisions" under Blocker), not just
+  // a bare number (2026-10-15, per explicit request after an "anything
+  // missing?" audit against that slide). There's no dedicated field for
+  // this — auto-computed instead from whatever's already on the matching
+  // items: sprint numbers if every item has one and no two share the
+  // same note/delay-reason worth surfacing, otherwise the distinct
+  // notes/delayReason text itself (deduped, short, since this is a
+  // one-line subtitle, not another table).
+  function featureKpiSubtitle(items) {
+    if (!items.length) return "";
+    const notes = Array.from(new Set(items.map((f) => f.delayReason || f.notes).filter(Boolean)));
+    if (notes.length === 1) return notes[0];
+    const sprints = Array.from(new Set(items.map((f) => f.sprint).filter((s) => s != null))).sort();
+    if (sprints.length) return "Sprint" + (sprints.length === 1 ? "" : "s") + " " + sprints.join(", ");
+    return "";
+  }
+
+  function buildFeatureKpis(p) {
+    const items = p.features || [];
+    const row = el("div", { class: "feature-kpi-row" });
+    const total = items.length;
+    const doneItems = items.filter((f) => f.status === "Done");
+    const inProgressItems = items.filter((f) => f.status === "In Progress" || f.status === "Partially Done");
+    const upcomingItems = items.filter((f) => f.status === "Upcoming");
+    const excludedItems = items.filter((f) => f.status === "Excluded");
+    const blockedItems = items.filter((f) => f.status === "Blocked");
+    const crCount = (p.changeRequests || []).length;
+    const metrics = [
+      { num: total, label: "Total Features", tone: "", sub: "" },
+      { num: doneItems.length, label: "Completed", tone: "tone-green", sub: featureKpiSubtitle(doneItems) },
+      { num: inProgressItems.length, label: "In Progress", tone: "tone-amber", sub: featureKpiSubtitle(inProgressItems) },
+      { num: upcomingItems.length, label: "Upcoming", tone: "tone-accent", sub: featureKpiSubtitle(upcomingItems) },
+      { num: excludedItems.length, label: "Excluded", tone: "", sub: featureKpiSubtitle(excludedItems) },
+      { num: blockedItems.length, label: "Blocker", tone: blockedItems.length ? "tone-red" : "tone-green", sub: featureKpiSubtitle(blockedItems) },
+      { num: crCount, label: "Change Request" + (crCount === 1 ? "" : "s"), tone: "", sub: "" },
+    ];
+    metrics.forEach((m) => {
+      row.appendChild(
+        el("div", { class: ["metric-card", m.tone].filter(Boolean).join(" ") }, [
+          el("div", { class: "num" }, [String(m.num)]),
+          el("div", { class: "label" }, [m.label]),
+          m.sub ? el("div", { class: "feature-kpi-sub" }, [m.sub]) : null,
+        ])
+      );
+    });
+    return row;
+  }
+
+  // Table rebuilt (2026-10-15, per explicit request) into the deck's own
+  // 7 columns exactly — SP, Type, Feature/Capability, Status, Notes,
+  // Planned/Actual, Delay Reason — instead of merging Notes and Delay
+  // Reason under the feature name, same wide-table treatment the other
+  // 4 logs got earlier the same day.
+  function buildFeatureTracker(p) {
+    const items = p.features || [];
+    const wrap = el("div");
+    wrap.appendChild(buildFeatureKpis(p));
+    if (!items.length) {
+      wrap.appendChild(el("p", { class: "empty-note" }, ["No features logged yet for this project."]));
+      return wrap;
+    }
+    const cols = ["SP", "Type", "Feature / Capability", "Status", "Notes", "Planned / Actual", "Delay Reason"];
+    const scroll = el("div", { class: "wide-log-table-scroll" });
+    scroll.appendChild(
+      el("table", { class: "wide-log-full-table feature-full-table" }, [
+        el("thead", null, [el("tr", null, cols.map((c) => el("th", null, [c])))]),
+        el(
+          "tbody",
+          null,
+          items.map((f) => {
+            const statusClass =
+              f.status === "Done"
+                ? "is-done"
+                : f.status === "In Progress" || f.status === "Partially Done"
+                ? "is-inprogress"
+                : f.status === "Excluded"
+                ? "is-excluded"
+                : f.status === "Blocked"
+                ? "is-blocked"
+                : "is-upcoming";
+            return el("tr", null, [
+              el("td", null, [f.sprint != null ? String(f.sprint) : "—"]),
+              el("td", null, [el("span", { class: "feature-type-tag" }, [f.type || "—"])]),
+              el("td", { class: "wide-log-title-cell" }, [f.feature || "—"]),
+              el("td", null, [el("span", { class: "feature-status " + statusClass }, [f.status || "Upcoming"])]),
+              el("td", null, [f.notes || "—"]),
+              el("td", null, [(f.plannedDate ? fmtDateShort(f.plannedDate) : "—") + " → " + (f.actualDate ? fmtDateShort(f.actualDate) : "—")]),
+              el("td", null, [f.delayReason || "—"]),
+            ]);
+          })
+        ),
+      ])
+    );
+    wrap.appendChild(scroll);
+
+    // Reference note — the deck's own disclaimer under this exact table
+    // (slide 20), generic/static rather than per-project data: a
+    // reminder of what "Planned/Actual" actually measures and what still
+    // has to happen before Go-Live even once every feature says "Done."
+    wrap.appendChild(
+      el("div", { class: "feature-reference-note" }, [
+        el("div", { class: "feature-reference-note-head" }, ["⚠ Reference Note"]),
+        el("ul", null, [
+          el("li", null, ["Planned/Actual dates indicate Development Completion dates only; QA testing, defect fixing, and QA sign-off activities will follow"]),
+          el("li", null, ["Before Go-Live, regression testing, security/performance testing, respective sign-offs, and UAT activities will be completed"]),
+        ]),
+      ])
+    );
+
+    return wrap;
+  }
+
   // Fixed left column width for the project name/cumulative-delay label —
   // kept in one place since both the JS (row/header layout math) and the
   // CSS (.hawkeye-row-label's sticky positioning) need to agree on it.
@@ -1567,12 +2042,12 @@
         cursor.setDate(cursor.getDate() + 7);
       }
     } else {
-      const cursor = new Date(minTime);
-      cursor.setDate(1);
-      cursor.setHours(0, 0, 0, 0);
+    const cursor = new Date(minTime);
+    cursor.setDate(1);
+    cursor.setHours(0, 0, 0, 0);
       cursor.setMonth(Math.floor(cursor.getMonth() / 3) * 3); // snap to quarter start
-      while (cursor.getTime() <= maxTime) {
-        if (cursor.getTime() >= minTime) {
+    while (cursor.getTime() <= maxTime) {
+      if (cursor.getTime() >= minTime) {
           marks.push({
             px: ((cursor.getTime() - minTime) / DAY) * pxPerDay,
             label: `Q${Math.floor(cursor.getMonth() / 3) + 1} ${cursor.getFullYear()}`,
@@ -1682,17 +2157,17 @@
     rowPlans.forEach((plan) => {
       const { p } = plan;
       const projectDelay = p.delayDays || 0;
-      const row = el("div", { class: "hawkeye-row", "data-project-id": p.id, tabindex: "0", role: "button" }, [
-        el("div", { class: "hawkeye-row-label" }, [
+        const row = el("div", { class: "hawkeye-row", "data-project-id": p.id, tabindex: "0", role: "button" }, [
+          el("div", { class: "hawkeye-row-label" }, [
           el("span", { class: "timeline-dot", style: `background:var(--${effectiveStatus(p)})` }),
-          el("div", null, [
-            el("strong", null, [p.name]),
+            el("div", null, [
+              el("strong", null, [p.name]),
             el("div", { class: "hawkeye-row-sub" }, [
               projectDelay > 0 ? `${projectDelay}d delayed` : "On pace",
             ]),
+            ]),
           ]),
-        ]),
-      ]);
+        ]);
 
       if (plan.empty) {
         row.appendChild(
@@ -1714,10 +2189,10 @@
         // more per-stage SLA overage number (see renderStageGridLegend).
         const label = width >= fitsPx(code) ? code : "";
         const title = `${p.name} — ${b.stage}: ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)}`;
-        track.appendChild(
+          track.appendChild(
           el("div", { class: "hawkeye-stage-block " + kindClass, style: `left:${left}px;width:${width}px`, title }, [label])
-        );
-      });
+          );
+        });
 
       if (plan.futureBlocks.length) {
         const strip = el("div", { class: "hawkeye-future-strip", style: `left:${plan.stripAnchorPx}px` });
@@ -1761,11 +2236,11 @@
             }
           });
         });
-      }
+        }
 
-      row.appendChild(track);
-      rowsWrap.appendChild(row);
-    });
+        row.appendChild(track);
+        rowsWrap.appendChild(row);
+      });
 
     scrollInner.appendChild(rowsWrap);
     board.appendChild(scrollInner);
@@ -3381,6 +3856,17 @@
       .filter((e) => e.deltaDays > 0);
   }
 
+  // Same as `stageAutoScheduleShifts`, but across every stage — the
+  // project-wide version used by the Delay tab's "Delay Analysis (all
+  // stages)" breakdown, instead of needing to click into one stage at a
+  // time via the Grid.
+  function projectAutoScheduleShifts(p) {
+    return buildScheduleTimeline(historyForProject(p.id))
+      .filter((e) => e.kind !== "timesaved")
+      .map((e) => Object.assign({ deltaDays: daysBetweenIso(e.from, e.to) }, e))
+      .filter((e) => e.deltaDays > 0);
+  }
+
   // Groups delay-log entries by a key (team/member/reason) and sums days —
   // the data behind the stage detail modal's "Delay Analysis" tab. Sorted
   // by days descending so the biggest contributor leads.
@@ -3613,6 +4099,81 @@
     document.body.classList.remove("no-scroll");
   }
 
+  // "Weekly status report" widget (Progress/Risks/Issues/Decisions/
+  // Dependencies/Upcoming milestones as a standalone box above the tab
+  // list) — REMOVED 2026-10-16. A user pointed out it duplicated the tab
+  // list right below it ("these are duplicates - all the top should just
+  // link to the icons") and asked for the two to merge into one list:
+  // each tab row now shows its own one-line teaser (a count/status, not
+  // a content preview) in the collapsed header, and the full detail is
+  // revealed on click (see `tabTeaser()` and the accordion rows below) —
+  // see git history for `weeklyReportRow()`/`weeklyReportTeaser()`/
+  // `buildWeeklyStatusReport()` if this needs resurrecting.
+  // One-line collapsed-header summary per accordion row (2026-10-16, see
+  // the big comment above `DETAIL_TABS` in `buildProjectDetail()` for why
+  // this exists — it's what replaced the standalone "Weekly status
+  // report" widget's teaser rows). Deliberately a count/status, never a
+  // content preview — "share high level delay counts or details and when
+  // the user clicks on it - it shows all the delay logs things that are
+  // present" — so each row stays a single line no matter how much data a
+  // project has; the full detail is only ever one click away.
+  function tabTeaser(tabId, p) {
+    const plural = (n, word, pluralWord) => n + " " + (n === 1 ? word : pluralWord || word + "s");
+    switch (tabId) {
+      case "schedule": {
+        const eStat = effectiveStatus(p);
+        return el("div", { class: "detail-tab-btn-progress" }, [
+          el("div", { class: "progress-track" }, [
+            el("div", { class: "progress-fill status-" + eStat, style: "width:" + p.progress + "%" }),
+          ]),
+          el("span", { class: "progress-pct" }, [p.progress + "%"]),
+        ]);
+      }
+      case "delay": {
+        const isLateP = (p.delayDays || 0) > 0;
+        const count = (p.delayItemLog || []).length + (p.delayLog || []).length;
+        const statusText = isLateP ? "+" + p.delayDays + " days" : "On schedule";
+        return statusText + (count ? " · " + plural(count, "logged delay") : "");
+      }
+      case "weekoverweek": {
+        const n = historyForProject(p.id).length;
+        return n ? plural(n, "weekly snapshot") + " logged" : "No history logged yet";
+      }
+      case "stagegate": {
+        const stage = p.stage || "Unstaged";
+        const target = currentStageTargetDate(p);
+        return stage + (target ? " — target " + fmtDateShort(target) : "");
+      }
+      case "changedecisions": {
+        const cr = (p.changeRequests || []).length;
+        const dec = (p.decisions || []).length;
+        return plural(cr, "change request") + " · " + plural(dec, "decision");
+      }
+      case "features": {
+        const feats = p.features || [];
+        if (!feats.length) return "No features tracked yet";
+        const done = feats.filter((f) => f.status === "Done").length;
+        return done + " of " + plural(feats.length, "feature") + " done";
+      }
+      case "depsrisks": {
+        const r = (p.risks || []).length;
+        const d = (p.dependencies || []).length;
+        const i = (p.escalations || []).length;
+        return plural(r, "risk") + " · " + plural(d, "dependency", "dependencies") + " · " + plural(i, "issue");
+      }
+      case "followups": {
+        const n = openNotesFor(p.id).length;
+        return n ? plural(n, "open follow-up") : "No open follow-ups";
+      }
+      case "feedback": {
+        const n = NOTES.filter((note) => note.projectId === p.id).length;
+        return n ? plural(n, "feedback entry", "feedback entries") : "No feedback logged yet";
+      }
+      default:
+        return "";
+    }
+  }
+
   function buildProjectDetail(p) {
     const isLate = p.delayDays > 0;
     const eStatus = effectiveStatus(p);
@@ -3647,96 +4208,52 @@
       ])
     );
 
-    root.appendChild(
-      el("div", { class: "progress-row detail-progress" }, [
-        el("div", { class: "progress-track" }, [
-          el("div", { class: "progress-fill status-" + eStatus, style: "width:" + p.progress + "%" }),
-        ]),
-        el("div", { class: "progress-pct" }, [p.progress + "%"]),
-      ])
-    );
-
-    root.appendChild(
-      el("dl", { class: "card-facts detail-facts" }, [
-        ...currentStageFactNodes(p),
-        el("dt", null, ["Next milestone"]),
-        el("dd", null, [(p.nextMilestone && p.nextMilestone.name || "—") + (p.nextMilestone && p.nextMilestone.date ? " · " + fmtDateShort(p.nextMilestone.date) : "")]),
-        el("dt", null, ["Go-live"]),
-        el("dd", null, [
-          p.originalGoLive && p.originalGoLive !== p.goLive
-            ? `${fmtDate(p.originalGoLive)} → ${fmtDate(p.goLive)}`
-            : fmtDate(p.goLive),
-        ]),
-        el("dt", null, ["Delay"]),
-        el("dd", { class: "delay-flag " + (isLate ? "is-late" : "is-ontime") }, [
-          isLate ? "+" + p.delayDays + " days" : "On schedule",
-        ]),
-        ...(isLate
-          ? [
-              el("dt", null, ["Impact of delay"]),
-              el("dd", { class: p.delayImpact ? "" : "is-missing" }, [
-                p.delayImpact || "Not yet documented",
-              ]),
-            ]
-          : []),
-        ...((p.timeSavedDays || 0) > 0
-          ? [
-              el("dt", null, ["Time saved"]),
-              el("dd", { class: "delay-flag is-saved" }, ["-" + p.timeSavedDays + " days"]),
-            ]
-          : []),
-      ])
-    );
-
-    // Detail-view tabs — everything below the header/progress/facts used to
-    // be one long flat stack of `<h3>` sections (Stage-gate timeline, Delay
-    // recovery, Follow-ups, Schedule, Dependencies/Risks/Escalations, Week
-    // -over-week, Feedback history), which meant scrolling past everything
-    // you didn't care about to find the one thing you clicked for. Tabbed
-    // instead: each button shows/hides its own panel via `.is-active`, and
-    // jump-links (the card badges, `openProjectDetail`'s `focusSectionId`)
-    // now switch to the right tab first, then scroll to the anchor inside
-    // it — see `DETAIL_SECTION_TAB_MAP` / `activateDetailTab` below.
-    // Order here is purely display order in the tab strip (and which one
-    // defaults to active, below) — doesn't affect anything functional, so
-    // it's just this one array to reorder. First entry is the default-open
-    // tab (2026-09-30: Schedule, since that's what a user wanted to land
-    // on first).
+    // Detail-view sections — everything below the header/progress/facts
+    // used to be one long flat stack of `<h3>` sections (Stage-gate
+    // timeline, Delay recovery, Follow-ups, Schedule, Dependencies/Risks/
+    // Escalations, Week-over-week, Feedback history), then a horizontal
+    // tab strip, then (same day) a vertical list of tabs — see git
+    // history. Rebuilt again, 2026-10-16, as a single-open ACCORDION:
+    // a user flagged that this tab list AND the separate "Weekly status
+    // report" widget above it ("Progress"/"Risks"/"Issues"/"Decisions"/
+    // "Dependencies"/"Upcoming milestones") were duplicating each other
+    // ("these are duplicates - all the top should just link to the
+    // icons... merge the top with the icons and just have icons with 1
+    // row info and when I click on them things expand below to show all
+    // the details"). So the widget is gone entirely (see
+    // `buildProgressFactsList()`'s call site inside the Schedule panel
+    // below for where its "Progress" row's facts list ended up), and
+    // each of these 9 rows now shows a one-line, data-driven `tabTeaser()`
+    // summary (a count or status, not a content preview) in its collapsed
+    // header; clicking a row expands it in place to show its full panel
+    // content, closing any other open row (confirmed: single-open,
+    // all-collapsed by default, jump-links auto-expand + scroll).
+    // Order here is purely display order — doesn't affect anything
+    // functional, so it's just this one array to reorder.
     const DETAIL_TABS = [
-      { id: "schedule", label: "Schedule" },
-      { id: "weekoverweek", label: "Week-over-week" },
-      { id: "stagegate", label: "Stage-gate" },
-      { id: "depsrisks", label: "Dependencies & Risks" },
-      { id: "followups", label: "Follow-ups" },
-      { id: "feedback", label: "Feedback" },
+      { id: "schedule", label: "Schedule", icon: "📅" },
+      { id: "delay", label: "Delay", icon: "⏳" },
+      { id: "weekoverweek", label: "Week-over-week", icon: "📈" },
+      { id: "stagegate", label: "Stage-gate", icon: "🧭" },
+      { id: "changedecisions", label: "Change & Decisions", icon: "⇄" },
+      { id: "features", label: "Features", icon: "✨" },
+      { id: "depsrisks", label: "Dependencies & Risks", icon: "⚠" },
+      { id: "followups", label: "Follow-ups", icon: "🔁" },
+      { id: "feedback", label: "Feedback", icon: "💬" },
     ];
-    const tabStrip = el(
-      "div",
-      { class: "detail-tabs", role: "tablist" },
-      DETAIL_TABS.map((t, i) =>
-        el(
-          "button",
-          {
-            class: "detail-tab-btn" + (i === 0 ? " is-active" : ""),
-            "data-tab": t.id,
-            role: "tab",
-            type: "button",
-          },
-          [t.label]
-        )
-      )
-    );
-    root.appendChild(tabStrip);
 
-    // Panels are created independent of display order, then appended in
-    // whatever order `DETAIL_TABS` says — only the first one in that order
-    // starts active, no matter which variable it happens to be.
+    // Panels are created independent of display order, then placed inside
+    // their accordion row below in whatever order `DETAIL_TABS` says. None
+    // start active/open — the whole list starts fully collapsed.
     const stagegatePanel = el("div", { class: "detail-tab-panel", "data-tab": "stagegate" });
     const depsRisksPanel = el("div", { class: "detail-tab-panel", "data-tab": "depsrisks" });
     const weekOverWeekPanel = el("div", { class: "detail-tab-panel", "data-tab": "weekoverweek" });
     const followupsPanel = el("div", { class: "detail-tab-panel", "data-tab": "followups" });
     const schedulePanel = el("div", { class: "detail-tab-panel", "data-tab": "schedule" });
     const feedbackPanel = el("div", { class: "detail-tab-panel", "data-tab": "feedback" });
+    const changeDecisionsPanel = el("div", { class: "detail-tab-panel", "data-tab": "changedecisions" });
+    const delayPanel = el("div", { class: "detail-tab-panel", "data-tab": "delay" });
+    const featuresPanel = el("div", { class: "detail-tab-panel", "data-tab": "features" });
     const PANELS_BY_TAB = {
       stagegate: stagegatePanel,
       depsrisks: depsRisksPanel,
@@ -3744,18 +4261,53 @@
       followups: followupsPanel,
       schedule: schedulePanel,
       feedback: feedbackPanel,
+      changedecisions: changeDecisionsPanel,
+      delay: delayPanel,
+      features: featuresPanel,
     };
-    DETAIL_TABS.forEach((t, i) => {
-      const panel = PANELS_BY_TAB[t.id];
-      if (i === 0) panel.classList.add("is-active");
-      root.appendChild(panel);
-    });
 
-    tabStrip.querySelectorAll(".detail-tab-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        activateDetailTab(root, btn.getAttribute("data-tab"));
-        const overlay = document.getElementById("projectDetail");
-        if (overlay) overlay.scrollTop = 0;
+    // Horizontal icon-tile strip (2026-10-16) — "make these horizontal and
+    // I want icons like these (second image) horizontally", pointing at
+    // the Five Logs banner's circular-badge-icon-above-label look. Tiles
+    // and panels are now two separate flat lists (tiles row, panels
+    // stack below it) instead of nested accordion rows, since a panel no
+    // longer has room to expand directly under its own tile once tiles
+    // sit side by side — `activateDetailTab()` below toggles both lists
+    // in lockstep by matching `data-tab`.
+    const tabStrip = el(
+      "div",
+      { class: "detail-tabs-h", role: "list" },
+      DETAIL_TABS.map((t) =>
+        el(
+          "button",
+          {
+            class: "detail-tab-tile",
+            "data-tab": t.id,
+            type: "button",
+            "aria-expanded": "false",
+            "aria-label": t.label,
+          },
+          [
+            el("span", { class: "detail-tab-tile-icon" }, [t.icon]),
+            el("span", { class: "detail-tab-tile-label" }, [t.label]),
+            el("span", { class: "detail-tab-tile-teaser" }, [tabTeaser(t.id, p)]),
+          ]
+        )
+      )
+    );
+    const tabPanels = el(
+      "div",
+      { class: "detail-tab-panels" },
+      DETAIL_TABS.map((t) => PANELS_BY_TAB[t.id])
+    );
+    root.appendChild(tabStrip);
+    root.appendChild(tabPanels);
+
+    tabStrip.querySelectorAll(".detail-tab-tile").forEach((tile) => {
+      tile.addEventListener("click", () => {
+        const tabId = tile.getAttribute("data-tab");
+        const willOpen = !tile.classList.contains("is-open");
+        activateDetailTab(root, willOpen ? tabId : null);
       });
     });
 
@@ -3768,6 +4320,12 @@
     // stages when on record, same source (`buildHawkeyeBlocks`) Hawk-eye
     // itself uses, so a clicked-through "potential target" here always
     // matches what's shown there.
+    const currentStageCard = buildCurrentStageOverviewCard(p);
+    if (currentStageCard) {
+      stagegatePanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Current stage"]));
+      stagegatePanel.appendChild(currentStageCard);
+    }
+
     stagegatePanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Stage-gate timeline"]));
     stagegatePanel.appendChild(
       el("div", { class: "stagegantt-legend" }, [
@@ -3781,6 +4339,15 @@
     stagegatePanel.appendChild(
       el("div", { id: "stage-gate-timeline-section" }, [buildStageGateTimeline(p)])
     );
+    stagegatePanel.appendChild(buildRaciReference());
+
+    stagegatePanel.appendChild(el("h3", { class: "weekly-subhead", id: "golive-checklist-section" }, ["Go-Live readiness"]));
+    stagegatePanel.appendChild(
+      el("p", { class: "section-subhead" }, [
+        "The fixed Go-Live approval package — every item needs to sign off before RGC grants a Permit to Rollout.",
+      ])
+    );
+    stagegatePanel.appendChild(buildGoLiveChecklist(p));
 
     if (isLate) {
       stagegatePanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Delay recovery"]));
@@ -3847,6 +4414,83 @@
       followupsPanel.appendChild(el("p", { class: "empty-note" }, ["No open follow-ups."]));
     }
 
+    // Change & Decisions tab — the two structured logs from the "five
+    // logs every project maintains" framework (slide 15) that didn't
+    // already exist anywhere in this dashboard: a Change Request Log
+    // (slide 8's CR process) and a Decision Log. Both always render
+    // (even empty) so the tab itself is a stable landing spot.
+    // (The "Five logs" summary banner that used to sit above these two
+    // logs was removed 2026-10-16 — see the note by `buildFiveLogsBanner`'s
+    // old definition for why.)
+    changeDecisionsPanel.appendChild(el("h3", { class: "weekly-subhead", id: "cr-log-section" }, ["Change Request Log"]));
+    changeDecisionsPanel.appendChild(
+      el("p", { class: "section-subhead" }, [
+        "Every change request — large or small — documented for tracking and transparency, per the CR process.",
+      ])
+    );
+    changeDecisionsPanel.appendChild(buildChangeRequestLog(p));
+
+    changeDecisionsPanel.appendChild(el("h3", { class: "weekly-subhead", id: "decision-log-section" }, ["Decision Log"]));
+    changeDecisionsPanel.appendChild(
+      el("p", { class: "section-subhead" }, [
+        "Key calls that were made — distinct from Dependencies & Risks, which tracks open items still being resolved.",
+      ])
+    );
+    changeDecisionsPanel.appendChild(buildDecisionLog(p));
+
+    // Features tab — brought back (2026-10-15), per explicit request
+    // ("Also bring the features back - lets keep those") shortly after it
+    // was removed the same day. The most granular view in the deck:
+    // every feature/capability as its own row with its own status,
+    // rather than one project-level status (slide 20's live MyBKY
+    // example). `buildFeatureKpis()`/`buildFeatureTracker()` were kept
+    // in place, unused, when the tab was removed — this just re-wires
+    // the tab button/panel/jump-link entry; no changes to those two
+    // functions or to `data.json`'s `features` field were needed.
+    // (`buildFeatureTracker()` calls `buildFeatureKpis()` internally.)
+    featuresPanel.appendChild(el("h3", { class: "weekly-subhead", id: "feature-tracker-section" }, ["Feature / sprint tracker"]));
+    featuresPanel.appendChild(
+      el("p", { class: "section-subhead" }, [
+        "Feature-level breakdown by sprint — Web and Mobile tracked separately, with planned vs. actual dates and delay reasons.",
+      ])
+    );
+    featuresPanel.appendChild(buildFeatureTracker(p));
+
+    // Current Stage / Next Milestone / Go-Live / Status facts — shown as
+    // the Schedule accordion row's expanded content, right under its
+    // one-line Progress-bar teaser (2026-10-16, see `tabTeaser()` and the
+    // accordion row-building code below). Previously lived in a
+    // standalone "Weekly status report" widget above the whole tab
+    // list, which a user flagged as duplicating this very tab's content
+    // once the tab list itself started showing per-row detail — merged
+    // in here instead of existing in two places.
+    schedulePanel.appendChild(buildProgressFactsList(p));
+
+    // Upcoming milestones — the `milestones` field revived (2026-10-15)
+    // specifically to back this tab's milestones list. Full list (not
+    // just upcoming) so this doubles as a complete milestone log, not
+    // just a teaser.
+    schedulePanel.appendChild(el("h3", { class: "weekly-subhead", id: "milestones-section" }, ["Milestones"]));
+    const allMilestones = (p.milestones || []).slice().sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+    if (!allMilestones.length) {
+      schedulePanel.appendChild(el("p", { class: "empty-note" }, ["No milestones logged yet."]));
+    } else {
+      const todayStr = todayISO();
+      schedulePanel.appendChild(
+        el(
+          "ul",
+          { class: "milestones-list" },
+          allMilestones.map((m) =>
+            el("li", { class: "milestones-row" + ((m.date && m.date < todayStr) ? " is-past" : "") }, [
+              el("span", { class: "pill pill-" + (m.status || "green") }, [STATUS_LABEL[m.status] || m.status || ""]),
+              el("span", { class: "milestones-name" }, [m.name]),
+              el("span", { class: "milestones-date" }, [m.date ? fmtDateShort(m.date) : "—"]),
+            ])
+          )
+        )
+      );
+    }
+
     // Progress trend chart
     schedulePanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Progress over time"]));
     if (!weeks.length) {
@@ -3855,10 +4499,23 @@
       schedulePanel.appendChild(buildTrendGraph(weeks));
     }
 
+    // Delay tab (2026-10-15) — everything delay-related lives here now,
+    // consolidated out of Schedule (the date-move log + narrative delay
+    // log both moved here) and out of the Grid-click-only stage detail
+    // modal (Delay Analysis + Delay Log, previously only viewable one
+    // stage at a time): a user asked for "delay in its own tab with logs
+    // — things that show up when I click on the grid," aggregated across
+    // every stage instead of requiring a click per stage.
+
     // Schedule timeline — a log of every date move (e.g. a CR pushing the
     // timeline). Used to also render a per-project calendar/Gantt above
     // this (`buildSingleProjectGantt()`) — removed 2026-09-30 per explicit
-    // request, for every project, not just one.
+    // request, for every project, not just one. Moved here from the
+    // Schedule tab 2026-10-15 (see note above) — `detailScheduleSection`'s
+    // id is unchanged, so the Grid tab's "click project name" jump-link
+    // still lands on it correctly (now via `DETAIL_SECTION_TAB_MAP` →
+    // "delay" instead of falling through to the wrong default tab, which
+    // this id was never actually mapped to before this change either).
     const scheduleSection = el("div", { id: "detailScheduleSection" });
     scheduleSection.appendChild(el("h3", { class: "weekly-subhead" }, ["Schedule timeline"]));
     scheduleSection.appendChild(
@@ -3870,7 +4527,40 @@
     scheduleSection.appendChild(
       scheduleEvents.length ? buildCollapsibleChangelog(scheduleEvents) : renderScheduleTimeline(scheduleEvents)
     );
-    schedulePanel.appendChild(scheduleSection);
+    delayPanel.appendChild(scheduleSection);
+
+    // Delay Log — narrative companion to the auto-detected shift log
+    // above: root cause, ownership and status, manually maintained
+    // rather than inferred from date diffs (slide 15 "five logs" + the
+    // sample Delay Log table).
+    delayPanel.appendChild(el("h3", { class: "weekly-subhead", id: "delay-log-section" }, ["Reported delay log (root cause & ownership)"]));
+    delayPanel.appendChild(
+      el("p", { class: "section-subhead" }, [
+        "Root cause, ownership and status for each delay — distinct from the auto-detected log above, and from the per-stage incident log below.",
+      ])
+    );
+    delayPanel.appendChild(buildDelayLogTable(p));
+
+    // Delay Analysis + Delay Log, aggregated across EVERY stage — the
+    // same `buildStageAnalysisPanel()` / `buildManualDelayLogSearchTable()`
+    // the stage detail modal uses one stage at a time (reached by
+    // clicking a Grid cell), now also available project-wide without
+    // needing to click into each stage separately.
+    const allDelayEntries = p.delayLog || [];
+    delayPanel.appendChild(el("h3", { class: "weekly-subhead", id: "delay-attribution-section" }, ["Delay attribution (all stages)"]));
+    delayPanel.appendChild(
+      el("p", { class: "section-subhead" }, [
+        "By team, member and reason — the same breakdown shown per-stage in the stage detail modal (click a Grid cell), summed across every stage here.",
+      ])
+    );
+    delayPanel.appendChild(buildStageAnalysisPanel(allDelayEntries, "No delay log entries recorded yet."));
+
+    delayPanel.appendChild(el("h3", { class: "weekly-subhead", id: "delay-entries-section" }, ["Delay log entries (all stages)"]));
+    if (!allDelayEntries.length) {
+      delayPanel.appendChild(el("p", { class: "empty-note" }, ["No manually reported delay log entries recorded yet."]));
+    } else {
+      delayPanel.appendChild(buildManualDelayLogSearchTable(allDelayEntries));
+    }
 
     // Renders the Dependencies / Weekly Status / Risks blocks for a given
     // week's data (either the live project `p` or a historical snapshot),
@@ -3938,11 +4628,11 @@
         const snapDeps = getDependencyObjects(snap).filter(
           (d) => !d.resolved && !isPlaceholderDependencyText(d.text)
         );
-        container.appendChild(
-          el("div", { class: "detail-block deps" }, [
-            el(
-              "ul",
-              { class: "paired-list" },
+      container.appendChild(
+        el("div", { class: "detail-block deps" }, [
+          el(
+            "ul",
+            { class: "paired-list" },
               interactive
                 ? dependencyListItems(snapDeps, p)
                 : pairedList(
@@ -3951,34 +4641,34 @@
                     "Mitigation / impact",
                     snapDeps.map((d) => d.team)
                   )
-            ),
-          ])
-        );
+          ),
+        ])
+      );
       }
 
       if (showWeeklyStatus) {
         container.appendChild(el("h3", { class: "weekly-subhead" }, ["Weekly Status"]));
-        if (!snap.sprintStatus) {
-          container.appendChild(
-            el("p", { class: "empty-note" }, ["Sprint work detail wasn't captured for this week's snapshot yet."])
-          );
-        } else {
-          container.appendChild(
-            el("div", { class: "sprint-grid" }, [
-              el("div", { class: "detail-block" }, [
-                el("h4", null, ["Completed"]),
-                el("ul", null, listOrDash(snap.sprintStatus.completed || [])),
-              ]),
-              el("div", { class: "detail-block" }, [
-                el("h4", null, ["In progress"]),
-                el("ul", null, listOrDash(snap.sprintStatus.inProgress || [])),
-              ]),
-              el("div", { class: "detail-block" }, [
-                el("h4", null, ["Next plan"]),
-                el("ul", null, listOrDash(snap.sprintStatus.nextPlan || [])),
-              ]),
-            ])
-          );
+      if (!snap.sprintStatus) {
+        container.appendChild(
+          el("p", { class: "empty-note" }, ["Sprint work detail wasn't captured for this week's snapshot yet."])
+        );
+      } else {
+        container.appendChild(
+          el("div", { class: "sprint-grid" }, [
+            el("div", { class: "detail-block" }, [
+              el("h4", null, ["Completed"]),
+              el("ul", null, listOrDash(snap.sprintStatus.completed || [])),
+            ]),
+            el("div", { class: "detail-block" }, [
+              el("h4", null, ["In progress"]),
+              el("ul", null, listOrDash(snap.sprintStatus.inProgress || [])),
+            ]),
+            el("div", { class: "detail-block" }, [
+              el("h4", null, ["Next plan"]),
+              el("ul", null, listOrDash(snap.sprintStatus.nextPlan || [])),
+            ]),
+          ])
+        );
         }
       }
 
@@ -3996,8 +4686,8 @@
             ].filter(Boolean)
           )
         );
-        container.appendChild(
-          el("div", { class: "detail-block risks" }, [
+      container.appendChild(
+        el("div", { class: "detail-block risks" }, [
             snapRisks.length
               ? el(
                   "ul",
@@ -4010,9 +4700,9 @@
                         "Mitigation plan"
                       )
                 )
-              : el("ul", null, [el("li", null, ["None reported"])]),
-          ])
-        );
+            : el("ul", null, [el("li", null, ["None reported"])]),
+        ])
+      );
       }
     }
 
@@ -4025,6 +4715,20 @@
     const liveSnapshotSections = el("div", { class: "snapshot-sections" });
     renderSnapshotSections(liveSnapshotSections, p, null, true, { weeklyStatus: false });
     depsRisksPanel.appendChild(liveSnapshotSections);
+
+    // RAID Log — Risks, Assumptions, Issues, Dependencies consolidated
+    // into one log (slide 18), appended below the existing
+    // Dependencies/Risks/Escalations sections above rather than
+    // replacing them (those stay as the structured, per-category views;
+    // this is the single-table rollup across all four categories, plus
+    // Assumptions which isn't tracked anywhere else).
+    depsRisksPanel.appendChild(el("h3", { class: "weekly-subhead", id: "raid-log-section" }, ["RAID Log"]));
+    depsRisksPanel.appendChild(
+      el("p", { class: "section-subhead" }, [
+        "Risks, Assumptions, Issues and Dependencies in one consolidated log — distinct from the structured Dependencies/Risks/Escalations sections above.",
+      ])
+    );
+    depsRisksPanel.appendChild(buildRaidLogTable(p));
 
     // "Week-over-week" tab — click a week to load its Dependencies /
     // Weekly Status / Risks as they stood that week. Its own snapshot
@@ -4157,15 +4861,36 @@
     "detail-deps-section": "depsrisks",
     "detail-risks-section": "depsrisks",
     "detail-escalations-section": "depsrisks",
+    "raid-log-section": "depsrisks",
     "detail-followups-section": "followups",
+    "golive-checklist-section": "stagegate",
+    "detailScheduleSection": "delay",
+    "milestones-section": "schedule",
+    "delay-log-section": "delay",
+    "delay-attribution-section": "delay",
+    "delay-entries-section": "delay",
+    "cr-log-section": "changedecisions",
+    "decision-log-section": "changedecisions",
+    "feature-tracker-section": "features",
   };
 
+  // Single-open accordion (2026-10-16, replacing a tab-strip's always-
+  // exactly-one-active model): `tabId` is the one tile/panel to open —
+  // pass a falsy value to collapse everything (used when a user clicks
+  // the already-open tile, toggling it closed, per the confirmed
+  // "single-open accordion" + "all collapsed by default" behavior).
+  // Tiles (`.detail-tab-tile`) and panels (`.detail-tab-panel`) are two
+  // separate flat lists since the horizontal icon-strip redesign (same
+  // day) — matched up here purely by `data-tab`, not by DOM nesting.
   function activateDetailTab(root, tabId) {
-    root.querySelectorAll(".detail-tab-btn").forEach((btn) => {
-      btn.classList.toggle("is-active", btn.getAttribute("data-tab") === tabId);
+    root.querySelectorAll(".detail-tab-tile").forEach((tile) => {
+      const isOpen = !!tabId && tile.getAttribute("data-tab") === tabId;
+      tile.classList.toggle("is-open", isOpen);
+      tile.setAttribute("aria-expanded", isOpen ? "true" : "false");
     });
     root.querySelectorAll(".detail-tab-panel").forEach((panel) => {
-      panel.classList.toggle("is-active", panel.getAttribute("data-tab") === tabId);
+      const isOpen = !!tabId && panel.getAttribute("data-tab") === tabId;
+      panel.classList.toggle("is-active", isOpen);
     });
   }
 
@@ -4338,6 +5063,70 @@
     });
 
     return root;
+  }
+
+  // Current-stage overview card, embedded directly in the Stage-gate
+  // panel (2026-10-16 — "I want this image view in the details too -
+  // wherever it make sense", pointing at the per-stage modal's Overview
+  // tab, screenshotted from MyBKY's "Tech. Design" stage). Reuses
+  // `buildStageOverviewPanel()` verbatim — same Start/Completion date
+  // boxes, Stage Progress bar, and 3 KPI cards shown in that modal — for
+  // the project's CURRENT stage only, so a user doesn't have to click
+  // into the Grid to see it. Clicking the full stage detail modal for
+  // Date History/Delay Analysis/Delay Log — this card is an at-a-glance
+  // summary, not a replacement for that drill-down. Returns null for a
+  // project with no current stage on record (`p.stage` unset or not a
+  // real pipeline stage, e.g. "Unstaged") since there's nothing to show.
+  //
+  // Whole-card click target (2026-10-16) — a user clicked one of the
+  // date boxes/KPI cards expecting the full stage modal to open and
+  // found only the small "View full stage history" link actually did
+  // anything ("when i click on the boxes the top pop up shows up
+  // anyways. make it such a way that people know they can click on
+  // it"). Confirmed via follow-up: the WHOLE card is now one click
+  // target (`role="button"`, keyboard-activatable), with a hover
+  // cursor + highlight as the "you can click this" affordance — the
+  // "View full stage history →" text stays as a plain (non-interactive)
+  // visual cue of what clicking does, since the card itself now handles
+  // the click.
+  function buildCurrentStageOverviewCard(p) {
+    const stage = p.stage;
+    if (!stage || PIPELINE_STAGES.indexOf(stage) === -1) return null;
+    const stageIndex = PIPELINE_STAGES.indexOf(stage);
+    const segments = computeStageSegments(p);
+    const seg = segments.find((s) => s.stage === stage) || null;
+    const days = seg ? seg.days : 0;
+    const plan = (p.stagePlan && p.stagePlan[stage]) || {};
+    const delayEntries = stageDelayLog(p, stage);
+
+    const card = el(
+      "div",
+      {
+        class: "current-stage-card",
+        role: "button",
+        tabindex: "0",
+        "aria-label": "View full stage history for " + stage,
+      },
+      [
+        el("div", { class: "current-stage-card-head" }, [
+          el("span", { class: "current-stage-card-kicker" }, [
+            "CURRENT STAGE \u00b7 " + (stageIndex + 1) + " OF " + PIPELINE_STAGES.length,
+          ]),
+          el("h4", { class: "current-stage-card-title" }, [stage]),
+        ]),
+        buildStageOverviewPanel(p, stage, seg, days, "current", plan, delayEntries),
+        el("span", { class: "current-stage-card-link" }, ["View full stage history \u2192"]),
+      ]
+    );
+    const open = () => openStageDetail(p.id, stage);
+    card.addEventListener("click", open);
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        open();
+      }
+    });
+    return card;
   }
 
   function dateVarianceCell(initial, latest, actual) {
@@ -4519,9 +5308,9 @@
     ]);
   }
 
-  function buildStageAnalysisPanel(entries) {
+  function buildStageAnalysisPanel(entries, emptyLabel) {
     if (!entries.length) {
-      return el("div", { class: "deps-empty-group" }, ["No delay log entries recorded for this stage."]);
+      return el("div", { class: "deps-empty-group" }, [emptyLabel || "No delay log entries recorded for this stage."]);
     }
     const totalDays = entries.reduce((sum, e) => sum + (e.days || 0), 0);
     const breakdowns = [
@@ -4648,7 +5437,19 @@
     }
 
     wrap.appendChild(el("h4", { class: "weekly-subhead stagedetail-manual-log-head" }, ["Manually reported delay log"]));
+    wrap.appendChild(buildManualDelayLogSearchTable(entries));
 
+    return wrap;
+  }
+
+  // The searchable/sortable "manually reported delay log" table — split
+  // out of `buildStageLogPanel()` (2026-10-15) so the project-wide Delay
+  // tab can reuse it directly with ALL of a project's `p.delayLog`
+  // entries (every stage, not just one), without also re-rendering the
+  // "Schedule shifts (auto-detected)" section above it a second time
+  // (that's shown once, at the top of the Delay tab, project-wide).
+  function buildManualDelayLogSearchTable(entries) {
+    const wrap = el("div");
     const reasons = Array.from(new Set(entries.map((e) => e.reason).filter(Boolean))).sort();
     const teams = Array.from(new Set(entries.map((e) => e.team).filter(Boolean))).sort();
 
@@ -4702,6 +5503,7 @@
             el("tr", null, [
               el("th", null, ["ID"]),
               el("th", null, ["Date"]),
+              el("th", null, ["Stage"]),
               el("th", null, ["Reason"]),
               el("th", null, ["Member"]),
               el("th", null, ["Team"]),
@@ -4715,6 +5517,7 @@
               el("tr", null, [
                 el("td", { class: "stagedetail-id-cell" }, [e.id || "—"]),
                 el("td", null, [fmtDateShort(e.date)]),
+                el("td", null, [e.stage || "—"]),
                 el("td", null, [e.reason]),
                 el("td", null, [e.member]),
                 el("td", null, [e.team]),

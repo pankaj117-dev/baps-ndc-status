@@ -343,6 +343,468 @@ button and active panel always agree on which tab, and every jump-link
 section id correctly activates its mapped tab with the target actually
 receiving a `scrollIntoView()` call.
 
+**Two new tabs + three new sections, grounded in a governance playbook
+deck (2026-10-15).** A user shared an "IT Application Development Project
+Management" slide deck describing a stage-gate process standard — in
+particular, slide 15's "five logs every project maintains" (Change log,
+Delay log, Decision log, Risk log, Issue log) and slide 13's Go-Live
+approval package. Before building anything, I checked `data.json`'s
+actual schema and found Risk log (`risks`) and a partial Delay log
+(auto-detected shift log + freeform `delayNote`/`delayMitigation`/
+`delayTradeoffs` text) already existed, but **Change log and Decision log
+did not exist as structured data anywhere** — CRs were previously only
+ever mentioned informally inside `delayTradeoffs` free text (e.g. "3 CRs
+already approved — CR1 added 10 working days..."). Five new empty array
+fields were added to all 15 projects so nothing broke: `changeRequests`,
+`decisions`, `goLiveChecklist`, `delayItemLog`, `features`.
+
+**Near-miss worth flagging:** the obvious name for the new narrative
+delay log was `delayLog` — but that name is already taken by a
+pre-existing, differently-shaped field (per-stage incident log:
+`{id, date, stage, reason, team, member, days}`, append-only via
+`delayLogSeq`, feeding the stage detail modal's Delay Analysis/Delay Log
+tabs). Caught this before shipping by reading the Data model section
+below and grepping `app.js` for existing `.delayLog` usages — reusing the
+name would have silently corrupted that feature the first time either
+field got real data (two incompatible shapes writing through the same
+key). Named the new field `delayItemLog` instead; `MyBKY (Phase 1)`'s
+pre-existing (empty) `delayLog` field was restored after an intermediate
+rename-based script transiently removed it.
+
+- **Change & Decisions** (new tab, after Stage-gate) — two structured
+  logs: a **Change Request Log** (`buildChangeRequestLog()`) and a
+  **Decision Log** (`buildDecisionLog()`). Both render a clean empty
+  state ("No change requests logged yet" / "No decisions logged yet")
+  since every project's new fields start empty — populating them with
+  real entries is left to whoever maintains `data.json`. A "Five logs
+  every project maintains" banner (see below, now clickable) sits above
+  both. Both rebuilt (2026-10-15, per
+  explicit request after seeing the deck's own "Decision Metrix" and
+  "Change Request" table screenshots — slide 19, the same "these and the
+  last two are templates on how things should be added" request that
+  confirmed the wide-table pattern for every log in this file) as real
+  `<table>`s with every column shown distinctly instead of merged into
+  shared cells:
+  - **Change Request Log**: Change Request, Description, Submitted
+    Date, By Whom, Action Item, "Approved for current phase / Moved to
+    next phase", Impact — 7 columns.
+  - **Decision Log**: Decision, Description, Date Taken, By Whom — 4
+    columns (Description used to be merged under the Decision title).
+- **Features — removed, then restored, same day (2026-10-15).** A
+  "Features" tab (every feature/capability as its own row, with the same
+  7 KPI cards the deck's MyBKY example used) was built, shared for
+  review, and explicitly pulled ("dont know if we need features") before
+  it had even been approved. Following this file's existing
+  `milestones`-field precedent for deprecating without deleting,
+  `buildFeatureTracker()`/`buildFeatureKpis()` and `data.json`'s
+  `features: []` field were left in place, unused — only the tab button,
+  its panel, and its `DETAIL_SECTION_TAB_MAP` entry were removed. A few
+  turns later, explicitly restored ("Also bring the features back -
+  lets keep those") — same functions, same data field, untouched the
+  whole time; only the tab wiring needed reinstating. Net effect: the
+  Features tab exists in the final build after all, same as before this
+  whole back-and-forth. Then audited against the deck's live MyBKY
+  example (slide 20) — "anything missing?" — and brought to parity:
+  table rebuilt onto the shared `.wide-log-*` scaffolding with the
+  deck's own 7 columns (SP, Type, Feature/Capability, Status, Notes,
+  Planned/Actual, Delay Reason) instead of merging Notes/Delay Reason
+  under the feature name; KPI cards gained a computed subtitle
+  (`featureKpiSubtitle()` — the shared `notes`/`delayReason` text if
+  every item in that bucket agrees on one, else the distinct sprint
+  numbers involved, since there's no dedicated field for this); and the
+  deck's own 2-bullet "Reference Note" disclaimer (what Planned/Actual
+  dates measure, what's still outstanding before Go-Live) was added
+  below the table, static/generic rather than per-project data.
+- **Go-Live readiness checklist** (new section inside the existing
+  **Stage-gate** tab, below the timeline) — the fixed 7-item "Go-Live -
+  Approval Package" from slide 13 (SIT, Regression Testing, UAT, Cyber
+  Security Testing, Performance Load Testing, Change Management, RGC
+  Approval), via `buildGoLiveChecklist()` / the `GOLIVE_CHECKLIST_ITEMS`
+  constant. `p.goLiveChecklist` only needs to list items that have moved
+  off "Not started" — anything missing defaults to "Not started," so this
+  cost zero data entry for any existing project while still being
+  immediately usable once someone starts filling it in.
+- **"Who leads each stage" reference** (new static panel inside the
+  **Stage-gate** tab, next to the color legend) — `buildRaciReference()` /
+  the `RACI_STAGES` constant, from slides 6/11/12's track-ownership
+  model (BA leads Requirements, PM leads Planning & Production
+  Readiness, Architecture leads Design, Development leads Development,
+  QA leads Testing, Cyber Security leads Security Validation, DevOps
+  leads Deployment). Deliberately kept the playbook's own stage names
+  (not force-mapped onto this dashboard's 9 `PIPELINE_STAGES`) since the
+  two models are close but not identical — relabeling them would imply a
+  false precision the deck never claimed.
+- **Delay (new consolidated tab, 2026-10-15)** — a user explicitly asked
+  to pull delay content out of the Schedule tab into "its own tab with
+  Logs — things that show up when I click on the grid," so instead of
+  needing to click a Grid cell to see one stage's delay breakdown, this
+  tab aggregates everything delay-related, project-wide, in one place:
+  - A **"Five logs every project maintains"** banner at the top (see
+    below, now clickable) — **removed 2026-10-16**, see the dedicated
+    note further down for why.
+  - **Schedule timeline** (moved here from the Schedule tab, same
+    `detailScheduleSection` id/content, unchanged) — the auto-detected
+    Go-Live/milestone date-move log.
+  - **Reported delay log** (moved here from the Schedule tab,
+    `buildDelayLogTable()`, reading `delayItemLog` — see the near-miss
+    note above for why it's not called `delayLog`): the narrative
+    companion to the auto-detected log above — root cause, who's
+    responsible, what action was taken, and open/closed status. Rebuilt
+    (2026-10-15) as a real, horizontally-scrollable `<table>` with all 11
+    columns from the deck's own sample Delay Log table, shown
+    side-by-side rather than merged into fewer card-style cells: Delayed
+    Item, Description, Reported Date, Impacted Phase, Impact
+    (Time/Cost/Scope), Root Cause, Responsible, Action Item, Action
+    Taken, Status, Closure Remarks. The first version of this table
+    condensed several of these into shared cells and never displayed
+    Reported Date at all — caught after the user shared the deck's actual
+    table screenshot.
+  - **Delay attribution (all stages)** — `buildStageAnalysisPanel()`,
+    the exact same team/member/reason breakdown the stage detail modal
+    shows for one stage at a time (reached by clicking a Grid cell),
+    now called with the project's full, unfiltered `delayLog` so it
+    covers every stage at once.
+  - **Delay log entries (all stages)** — the stage detail modal's
+    searchable/sortable "Manually reported delay log" table, extracted
+    into its own `buildManualDelayLogSearchTable()` function (so it can
+    be reused here without double-rendering the auto-shift section
+    above it) and called with the same unfiltered `delayLog`. A new
+    "Stage" column was added to this table so project-wide rows (which
+    now span different stages) are still distinguishable — a harmless,
+    always-the-same-value column when this same function renders inside
+    the single-stage modal.
+  - `DETAIL_SECTION_TAB_MAP["detailScheduleSection"]` now correctly
+    points to `"delay"`. (This id wasn't actually a key in that map
+    before this change, despite the Grid tab's "click a project name"
+    handler jumping to it — meaning that click likely silently fell
+    back to the map's `"stagegate"` default instead of landing on
+    Schedule. Fixed as a side effect of this move.)
+- **"Five logs every project maintains" banner** (`buildFiveLogsBanner()`
+  / `FIVE_LOGS` constant, **removed 2026-10-16** — see the dedicated note
+  further down) — originally a faithful SVG/CSS reproduction of slide
+  15's 5-icon graphic (Change/Delay/Decision/Risk/Issue log), not an
+  embedded raster image (consistent with the rest of this dashboard).
+  Shown on both the Change & Decisions tab and the new Delay tab.
+  **Made clickable, 2026-10-15** ("I like this - why not just make
+  these clicable where things show and just nothing if its empty"):
+  each `FIVE_LOGS` entry carried a `sectionId` (where that log's
+  content actually lives) and a `count(p)` function (how many entries
+  the current project has for it) — an icon was only clickable when
+  `count(p) > 0` for the project currently open, otherwise genuinely
+  inert (dimmed, no listener, not just visually disabled). Superseded
+  entirely once the icon-tile strip above these tabs started covering
+  the same 5 destinations (see "'Five logs' banner removed" below).
+
+Final tab order: Schedule → Delay → Week-over-week → Stage-gate → Change
+& Decisions → Features → Dependencies & Risks → Follow-ups → Feedback (9
+tabs total, up from 6 pre-deck — Features was added, removed, and
+restored, all the same day, netting out to +2 tabs overall: Delay +
+Features; the 9th, Follow-ups, predates this whole deck-driven round).
+
+**Shrunk to icon-only buttons, then to a labeled list, both 2026-10-16.**
+First shrunk to icon-only square buttons ("this is a lot of tabs - can
+we shrink them - and just put icons for them that people can click and
+go to"): each `DETAIL_TABS` entry gained an `icon` (a single
+emoji/glyph — 📅 ⏳ 📈 🧭 ⇄ ✨ ⚠ 🔁 💬, in tab order), with the full
+label surviving only as a `title` tooltip on hover. Minutes later,
+changed again ("I want to see how we can view all the things in the
+list and then details can be found when they click on things - so all
+the icons show in the list") — the tooltip-only label didn't satisfy
+"see all the things in the list" at a glance, so the strip became a
+vertical list instead: each row now shows the icon AND the full label
+side by side, one row per tab, click anywhere on the row to jump to
+that section. Same `.detail-tab-btn`/`.detail-tab-panel` classes and
+`activateDetailTab()` switching logic throughout both changes — only
+the markup (icon span + label span) and CSS (horizontal icon-only strip
+→ vertical bordered list) changed. Where a couple of the icons double up
+with icons already used elsewhere (Delay ⏳ matches the Five Logs
+banner's Delay log icon; Change & Decisions ⇄ and Dependencies & Risks
+⚠ likewise match the banner's Change log and Risk log icons) that's
+intentional — those tabs house exactly that content.
+
+**Rebuilt into a single-open accordion, same day (2026-10-16) — the tab
+list and the "Weekly status report" widget merged into one.** The
+labeled-list version above lasted only a few minutes before a user,
+looking at both the tab list and the Weekly Status Report widget above
+it side by side, said: *"these are duplicates - all the top should just
+link to the icons... merge the top with the icons and just have icons
+with 1 row info and when I click on them things expand below to show
+all the details."* Confirmed via follow-up questions: single-open
+accordion (opening one row collapses any other open row), all rows
+start collapsed, and jump-links auto-expand + scroll to the right row.
+
+- Each row was a clickable header (icon + label + a one-line **teaser**
+  + a chevron that rotates 90° when open) plus its `.detail-tab-panel`
+  body nested directly underneath, collapsed by default. The 9 panels
+  (`stagegatePanel`, `depsRisksPanel`, etc.) and their internal content
+  were completely unchanged from the tab-list version — only how
+  they're shown/hidden and where they live in the DOM changed.
+
+**Rebuilt again, same day, into a HORIZONTAL icon-tile strip.** Minutes
+later a user, pointing at the vertical accordion's icon+label rows next
+to a screenshot of the Five Logs banner, said: *"make these horizontal
+and I want icons like these (second image) horizontally."* The 9
+`.detail-tab-tile` buttons now sit side by side in a wrapping flex row
+— each one a circular icon badge above its label above its one-line
+teaser, deliberately styled to match `.five-logs-item`/`.five-logs-icon`
+(same 34px circle, soft-accent default fill, solid-accent fill +
+card background/shadow when selected) so the two icon strips in this
+view read as one visual language. Structurally this meant splitting
+tiles and panels into two separate flat sibling lists instead of one
+nested accordion row per tab — a tile and a panel no longer live next
+to each other in the DOM, since there's no room for a panel to expand
+directly under a tile once tiles sit side by side:
+- `.detail-tabs-h` (`role="list"`) holds the 9 `.detail-tab-tile`
+  buttons, each with a `.detail-tab-tile-icon` circle, a
+  `.detail-tab-tile-label`, and a `.detail-tab-tile-teaser` (reusing the
+  exact same `tabTeaser()` output as before — Schedule's mini progress
+  bar included, just shrunk further to fit under a 96px-wide tile).
+- `.detail-tab-panels` holds the 9 `.detail-tab-panel` divs as flat
+  siblings, below the whole tile strip. The panels and their internal
+  content are completely unchanged from both prior versions.
+- `activateDetailTab(root, tabId)` (same signature) now toggles
+  `.detail-tab-tile`s and `.detail-tab-panel`s as two separate
+  `querySelectorAll` passes matched by `data-tab`, instead of walking
+  nested accordion rows — same single-open / all-collapsed-by-default
+  behavior, same jump-link auto-expand (`openProjectDetail` still
+  scrolls straight to the target anchor inside whichever panel just
+  got activated).
+- **`tabTeaser(tabId, p)`** (new) computes each row's one-line summary —
+  deliberately a count or status, never a content preview, so a row
+  never grows past one line no matter how much data a project has
+  ("share high level delay counts or details... when the user clicks on
+  it - it shows all the delay logs things that are present"):
+  - **Schedule** — the Progress bar + percentage itself (*"schedule
+    should show progress"*), via `.detail-tab-btn-progress` (a shrunk
+    version of the same `.progress-track`/`.progress-fill` markup used
+    everywhere else). Expanding Schedule now also shows the full
+    Current Stage/Next Milestone/Go-Live/Status fact list
+    (`buildProgressFactsList(p)`, moved in from the deleted Weekly
+    Status Report widget's old Progress row) above the existing
+    Milestones list and Progress-over-time trend graph.
+  - **Delay** — status ("On schedule" / "+N days") plus a count of
+    logged delay-log entries (`delayItemLog.length + delayLog.length`,
+    the same count `FIVE_LOGS` already used for the Five Logs banner's
+    Delay icon).
+  - **Week-over-week** — count of weekly snapshots logged (or "No
+    history logged yet").
+  - **Stage-gate** — current stage name + its target date (reuses
+    `currentStageTargetDate()`).
+  - **Change & Decisions** — "N change requests · M decisions".
+  - **Features** — "X of Y features done" (or "No features tracked
+    yet").
+  - **Dependencies & Risks** — "N risks · M dependencies · K issues"
+    (merging what used to be three separate Weekly Status Report rows
+    — Risks, Issues, Dependencies — into one row's teaser, since they
+    all expand into the same panel anyway).
+  - **Follow-ups** — count of open follow-ups (`openNotesFor(p.id)`).
+  - **Feedback** — count of feedback entries logged for the project.
+- `activateDetailTab(root, tabId)` (same name, rewritten body): opens
+  the row matching `tabId`, closes every other row, and toggles each
+  row's panel `.is-active` state to match — pass a falsy `tabId` to
+  collapse everything. The click handler on each header computes
+  whether the row *will* open (i.e. it's currently closed) before
+  calling this, so clicking an already-open row's header toggles it
+  closed instead of doing nothing.
+- `openProjectDetail(id, focusSectionId)` (jump-links from card badges,
+  etc.) is unchanged — it already called `activateDetailTab(root,
+  DETAIL_SECTION_TAB_MAP[focusSectionId])` before scrolling, which maps
+  perfectly onto "auto-expand the right row, close everything else."
+- `buildWeeklyStatusReport()` and its helpers were deleted outright (see
+  the superseded note above) rather than kept as dead code.
+
+Verified two ways, re-run after the horizontal-tile rebuild too: (1)
+headlessly against all 15 real projects — exactly 9 tiles in the
+documented order, all starting collapsed (`aria-expanded="false"`, no
+matching panel `.is-active`), every tile's teaser non-empty, the
+Schedule tile's teaser specifically rendering the mini progress bar
+(not plain text), `activateDetailTab()` opening exactly one tile +
+its matching panel and closing/deactivating the rest (and collapsing
+everything when passed a falsy tabId), every jump-linkable anchor id
+present and inside the right panel, the Current Stage/.../Status fact
+list appearing exactly once in the entire detail root (inside the
+Schedule panel, not duplicated), no leftover `.weekly-report` nodes
+anywhere, no duplicate DOM ids, and the stage detail modal's Delay
+Analysis/Delay Log (reached via Grid cell click) still rendering
+unchanged; (2) against synthetic populated data (a project temporarily
+given real-shaped CR/decision/delay-log/RAID/feature entries, not
+committed to `data.json`) — confirmed every tile's teaser reflects the
+synthetic counts correctly (e.g. "3 risks · 1 dependency · 1 issue",
+"1 of 3 features done"), CR
+approval-status badges and Go-Live checklist completion counting still
+render correctly inside their now-nested panels, and
+`openProjectDetail(id, "raid-log-section")` auto-expands the
+Dependencies & Risks row (and only that row) before scrolling.
+
+**Current-stage overview card, embedded in the Stage-gate panel
+(2026-10-16).** A user shared a screenshot of the per-stage detail
+modal's Overview tab (opened by clicking a stage cell in the Grid tab —
+Start Date / Completion Date boxes with initial/latest/actual dates and
+a variance pill, a Stage Progress bar, and 3 KPI cards for stage
+duration / log entries / project delay) and asked: *"I want this image
+view in the details too - wherever it make sense."* Confirmed via
+follow-up questions: embed it for the **current stage only**, inside
+the **Stage-gate** panel, above the existing stage-gate timeline — and
+keep the Schedule panel's existing Current Stage/Next Milestone/
+Go-Live/Status facts list exactly as-is rather than replacing it with
+this (the two serve different purposes: Schedule's facts list is a
+compact one-paragraph summary across the whole project; this card is a
+richer, stage-scoped breakdown with real planned-vs-actual date
+tracking).
+- New `buildCurrentStageOverviewCard(p)` computes the same inputs
+  `buildStageDetail(p, stage)` already computes for the modal (stage
+  segment from `computeStageSegments()`, elapsed days, `stagePlan`
+  entry, `stageDelayLog()` entries) for `p.stage` specifically, then
+  calls the exact same `buildStageOverviewPanel()` the modal's Overview
+  tab uses — so the date boxes, progress bar, and KPI cards are
+  pixel-for-pixel the same rendering code, not a reimplementation.
+  Wrapped in a `.current-stage-card` with a kicker ("CURRENT STAGE · N
+  OF 9") + the stage name as a title, and a "View full stage history →"
+  line underneath that leads to the real per-stage modal
+  (`openStageDetail`) for anyone who wants the modal's other 3 tabs
+  (Date History, Delay Analysis, Delay Log) — this card is an
+  at-a-glance summary, not a replacement for that drill-down.
+- Returns `null` (renders nothing, no "Current stage" heading either)
+  for a project with no valid current stage on record — i.e. `p.stage`
+  unset or not one of the 9 `PIPELINE_STAGES` (the "Unstaged" case).
+  Every one of the 15 real projects has a valid stage today, so this
+  path is only exercised by a synthetic test.
+
+**Whole card made clickable, same day.** Originally only the small
+"View full stage history →" link opened the per-stage modal — a user
+clicked one of the date boxes/KPI cards expecting that to work too:
+*"when i click on the boxes the top pop up shows up anyways. make it
+such a way that people know they can click on it."* Confirmed via
+follow-up questions: the **entire card** became one click target
+(not just the 3 KPI boxes), with a **hover cursor + border/shadow
+highlight** as the "you can click this" signal. The card itself now
+carries `role="button"`, `tabindex="0"`, and both `click`/`keydown`
+(Enter/Space) listeners calling `openStageDetail(p.id, stage)`; the
+"View full stage history →" text became a plain non-interactive
+`<span>` (no listener of its own — the surrounding card handles the
+click, so there's exactly one way this action gets triggered, not two
+competing handlers that could double-render the modal).
+
+Verified: all 15 real projects render exactly one `.current-stage-card`
+inside the Stage-gate panel, titled with that project's actual
+`p.stage` value, containing the reused `.stagedetail-datebox-row`/
+`.stagedetail-stat-row` structure, correct `role="button"`/
+`tabindex="0"`/click-listener attributes on the card itself (and
+confirmed the "View full stage history" text has **no** listener of
+its own), and — invoking that click listener directly — the real
+per-stage modal (`#stageDetailContent`) actually gets populated with
+that project's current stage; a synthetic unstaged project
+(`stage: "Unstaged"`) renders zero cards and
+`buildCurrentStageOverviewCard()` returns `null` directly, confirmed
+both via a direct function call and via the full `buildProjectDetail()`
+render.
+
+**"Five logs" banner removed; icon-tile strip now a single row
+(2026-10-16).** With the horizontal icon-tile strip now covering all 9
+destinations up top, a user looked at the Change & Decisions tile
+expanded (teaser: "0 change requests · 0 decisions") with the old
+"Five logs" banner showing underneath it and pointed out: *"changes and
+decisions and risk too and then the icon below takes them to risks
+again - don't need duplicates. And I want all icons in one row."*
+- **Banner removed outright.** Every single one of its 5 icons had
+  become a duplicate of a tile already in the main strip — Change log
+  and Decision log duplicated the very "Change & Decisions" tile the
+  banner lived inside (clicking either just scrolled within the same
+  already-open panel), Risk log and Issue log duplicated "Dependencies
+  & Risks," Delay log duplicated "Delay." `buildFiveLogsBanner()` and
+  the `FIVE_LOGS` constant were deleted outright (not kept as dead
+  code), along with both call sites (`changeDecisionsPanel`/
+  `delayPanel`) and all `.five-logs-*` CSS.
+- **Icon-tile strip forced into one row.** `.detail-tabs-h` switched
+  from `flex-wrap: wrap` (which let 9 tiles spill onto a second row of
+  3 at typical widths) to `flex-wrap: nowrap` with each
+  `.detail-tab-tile` set to `flex: 1 1 0; min-width: 82px` — tiles
+  shrink evenly to fit the available width instead of wrapping.
+  `overflow-x: auto` on the strip is a safety net for very narrow
+  viewports where even the `min-width` floor can't fit all 9 (scrolls
+  horizontally instead of wrapping).
+
+Verified: all 15 real projects' Change & Decisions and Delay panels
+confirmed to no longer contain any `.five-logs-banner` node (both via
+the real-project loop and a repeat check against the synthetic
+populated-data project), and the tile strip container still carries
+`.detail-tabs-h` (now `flex-wrap: nowrap` per the stylesheet) with all
+9 tiles present and correctly ordered.
+
+**"Weekly status report" summary widget — superseded, 2026-10-16.** For
+about an hour this session there was a standalone 6-row widget
+(`buildWeeklyStatusReport()`, Progress/Risks/Issues/Decisions/
+Dependencies/Upcoming milestones) sitting above the tab list, built per
+slide 15 of the governance deck. It went through two rounds of fixes
+(Issues no longer blending with Risks; Progress gaining the full
+Current Stage/Next Milestone/Go-Live/Status fact list) before a user
+pointed out it now duplicated the tab list right below it and asked for
+the two to merge into one — see "Single-open accordion" below for what
+replaced it. `buildWeeklyStatusReport()`/`weeklyReportRow()`/
+`weeklyReportTeaser()` were deleted outright (not deprecated-in-place
+like the `milestones`/`features` fields elsewhere in this file) since
+nothing else referenced them.
+
+**Grid card "Current Stage" clamped to 2 lines (2026-10-16).** A
+project's optional free-text `phase` field is meant to be a short
+secondary detail (e.g. `Pledge – 1.0`'s `"Hypercare (90% complete)"`),
+but nothing stopped it from being much longer — `Pledge - 1.x`'s `phase`
+is an audit-trail-style rationale paragraph (why its stage was advanced,
+dated, with a caveat about unconfirmed reports), and on the Grid card
+that blew the card's height way out, making it feel cluttered ("there is
+a lot of info in current state - this card needs to be clean and
+clear"). Fixed with CSS only — `.phase-fact-detail` is now clamped to 2
+lines with an ellipsis on the Grid card specifically
+(`.card-facts:not(.detail-facts)`, so the full, un-clamped detail view
+is unaffected), and the full text is still available via a native
+`title` tooltip on hover so nothing is actually lost, just hidden until
+you ask for it.
+
+**"Delay" fact relabeled to "Status" (2026-10-16).** A user pointed at
+this row showing "On schedule" under the label "Delay" and flagged
+`delay = Status` — the value here has always been a status-like signal
+("On schedule" or "+N days"), so a label of "Delay" read oddly when
+there wasn't one. Relabeled the `dt` from "Delay" to "Status" in both
+places it appears (the Grid card's fact list and
+`buildProgressFactsList()`); the underlying `p.delayDays`/`isLate` logic,
+CSS classes (`delay-flag`/`is-late`/`is-ontime`), and the separate
+"Impact of delay" row (only shown when late) are all unchanged — this
+was a label-only fix (note: this fact row now lives inside the Schedule
+accordion row, not a separate "Weekly status report" widget — see
+"Single-open accordion" below).
+
+**`milestones` field revived (2026-10-15).** This field existed in the
+schema/README since 2026-09-30 (documented as "CURRENTLY UNUSED... left
+in as-is in case a future feature wants it back") but, on inspection, had
+actually never been added to any of the 15 projects in `data.json` — the
+README's claim that it was "left in the sample data" was stale. Added
+`milestones: []` to all 15 projects to back the Schedule tab's
+Milestones section (and, briefly, the now-superseded Weekly Status
+Report widget's "Upcoming milestones" row).
+
+**RAID Log, added to the Dependencies & Risks tab (2026-10-15).** A user
+shared slide 18's sample table (same "Weekly Status Updates" slide series
+the Delay Log table came from) — Risks, Assumptions, Issues, Dependencies
+consolidated into one log: Item, Description, Reported Date, Action
+Item, Targeted Completion Date, Responsible, Status, Closure Remarks.
+This dashboard already had separate `risks`/`dependencies`/`escalations`
+fields feeding their own sections, none shaped like this table and none
+able to track **Assumptions** at all — so this is a genuinely new,
+separate `raidLog` field (`buildRaidLogTable()`), appended below the
+existing Dependencies/Risks/Escalations sections rather than replacing
+them: those stay as the structured per-category views, RAID Log is the
+single-table rollup across all four categories. Reuses the shared
+wide-table scaffolding (`.wide-log-table-scroll` / `.wide-log-full-table`
+— renamed generic the same day once the Change Request and Decision
+logs were rebuilt onto it too), plus its own per-row **Type** pill
+(Risk/Assumption/Issue/Dependency) —
+the deck's own sample table has no such column, added anyway per
+explicit request, since without it "RAID" is just a label with no way
+to tell which letter a given row actually is. Verified against synthetic
+data (an Assumption and a Resolved Issue entry, not committed to
+`data.json`) — confirmed all 9 columns and type-pill styling render
+correctly.
+
 ## Tab 2 — Grid (live)
 
 A portfolio-wide matrix: every project as a row, every pipeline stage as a
@@ -1076,13 +1538,17 @@ Everything lives in three files:
                                 // "Escalated to leadership" section at the bottom of the Dependencies
                                 // tab (Tab 5), the card's "🚨 N escalated" badge, and the
                                 // detail view's escalations block.
-  "milestones": [              // CURRENTLY UNUSED (2026-09-30) — used to feed a per-project mini
-                                // Gantt in the detail view's Schedule tab (`buildSingleProjectGantt()`);
-                                // that visualization was removed entirely per explicit request, and
-                                // nothing in app.js reads this field anymore. Left in the schema/sample
-                                // data as-is (harmless to keep populating) in case a future feature
-                                // wants it back. (Hawk-eye/Tab 3 plots pipeline stages instead, built
-                                // entirely from history — never read this field either.)
+  "milestones": [              // REVIVED (2026-10-15) — originally fed a per-project mini Gantt in
+                                // the Schedule tab (`buildSingleProjectGantt()`), removed 2026-09-30
+                                // per explicit request; the field itself was marked "left in as-is
+                                // for later" at the time, but had actually never been added to any
+                                // project's real data until now. Now feeds the header's "Weekly
+                                // status report" summary's "Upcoming milestones" row (top 2, date >=
+                                // today) and the Schedule tab's "Milestones" section (full list,
+                                // `id="milestones-section"`). `status` is one of the same
+                                // green/amber/red/black values as a project's own `status`.
+                                // (Hawk-eye/Tab 3 plots pipeline stages instead, built entirely from
+                                // history — never reads this field.)
     { "name": "Requirements sign-off", "date": "2026-08-01", "status": "green" }
   ],
   "stagePlan": {                // OPTIONAL — per-stage planned dates, keyed by pipeline stage name.
@@ -1105,7 +1571,105 @@ Everything lives in three files:
                                  // the "Delay log entries (this week)" field. Feeds the stage detail
                                  // modal's Delay Analysis (by team/member/reason) and Delay Log
                                  // (searchable/sortable table) tabs — both filtered to `stage`.
+                                 // Also feeds the detail view's **Delay** tab's "Delay attribution
+                                 // (all stages)" and "Delay log entries (all stages)" sections
+                                 // (2026-10-15) — same two renderers, called unfiltered instead of
+                                 // filtered to one stage.
     { "id": "DL-101", "date": "2026-01-10", "stage": "Development", "reason": "Review defects resolution", "team": "Team2", "member": "V. Mehta", "days": 2 }
+  ],
+  "changeRequests": [            // OPTIONAL (2026-10-15) — structured Change Request Log (Change &
+                                  // Decisions tab). Only entries that have moved off "TBD" need to be
+                                  // added; nothing here is auto-generated.
+    {
+      "id": "CR-1",
+      "title": "Rooming Validation Enhancements",
+      "description": "...",
+      "submittedDate": "2026-06-09",
+      "by": "Aksharbhai",
+      "actionItem": "Review requirements, assess effort, obtain CR approval",
+      "approvalStatus": "Approved for current phase",  // free text; "approved"/"pending"/"tbd" (case-
+                                                          // insensitive substring) drive the badge color
+      "impact": "Go-Live date impacted by 10 days"
+    }
+  ],
+  "decisions": [                 // OPTIONAL (2026-10-15) — structured Decision Log (Change &
+                                  // Decisions tab). Distinct from Dependencies/Risks: a decision is a
+                                  // closed-door call that was made, not an open item being resolved.
+    { "id": "DEC-1", "decision": "Go-Live Date Extension by 1 Month", "description": "...", "dateTaken": "2026-04-09", "by": "Aksharbhai Patel" }
+  ],
+  "goLiveChecklist": [           // OPTIONAL (2026-10-15) — Stage-gate tab's "Go-Live readiness"
+                                  // section. Only needs entries for items that have moved off
+                                  // "Not started" — see GOLIVE_CHECKLIST_ITEMS in app.js for the
+                                  // fixed 7-item list (SIT, Regression, UAT, Cyber Security,
+                                  // Performance, Change Management, RGC Approval); anything not
+                                  // listed here defaults to "Not started."
+    { "item": "System Integration Testing (SIT)", "status": "Complete", "notes": "" } // status: "Not started" | "In progress" | "Complete"
+  ],
+  "delayItemLog": [              // OPTIONAL (2026-10-15) — the detail view's **Delay** tab's
+                                  // "Reported delay log" section (moved there from the Schedule tab
+                                  // the same day it was added). NOT the same field as `delayLog`
+                                  // above (different shape, different feature — see the "near-miss"
+                                  // note in Tab 1's writeup for why these are two separate fields
+                                  // even though both are "delay logs"). This one is the
+                                  // narrative/root-cause/ownership version, modeled on the
+                                  // slide-deck's own Delay Log table.
+    {
+      "id": "DL-ITEM-1",
+      "delayedItem": "Web UI/UX Readiness",
+      "description": "...",
+      "reportedDate": "2026-03-26",
+      "impactedPhase": "Development",
+      "impact": "Lost 3 weeks",            // free text (Time/Cost/Scope impact)
+      "rootCause": "Vendor onboarding delays",
+      "responsible": "Satish Buddhadev",
+      "actionItem": "Cancel vendor contract",
+      "actionTaken": "Proceeded with internal design team",
+      "status": "Closed",                  // free text; "closed"/"resolved" (case-insensitive) renders green
+      "closureRemarks": "Go-Live date extended from 07/31 to 08/28/2026"
+    }
+  ],
+  "features": [                  // OPTIONAL (2026-10-15) — CURRENTLY UNUSED, same day it was added
+                                  // (2026-10-15): fed a "Features" tab/feature-sprint tracker that
+                                  // was built, reviewed, and then explicitly removed before
+                                  // approval ("dont know if we need features"). Following this
+                                  // file's `milestones`-field precedent, left here unused rather
+                                  // than deleted — `buildFeatureTracker()`/`buildFeatureKpis()` in
+                                  // app.js are similarly kept, just no longer wired to a tab — in
+                                  // case the feature is revived later. Was the most granular view in
+                                  // the dashboard (every feature/capability as its own row, not one
+                                  // project-level status); its Change Request KPI was never a
+                                  // separate field — it read `changeRequests.length` live.
+    {
+      "sprint": 1,
+      "type": "Web",             // free text, shown as-is (e.g. "Web", "Mobile", "Web/Mob.")
+      "feature": "Login & Profile Management",
+      "status": "Done",          // "Done" | "In Progress" | "Partially Done" | "Excluded" | "Blocked" | "Upcoming"
+      "notes": "Read-only profile for now; full profile mgmt in Phase 3",
+      "plannedDate": "2026-04-20",
+      "actualDate": "2026-04-24",
+      "delayReason": "Design delay (4 days)"
+    }
+  ],
+  "raidLog": [                   // OPTIONAL (2026-10-15) — Dependencies & Risks tab's "RAID Log"
+                                  // section: Risks, Assumptions, Issues, Dependencies consolidated
+                                  // into one log (slide 18). Distinct from `risks`/`dependencies`/
+                                  // `escalations` above (different shape, different section) — this
+                                  // is the only place "Assumption"-type entries can be tracked.
+                                  // `type` is one of RAID_TYPES in app.js: "Risk" | "Assumption" |
+                                  // "Issue" | "Dependency" — not in the deck's own sample table,
+                                  // added so each row's RAID letter is actually distinguishable.
+    {
+      "id": "RAID-1",
+      "type": "Issue",
+      "item": "QA tasks getting delayed due to unavailability of QA resource",
+      "description": "QA task on hold due to QA resource not yet finalized, delaying requirement understanding and test case design",
+      "reportedDate": "2026-03-24",
+      "actionItem": "Kishanbhai to conduct QA interviews this week; onboard QA resource from 1-Apr-26; resume requirement understanding and test case design immediately after onboarding",
+      "targetedCompletionDate": "2026-04-03",
+      "responsible": "Nimeshbhai / Kishanbhai",
+      "status": "Resolved",             // free text; "closed"/"resolved" (case-insensitive) renders green
+      "closureRemarks": "QA resouce onboarded on project from 06/04/2026"
+    }
   ],
   "delayLogSeq": 101             // SYSTEM-MANAGED — running counter scripts/ingest.py uses to mint
                                   // each new delayLog entry's sequential "DL-NNN" id. Don't hand-edit.
