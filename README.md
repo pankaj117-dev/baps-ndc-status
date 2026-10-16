@@ -1370,6 +1370,40 @@ run automatically picks it back up once the reason is filled in — no reason
 is ever silently dropped. Once merged, the reason shows up with its date on
 the **Status History** tab and is highlighted (amber) if it's ever missing.
 
+### Alternative: the `pm-weekly-update` Q&A skill (2026-10-16)
+
+A user asked: *"I need to create a skill that is used like a Q and A that
+will allow PMs to fill in all the details. They invoke the skill and talk
+with it to add alll the data week over week"* — clarified to be: a
+project skill usable from **both Cursor and Claude** ("do A but it can be
+used with claude or cursor"), covering **every** field including the newer
+ones the issue form doesn't have yet ("yes cover it all" —
+`changeRequests`, `decisions`, `goLiveChecklist`, `raidLog`, `features`,
+`milestones`, `delayItemLog`), and writing straight into the dashboard
+rather than filing an issue and waiting for the scheduled bot ("it should
+just load all the data into the dashboard").
+
+Lives at `.cursor/skills/pm-weekly-update/` (`SKILL.md` + `reference.md`),
+with `.claude/skills/pm-weekly-update` symlinked to it so either tool
+discovers the same content — one canonical copy, no drift. The skill
+interviews the PM field-by-field (same labels/order/conditional-required
+rules as the issue form above, including the same status-downgrade-needs-
+a-reason gate), then writes a `fields.json` and runs
+`scripts/apply_weekly_update_direct.py --fields ...`, a new script that
+calls `ingest.py`'s own `apply_weekly_update()`/`snapshot_history()`
+unchanged for every core field (so the merge/validation logic lives in
+exactly one place, not duplicated), and adds `upsert_by_id()` /
+`upsert_by_key()` helpers for the six extended fields — entries with a
+matching `id` (or `item`/`name`/`sprint`+`feature` key, for the three
+fields that aren't id-based) are merged in place; entries without one are
+appended with a freshly minted id. This updates `data.json`/`history.json`
+immediately — no issue, no bot run, no waiting for the next scheduled
+ingest — but the PM still needs to `git pull` first and commit/push the
+result afterward, since the scheduled bot commits independently and can
+otherwise race a direct write to the same file (see `scripts/
+apply_weekly_update_direct.py`'s docstring and the skill's own
+"before you start" step).
+
 ## Adding a dependency mid-week
 
 When a new cross-team blocker comes up between weekly cycles, open a **Add a
