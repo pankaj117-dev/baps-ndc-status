@@ -1459,16 +1459,24 @@
           : "is-future" + (b.overdue ? " is-plan-overdue" : "");
       const code = STAGE_SHORT_CODE[b.stage] || b.stage;
 
-      // Not clickable (2026-10-16, per explicit request — "the pop up
-      // that happens when I click the boxes in the timeline view" is no
-      // longer wanted). Blocks are now purely visual; no role/tabindex/
-      // title affordance, no stage detail modal on click.
+      // Clickable again (2026-10-16, re-added same day it was removed —
+      // "I want to click on this - and make it such a way people know
+      // they can click on it"). role="button" + tabindex make it
+      // keyboard-reachable; cursor:pointer + a hover highlight (CSS)
+      // are the "you can click this" affordance; title/aria-label spell
+      // it out for anyone hovering or using a screen reader.
       track.appendChild(
         el(
           "div",
           {
             class: "stagegantt-block " + kindClass,
             style: `left:${left}px;width:${width}px`,
+            "data-project-id": p.id,
+            "data-stage": b.stage,
+            role: "button",
+            tabindex: "0",
+            title: "Click for stage detail — " + b.stage,
+            "aria-label": "View full stage detail for " + b.stage,
           },
           [width >= 32 ? code : ""]
         )
@@ -1489,6 +1497,17 @@
 
     inner.appendChild(track);
     wrap.appendChild(inner);
+
+    wrap.querySelectorAll(".stagegantt-block").forEach((blockEl) => {
+      const open = () => openStageDetail(blockEl.getAttribute("data-project-id"), blockEl.getAttribute("data-stage"));
+      blockEl.addEventListener("click", open);
+      blockEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          open();
+        }
+      });
+    });
 
     // Default scroll position: land with "today" a little in from the
     // left edge, same reasoning as Hawk-eye's own default scroll.

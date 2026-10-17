@@ -727,6 +727,24 @@ that happens when I click the boxes in the timeline view."*
   unchanged, confirming the shared `openStageDetail()` function and
   modal weren't broken for the entry points that still use them.
 
+**Stage-gate timeline boxes made clickable again, same day.** Looking
+at a screenshot of the now-non-clickable timeline, a user said: *"I
+want to click on this - and make it such a way people know they can
+click on it."* `.stagegantt-block` got `data-project-id`/`data-stage`
+back plus `role="button"`, `tabindex="0"`, a `title`/`aria-label`
+spelling out what clicking does, and click/keydown (Enter/Space)
+listeners calling `openStageDetail()` again — same function the Grid
+and Hawk-eye tabs already used, so this didn't duplicate any modal
+logic. CSS affordance: `cursor: pointer` plus a `:hover`/
+`:focus-visible` accent-colored box-shadow ring, same visual language
+as the current-stage card's click affordance had (before that card was
+removed) and the detail accordion tiles already use. Verified: every
+`.stagegantt-block` across all 15 real projects has `role="button"`,
+`tabindex="0"`, and a click listener; invoking that listener directly
+on the current stage's block populates the real per-stage modal with
+that project's current stage, same regression pattern used for the
+(now-removed) current-stage card's own click check.
+
 **"Five logs" banner removed; icon-tile strip now a single row
 (2026-10-16).** With the horizontal icon-tile strip now covering all 9
 destinations up top, a user looked at the Change & Decisions tile

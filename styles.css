@@ -586,8 +586,11 @@ body {
 }
 
 .stagegantt-block {
-  /* Not clickable (2026-10-16) — purely visual, no cursor/hover
-     affordance; see the removal note at its build site in app.js. */
+  /* Clickable again (2026-10-16, re-added same day it was removed —
+     "I want to click on this - and make it such a way people know
+     they can click on it"). cursor:pointer + hover highlight are the
+     click affordance; see the build site in app.js for the
+     click/keydown listeners this pairs with. */
   position: absolute;
   top: 0;
   height: 32px;
@@ -598,8 +601,15 @@ body {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
+  cursor: pointer;
+  transition: box-shadow 0.12s ease, outline-color 0.12s ease;
   z-index: 1;
 }
+.stagegantt-block:hover,
+.stagegantt-block:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+.stagegantt-block:focus-visible { outline: none; }
 
 .stagegantt-block.is-done {
   background: var(--green-bg);
