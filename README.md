@@ -771,6 +771,31 @@ before you touch it; hover/focus still adds a stronger accent ring plus
 a small upward lift (`translateY(-1px)`), matching the lift effect
 `.btn-ghost`/`.btn-primary` already use on hover.
 
+**"Today" line bug fix, same day — "the timeline does not look correct
+the today is after the 27th of Oct?"** A screenshot showed the "Today"
+line sitting visually to the LEFT of the current ("Tech. Design")
+block, even though its own caption read "Sep 17 → now · 29d" — i.e.
+today (Oct 16) is unambiguously inside that block's real date range,
+not before it. Root cause: `buildStageGateTimeline()`'s "Today" line
+was positioned by a RAW, independently-computed `xPx(todayIso)` pixel
+position, while every BLOCK's rendered position goes through the
+collision-avoiding `cursorPx` shift described above (each block gets
+pushed right far enough to leave room for its own caption's real pixel
+width). On a project with a long overall span, `PX_PER_DAY` compresses
+heavily, so a caption's fixed pixel width can represent many "virtual
+days" of shift — the current block had been pushed well to the right
+of its own true calendar position by the previous (Requirements)
+block's long caption, while the Today line kept using the unshifted
+raw date position, landing to its left. Fixed by anchoring the Today
+line to the CURRENT block's own rendered right edge
+(`currentPlaced.left + currentPlaced.width`) instead of a raw date
+calculation — correct by construction, since `buildHawkeyeBlocks()`
+already defines the current stage's `end` as `today`, whatever shift
+has or hasn't been applied to get there. Verified with a dedicated
+check across all 15 real projects: the Today line's pixel position now
+exactly matches the current block's right edge (within rounding) for
+every one, and is never left of that block's own start.
+
 **"Five logs" banner removed; icon-tile strip now a single row
 (2026-10-16).** With the horizontal icon-tile strip now covering all 9
 destinations up top, a user looked at the Change & Decisions tile

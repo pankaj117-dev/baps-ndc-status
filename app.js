@@ -1432,7 +1432,26 @@
       cursorPx = left + Math.max(width, capWidth + CAPTION_GAP_PX);
       return { b, left, width, metaLine, metaOverdue };
     });
-    const timelineWidthPx = Math.max(cursorPx, xPx(todayIso)) + 24;
+
+    // "Today" line position (2026-10-16 bug fix — "the timeline does
+    // not look correct the today is after the 27th of Oct?"). The
+    // CURRENT stage's block always ends exactly on today by definition
+    // (`buildHawkeyeBlocks` sets its `end` to `today` for the current
+    // stage), so the Today line belongs at that block's RENDERED right
+    // edge — NOT at a raw `xPx(todayIso)` computed independently. Using
+    // the raw date position was the bug: once an earlier block's long
+    // caption pushed the collision-avoidance `cursorPx` rightward (very
+    // visible on a compressed, multi-month scale where a caption's real
+    // pixel width is much wider than the few actual days it's reserving
+    // room for), the current block's `left` could end up well to the
+    // right of its own true calendar position — but the Today line kept
+    // using the UNSHIFTED raw position, so it visually landed to the
+    // LEFT of the stage it's actually inside. Anchoring to the current
+    // block's own (possibly-shifted) edge keeps the two always in sync,
+    // whatever the shift ends up being.
+    const currentPlaced = placed.find((pl) => pl.b.kind === "current");
+    const todayLineX = currentPlaced ? currentPlaced.left + currentPlaced.width : xPx(todayIso);
+    const timelineWidthPx = Math.max(cursorPx, todayLineX) + 24;
 
     const wrap = el("div", { class: "stagegantt-scroll" });
     const inner = el("div", { class: "stagegantt-inner", style: `width:${timelineWidthPx}px` });
@@ -1448,7 +1467,7 @@
       track.appendChild(el("div", { class: "stagegantt-grid-line", style: `left:${m.px}px` }));
     });
     track.appendChild(
-      el("div", { class: "stagegantt-today-line", style: `left:${xPx(todayIso)}px` }, [
+      el("div", { class: "stagegantt-today-line", style: `left:${todayLineX}px` }, [
         el("span", { class: "stagegantt-today-label" }, ["Today"]),
       ])
     );
