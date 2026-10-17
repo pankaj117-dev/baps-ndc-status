@@ -548,13 +548,15 @@ body {
   white-space: nowrap;
 }
 
-/* Tall enough for the block itself (top ~34px) plus its single caption
-   row underneath it (~38px) — see `.stagegantt-caption`. Block spacing is
-   computed in JS to always reserve room for the caption text, so there's
-   never a need for a second staggered tier. */
+/* Tall enough for the block itself (top ~34px) plus its 2-line caption
+   underneath it (~28px, down from 3 lines/~38px, 2026-10-16 — "the
+   timeline needs to be cleaner too", merged the date range + day-count
+   into one line) — see `.stagegantt-caption`. Block spacing is computed
+   in JS to always reserve room for the caption text, so there's never a
+   need for a second staggered tier. */
 .stagegantt-track {
   position: relative;
-  height: 76px;
+  height: 68px;
 }
 
 .stagegantt-grid-line {
@@ -664,19 +666,16 @@ body {
   color: var(--ink);
 }
 
-.stagegantt-caption-date {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  color: var(--ink-faint);
-}
-
+/* Quieter single tone (2026-10-16) now that this line carries BOTH the
+   date range and day-count merged together — the old bold/dark weight
+   was tuned for just the short "29d" count, not a full date range. */
 .stagegantt-caption-meta {
   font-family: var(--font-mono);
   font-size: 10.5px;
-  font-weight: 700;
-  color: var(--ink-soft);
+  font-weight: 500;
+  color: var(--ink-faint);
 }
-.stagegantt-caption-meta.is-plan-overdue { color: var(--red); }
+.stagegantt-caption-meta.is-plan-overdue { color: var(--red); font-weight: 700; }
 
 /* ---------- Project × Stage grid tab ---------- */
 

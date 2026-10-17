@@ -745,6 +745,21 @@ on the current stage's block populates the real per-stage modal with
 that project's current stage, same regression pattern used for the
 (now-removed) current-stage card's own click check.
 
+**Timeline caption cleanup, same day — "the timeline needs to be
+cleaner too."** Each block's caption used to be 3 stacked lines (stage
+name, then date range, then day-count, in 3 different weights/colors).
+The date range and day-count are now merged into one line ("Sep 17 →
+now  ·  29d"), so every caption is 2 lines instead of 3 — layout-
+collision math (`capWidth`) now measures the width of that merged
+string directly rather than taking the max of the two separate strings,
+so blocks still never collide. The merged line also dropped to a single
+quieter weight/color (`font-weight: 500`, `--ink-faint`) instead of the
+old mixed bold-dark-days/plain-faint-date look, except the "plan
+passed, not yet reported started" overdue case, which stays bold red
+for emphasis. `.stagegantt-track`'s reserved height shrank from 76px to
+68px to match. `.stagegantt-caption-date` (now-unused CSS class) was
+removed.
+
 **"Five logs" banner removed; icon-tile strip now a single row
 (2026-10-16).** With the horizontal icon-tile strip now covering all 9
 destinations up top, a user looked at the Change & Decisions tile

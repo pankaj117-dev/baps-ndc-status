@@ -1397,12 +1397,15 @@
       } else if (b.kind !== "future" && seg) {
         metaText = (seg.approxStart ? "≥" : "") + seg.days + "d";
       }
-      const capWidth = Math.max(
-        textWidthPx(b.stage, STAGE_CHAR_PX),
-        textWidthPx(dateLabel, META_CHAR_PX),
-        textWidthPx(metaText, META_CHAR_PX)
-      );
-      return { b, dateLabel, metaText, capWidth };
+      // Caption cleanup (2026-10-16, "the timeline needs to be cleaner
+      // too") — date range and day-count used to be two separate lines;
+      // merged into one ("Sep 17 → now  ·  29d") so each block's caption
+      // is 2 lines instead of 3. Width is measured on the COMBINED
+      // string now, not the max of the two separately, so collision
+      // layout still reserves correctly for the (now wider) single line.
+      const metaLine = dateLabel + "  \u00b7  " + metaText;
+      const capWidth = Math.max(textWidthPx(b.stage, STAGE_CHAR_PX), textWidthPx(metaLine, META_CHAR_PX));
+      return { b, metaLine, metaOverdue: b.kind === "future" && b.overdue, capWidth };
     });
 
     // Sequential collision-avoiding layout — same idea as Hawk-eye's
@@ -1415,7 +1418,7 @@
     // calendar-adjacent stages with long captions get visually spread a
     // little further apart than their raw dates alone would place them.
     let cursorPx = 0;
-    const placed = captioned.map(({ b, dateLabel, metaText, capWidth }) => {
+    const placed = captioned.map(({ b, metaLine, metaOverdue, capWidth }) => {
       const rawLeft = xPx(b.start);
       // Width comes from the stage's OWN real date span, measured before
       // any rightward shift — not from `end - left`. Using the shifted
@@ -1427,7 +1430,7 @@
       const width = Math.max(xPx(b.end) - rawLeft, MIN_BLOCK_PX);
       const left = Math.max(rawLeft, cursorPx);
       cursorPx = left + Math.max(width, capWidth + CAPTION_GAP_PX);
-      return { b, left, width, dateLabel, metaText };
+      return { b, left, width, metaLine, metaOverdue };
     });
     const timelineWidthPx = Math.max(cursorPx, xPx(todayIso)) + 24;
 
@@ -1450,7 +1453,7 @@
       ])
     );
 
-    placed.forEach(({ b, left, width, dateLabel, metaText }) => {
+    placed.forEach(({ b, left, width, metaLine, metaOverdue }) => {
       const kindClass =
         b.kind === "done"
           ? "is-done"
@@ -1485,12 +1488,14 @@
       // Caption directly below the block, left-anchored to it — always
       // real dates, no hover required. The layout pass above already
       // reserved enough horizontal room for this exact text, so a single
-      // tier is guaranteed not to collide with its neighbors.
+      // tier is guaranteed not to collide with its neighbors. Merged to
+      // 2 lines (2026-10-16, "the timeline needs to be cleaner too") —
+      // date range and day-count used to be two separate lines; now one
+      // combined "date range  ·  Nd" line under the stage name.
       track.appendChild(
         el("div", { class: "stagegantt-caption", style: `left:${left}px` }, [
           el("span", { class: "stagegantt-caption-stage" }, [b.stage]),
-          el("span", { class: "stagegantt-caption-date" }, [dateLabel]),
-          el("span", { class: "stagegantt-caption-meta" + (b.kind === "future" && b.overdue ? " is-plan-overdue" : "") }, [metaText]),
+          el("span", { class: "stagegantt-caption-meta" + (metaOverdue ? " is-plan-overdue" : "") }, [metaLine]),
         ])
       );
     });
