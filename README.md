@@ -760,6 +760,17 @@ for emphasis. `.stagegantt-track`'s reserved height shrank from 76px to
 68px to match. `.stagegantt-caption-date` (now-unused CSS class) was
 removed.
 
+**Persistent "clickable" shadow, same day — "can you make those boxes
+easy to know you can click on them."** The hover-only cursor/ring added
+earlier that same day isn't visible without hovering — nothing told
+you *before* you tried. `.stagegantt-block` now carries a RESTING
+box-shadow (`0 2px 5px rgba(30, 41, 59, 0.16)`) at all times, same idea
+as `.btn-primary`'s always-on colored shadow elsewhere in the
+dashboard, so every box reads as a raised, clickable button even
+before you touch it; hover/focus still adds a stronger accent ring plus
+a small upward lift (`translateY(-1px)`), matching the lift effect
+`.btn-ghost`/`.btn-primary` already use on hover.
+
 **"Five logs" banner removed; icon-tile strip now a single row
 (2026-10-16).** With the horizontal icon-tile strip now covering all 9
 destinations up top, a user looked at the Change & Decisions tile

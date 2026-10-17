@@ -590,9 +590,12 @@ body {
 .stagegantt-block {
   /* Clickable again (2026-10-16, re-added same day it was removed —
      "I want to click on this - and make it such a way people know
-     they can click on it"). cursor:pointer + hover highlight are the
-     click affordance; see the build site in app.js for the
-     click/keydown listeners this pairs with. */
+     they can click on it"). Followed up same day — "can you make
+     those boxes easy to know you can click on them" — hover-only cues
+     aren't visible without hovering, so a RESTING shadow (same idea as
+     .btn-primary's always-on colored shadow) now signals "clickable"
+     even before you touch it; hover/focus adds a stronger ring + a
+     slight lift, same language the app's other buttons already use. */
   position: absolute;
   top: 0;
   height: 32px;
@@ -604,12 +607,14 @@ body {
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
-  transition: box-shadow 0.12s ease, outline-color 0.12s ease;
+  box-shadow: 0 2px 5px rgba(30, 41, 59, 0.16);
+  transition: box-shadow 0.12s ease, transform 0.12s ease, outline-color 0.12s ease;
   z-index: 1;
 }
 .stagegantt-block:hover,
 .stagegantt-block:focus-visible {
-  box-shadow: 0 0 0 2px var(--accent);
+  box-shadow: 0 0 0 2px var(--accent), 0 4px 10px rgba(30, 41, 59, 0.2);
+  transform: translateY(-1px);
 }
 .stagegantt-block:focus-visible { outline: none; }
 
