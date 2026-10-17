@@ -586,6 +586,8 @@ body {
 }
 
 .stagegantt-block {
+  /* Not clickable (2026-10-16) — purely visual, no cursor/hover
+     affordance; see the removal note at its build site in app.js. */
   position: absolute;
   top: 0;
   height: 32px;
@@ -596,11 +598,8 @@ body {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
-  cursor: pointer;
-  transition: box-shadow 0.12s ease;
   z-index: 1;
 }
-.stagegantt-block:hover { box-shadow: 0 0 0 2px var(--accent); }
 
 .stagegantt-block.is-done {
   background: var(--green-bg);
@@ -3347,64 +3346,9 @@ dd.is-missing {
 
 .stagedetail-tab-btn:hover { color: var(--ink); }
 
-/* Current-stage overview card, embedded in the Stage-gate panel
-   (2026-10-16) — a wrapper around a reused `buildStageOverviewPanel()`
-   render (same `.stagedetail-datebox-row`/`.stagedetail-completion`/
-   `.stagedetail-stat-row` classes as the per-stage modal, styled above)
-   plus a kicker/title header and a "View full stage history" link. */
-.current-stage-card {
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--bg-panel);
-  padding: 16px;
-  margin-bottom: 18px;
-  /* Whole card is one click target → full stage detail modal (2026-10-16,
-     "when i click on the boxes the top pop up shows up anyways. make it
-     such a way that people know they can click on it") — cursor +
-     hover highlight are the "you can click this" affordance. */
-  cursor: pointer;
-  transition: border-color 0.12s ease, box-shadow 0.12s ease;
-}
-.current-stage-card:hover,
-.current-stage-card:focus-visible {
-  border-color: var(--accent);
-  box-shadow: var(--shadow-hover);
-}
-.current-stage-card:focus-visible { outline: none; }
-
-.current-stage-card-head {
-  margin-bottom: 14px;
-}
-
-.current-stage-card-kicker {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ink-faint);
-  margin-bottom: 4px;
-}
-
-.current-stage-card-title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--ink);
-}
-
-/* Plain visual cue now (2026-10-16) — the whole `.current-stage-card`
-   is the actual click target, so this is just a `<span>`, not its own
-   button/listener. */
-.current-stage-card-link {
-  display: block;
-  margin-top: 14px;
-  font-family: var(--font-display);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--accent);
-}
+/* Current-stage overview card (`.current-stage-card*`) removed
+   2026-10-16, same day it was made whole-card-clickable — see the
+   removal note at `buildStageGateTimeline()`'s old caller in app.js. */
 
 .stagedetail-tab-btn.is-active {
   color: var(--accent);

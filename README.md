@@ -699,6 +699,34 @@ that project's current stage; a synthetic unstaged project
 both via a direct function call and via the full `buildProjectDetail()`
 render.
 
+**Current-stage overview card removed; Stage-gate timeline boxes no
+longer clickable (2026-10-16, later the same day).** Looking at a
+screenshot of the above card together with the Stage-gate timeline
+below it, a user said: *"I don't need the top thing and the pop up
+that happens when I click the boxes in the timeline view."*
+- `buildCurrentStageOverviewCard(p)` and its call site in
+  `buildProjectDetail()` were deleted outright (not deprecated-in-place
+  — nothing else called it, unlike `milestones`/`features`), along with
+  all `.current-stage-card*` CSS. `buildStageOverviewPanel()` itself
+  stays — the per-stage modal (`buildStageDetail`/`openStageDetail`) is
+  its only remaining caller.
+- `buildStageGateTimeline()`'s blocks (`.stagegantt-block`) dropped
+  `data-project-id`/`data-stage`/`role="button"`/`tabindex="0"` and
+  their click/keydown listeners — they're purely visual now, same
+  colors/captions/legend/today-line/scroll behavior as before, just no
+  longer open `openStageDetail()` on click. `.stagegantt-block`'s
+  `cursor: pointer` and `:hover` box-shadow were removed from the CSS
+  to match. Scoped narrowly to this one timeline — the Grid tab and
+  Hawk-eye tab's own stage-cell/chip click-throughs to the same
+  `openStageDetail()` modal (a different feature the user didn't
+  mention) are untouched; the modal itself still works from those.
+- Verified: all 15 real projects render zero `.current-stage-card`
+  nodes in the Stage-gate panel; every `.stagegantt-block` has no
+  `role`/`tabindex` attribute and no click listener; the Grid-tab/
+  Hawk-eye-tab stage-detail-modal regression check still passes
+  unchanged, confirming the shared `openStageDetail()` function and
+  modal weren't broken for the entry points that still use them.
+
 **"Five logs" banner removed; icon-tile strip now a single row
 (2026-10-16).** With the horizontal icon-tile strip now covering all 9
 destinations up top, a user looked at the Change & Decisions tile

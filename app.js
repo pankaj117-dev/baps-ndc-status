@@ -1459,17 +1459,16 @@
           : "is-future" + (b.overdue ? " is-plan-overdue" : "");
       const code = STAGE_SHORT_CODE[b.stage] || b.stage;
 
+      // Not clickable (2026-10-16, per explicit request — "the pop up
+      // that happens when I click the boxes in the timeline view" is no
+      // longer wanted). Blocks are now purely visual; no role/tabindex/
+      // title affordance, no stage detail modal on click.
       track.appendChild(
         el(
           "div",
           {
             class: "stagegantt-block " + kindClass,
             style: `left:${left}px;width:${width}px`,
-            "data-project-id": p.id,
-            "data-stage": b.stage,
-            tabindex: "0",
-            role: "button",
-            title: "Click for stage detail",
           },
           [width >= 32 ? code : ""]
         )
@@ -1490,17 +1489,6 @@
 
     inner.appendChild(track);
     wrap.appendChild(inner);
-
-    wrap.querySelectorAll(".stagegantt-block").forEach((blockEl) => {
-      const open = () => openStageDetail(blockEl.getAttribute("data-project-id"), blockEl.getAttribute("data-stage"));
-      blockEl.addEventListener("click", open);
-      blockEl.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          open();
-        }
-      });
-    });
 
     // Default scroll position: land with "today" a little in from the
     // left edge, same reasoning as Hawk-eye's own default scroll.
@@ -4319,12 +4307,10 @@
     // stages when on record, same source (`buildHawkeyeBlocks`) Hawk-eye
     // itself uses, so a clicked-through "potential target" here always
     // matches what's shown there.
-    const currentStageCard = buildCurrentStageOverviewCard(p);
-    if (currentStageCard) {
-      stagegatePanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Current stage"]));
-      stagegatePanel.appendChild(currentStageCard);
-    }
-
+    // "Current stage" overview card removed 2026-10-16 per explicit
+    // request ("I don't need the top thing") — it duplicated the same
+    // Start/Completion/Progress info the stage detail modal below
+    // already shows for whichever stage you click into.
     stagegatePanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Stage-gate timeline"]));
     stagegatePanel.appendChild(
       el("div", { class: "stagegantt-legend" }, [
@@ -5064,69 +5050,14 @@
     return root;
   }
 
-  // Current-stage overview card, embedded directly in the Stage-gate
-  // panel (2026-10-16 — "I want this image view in the details too -
-  // wherever it make sense", pointing at the per-stage modal's Overview
-  // tab, screenshotted from MyBKY's "Tech. Design" stage). Reuses
-  // `buildStageOverviewPanel()` verbatim — same Start/Completion date
-  // boxes, Stage Progress bar, and 3 KPI cards shown in that modal — for
-  // the project's CURRENT stage only, so a user doesn't have to click
-  // into the Grid to see it. Clicking the full stage detail modal for
-  // Date History/Delay Analysis/Delay Log — this card is an at-a-glance
-  // summary, not a replacement for that drill-down. Returns null for a
-  // project with no current stage on record (`p.stage` unset or not a
-  // real pipeline stage, e.g. "Unstaged") since there's nothing to show.
-  //
-  // Whole-card click target (2026-10-16) — a user clicked one of the
-  // date boxes/KPI cards expecting the full stage modal to open and
-  // found only the small "View full stage history" link actually did
-  // anything ("when i click on the boxes the top pop up shows up
-  // anyways. make it such a way that people know they can click on
-  // it"). Confirmed via follow-up: the WHOLE card is now one click
-  // target (`role="button"`, keyboard-activatable), with a hover
-  // cursor + highlight as the "you can click this" affordance — the
-  // "View full stage history →" text stays as a plain (non-interactive)
-  // visual cue of what clicking does, since the card itself now handles
-  // the click.
-  function buildCurrentStageOverviewCard(p) {
-    const stage = p.stage;
-    if (!stage || PIPELINE_STAGES.indexOf(stage) === -1) return null;
-    const stageIndex = PIPELINE_STAGES.indexOf(stage);
-    const segments = computeStageSegments(p);
-    const seg = segments.find((s) => s.stage === stage) || null;
-    const days = seg ? seg.days : 0;
-    const plan = (p.stagePlan && p.stagePlan[stage]) || {};
-    const delayEntries = stageDelayLog(p, stage);
-
-    const card = el(
-      "div",
-      {
-        class: "current-stage-card",
-        role: "button",
-        tabindex: "0",
-        "aria-label": "View full stage history for " + stage,
-      },
-      [
-        el("div", { class: "current-stage-card-head" }, [
-          el("span", { class: "current-stage-card-kicker" }, [
-            "CURRENT STAGE \u00b7 " + (stageIndex + 1) + " OF " + PIPELINE_STAGES.length,
-          ]),
-          el("h4", { class: "current-stage-card-title" }, [stage]),
-        ]),
-        buildStageOverviewPanel(p, stage, seg, days, "current", plan, delayEntries),
-        el("span", { class: "current-stage-card-link" }, ["View full stage history \u2192"]),
-      ]
-    );
-    const open = () => openStageDetail(p.id, stage);
-    card.addEventListener("click", open);
-    card.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        open();
-      }
-    });
-    return card;
-  }
+  // Current-stage overview card (`buildCurrentStageOverviewCard`,
+  // embedded in the Stage-gate panel 2026-10-16, made whole-card-
+  // clickable the same day) was removed 2026-10-16, same day as its
+  // last edit — see the removal note at its old call site in
+  // `buildProjectDetail()` above. Function deleted outright since
+  // nothing else called it; `buildStageOverviewPanel()` below is still
+  // very much alive — the stage detail modal (`openStageDetail`) is its
+  // only remaining caller now.
 
   function dateVarianceCell(initial, latest, actual) {
     let varianceLabel = "—";
