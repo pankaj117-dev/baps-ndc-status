@@ -28,5 +28,15 @@
     "createdAt": "2026-09-09T10:50:24Z",
     "sourceIssue": "https://github.com/pankaj117-dev/baps-ndc-status/issues/2",
     "status": "open"
+  },
+  {
+    "id": "note-4",
+    "projectId": "emm",
+    "text": "Janak bhai to whitelist new URLs in Google Console. #DevOps-1205. \nGoogle Places APIs not returning any address in search fields in EMM. This functionality not working in new URLs setup for automatic FE deployment via CI/CD.",
+    "mitigationImpact": "Divyesh bhai to share configurational setup with Janak bhai for #DevOps-1205",
+    "raisedBy": "Nitin",
+    "createdAt": "2026-10-27T09:03:39Z",
+    "sourceIssue": "https://github.com/pankaj117-dev/baps-ndc-status/issues/11",
+    "status": "open"
   }
 ]

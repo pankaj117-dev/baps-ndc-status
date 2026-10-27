@@ -1,6 +1,6 @@
 {
   "asOf": "2026-10-27",
-  "lastUpdated": "2026-10-27T04:25:39.529728Z",
+  "lastUpdated": "2026-10-27T17:00:17.465658Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -511,13 +511,13 @@
       "dependencies": [
         {
           "id": "DEP-101",
-          "text": "1. SSO (Single Sign-On) user accounts still need to be created - Janakbhai: ETA 11th Oct 2026",
+          "text": "SSO (Single Sign-On) user accounts creation - Janakbhai",
           "team": "RGC",
           "mitigation": "",
           "dueBy": "2026-09-24",
           "priority": "Critical",
           "escalated": false,
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "DEP-102",
@@ -558,17 +558,29 @@
           "priority": "Medium",
           "escalated": false,
           "resolved": true
+        },
+        {
+          "id": "DEP-106",
+          "resolved": true,
+          "text": "SSO (Single Sign-On) user accounts creation - Janakbhai",
+          "team": "",
+          "mitigation": "",
+          "dueBy": "",
+          "priority": "Medium",
+          "escalated": false
         }
       ],
       "sprintStatus": {
         "completed": [
-          "Go-Live"
+          "CRs implemented",
+          "Hypercare issues fixed"
         ],
         "inProgress": [
-          "Hypercare"
+          "Hypercare (55% complete)"
         ],
         "nextPlan": [
-          "Hypercare support and project closure"
+          "Phase 1 closure",
+          "myBKY 2A work continues"
         ]
       },
       "risks": [
@@ -616,8 +628,8 @@
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
-      "statusChangeReason": "Project Go-Live completed on 1st Oct 2026 against the planned Go-Live date of 5th Oct 2026",
-      "dependencySeq": 105,
+      "statusChangeReason": "",
+      "dependencySeq": 106,
       "stagePlan": {
         "Requirements": {
           "initialStart": "2025-11-08",

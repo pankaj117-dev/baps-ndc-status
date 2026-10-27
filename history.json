@@ -6694,7 +6694,7 @@
     ]
   },
   "2026-10-27": {
-    "capturedAt": "2026-10-27T04:25:39.529922Z",
+    "capturedAt": "2026-10-27T17:00:17.465686Z",
     "projects": [
       {
         "id": "webnext",
@@ -7138,7 +7138,7 @@
         "stage": "Hypercare",
         "delayDays": 0,
         "delayNote": "22-Sep review: UAT/VAPT/Load stages slipped (UAT +7d, VAPT +6d, Load +6d per deck); go-live planned 05-Oct-2026; blocked on mobile VAPT sign-off and DevOps/NAHQ production readiness.",
-        "statusChangeReason": "Project Go-Live completed on 1st Oct 2026 against the planned Go-Live date of 5th Oct 2026",
+        "statusChangeReason": "",
         "phase": "Hypercare",
         "nextMilestone": {
           "name": "Project Closure",
@@ -7194,13 +7194,13 @@
         "dependencies": [
           {
             "id": "DEP-101",
-            "text": "1. SSO (Single Sign-On) user accounts still need to be created - Janakbhai: ETA 11th Oct 2026",
+            "text": "SSO (Single Sign-On) user accounts creation - Janakbhai",
             "team": "RGC",
             "mitigation": "",
             "dueBy": "2026-09-24",
             "priority": "Critical",
             "escalated": false,
-            "resolved": false
+            "resolved": true
           },
           {
             "id": "DEP-102",
@@ -7241,6 +7241,16 @@
             "priority": "Medium",
             "escalated": false,
             "resolved": true
+          },
+          {
+            "id": "DEP-106",
+            "resolved": true,
+            "text": "SSO (Single Sign-On) user accounts creation - Janakbhai",
+            "team": "",
+            "mitigation": "",
+            "dueBy": "",
+            "priority": "Medium",
+            "escalated": false
           }
         ],
         "stagePlan": {
@@ -7289,13 +7299,15 @@
         },
         "sprintStatus": {
           "completed": [
-            "Go-Live"
+            "CRs implemented",
+            "Hypercare issues fixed"
           ],
           "inProgress": [
-            "Hypercare"
+            "Hypercare (55% complete)"
           ],
           "nextPlan": [
-            "Hypercare support and project closure"
+            "Phase 1 closure",
+            "myBKY 2A work continues"
           ]
         }
       },
