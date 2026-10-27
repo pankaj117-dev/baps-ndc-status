@@ -1,6 +1,6 @@
 {
-  "asOf": "2026-10-14",
-  "lastUpdated": "2026-10-14T16:09:20.678409Z",
+  "asOf": "2026-10-27",
+  "lastUpdated": "2026-10-27T04:25:39.529728Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -918,11 +918,11 @@
       "name": "GMS 1.4",
       "owner": "Vasu Champaneria",
       "status": "green",
-      "progress": 35,
-      "phase": "Development",
+      "progress": 100,
+      "phase": "Hypercare",
       "nextMilestone": {
-        "name": "Development completion",
-        "date": "2026-10-05"
+        "name": "Hotfix deployment",
+        "date": "2026-11-08"
       },
       "goLive": "2026-10-12",
       "originalGoLive": "2026-10-19",
@@ -937,7 +937,7 @@
           "dueBy": "2026-09-26",
           "priority": "High",
           "escalated": false,
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "DEP-102",
@@ -947,19 +947,22 @@
           "dueBy": "2026-10-01",
           "priority": "Medium",
           "escalated": false,
-          "resolved": false
+          "resolved": true
         }
       ],
       "sprintStatus": {
         "completed": [
-          "Fixed 6 major Pilot issues (Prod) related to Recipient permissions, Correcting Data retrieval query, Admin Secretary approvals, etc)",
-          "Hotfix Prod deployment with Hotfix QA sign off."
+          "Technical stories written for 3 user stories planned for hotfix",
+          "WSO2 (SSO) implementation completed for AMS and GMS",
+          "Resolved 4 P0 and 2 P1 production issues"
         ],
         "inProgress": [
-          "Technical Design for Unsubscribe feature"
+          "Development started for hotfix",
+          "QA for WSO2 (SSO) implementation in AMS and GMS"
         ],
         "nextPlan": [
-          "Start Development for Unsubscrive Feature"
+          "Deploy WSO2 (SSO) to UAT after QA",
+          "Complete QA for hotfix"
         ]
       },
       "risks": [
@@ -967,7 +970,7 @@
           "id": "RISK-101",
           "text": "Domain needed for Reply-to email and Unsubscribe page hosting (RGC, High)",
           "mitigation": "",
-          "resolved": false
+          "resolved": true
         }
       ],
       "delayImpact": "",
@@ -975,12 +978,14 @@
         "Scope Reduction: Of the two planned features, we will prioritize the Unsubscribe feature for the current delivery. The Contact Reorder feature will be addressed separately as a hotfix, as it does not impact the current production functionality."
       ],
       "delayTradeoffs": "Reducing the scope; Management is aware.",
-      "stage": "Development",
+      "stage": "Hypercare",
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": true,
-      "fastFollowItems": [],
+      "fastFollowItems": [
+        "Contact Reorder: deferred indefinitely, not a current priority"
+      ],
       "statusChangeReason": "",
       "dependencySeq": 102,
       "stagePlan": {
