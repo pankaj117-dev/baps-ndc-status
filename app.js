@@ -3914,7 +3914,10 @@
 
   const STATUS_COLOR = { green: "#2f6b4f", amber: "#a6650f", red: "#b5342a", black: "#1c1d24" };
 
-  function buildTrendGraph(weeks) {
+  // `fillId` keeps each chart's gradient id unique — the Schedule tab can
+  // render several of these at once (project + one per milestone), and
+  // duplicate SVG ids would make every chart reuse the first one's fill.
+  function buildTrendGraph(weeks, fillId = "trendFill") {
     const width = 700;
     const height = 210;
     const padL = 38;
@@ -3955,13 +3958,13 @@
     const svg = `
       <svg viewBox="0 0 ${width} ${height}" class="trend-graph" preserveAspectRatio="none">
         <defs>
-          <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id="${fillId}" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stop-color="${latestColor}" stop-opacity="0.16" />
             <stop offset="100%" stop-color="${latestColor}" stop-opacity="0" />
           </linearGradient>
         </defs>
         ${gridLines}
-        <path d="${areaD}" fill="url(#trendFill)" stroke="none" />
+        <path d="${areaD}" fill="url(#${fillId})" stroke="none" />
         <path d="${lineD}" fill="none" stroke="${latestColor}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
         ${dots}
         ${xLabels}
@@ -4526,6 +4529,27 @@
     } else {
       schedulePanel.appendChild(buildTrendGraph(weeks));
     }
+
+    // Per-milestone progress charts (2026-10-27) — a project running
+    // several milestones in parallel (e.g. myMandir 1B's Oct + Nov
+    // releases) can't express both in one project-level %. Each milestone
+    // with a `progress` value in any weekly snapshot gets its own chart,
+    // built from history.json the same way as the project chart above.
+    const milestoneSeries = {};
+    weeks.forEach((w) => {
+      (w.milestones || []).forEach((m) => {
+        if (m.progress == null || m.progress === "") return;
+        (milestoneSeries[m.name] || (milestoneSeries[m.name] = [])).push({
+          asOf: w.asOf,
+          progress: Number(m.progress),
+          status: m.status || w.status,
+        });
+      });
+    });
+    Object.keys(milestoneSeries).forEach((name, i) => {
+      schedulePanel.appendChild(el("h3", { class: "weekly-subhead" }, [name + " — progress over time"]));
+      schedulePanel.appendChild(buildTrendGraph(milestoneSeries[name], "trendFillMilestone" + i));
+    });
 
     // Delay tab (2026-10-15) — everything delay-related lives here now,
     // consolidated out of Schedule (the date-move log + narrative delay
