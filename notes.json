@@ -38,5 +38,15 @@
     "createdAt": "2026-10-27T09:03:39Z",
     "sourceIssue": "https://github.com/pankaj117-dev/baps-ndc-status/issues/11",
     "status": "open"
+  },
+  {
+    "id": "note-5",
+    "projectId": "emm",
+    "text": "As Diwali is approaching, P. Satyanishth Swami ji has suggested to get the production frontend ready and available on Cloud rather than on-prem servers.",
+    "mitigationImpact": "1. Non-prod URLs that were generated using CI/CD FE pipeline, have FE hosted on Cloud and if production deployment done the same way, prod site FE will be on Cloud. No separate need to deploy FE on Cloud.\n\n2. The only delay currently is in whitelisting non-prod urls in Google Console so that Address fields work. The QA team has completed testing 3 weeks back and high-level regression would be required before production sign-off is given. \n\n3. We also need to provide few days to UAT for their verification as well before we officially move to production.",
+    "raisedBy": "Nitin",
+    "createdAt": "2026-10-28T06:14:37Z",
+    "sourceIssue": "https://github.com/pankaj117-dev/baps-ndc-status/issues/14",
+    "status": "open"
   }
 ]
