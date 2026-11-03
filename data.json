@@ -1,6 +1,6 @@
 {
-  "asOf": "2026-10-23",
-  "lastUpdated": "2026-10-27T04:26:57.537379Z",
+  "asOf": "2026-11-02",
+  "lastUpdated": "2026-11-03T04:07:35.823676Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -511,13 +511,13 @@
       "dependencies": [
         {
           "id": "DEP-101",
-          "text": "1. SSO (Single Sign-On) user accounts still need to be created - Janakbhai: ETA 11th Oct 2026",
+          "text": "SSO (Single Sign-On) user accounts creation - Janakbhai",
           "team": "RGC",
           "mitigation": "",
           "dueBy": "2026-09-24",
           "priority": "Critical",
           "escalated": false,
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "DEP-102",
@@ -558,17 +558,29 @@
           "priority": "Medium",
           "escalated": false,
           "resolved": true
+        },
+        {
+          "id": "DEP-106",
+          "resolved": true,
+          "text": "SSO (Single Sign-On) user accounts creation - Janakbhai",
+          "team": "",
+          "mitigation": "",
+          "dueBy": "",
+          "priority": "Medium",
+          "escalated": false
         }
       ],
       "sprintStatus": {
         "completed": [
-          "Go-Live"
+          "CRs implemented",
+          "Hypercare issues fixed"
         ],
         "inProgress": [
-          "Hypercare"
+          "Hypercare (55% complete)"
         ],
         "nextPlan": [
-          "Hypercare support and project closure"
+          "Phase 1 closure",
+          "myBKY 2A work continues"
         ]
       },
       "risks": [
@@ -616,8 +628,8 @@
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
-      "statusChangeReason": "Project Go-Live completed on 1st Oct 2026 against the planned Go-Live date of 5th Oct 2026",
-      "dependencySeq": 105,
+      "statusChangeReason": "",
+      "dependencySeq": 106,
       "stagePlan": {
         "Requirements": {
           "initialStart": "2025-11-08",
@@ -927,17 +939,17 @@
       "id": "gms",
       "name": "GMS 1.4",
       "owner": "Vasu Champaneria",
-      "status": "green",
-      "progress": 35,
-      "phase": "Development",
+      "status": "amber",
+      "progress": 100,
+      "phase": "Hypercare",
       "nextMilestone": {
-        "name": "Development completion",
-        "date": "2026-10-05"
+        "name": "Hotfix deployment",
+        "date": "2026-11-18"
       },
       "goLive": "2026-10-12",
       "originalGoLive": "2026-10-19",
-      "delayDays": 0,
-      "delayNote": "22-Sep deck: Green overall; development stage slipped +5d; go-live planned 11\u201312-Oct-2026; Contact Reorder deferred (scope reduction).",
+      "delayDays": 4,
+      "delayNote": "Hotfix deployment moved from Nov 8 to Nov 18 (time spent on post-prod bug fixes; 1 week of Diwali vacation).",
       "dependencies": [
         {
           "id": "DEP-101",
@@ -947,7 +959,7 @@
           "dueBy": "2026-09-26",
           "priority": "High",
           "escalated": false,
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "DEP-102",
@@ -957,19 +969,19 @@
           "dueBy": "2026-10-01",
           "priority": "Medium",
           "escalated": false,
-          "resolved": false
+          "resolved": true
         }
       ],
       "sprintStatus": {
         "completed": [
-          "Fixed 6 major Pilot issues (Prod) related to Recipient permissions, Correcting Data retrieval query, Admin Secretary approvals, etc)",
-          "Hotfix Prod deployment with Hotfix QA sign off."
+          "WSO2 (SSO) implementation done",
+          "Addressed 4 post-production issues"
         ],
         "inProgress": [
-          "Technical Design for Unsubscribe feature"
+          "Hotfix: Unsubscribe user stories"
         ],
         "nextPlan": [
-          "Start Development for Unsubscrive Feature"
+          "QA for hotfix"
         ]
       },
       "risks": [
@@ -977,21 +989,23 @@
           "id": "RISK-101",
           "text": "Domain needed for Reply-to email and Unsubscribe page hosting (RGC, High)",
           "mitigation": "",
-          "resolved": false
+          "resolved": true
         }
       ],
-      "delayImpact": "",
+      "delayImpact": "Limited to the hotfix itself. The hotfix establishes a solid base for Unsubscribe, ensuring users who unsubscribe receive no further GMS communications.",
       "delayMitigation": [
-        "Scope Reduction: Of the two planned features, we will prioritize the Unsubscribe feature for the current delivery. The Contact Reorder feature will be addressed separately as a hotfix, as it does not impact the current production functionality."
+        "No mitigation available; team will absorb the delay."
       ],
       "delayTradeoffs": "Reducing the scope; Management is aware.",
-      "stage": "Development",
+      "stage": "Hypercare",
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
-      "scopeReduced": true,
-      "fastFollowItems": [],
-      "statusChangeReason": "",
+      "scopeReduced": false,
+      "fastFollowItems": [
+        "Contact Reorder: deferred indefinitely, not a current priority"
+      ],
+      "statusChangeReason": "Time was used to address post-production bugs, which pushed the hotfix timeline.",
       "dependencySeq": 102,
       "stagePlan": {
         "Development": {
@@ -1027,8 +1041,8 @@
         "Hypercare": {
           "initialStart": "2026-10-12",
           "latestStart": "2026-10-12",
-          "initialEnd": "2026-12-31",
-          "latestEnd": "2026-12-31"
+          "initialEnd": "2026-11-20",
+          "latestEnd": "2026-11-20"
         }
       },
       "riskSeq": 101,
@@ -1038,7 +1052,8 @@
       "features": [],
       "delayItemLog": [],
       "milestones": [],
-      "raidLog": []
+      "raidLog": [],
+      "scheduleScope": "hotfix"
     },
     {
       "id": "baps-sso",
