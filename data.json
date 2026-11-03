@@ -1,6 +1,6 @@
 {
-  "asOf": "2026-10-27",
-  "lastUpdated": "2026-10-28T17:37:11.411101Z",
+  "asOf": "2026-11-02",
+  "lastUpdated": "2026-11-03T04:07:35.823676Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -929,17 +929,17 @@
       "id": "gms",
       "name": "GMS 1.4",
       "owner": "Vasu Champaneria",
-      "status": "green",
+      "status": "amber",
       "progress": 100,
       "phase": "Hypercare",
       "nextMilestone": {
         "name": "Hotfix deployment",
-        "date": "2026-11-08"
+        "date": "2026-11-18"
       },
       "goLive": "2026-10-12",
       "originalGoLive": "2026-10-19",
-      "delayDays": 0,
-      "delayNote": "22-Sep deck: Green overall; development stage slipped +5d; go-live planned 11\u201312-Oct-2026; Contact Reorder deferred (scope reduction).",
+      "delayDays": 4,
+      "delayNote": "Hotfix deployment moved from Nov 8 to Nov 18 (time spent on post-prod bug fixes; 1 week of Diwali vacation).",
       "dependencies": [
         {
           "id": "DEP-101",
@@ -964,17 +964,14 @@
       ],
       "sprintStatus": {
         "completed": [
-          "Technical stories written for 3 user stories planned for hotfix",
-          "WSO2 (SSO) implementation completed for AMS and GMS",
-          "Resolved 4 P0 and 2 P1 production issues"
+          "WSO2 (SSO) implementation done",
+          "Addressed 4 post-production issues"
         ],
         "inProgress": [
-          "Development started for hotfix",
-          "QA for WSO2 (SSO) implementation in AMS and GMS"
+          "Hotfix: Unsubscribe user stories"
         ],
         "nextPlan": [
-          "Deploy WSO2 (SSO) to UAT after QA",
-          "Complete QA for hotfix"
+          "QA for hotfix"
         ]
       },
       "risks": [
@@ -985,20 +982,20 @@
           "resolved": true
         }
       ],
-      "delayImpact": "",
+      "delayImpact": "Limited to the hotfix itself. The hotfix establishes a solid base for Unsubscribe, ensuring users who unsubscribe receive no further GMS communications.",
       "delayMitigation": [
-        "Scope Reduction: Of the two planned features, we will prioritize the Unsubscribe feature for the current delivery. The Contact Reorder feature will be addressed separately as a hotfix, as it does not impact the current production functionality."
+        "No mitigation available; team will absorb the delay."
       ],
       "delayTradeoffs": "Reducing the scope; Management is aware.",
       "stage": "Hypercare",
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
-      "scopeReduced": true,
+      "scopeReduced": false,
       "fastFollowItems": [
         "Contact Reorder: deferred indefinitely, not a current priority"
       ],
-      "statusChangeReason": "",
+      "statusChangeReason": "Time was used to address post-production bugs, which pushed the hotfix timeline.",
       "dependencySeq": 102,
       "stagePlan": {
         "Development": {
