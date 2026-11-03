@@ -2984,6 +2984,27 @@ body.no-scroll { overflow: hidden; }
   fill: var(--ink);
 }
 
+.trend-graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  padding: 4px 0 8px;
+  font-size: 12px;
+  color: var(--ink);
+}
+
+.trend-graph-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trend-graph-legend-swatch {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+}
+
 .changelog {
   background: var(--bg-panel);
   border: 1px solid var(--line);
