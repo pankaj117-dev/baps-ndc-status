@@ -3925,7 +3925,19 @@
 
   const STATUS_COLOR = { green: "#2f6b4f", amber: "#a6650f", red: "#b5342a", black: "#1c1d24" };
 
-  function buildTrendGraph(weeks) {
+  // Line colors for per-milestone series overlaid on the project chart —
+  // deliberately not status colors, so a milestone line can't be misread
+  // as the project's own Green/Amber/Red.
+  const MILESTONE_SERIES_COLORS = ["#2f62c4", "#8a4fd0", "#0f8a8a", "#c2410c"];
+
+  // `fillId` keeps each chart's gradient id unique in case several of
+  // these render on one page (duplicate SVG ids would share one fill).
+  // `extraSeries` ([{name, color, points: [{asOf, progress}]}]) overlays
+  // additional lines — e.g. one per milestone — plotted on the same weekly
+  // x positions as `weeks`; weeks a series has no value for are skipped,
+  // so its line joins its known points. `lineColor` overrides the
+  // status-based coloring (used for the standalone per-milestone charts).
+  function buildTrendGraph(weeks, fillId = "trendFill", extraSeries = [], lineColor = null) {
     const width = 700;
     const height = 210;
     const padL = 38;
@@ -3952,33 +3964,68 @@
       `<text x="${p.x}" y="${height - 8}" text-anchor="middle" class="graph-axis-label">${fmtDateShort(p.w.asOf)}</text>`
     ).join("");
 
-    const latestColor = STATUS_COLOR[weeks[weeks.length - 1].status] || "var(--accent)";
+    const latestColor = lineColor || STATUS_COLOR[weeks[weeks.length - 1].status] || "var(--accent)";
 
     const dots = points.map((p) => {
       // Flip the label below the dot when it's too close to the top edge
       // (and thus the "100" axis label) to avoid the two overlapping.
       const tooHigh = p.y - 12 < padT + 10;
       const labelY = tooHigh ? p.y + 18 : p.y - 12;
-      return `<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="${STATUS_COLOR[p.w.status] || latestColor}" stroke="#fff" stroke-width="2" />` +
+      return `<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="${lineColor || STATUS_COLOR[p.w.status] || latestColor}" stroke="#fff" stroke-width="2" />` +
         `<text x="${p.x}" y="${labelY}" text-anchor="middle" class="graph-point-label">${p.w.progress}%</text>`;
+    }).join("");
+
+    const indexByAsOf = {};
+    weeks.forEach((w, i) => { indexByAsOf[w.asOf] = i; });
+    const seriesSvg = extraSeries.map((s) => {
+      const pts = s.points
+        .filter((pt) => indexByAsOf[pt.asOf] != null)
+        .map((pt) => ({ x: xFor(indexByAsOf[pt.asOf]), y: yFor(pt.progress), progress: pt.progress }));
+      if (!pts.length) return "";
+      const d = pts.map((pt, i) => (i === 0 ? `M ${pt.x} ${pt.y}` : `L ${pt.x} ${pt.y}`)).join(" ");
+      return `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-dasharray="6 4" stroke-linejoin="round" stroke-linecap="round" />` +
+        pts.map((pt) => {
+          const tooHigh = pt.y - 12 < padT + 10;
+          const labelY = tooHigh ? pt.y + 18 : pt.y - 12;
+          return `<circle cx="${pt.x}" cy="${pt.y}" r="4.5" fill="${s.color}" stroke="#fff" stroke-width="2" />` +
+            `<text x="${pt.x}" y="${labelY}" text-anchor="middle" class="graph-point-label" style="fill:${s.color}">${pt.progress}%</text>`;
+        }).join("");
     }).join("");
 
     const svg = `
       <svg viewBox="0 0 ${width} ${height}" class="trend-graph" preserveAspectRatio="none">
         <defs>
-          <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id="${fillId}" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stop-color="${latestColor}" stop-opacity="0.16" />
             <stop offset="100%" stop-color="${latestColor}" stop-opacity="0" />
           </linearGradient>
         </defs>
         ${gridLines}
-        <path d="${areaD}" fill="url(#trendFill)" stroke="none" />
+        <path d="${areaD}" fill="url(#${fillId})" stroke="none" />
         <path d="${lineD}" fill="none" stroke="${latestColor}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
         ${dots}
+        ${seriesSvg}
         ${xLabels}
       </svg>`;
 
-    return el("div", { class: "trend-graph-wrap", html: svg });
+    const wrap = el("div", { class: "trend-graph-wrap", html: svg });
+    if (extraSeries.length) {
+      wrap.appendChild(
+        el("div", { class: "trend-graph-legend" }, [
+          el("span", { class: "trend-graph-legend-item" }, [
+            el("span", { class: "trend-graph-legend-swatch", style: `background:${latestColor}` }),
+            "Overall project",
+          ]),
+          ...extraSeries.map((s) =>
+            el("span", { class: "trend-graph-legend-item" }, [
+              el("span", { class: "trend-graph-legend-swatch", style: `background:${s.color}` }),
+              s.name,
+            ])
+          ),
+        ])
+      );
+    }
+    return wrap;
   }
 
   function buildScheduleTimeline(weeks) {
@@ -4132,6 +4179,11 @@
         if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     } else {
+      // No specific jump-link target (e.g. a plain click on a project
+      // card) — pre-load the Schedule tile open by default instead of
+      // leaving all 9 tiles collapsed (2026-11-02, "can you pre-load
+      // the schedule icon").
+      activateDetailTab(detailRoot, "schedule");
       overlay.scrollTop = 0;
     }
   }
@@ -4530,12 +4582,35 @@
       );
     }
 
-    // Progress trend chart
+    // Progress trend chart. Per-milestone lines (2026-11-03) — a project
+    // running several milestones in parallel (e.g. myMandir 1B's Oct + Nov
+    // releases) can't express both in one project-level %, so each
+    // milestone with a `progress` value in any weekly snapshot is overlaid
+    // as its own line, built from history.json like the project line.
     schedulePanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Progress over time"]));
     if (!weeks.length) {
       schedulePanel.appendChild(el("p", { class: "empty-note" }, ["No history yet — it'll build up week over week as updates get ingested."]));
     } else {
-      schedulePanel.appendChild(buildTrendGraph(weeks));
+      const milestonePoints = {};
+      weeks.forEach((w) => {
+        (w.milestones || []).forEach((m) => {
+          if (m.progress == null || m.progress === "") return;
+          (milestonePoints[m.name] || (milestonePoints[m.name] = [])).push({ asOf: w.asOf, progress: Number(m.progress) });
+        });
+      });
+      const milestoneSeries = Object.keys(milestonePoints).map((name, i) => ({
+        name,
+        color: MILESTONE_SERIES_COLORS[i % MILESTONE_SERIES_COLORS.length],
+        points: milestonePoints[name],
+      }));
+      schedulePanel.appendChild(buildTrendGraph(weeks, "trendFill", milestoneSeries));
+
+      // Plus one standalone chart per milestone, in that milestone's line
+      // color, so each one's trend can be read on its own.
+      milestoneSeries.forEach((s, i) => {
+        schedulePanel.appendChild(el("h3", { class: "weekly-subhead" }, [s.name + " — progress over time"]));
+        schedulePanel.appendChild(buildTrendGraph(s.points, "trendFillMilestone" + i, [], s.color));
+      });
     }
 
     // Delay tab (2026-10-15) — everything delay-related lives here now,
