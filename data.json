@@ -1615,8 +1615,8 @@
         "Hypercare": {
           "initialStart": "2026-10-12",
           "latestStart": "2026-10-12",
-          "initialEnd": "2026-11-20",
-          "latestEnd": "2026-11-20"
+          "initialEnd": "2026-11-12",
+          "latestEnd": "2026-11-12"
         }
       },
       "riskSeq": 101,
