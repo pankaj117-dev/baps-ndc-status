@@ -48,5 +48,13 @@
     "createdAt": "2026-10-28T06:14:37Z",
     "sourceIssue": "https://github.com/pankaj117-dev/baps-ndc-status/issues/14",
     "status": "open"
+  },
+  {
+    "id": "note-6",
+    "projectId": "mymandir",
+    "text": "Milestone 1 shared on UAT with stakeholders on 27 Oct 2026; first follow-up taken with stakeholders on 2 Nov 2026 for UAT feedback.",
+    "raisedBy": "Aniket",
+    "createdAt": "2026-11-02T00:00:00Z",
+    "status": "open"
   }
 ]

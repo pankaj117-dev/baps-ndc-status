@@ -10981,7 +10981,7 @@
     ]
   },
   "2026-11-03": {
-    "capturedAt": "2026-11-03T06:16:37.818814Z",
+    "capturedAt": "2026-11-03T06:20:13.675436Z",
     "projects": [
       {
         "id": "webnext",
@@ -11807,9 +11807,9 @@
           },
           "VAPT": {
             "initialStart": "2026-10-16",
-            "latestStart": "2026-10-16",
+            "latestStart": "2026-11-16",
             "initialEnd": "2026-10-28",
-            "latestEnd": "2026-10-28"
+            "latestEnd": "2026-11-20"
           }
         },
         "sprintStatus": {

@@ -1,6 +1,6 @@
 {
   "asOf": "2026-11-03",
-  "lastUpdated": "2026-11-03T06:16:37.818814Z",
+  "lastUpdated": "2026-11-03T06:20:13.675436Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -911,9 +911,9 @@
         },
         "VAPT": {
           "initialStart": "2026-10-16",
-          "latestStart": "2026-10-16",
+          "latestStart": "2026-11-16",
           "initialEnd": "2026-10-28",
-          "latestEnd": "2026-10-28"
+          "latestEnd": "2026-11-20"
         }
       },
       "riskSeq": 103,
