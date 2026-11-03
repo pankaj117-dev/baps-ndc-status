@@ -10981,7 +10981,7 @@
     ]
   },
   "2026-11-03": {
-    "capturedAt": "2026-11-03T06:20:13.675436Z",
+    "capturedAt": "2026-11-03T06:24:13.392930Z",
     "projects": [
       {
         "id": "webnext",
@@ -11770,6 +11770,15 @@
             "mitigation": "We have a dependency on the GMS project for integration activities. The required information and integration prerequisites have already been communicated, and regular follow-ups are being conducted with the GMS Application Owner to track progress and obtain the necessary inputs.",
             "dueBy": "2026-09-28",
             "priority": "Critical",
+            "escalated": false,
+            "resolved": false
+          },
+          {
+            "id": "DEP-102",
+            "text": "Restructure Teams as department/sub-department with coordinator + members (Nov 2026 user story) \u2014 the only user story still pending from Milestone 2; depends on Satyanishtha Swami and Shreyank bhai.",
+            "team": "Satyanishtha Swami / Shreyank bhai",
+            "mitigation": "Awaiting inputs from Satyanishtha Swami and Shreyank bhai to complete this user story; not resolved yet.",
+            "dueBy": "",
             "escalated": false,
             "resolved": false
           }

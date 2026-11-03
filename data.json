@@ -1,6 +1,6 @@
 {
   "asOf": "2026-11-03",
-  "lastUpdated": "2026-11-03T06:20:13.675436Z",
+  "lastUpdated": "2026-11-03T06:24:13.392930Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -830,6 +830,15 @@
           "priority": "Critical",
           "escalated": false,
           "resolved": false
+        },
+        {
+          "id": "DEP-102",
+          "text": "Restructure Teams as department/sub-department with coordinator + members (Nov 2026 user story) \u2014 the only user story still pending from Milestone 2; depends on Satyanishtha Swami and Shreyank bhai.",
+          "team": "Satyanishtha Swami / Shreyank bhai",
+          "mitigation": "Awaiting inputs from Satyanishtha Swami and Shreyank bhai to complete this user story; not resolved yet.",
+          "dueBy": "",
+          "escalated": false,
+          "resolved": false
         }
       ],
       "sprintStatus": {
@@ -877,7 +886,7 @@
       "timeSavedNote": [],
       "scopeReduced": false,
       "statusChangeReason": "",
-      "dependencySeq": 101,
+      "dependencySeq": 102,
       "stagePlan": {
         "Tech. Design": {
           "initialStart": "2026-09-17",
