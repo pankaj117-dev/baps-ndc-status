@@ -1,6 +1,6 @@
 {
   "asOf": "2026-11-03",
-  "lastUpdated": "2026-11-03T06:06:39.793888Z",
+  "lastUpdated": "2026-11-03T06:13:21.560778Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -811,7 +811,7 @@
       "owner": "Aniket Udgaonkar",
       "status": "green",
       "progress": 30,
-      "phase": "Milestone 1: UAT (stakeholder bugs received 3 Nov) \u00b7 Milestone 2: 70%, UAT release 6 Nov",
+      "phase": "Milestone 1 delivered on UAT to stakeholders on 27 Oct 2026 \u00b7 Milestone 1: 100%, Milestone 2: 70%",
       "nextMilestone": {
         "name": "Milestone 2 \u2013 Nov 2026 release",
         "date": "2026-11-06"
@@ -871,7 +871,7 @@
         "Aniket connected with Sameep during BA's leave period to secure FRD sign-off"
       ],
       "delayTradeoffs": "",
-      "stage": "Development",
+      "stage": "UAT",
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
@@ -899,7 +899,7 @@
         },
         "UAT": {
           "initialStart": "2026-10-23",
-          "latestStart": "2026-10-23",
+          "latestStart": "2026-10-27",
           "initialEnd": "2026-10-26",
           "latestEnd": "2026-10-26"
         },

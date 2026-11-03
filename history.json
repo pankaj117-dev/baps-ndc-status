@@ -10981,7 +10981,7 @@
     ]
   },
   "2026-11-03": {
-    "capturedAt": "2026-11-03T06:06:39.793888Z",
+    "capturedAt": "2026-11-03T06:13:21.560778Z",
     "projects": [
       {
         "id": "webnext",
@@ -11721,11 +11721,11 @@
         "name": "myMandir 1B",
         "status": "green",
         "progress": 30,
-        "stage": "Development",
+        "stage": "UAT",
         "delayDays": 0,
         "delayNote": "TDD end revised from 22-Sep to 25-Sep (+2 days) per 22-Sep deck; Amber status.",
         "statusChangeReason": "",
-        "phase": "Milestone 1: UAT (stakeholder bugs received 3 Nov) \u00b7 Milestone 2: 70%, UAT release 6 Nov",
+        "phase": "Milestone 1 delivered on UAT to stakeholders on 27 Oct 2026 \u00b7 Milestone 1: 100%, Milestone 2: 70%",
         "nextMilestone": {
           "name": "Milestone 2 \u2013 Nov 2026 release",
           "date": "2026-11-06"
@@ -11795,7 +11795,7 @@
           },
           "UAT": {
             "initialStart": "2026-10-23",
-            "latestStart": "2026-10-23",
+            "latestStart": "2026-10-27",
             "initialEnd": "2026-10-26",
             "latestEnd": "2026-10-26"
           },
