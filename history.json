@@ -10174,12 +10174,12 @@
         "id": "gms",
         "name": "GMS 1.4",
         "status": "green",
-        "progress": 35,
-        "stage": "Development",
+        "progress": 100,
+        "stage": "Hypercare",
         "delayDays": 0,
         "delayNote": "22-Sep deck: Green overall; development stage slipped +5d; go-live planned 11\u201312-Oct-2026; Contact Reorder deferred (scope reduction).",
         "statusChangeReason": "",
-        "phase": "Development",
+        "phase": "Hypercare",
         "nextMilestone": {
           "name": "Development completion",
           "date": "2026-10-05"
@@ -14818,12 +14818,12 @@
         "id": "gms",
         "name": "GMS 1.4",
         "status": "green",
-        "progress": 55,
-        "stage": "Development",
+        "progress": 100,
+        "stage": "Hypercare",
         "delayDays": 0,
         "delayNote": "22-Sep deck: Green overall; development stage slipped +5d; go-live planned 11\u201312-Oct-2026; Contact Reorder deferred (scope reduction).",
         "statusChangeReason": "",
-        "phase": "Development",
+        "phase": "Hypercare",
         "nextMilestone": {
           "name": "Development completion",
           "date": "2026-10-05"
@@ -16429,8 +16429,7 @@
           "nextPlan": [
             "Start Development for Unsubscrive Feature"
           ]
-        },
-        "asOf": "2026-10-12"
+        }
       },
       {
         "id": "baps-sso",

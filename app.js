@@ -3754,7 +3754,8 @@
         // 10-12, captured in the 10-14 snapshot) — it wins over the key.
         return snap ? { asOf, ...snap } : null;
       })
-      .filter(Boolean);
+      .filter(Boolean)
+      .sort((a, b) => (a.asOf < b.asOf ? -1 : a.asOf > b.asOf ? 1 : 0));
   }
 
   /* ---------------- Stage-gate timeline ---------------- */
