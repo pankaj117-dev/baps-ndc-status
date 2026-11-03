@@ -1,6 +1,6 @@
 {
   "asOf": "2026-11-02",
-  "lastUpdated": "2026-11-03T04:07:35.823676Z",
+  "lastUpdated": "2026-11-03T05:52:29.836660Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -498,8 +498,8 @@
       "name": "MyBKY (Phase 1)",
       "owner": "Satish Buddhadev",
       "status": "green",
-      "progress": 97,
-      "phase": "Hypercare",
+      "progress": 99,
+      "phase": "Hypercare (95% complete)",
       "nextMilestone": {
         "name": "Project Closure",
         "date": "2026-11-06"
@@ -507,7 +507,7 @@
       "goLive": "2026-10-01",
       "originalGoLive": "2026-09-21",
       "delayDays": 0,
-      "delayNote": "22-Sep review: UAT/VAPT/Load stages slipped (UAT +7d, VAPT +6d, Load +6d per deck); go-live planned 05-Oct-2026; blocked on mobile VAPT sign-off and DevOps/NAHQ production readiness.",
+      "delayNote": "Go-live achieved 01-Oct-2026; no delay.",
       "dependencies": [
         {
           "id": "DEP-101",
@@ -572,14 +572,14 @@
       ],
       "sprintStatus": {
         "completed": [
-          "CRs implemented",
-          "Hypercare issues fixed"
+          "Hypercare triage of 27 reported issues: 8 fixed, 19 closed (not a bug / not reproducible / out of scope)"
         ],
         "inProgress": [
-          "Hypercare (55% complete)"
+          "Hypercare (95% complete)"
         ],
         "nextPlan": [
-          "Phase 1 closure",
+          "Phase 1 closure (06-Nov)",
+          "Handover to support",
           "myBKY 2A work continues"
         ]
       },
@@ -588,31 +588,31 @@
           "id": "RISK-101",
           "text": "Mobile VAPT sign-off pending (VAPT \u2014 Critical)",
           "mitigation": "",
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "RISK-102",
           "text": "UAT sign-off received but ~25% of items still need updates in tracking sheet (Stakeholders \u2014 Critical)",
           "mitigation": "UAT team updating tracking sheet",
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "RISK-103",
           "text": "Production integration keys needed for SSO, SFS, MIS, MDS (DevOps \u2014 Critical)",
           "mitigation": "DevOps/NAHQ chasing keys and access",
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "RISK-104",
           "text": "Read-only MIS access, Google Maps API key, Apple Pay for Stripe, n8n pipelines (DevOps \u2014 Critical)",
           "mitigation": "",
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "RISK-105",
           "text": "SSO user accounts for Kishor/Kishori participants still need creation (NAHQ \u2014 Critical)",
           "mitigation": "NAHQ creating SSO accounts",
-          "resolved": false
+          "resolved": true
         }
       ],
       "delayImpact": "Go_live slips",
@@ -676,14 +676,367 @@
       },
       "riskSeq": 105,
       "delayLogSeq": 100,
-      "changeRequests": [],
+      "changeRequests": [
+        {
+          "title": "Rooming Validation Enhancements",
+          "description": "Additional rooming validation requirements were identified after scope finalization. The enhancements include new validation rules for room charges",
+          "submittedDate": "2026-06-09",
+          "by": "Aksharbhai",
+          "actionItem": "Review the detailed requirements, assess development and testing effort, obtain CR approval, and finalize implementation timeline.",
+          "approvalStatus": "Approved for current phase",
+          "impact": "Go-Live date will be impacted by 10 working days",
+          "id": "CR-101"
+        },
+        {
+          "title": "Event Registration - Include incoming graduates in Invitees list",
+          "description": "The Business Team now wants the invitation logic to consider the delegate\u2019s next Mandal progression as well. Accordingly, delegates who are expected to graduate to the next Mandal should be invited to the corresponding next-level event.\n\nFor example:\n\n1. Bal_3 delegates graduating to Kishore_K1 \u2192 invited to the Kishore_K1 event\n2. Kishore_K1 delegates graduating to Kishore_K2 \u2192 invited to the Kishore_K2 event\n3. Kishore_K2 delegates graduating to Yuvak \u2192 invited to the Yuvak event",
+          "submittedDate": "2026-08-21",
+          "by": "Bhargavbhai",
+          "actionItem": "Review the detailed requirements, assess development and testing effort, obtain CR approval, and finalize implementation timeline.",
+          "approvalStatus": "Approved for current phase",
+          "impact": "Go-Live date will be impacted by 6 working days",
+          "id": "CR-102"
+        },
+        {
+          "title": "Daycare Age range change",
+          "description": "Currently we have daycate range from 2 to 9",
+          "submittedDate": "2026-08-28",
+          "by": "Kishanbhai",
+          "actionItem": "Change day care rannge from 2 to 9 to 0 to 17",
+          "approvalStatus": "Approved for current phase",
+          "impact": "No impact on Go-Live date",
+          "id": "CR-103"
+        },
+        {
+          "title": "Spelling Grammer correction in Mobile App",
+          "description": "Kishanbhai shared the \u201cmyBKY \u2013 Grammar-Spelling Errors\u201d feedback file with us, which includes the grammar/spelling correction changes.\n\nWhile reviewing the file, we observed that there are some changes where entire sentences have been revised/replaced, beyond the regular grammar and spelling corrections.\n\nThe Figma designs have already been reviewed and approved",
+          "submittedDate": "2026-08-09",
+          "by": "Kishanbhai",
+          "actionItem": "Update the spelling / Grammer / Sentences as per the shared documents",
+          "approvalStatus": "Approved for current phase",
+          "impact": "No impact on Go-Live date",
+          "id": "CR-104"
+        },
+        {
+          "title": "Rooming splash screen update",
+          "description": "As per the approved Figma design, the Rooming splash screen displayed all room types configured for the respective event. However, upon proceeding to room selection, users could only view the room types they were eligible to select, which created confusion and an inconsistent user experience.\n\nTo address this, a validation has been introduced on the splash screen itself. The screen will now display only those room types for which the user is eligible, ensuring consistency between the splash screen and the room selection page and providing a clearer user experience.",
+          "submittedDate": "2026-08-07",
+          "by": "Kishanbhai",
+          "actionItem": "Apply the validation on Rooming Splash screen as well",
+          "approvalStatus": "Approved for current phase",
+          "impact": "No impact on Go-Live date",
+          "id": "CR-105"
+        },
+        {
+          "title": "Additional filters, announcement visibility to parents and App level consent",
+          "description": "1. Add filters for Delegate registration data grid\nFilters: Department, Locations (same as event filters)\n2. Add filters for Volunteer registration data grid\nFilters: Personal Department, Seva Department, Seva Roles, Locations\n3. Make news feed and announcements in mobile app accessible to all parents without any personal invitation for an event\n4. Mobile App first time login consent capture (Proposed by Pravinbhai and Board)",
+          "submittedDate": "2026-09-29",
+          "by": "Kishanbhai",
+          "actionItem": "Review the detailed requirements, assess development and testing effort, obtain CR approval, and finalize implementation timeline.",
+          "approvalStatus": "Approved for phase 1 (immediate release)",
+          "impact": "Either scope to be reduced or Phase 2A Go-live will be impacted by 4 working days",
+          "id": "CR-106"
+        },
+        {
+          "title": "Multiple items",
+          "description": "CR 1: Web - Allow Sanyukt/Premvati members to be manually invited for Yuvak/Yuvati Shibir\nCR 2: Web - Remove position checking while manually inviting volunteers (Currently system looks for at least one active position)\nCR 3: Mobile: Make Allergy/Dietary Restriction questions optional",
+          "submittedDate": "2026-10-05",
+          "by": "Kishanbhai",
+          "actionItem": "Review the detailed requirements, assess development and testing effort, obtain CR approval, and finalize implementation timeline.",
+          "approvalStatus": "Approved for phase 1 (immediate release)",
+          "impact": "Either scope to be reduced or Phase 2A Go-live will be impacted by 5 working days",
+          "id": "CR-107"
+        },
+        {
+          "title": "Multiple items",
+          "description": "1. Relax the family room rule to allow couples without children or daycare requirements to opt for shared rooms instead of being restricted to family rooms.\n2. Include a detailed pricing breakdown on the payment summary screen.",
+          "submittedDate": "2026-10-14",
+          "by": "Kishanbhai / Bhargavbhai",
+          "actionItem": "Fix the production bugs and release ASAP",
+          "approvalStatus": "Approved for phase 1 (immediate release)",
+          "impact": "Either scope to be reduced or Phase 2A Go-live will be impacted by 1.5 working days",
+          "id": "CR-108"
+        }
+      ],
       "decisions": [],
       "goLiveChecklist": [],
-      "features": [],
+      "features": [
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Promo codes not working",
+          "status": "Excluded",
+          "notes": "Not a bug",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Invited kids not visible to parents",
+          "status": "Done",
+          "notes": "Fixed",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "BAPSID changed for delegate, can\u2019t register",
+          "status": "Excluded",
+          "notes": "Not reproducible in QA",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Parent registered as volunteer, can\u2019t select room for kid",
+          "status": "Excluded",
+          "notes": "Not a bug",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Cross-department access (BKY / iBKY / Yuvak-Yuvati)",
+          "status": "Done",
+          "notes": "Fixed",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Event roles not working",
+          "status": "Excluded",
+          "notes": "Not a bug - Out of scope",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Permissions not working for P. Sant and some karyakars",
+          "status": "Excluded",
+          "notes": "Not reproducible in QA",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Payment successful, admin portal shows \u201cPending\u201d",
+          "status": "Done",
+          "notes": "Fixed",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Graduating members: rooming and other data not moved",
+          "status": "Excluded",
+          "notes": "Not reproducible in QA",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Empty member / payee names in payment transactions",
+          "status": "Done",
+          "notes": "Fixed",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Paid twice (link + credit card)",
+          "status": "Excluded",
+          "notes": "Not reproducible in QA",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Parent\u2019s name in registration success email",
+          "status": "Excluded",
+          "notes": "Not a bug",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Script to fix registration status where payment is done",
+          "status": "Excluded",
+          "notes": "Not a bug",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "View newsfeed role: unauthorized on opening a feed",
+          "status": "Excluded",
+          "notes": "Not a bug",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Sub-event selection unauthorized the first time",
+          "status": "Excluded",
+          "notes": "Not a bug",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Communication manager event role can\u2019t access news feeds",
+          "status": "Excluded",
+          "notes": "Not a bug - Out of scope",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Event ID shown instead of event name on summary",
+          "status": "Excluded",
+          "notes": "Not reproducible in QA",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "2 children, 2 events, total $100: is this correct? (amount mismatch)",
+          "status": "Excluded",
+          "notes": "Not reproducible in QA",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Deleted person still shown in family (mobile)",
+          "status": "Done",
+          "notes": "Fixed",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Login screen freeze on many devices",
+          "status": "Excluded",
+          "notes": "Not a bug",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Stuck at payment summary despite successful payment",
+          "status": "Excluded",
+          "notes": "Not reproducible in QA",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Cancelling one event cancels multiple events (family)",
+          "status": "Excluded",
+          "notes": "Not reproducible in QA",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Daycare consent label wording",
+          "status": "Done",
+          "notes": "Fixed",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "1Password autofill turns payment screen white",
+          "status": "Excluded",
+          "notes": "Not reproducible in QA",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Stuck on biometric screen after first login",
+          "status": "Excluded",
+          "notes": "Not a bug",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Daycare option not shown for eligible child",
+          "status": "Done",
+          "notes": "Fixed",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Person missing on Edit Registration summary",
+          "status": "Done",
+          "notes": "Fixed",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        }
+      ],
       "delayItemLog": [],
       "delayLog": [],
       "milestones": [],
-      "raidLog": []
+      "raidLog": [],
+      "changeRequestSeq": 108
     },
     {
       "id": "mybky-phase2",
