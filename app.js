@@ -4132,6 +4132,11 @@
         if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     } else {
+      // No specific jump-link target (e.g. a plain click on a project
+      // card) — pre-load the Schedule tile open by default instead of
+      // leaving all 9 tiles collapsed (2026-11-02, "can you pre-load
+      // the schedule icon").
+      activateDetailTab(detailRoot, "schedule");
       overlay.scrollTop = 0;
     }
   }
