@@ -6116,11 +6116,11 @@
         "name": "GMS 1.4",
         "status": "green",
         "progress": 100,
-        "stage": "Development",
+        "stage": "Hypercare",
         "delayDays": 0,
         "delayNote": "22-Sep deck: Green overall; development stage slipped +5d; go-live planned 11\u201312-Oct-2026; Contact Reorder deferred (scope reduction).",
         "statusChangeReason": "",
-        "phase": "Development",
+        "phase": "Hypercare",
         "nextMilestone": {
           "name": "Development completion",
           "date": "2026-10-05"
