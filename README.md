@@ -1633,6 +1633,8 @@ Everything lives in three files:
   "timeSavedDays": 0,          // positive integer if the team pulled time back IN this week
   "timeSavedNote": ["..."],    // one per line — what specifically was done to save that time;
                                 // required in the form whenever timeSavedDays > 0
+  "stageDatesFromPlan": false, // true → Stage-gate timeline / Hawk-eye plot every reached stage from
+                                // stagePlan's latest dates instead of weekly-snapshot reconstruction
   "scheduleScope": "",         // optional qualifier shown after the Status line, e.g. "hotfix" →
                                 // "On schedule (hotfix)" / "+4 days (hotfix)"; set by hand in data.json
   "scopeReduced": false,       // true if scope is being cut/deferred this week to hold the go-live

@@ -1582,12 +1582,6 @@
       "statusChangeReason": "Time was used to address post-production bugs, which pushed the hotfix timeline.",
       "dependencySeq": 102,
       "stagePlan": {
-        "Development": {
-          "initialStart": "2026-09-15",
-          "latestStart": "2026-09-23",
-          "initialEnd": "2026-09-24",
-          "latestEnd": "2026-10-05"
-        },
         "Requirements": {
           "initialStart": "2026-09-03",
           "latestStart": "2026-09-03",
@@ -1600,11 +1594,23 @@
           "initialEnd": "2026-09-14",
           "latestEnd": "2026-09-22"
         },
+        "Development": {
+          "initialStart": "2026-09-15",
+          "latestStart": "2026-09-23",
+          "initialEnd": "2026-09-24",
+          "latestEnd": "2026-10-05"
+        },
         "UAT": {
-          "initialStart": "2026-09-17",
+          "initialStart": "2026-09-27",
           "latestStart": "2026-10-07",
-          "initialEnd": "2026-10-08",
+          "initialEnd": "2026-10-06",
           "latestEnd": "2026-10-12"
+        },
+        "VAPT": {
+          "initialStart": "2026-09-27",
+          "latestStart": "2026-10-07",
+          "initialEnd": "2026-10-09",
+          "latestEnd": "2026-10-09"
         },
         "Rollout": {
           "initialStart": "2026-10-11",
@@ -1627,7 +1633,8 @@
       "delayItemLog": [],
       "milestones": [],
       "raidLog": [],
-      "scheduleScope": "hotfix"
+      "scheduleScope": "hotfix",
+      "stageDatesFromPlan": true
     },
     {
       "id": "baps-sso",

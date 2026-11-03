@@ -3819,6 +3819,7 @@
   // don't know how long the project was in that stage before tracking began.
   function computeStageSegments(p) {
     const today = todayISO();
+    if (p.stageDatesFromPlan) return stageSegmentsFromPlan(p, today);
     const points = historyForProject(p.id).map((w) => ({ asOf: w.asOf, stage: w.stage || "Unstaged" }));
     const currentStage = p.stage || "Unstaged";
     // Track this explicitly (rather than re-deriving it later) — needed
@@ -3936,6 +3937,27 @@
       return ai - bi;
     });
     return combined;
+  }
+
+  // `p.stageDatesFromPlan` (2026-11-03, GMS 1.4): the PM's own stage table
+  // is the source of truth, so every stage up to the current one is
+  // plotted straight from stagePlan's latest (post-delay) dates instead of
+  // being reconstructed from weekly snapshots — which, for GMS, still
+  // carried the previous release's UAT/Rollout and a stale Development
+  // stretch. The current stage runs from its latest start to today.
+  function stageSegmentsFromPlan(p, today) {
+    const currentIndex = PIPELINE_STAGES.indexOf(p.stage || "Unstaged");
+    const segments = [];
+    PIPELINE_STAGES.slice(0, currentIndex + 1).forEach((stage, i) => {
+      const plan = p.stagePlan && p.stagePlan[stage];
+      const start = plan && (plan.latestStart || plan.initialStart);
+      if (!start) return;
+      const ongoing = i === currentIndex;
+      const end = ongoing ? today : plan.latestEnd || plan.initialEnd;
+      if (!end) return;
+      segments.push({ stage, start, end, ongoing, days: Math.max(0, daysBetweenIso(start, end)) });
+    });
+    return segments;
   }
 
   /* ---------------- Stage detail modal (per-stage planned/actual dates,
