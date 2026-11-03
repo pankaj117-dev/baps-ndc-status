@@ -10981,7 +10981,7 @@
     ]
   },
   "2026-11-03": {
-    "capturedAt": "2026-11-03T06:24:13.392930Z",
+    "capturedAt": "2026-11-03T06:26:06.835761Z",
     "projects": [
       {
         "id": "webnext",
@@ -11745,17 +11745,17 @@
             "id": "RISK-101",
             "text": "API blocker-",
             "mitigation": "we can complete story-575 in October,  user have to generate QR by themselves. our system will not be able to generate QR due to this technical blocker. Other than that, whole flow of Tap/Scan to create request will work as it is.",
-            "resolved": false
+            "resolved": true
           },
           {
             "id": "RISK-102",
             "text": "API blocker which developer  raised for User Story 575.Below are the  findings from that discussion below:",
             "mitigation": "Aniket driving weekly pace checks to hold the Oct/Nov timeline",
-            "resolved": false
+            "resolved": true
           },
           {
             "id": "RISK-103",
-            "resolved": false,
+            "resolved": true,
             "text": "The QR Code utility currently used to generate ZIP files for  assets is hosted on the Project Tree server currently  and is no longer available for use. Replicating the same functionality on the FMS server will require additional development effort and time. We can treat this as a known issue.",
             "mitigation": ""
           }
@@ -11771,7 +11771,7 @@
             "dueBy": "2026-09-28",
             "priority": "Critical",
             "escalated": false,
-            "resolved": false
+            "resolved": true
           },
           {
             "id": "DEP-102",
