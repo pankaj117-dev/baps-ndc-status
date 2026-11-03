@@ -1042,17 +1042,17 @@
       "id": "mybky-phase2",
       "name": "myBKY 2A",
       "owner": "Satish Buddhadev",
-      "status": "red",
-      "progress": 45,
-      "phase": "Requirements through 02-Oct-2026; TDD through 23-Oct-2026 (per 22-Sep deck)",
+      "status": "amber",
+      "progress": 51,
+      "phase": "Requirements 97% | Design 75% | Dev & QA 40%",
       "nextMilestone": {
-        "name": "Requirements completion",
-        "date": "2026-10-02"
+        "name": "Development & QA completion",
+        "date": "2026-12-18"
       },
       "goLive": "2027-01-28",
-      "originalGoLive": "2026-12-20",
-      "delayDays": 14,
-      "delayNote": "22-Sep deck: requirement end 02-Oct-2026; TDD end 23-Oct-2026; go-live window 11-Jan\u201328-Jan-2027.",
+      "originalGoLive": "2027-01-28",
+      "delayDays": 22,
+      "delayNote": "Team on Phase 1 bugs and 9 CR items from 29-Sep to 18-Oct (~16 working days); Event Management Figma approved 6 days late (19-Oct); GL & Chaperon requirements late (planned 21-Oct).",
       "dependencies": [
         {
           "id": "DEP-101",
@@ -1062,25 +1062,57 @@
           "dueBy": "2026-09-25",
           "priority": "Critical",
           "escalated": false,
+          "resolved": true
+        },
+        {
+          "id": "DEP-102",
+          "text": "RGC team to provide 1.5 additional QAs (for one month) to meet the functional / QA sign-off timeline (Dev & QA completion 18-Dec-2026)",
+          "team": "RGC",
+          "mitigation": "Requested 1.5 additional QAs from RGC; test plan being reprioritized for the remaining ~7 person-day gap",
+          "dueBy": "2026-11-09",
+          "priority": "Critical",
+          "escalated": false,
+          "resolved": false
+        },
+        {
+          "id": "DEP-103",
+          "text": "Implement UI/UX changes received for Group Lead module \u2014 Abhishek Patel, Pranay Gauda",
+          "team": "Dev Team",
+          "mitigation": "",
+          "dueBy": "2026-11-05",
+          "priority": "High",
+          "escalated": false,
+          "resolved": false
+        },
+        {
+          "id": "DEP-104",
+          "text": "2nd session needed with the Architecture Board for Global guideline \u2014 Pratik Gohil, Vishal Patel (Tampa)",
+          "team": "Architecture Board",
+          "mitigation": "",
+          "dueBy": "2026-11-06",
+          "priority": "High",
+          "escalated": false,
           "resolved": false
         }
       ],
       "sprintStatus": {
         "completed": [
-          "Sprint 1 Dev started",
-          "Transportation Module Frontend development completed",
-          "Transportation Backend development completed"
+          "Requirements: all 6 modules (Transportation, Accommodation, GL and Chaperon, GMS, Event Management, Form)",
+          "UI/UX: Transportation, Accommodation, GMS, Event Management, Form",
+          "TDD: Transportation, GMS, Event Management, Form",
+          "Development: Transportation, GMS, Form"
         ],
         "inProgress": [
-          "Requirement completion",
-          "Sprint 1 TDD submission & approval",
-          "Web Transportation TDD review",
-          "GMS FRD review",
-          "Guest Registration FRD creation"
+          "QA: Transportation, Form",
+          "TDD: Accommodation",
+          "UI/UX: GL and Chaperon"
         ],
         "nextPlan": [
-          "Transportation module API integration \u2014 pending release dependency",
-          "Partial GMS module + Response form module (Phase 1 carryover) development"
+          "Complete QA (QA sign-off) for Transportation and Form",
+          "Start QA for GMS",
+          "Start development for Event Management",
+          "Complete Accommodation TDD, then start development",
+          "Complete GL and Chaperon UI/UX, then TDD"
         ]
       },
       "risks": [
@@ -1088,41 +1120,150 @@
           "id": "RISK-101",
           "text": "Scope creep \u2014 requirement gaps in approved transportation module (RGC, Critical)",
           "mitigation": "",
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "RISK-102",
           "text": "Timely requirement reviews/approvals \u2014 stakeholder availability (RGC, Critical)",
           "mitigation": "",
+          "resolved": true
+        },
+        {
+          "id": "RISK-103",
+          "text": "Resource overlap with Phase 1: 2 QAs and 1 developer on Phase 1; Kishanbhai partly on Phase 1 support",
+          "mitigation": "Prioritize Phase 1 closure and optimize resource allocation for Phase 2A",
+          "resolved": false
+        },
+        {
+          "id": "RISK-104",
+          "text": "Kishanbhai unavailability impacting Phase 2A requirement and development work",
+          "mitigation": "Confirm availability, assess impact and plan alternate support",
+          "resolved": false
+        },
+        {
+          "id": "RISK-105",
+          "text": "Pending review/approval of Guest Registration and Event Management requirements",
+          "mitigation": "Follow up with stakeholders to complete review and approval",
+          "resolved": true
+        },
+        {
+          "id": "RISK-106",
+          "text": "Delay in Group Lead and Chaperon UI/UX",
+          "mitigation": "Expedite UI/UX completion and align with development",
+          "resolved": false
+        },
+        {
+          "id": "RISK-107",
+          "text": "Kishanbhai occupied with NC27 activities; TDD reviews and requirement finalization for his modules pending",
+          "mitigation": "Confirm open issues, assign owners, track actions",
+          "resolved": false
+        },
+        {
+          "id": "RISK-108",
+          "text": "Transportation mobile TDD review pending Kishanbhai",
+          "mitigation": "Start development on TDDs by senior developer; get review when available",
+          "resolved": true
+        },
+        {
+          "id": "RISK-109",
+          "text": "GMS TDD review pending Kishanbhai",
+          "mitigation": "Start development on TDDs by senior developer; get review when available",
+          "resolved": true
+        },
+        {
+          "id": "RISK-110",
+          "text": "Accommodation TDD review pending Kishanbhai",
+          "mitigation": "Start development on TDDs by senior developer; get review when available",
+          "resolved": false
+        },
+        {
+          "id": "RISK-111",
+          "text": "Production issues reported by NC27 Hub team pulling developers off Phase 2A",
+          "mitigation": "Log and prioritize incidents, assign owners, resolve, document root causes",
+          "resolved": true
+        },
+        {
+          "id": "RISK-112",
+          "text": "Transportation mobile and Response form development delay (requirement gaps, Kishanbhai on NC27, production bugs, 2 new CRs with 5 user stories)",
+          "mitigation": "Prioritize Phase 1 bugs and CRs; reduce scope (My Team removed; Guest Registration pending)",
+          "resolved": false
+        },
+        {
+          "id": "RISK-113",
+          "text": "Phase 1 defects and CRs may impact the Phase 2A timeline",
+          "mitigation": "Balance resources between Phase 1 defects/CRs and Phase 2A development",
+          "resolved": false
+        },
+        {
+          "id": "RISK-114",
+          "text": "Incomplete Chaperon requirements may delay requirements and TDD closure",
+          "mitigation": "Validate Chaperon requirements against scope and expedite sign-off",
+          "resolved": false
+        },
+        {
+          "id": "RISK-115",
+          "text": "Event Management TDD completion delay (Kishanbhai on Phase 1; user stories pending)",
+          "mitigation": "Complete pending user stories and prioritize Kishanbhai for TDD",
+          "resolved": false
+        },
+        {
+          "id": "RISK-116",
+          "text": "Transportation development delay: new edge cases need one extra screen and user story updates",
+          "mitigation": "Finalize edge cases, design the extra screen, update user stories",
+          "resolved": false
+        },
+        {
+          "id": "RISK-117",
+          "text": "Response form development delay: defects found in development demo",
+          "mitigation": "Analyze and fix defects, validate in a follow-up demo",
+          "resolved": false
+        },
+        {
+          "id": "RISK-118",
+          "text": "GMS development delay: user story gaps need development rework",
+          "mitigation": "Close gaps, finalize user stories, complete rework",
+          "resolved": false
+        },
+        {
+          "id": "RISK-119",
+          "text": "Accommodation development delay: requirement gaps from user story grooming",
+          "mitigation": "Close requirement gaps, update user stories, share with developers",
+          "resolved": false
+        },
+        {
+          "id": "RISK-120",
+          "text": "If RGC does not provide the 1.5 additional QAs, functional / QA sign-off by 18-Dec-2026 is at risk: 77 QA person-days needed vs 40 available (70 with the extra 1.5 QAs)",
+          "mitigation": "Follow up with RGC on DEP-102; reprioritize the test plan for the remaining ~7 person-day gap; escalate if not confirmed",
           "resolved": false
         }
       ],
-      "delayImpact": "Current Phase 2A go-live date is very challenging to hold; a revised, realistic go-live date is being proposed",
+      "delayImpact": "Phase 1 CRs and bugs took ~17.5 working days (Change Request log): development can still complete by 18-Dec, but completion of testing (QA sign-off) is at risk.",
       "delayMitigation": [
-        "Highlighted to Aksharbhai that current go-live date is very challenging to achieve",
-        "Aksharbhai asked for a proposed revised, realistic go-live date to discuss with the BKY team",
-        "Satish and Kishanbhai finalizing the realistic go-live date to share with Aksharbhai"
+        "Scope reduction approved 19-Oct: Bulk Update of Transport Details and Guest Registration removed from Phase 2A",
+        "Phase 1 bugs and CRs implemented (18-Oct); production fixes deployed 25-Oct",
+        "Chaperon requirements added to FRD on priority",
+        "Fixing Response form demo defects, GMS user story gaps and Accommodation requirement gaps"
       ],
-      "delayTradeoffs": "",
+      "delayTradeoffs": "19-Oct: Aksharbhai approved removing Bulk Update of Transport Details by Karyakars and Guest Registration from Phase 2A to compensate CR effort.",
       "stage": "Requirements",
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
-      "scopeReduced": false,
-      "statusChangeReason": "22-Sep deck marks Phase 2A RED with open critical RGC scope/approval blockers on transportation requirements.",
-      "dependencySeq": 101,
+      "scopeReduced": true,
+      "statusChangeReason": "Requirements and TDD (design) delayed.",
+      "dependencySeq": 104,
       "stagePlan": {
         "Requirements": {
           "initialStart": "2026-06-12",
           "latestStart": "2026-06-12",
           "initialEnd": "2026-10-02",
-          "latestEnd": "2026-10-02"
+          "latestEnd": "2026-11-05"
         },
         "Tech. Design": {
           "initialStart": "2026-08-10",
           "latestStart": "2026-08-10",
           "initialEnd": "2026-10-23",
-          "latestEnd": "2026-10-23"
+          "latestEnd": "2026-11-05"
         },
         "Development": {
           "initialStart": "2026-08-24",
@@ -1131,6 +1272,12 @@
           "latestEnd": "2026-12-18"
         },
         "UAT": {
+          "initialStart": "2026-12-21",
+          "latestStart": "2026-12-21",
+          "initialEnd": "2027-01-08",
+          "latestEnd": "2027-01-08"
+        },
+        "VAPT": {
           "initialStart": "2026-12-21",
           "latestStart": "2026-12-21",
           "initialEnd": "2027-01-08",
@@ -1149,14 +1296,62 @@
           "latestEnd": "2027-03-05"
         }
       },
-      "riskSeq": 102,
+      "riskSeq": 120,
       "changeRequests": [],
-      "decisions": [],
+      "decisions": [
+        {
+          "decision": "Go-Live Date Extension",
+          "description": "Approval has been received to extend the project Go-Live date from 31 Dec 2026 to 31 Jan 2027 due to delayed requirement completion and Change requests during phase 1 UAT",
+          "dateTaken": "2026-09-19",
+          "by": "Aksharbhai Patel",
+          "id": "DEC-101"
+        },
+        {
+          "decision": "Scope Reduction",
+          "description": "The following two items under NC27 Hub \u2013 Phase 2A are to be removed from the current scope:\n1. Bulk Update of Transport Details by Karyakars\n2. Guest Registration\n\nReason - To compensate the efforts required in implementing the change requests",
+          "dateTaken": "2026-10-19",
+          "by": "Aksharbhai Patel",
+          "id": "DEC-102"
+        }
+      ],
       "goLiveChecklist": [],
       "features": [],
       "delayItemLog": [],
-      "milestones": [],
-      "raidLog": []
+      "milestones": [
+        {
+          "name": "Requirements",
+          "date": "2026-11-05",
+          "status": "amber",
+          "progress": 97
+        },
+        {
+          "name": "Design",
+          "date": "2026-11-05",
+          "status": "amber",
+          "progress": 75
+        },
+        {
+          "name": "Development & QA",
+          "date": "2026-12-18",
+          "status": "amber",
+          "progress": 40
+        }
+      ],
+      "raidLog": [],
+      "fastFollowItems": [
+        "My Team",
+        "Guest Registration",
+        "Bulk Update of Transport Details"
+      ],
+      "milestoneOverlay": false,
+      "scheduleBaseline": true,
+      "parallelStages": {
+        "Requirements": "Requirements",
+        "Tech. Design": "Design",
+        "Development": "Development & QA"
+      },
+      "decisionSeq": 102,
+      "usePmStatus": true
     },
     {
       "id": "mymandir",
