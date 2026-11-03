@@ -3616,6 +3616,9 @@
       .sort()
       .map((asOf) => {
         const snap = HISTORY[asOf].projects.find((p) => p.id === projectId);
+        // A snapshot may carry its own `asOf` to correct one project's
+        // date without moving the whole week (e.g. GMS 1.4 went live
+        // 10-12, captured in the 10-14 snapshot) — it wins over the key.
         return snap ? { asOf, ...snap } : null;
       })
       .filter(Boolean);
