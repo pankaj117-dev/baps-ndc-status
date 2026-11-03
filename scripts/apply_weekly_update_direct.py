@@ -24,7 +24,7 @@ risks/dependencies textareas above:
     "GoLiveChecklist" -> [{item, status, notes}]                 (upsert by "item")
     "RaidLog"         -> [{id?, type, item, description, reportedDate, actionItem, targetedCompletionDate, responsible, status, closureRemarks}]
     "Features"        -> [{sprint, type, feature, status, notes, plannedDate, actualDate, delayReason}]  (upsert by sprint+feature)
-    "Milestones"      -> [{name, date, status}]                  (upsert by "name")
+    "Milestones"      -> [{name, date, status, progress?}]       (upsert by "name")
     "DelayItemLog"    -> [{id?, delayedItem, description, reportedDate, impactedPhase, impact, rootCause, responsible, actionItem, actionTaken, status, closureRemarks}]
 
 Any of the six may be omitted or an empty list — same "blank = unchanged"

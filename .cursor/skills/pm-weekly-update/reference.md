@@ -121,9 +121,12 @@ RGC Approval) defaults anything unlisted to "Not started."
 
 ### `Milestones` → `milestones` (upserted by `"name"`)
 ```json
-{ "name": "Requirements sign-off", "date": "2026-08-01", "status": "green" }
+{ "name": "Requirements sign-off", "date": "2026-08-01", "status": "green", "progress": 40 }
 ```
 `status`: `"green"` | `"amber"` | `"red"` | `"black"` (same vocabulary as a project's own `status`)
+`progress` (optional, 0-100): ask for it every week for each active
+milestone — it's snapshotted into `history.json` and drives that
+milestone's own "progress over time" chart on the Schedule tab.
 
 ### `DelayItemLog` → `delayItemLog`
 Narrative delay log — NOT the same as the stage detail view's

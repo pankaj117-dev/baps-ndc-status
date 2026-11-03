@@ -1,6 +1,6 @@
 {
-  "asOf": "2026-11-02",
-  "lastUpdated": "2026-11-03T04:07:35.823676Z",
+  "asOf": "2026-11-03",
+  "lastUpdated": "2026-11-03T06:36:30.914912Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -809,16 +809,16 @@
       "id": "mymandir",
       "name": "myMandir 1B",
       "owner": "Aniket Udgaonkar",
-      "status": "amber",
-      "progress": 30,
-      "phase": "Development",
+      "status": "green",
+      "progress": 75,
+      "phase": "Milestone 1 delivered on UAT to stakeholders on 27 Oct 2026 \u00b7 Milestone 1: 100%, Milestone 2: 70%",
       "nextMilestone": {
-        "name": "QA",
-        "date": "2026-10-20"
+        "name": "Milestone 2 \u2013 Nov 2026 release",
+        "date": "2026-11-06"
       },
-      "goLive": "2026-12-31",
+      "goLive": "2026-11-30",
       "originalGoLive": "2026-10-30",
-      "delayDays": 1,
+      "delayDays": 0,
       "delayNote": "TDD end revised from 22-Sep to 25-Sep (+2 days) per 22-Sep deck; Amber status.",
       "dependencies": [
         {
@@ -829,17 +829,26 @@
           "dueBy": "2026-09-28",
           "priority": "Critical",
           "escalated": false,
+          "resolved": true
+        },
+        {
+          "id": "DEP-102",
+          "text": "Restructure Teams as department/sub-department with coordinator + members (Nov 2026 user story) \u2014 the only user story still pending from Milestone 2; depends on Satyanishtha Swami and Shreyank bhai.",
+          "team": "Satyanishtha Swami / Shreyank bhai",
+          "mitigation": "Awaiting inputs from Satyanishtha Swami and Shreyank bhai to complete this user story; not resolved yet.",
+          "dueBy": "",
+          "escalated": false,
           "resolved": false
         }
       ],
       "sprintStatus": {
         "completed": [
-          "Majority of TDD completed with creation and approval.",
-          "Majority of test cases are prepared now.",
-          "front end development done for independent user stories and we have sheduled dev demo to QA on 6 oct 2026"
+          "Milestone 1 \u2013 UAT release to stakeholders on 27 Oct 2026",
+          "Milestone 2 \u2013 development completed on 29 Oct 2026",
+          "Milestone 1 \u2013 UAT bugs received from stakeholders on 3 Nov 2026"
         ],
         "inProgress": [
-          "For the milestone 1- OCt 2026 release- development is in progress from back end and front end ."
+          "Milestone 2 (Nov 2026 release) \u2013 70% complete; UAT release revised to 6 Nov 2026 (from 15 Nov 2026)"
         ],
         "nextPlan": [
           "from next week,",
@@ -851,17 +860,17 @@
           "id": "RISK-101",
           "text": "API blocker-",
           "mitigation": "we can complete story-575 in October,  user have to generate QR by themselves. our system will not be able to generate QR due to this technical blocker. Other than that, whole flow of Tap/Scan to create request will work as it is.",
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "RISK-102",
           "text": "API blocker which developer  raised for User Story 575.Below are the  findings from that discussion below:",
           "mitigation": "Aniket driving weekly pace checks to hold the Oct/Nov timeline",
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "RISK-103",
-          "resolved": false,
+          "resolved": true,
           "text": "The QR Code utility currently used to generate ZIP files for  assets is hosted on the Project Tree server currently  and is no longer available for use. Replicating the same functionality on the FMS server will require additional development effort and time. We can treat this as a known issue.",
           "mitigation": ""
         }
@@ -871,13 +880,13 @@
         "Aniket connected with Sameep during BA's leave period to secure FRD sign-off"
       ],
       "delayTradeoffs": "",
-      "stage": "Development",
+      "stage": "UAT",
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
       "statusChangeReason": "",
-      "dependencySeq": 101,
+      "dependencySeq": 102,
       "stagePlan": {
         "Tech. Design": {
           "initialStart": "2026-09-17",
@@ -899,9 +908,9 @@
         },
         "UAT": {
           "initialStart": "2026-10-23",
-          "latestStart": "2026-10-23",
+          "latestStart": "2026-10-27",
           "initialEnd": "2026-10-26",
-          "latestEnd": "2026-10-26"
+          "latestEnd": "2026-11-06"
         },
         "Rollout": {
           "initialStart": "2026-10-28",
@@ -911,9 +920,9 @@
         },
         "VAPT": {
           "initialStart": "2026-10-16",
-          "latestStart": "2026-10-16",
+          "latestStart": "2026-11-16",
           "initialEnd": "2026-10-28",
-          "latestEnd": "2026-10-28"
+          "latestEnd": "2026-11-20"
         }
       },
       "riskSeq": 103,
@@ -922,7 +931,34 @@
       "goLiveChecklist": [],
       "features": [],
       "delayItemLog": [],
-      "milestones": [],
+      "milestones": [
+        {
+          "name": "Milestone 1 \u2013 Oct 2026 release",
+          "status": "green",
+          "progress": 100
+        },
+        {
+          "name": "Milestone 2 \u2013 Nov 2026 release",
+          "date": "2026-11-06",
+          "status": "green",
+          "progress": 70
+        },
+        {
+          "name": "Milestone 1 \u2013 UAT release to stakeholders",
+          "date": "2026-10-27",
+          "status": "green"
+        },
+        {
+          "name": "Milestone 2 \u2013 Development complete",
+          "date": "2026-10-29",
+          "status": "green"
+        },
+        {
+          "name": "Milestone 1 \u2013 UAT bugs received from stakeholders",
+          "date": "2026-11-03",
+          "status": "green"
+        }
+      ],
       "raidLog": []
     },
     {
