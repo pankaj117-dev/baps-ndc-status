@@ -3935,8 +3935,9 @@
   // `extraSeries` ([{name, color, points: [{asOf, progress}]}]) overlays
   // additional lines — e.g. one per milestone — plotted on the same weekly
   // x positions as `weeks`; weeks a series has no value for are skipped,
-  // so its line joins its known points.
-  function buildTrendGraph(weeks, fillId = "trendFill", extraSeries = []) {
+  // so its line joins its known points. `lineColor` overrides the
+  // status-based coloring (used for the standalone per-milestone charts).
+  function buildTrendGraph(weeks, fillId = "trendFill", extraSeries = [], lineColor = null) {
     const width = 700;
     const height = 210;
     const padL = 38;
@@ -3963,14 +3964,14 @@
       `<text x="${p.x}" y="${height - 8}" text-anchor="middle" class="graph-axis-label">${fmtDateShort(p.w.asOf)}</text>`
     ).join("");
 
-    const latestColor = STATUS_COLOR[weeks[weeks.length - 1].status] || "var(--accent)";
+    const latestColor = lineColor || STATUS_COLOR[weeks[weeks.length - 1].status] || "var(--accent)";
 
     const dots = points.map((p) => {
       // Flip the label below the dot when it's too close to the top edge
       // (and thus the "100" axis label) to avoid the two overlapping.
       const tooHigh = p.y - 12 < padT + 10;
       const labelY = tooHigh ? p.y + 18 : p.y - 12;
-      return `<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="${STATUS_COLOR[p.w.status] || latestColor}" stroke="#fff" stroke-width="2" />` +
+      return `<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="${lineColor || STATUS_COLOR[p.w.status] || latestColor}" stroke="#fff" stroke-width="2" />` +
         `<text x="${p.x}" y="${labelY}" text-anchor="middle" class="graph-point-label">${p.w.progress}%</text>`;
     }).join("");
 
@@ -4603,6 +4604,13 @@
         points: milestonePoints[name],
       }));
       schedulePanel.appendChild(buildTrendGraph(weeks, "trendFill", milestoneSeries));
+
+      // Plus one standalone chart per milestone, in that milestone's line
+      // color, so each one's trend can be read on its own.
+      milestoneSeries.forEach((s, i) => {
+        schedulePanel.appendChild(el("h3", { class: "weekly-subhead" }, [s.name + " — progress over time"]));
+        schedulePanel.appendChild(buildTrendGraph(s.points, "trendFillMilestone" + i, [], s.color));
+      });
     }
 
     // Delay tab (2026-10-15) — everything delay-related lives here now,

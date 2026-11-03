@@ -1,6 +1,6 @@
 {
   "asOf": "2026-11-03",
-  "lastUpdated": "2026-11-03T06:36:30.914912Z",
+  "lastUpdated": "2026-11-03T07:34:44.121215Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -1087,7 +1087,7 @@
       "owner": "Aniket Udgaonkar",
       "status": "amber",
       "progress": 80,
-      "phase": "Development track Amber; Implementation/onboarding phases Green (22-Sep deck)",
+      "phase": "Dev to QA for Karyakar and Satsangi flow",
       "nextMilestone": {
         "name": "UAT",
         "date": "2026-12-21"
@@ -1243,7 +1243,48 @@
       "changeRequests": [],
       "decisions": [],
       "goLiveChecklist": [],
-      "features": [],
+      "features": [
+        {
+          "sprint": null,
+          "type": "QA",
+          "feature": "Test case creation \u2013 Karyakar flow",
+          "status": "Done",
+          "notes": "Planned 14 Oct \u2013 19 Oct 2026; actual 14 Oct \u2013 19 Oct 2026 (on plan)",
+          "plannedDate": "2026-10-19",
+          "actualDate": "2026-10-19",
+          "delayReason": ""
+        },
+        {
+          "sprint": null,
+          "type": "QA",
+          "feature": "Functional testing \u2013 Karyakar flow",
+          "status": "In Progress",
+          "notes": "Planned 22 Oct \u2013 28 Oct 2026; actual start 22 Oct 2026, still in QA",
+          "plannedDate": "2026-10-28",
+          "actualDate": "",
+          "delayReason": "Blockers and defects"
+        },
+        {
+          "sprint": null,
+          "type": "QA",
+          "feature": "Test case creation \u2013 Satsangi flow",
+          "status": "Done",
+          "notes": "Planned 26 Oct \u2013 29 Oct 2026; actual 27 Oct \u2013 28 Oct 2026",
+          "plannedDate": "2026-10-29",
+          "actualDate": "2026-10-28",
+          "delayReason": ""
+        },
+        {
+          "sprint": null,
+          "type": "QA",
+          "feature": "Functional testing \u2013 Satsangi flow",
+          "status": "In Progress",
+          "notes": "Planned 29 Oct \u2013 04 Nov 2026; actual start 02 Nov 2026, still in QA",
+          "plannedDate": "2026-11-04",
+          "actualDate": "",
+          "delayReason": "Started 2 Nov instead of planned 29 Oct"
+        }
+      ],
       "delayItemLog": [],
       "milestones": [],
       "raidLog": []
