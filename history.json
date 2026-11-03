@@ -10981,7 +10981,7 @@
     ]
   },
   "2026-11-03": {
-    "capturedAt": "2026-11-03T06:26:06.835761Z",
+    "capturedAt": "2026-11-03T06:36:30.914912Z",
     "projects": [
       {
         "id": "webnext",
@@ -11720,7 +11720,7 @@
         "id": "mymandir",
         "name": "myMandir 1B",
         "status": "green",
-        "progress": 30,
+        "progress": 75,
         "stage": "UAT",
         "delayDays": 0,
         "delayNote": "TDD end revised from 22-Sep to 25-Sep (+2 days) per 22-Sep deck; Amber status.",
