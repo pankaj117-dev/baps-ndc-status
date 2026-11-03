@@ -1300,6 +1300,53 @@
     return blocks;
   }
 
+  // Full continuous PLANNED schedule for the cross-project Hawk-eye's
+  // "Planned" row (2026-11-03, "update the hawk-eye to be a calendar
+  // view ... two lines one planned and one actual") — one block per
+  // PIPELINE_STAGES entry, chained end-to-end, using ONLY plan dates
+  // (stagePlan's latest, falling back to initial, falling back to a
+  // generic chained estimate when no plan date is on record at all).
+  // Unlike buildHawkeyeBlocks(), this never substitutes real recorded
+  // history for done/current stages — it's always the baseline/plan
+  // line, so it can be compared directly against the separate "Actual"
+  // row (which IS real history, via buildHawkeyeBlocks() filtered to
+  // its non-"future" blocks). Returns [] for a project with no
+  // recognized current stage, same as buildHawkeyeBlocks().
+  function buildHawkeyePlannedBlocks(p) {
+    const today = todayISO();
+    const currentIndex = PIPELINE_STAGES.indexOf(p.stage || "Unstaged");
+    if (currentIndex === -1) return [];
+
+    const blocks = [];
+    PIPELINE_STAGES.forEach((stage, i) => {
+      const plan = p.stagePlan && p.stagePlan[stage];
+      const planStart = plan && (plan.latestStart || plan.initialStart);
+      const planEnd = plan && (plan.latestEnd || plan.initialEnd);
+      let start, end, estimated;
+      if (planStart && planEnd) {
+        start = planStart;
+        end = planEnd;
+        estimated = false;
+      } else {
+        const estDuration = stageSlaDays(stage) || DEFAULT_FUTURE_STAGE_DAYS;
+        const prev = blocks[blocks.length - 1];
+        start = prev ? prev.end : today;
+        end = addDaysIso(start, estDuration);
+        estimated = true;
+      }
+      const kind = i < currentIndex ? "done" : i === currentIndex ? "current" : "future";
+      blocks.push({
+        stage,
+        start,
+        end,
+        kind,
+        estimated,
+        flag: kind === "current" ? (currentStageOverdue(p, stage) ? "breach" : "warn") : undefined,
+      });
+    });
+    return blocks;
+  }
+
   // Single-project version of the Hawk-eye visual timeline, embedded in
   // the project detail view's Stage-gate tab (2026-09-30, replacing a
   // flat list of rows) — same visual language as the cross-project
@@ -1935,6 +1982,13 @@
   // CSS (.hawkeye-row-label's sticky positioning) need to agree on it.
   const HAWKEYE_LABEL_WIDTH = 220;
 
+  // Width of the small sticky "Planned"/"Actual" sub-row tag that sits
+  // immediately right of the project name column (2026-11-03 calendar
+  // redesign — each project now gets two stacked sub-rows instead of
+  // one). Sticky for the same reason the label column is: stays
+  // readable as the timeline content scrolls horizontally underneath.
+  const HAWKEYE_SUBROW_TAG_WIDTH = 60;
+
   // Three timeline densities. Quarter = the most zoomed-out view
   // (2026-10-05, added alongside Month/Week) — for a portfolio with
   // projects spanning a year or more, Month's 5px/day still means a lot
@@ -1962,23 +2016,41 @@
 
     const DAY = 86400000;
     const todayIso = todayISO();
-    const rows = projects.map((p) => ({ p, blocks: buildHawkeyeBlocks(p) }));
-    const withBlocks = rows.filter((r) => r.blocks.length);
+    // Two independently-dated rows per project (2026-11-03 calendar
+    // redesign — "update the hawk-eye to be a calendar view ... two
+    // lines one planned and one actual"): "Planned" is the full
+    // baseline schedule for every stage (buildHawkeyePlannedBlocks() —
+    // plan dates only, chained end-to-end, covering done/current/future
+    // stages alike); "Actual" is real recorded history only
+    // (buildHawkeyeBlocks()'s own done/current blocks, with its
+    // "future" placeholder blocks dropped entirely — a stage not yet
+    // reached in reality is just blank on the Actual row, not
+    // estimated; per explicit confirmation, "actual" means it really
+    // happened).
+    const rows = projects.map((p) => ({
+      p,
+      plannedBlocks: buildHawkeyePlannedBlocks(p),
+      actualBlocks: buildHawkeyeBlocks(p).filter((b) => b.kind !== "future"),
+    }));
+    const withBlocks = rows.filter((r) => r.plannedBlocks.length);
 
     if (!withBlocks.length) {
       board.appendChild(el("p", { class: "empty-note" }, ["No pipeline stage data to plot yet."]));
       return;
     }
 
-    // Only "done"/"current" blocks are date-accurate, so only they should
-    // stretch the calendar range — future/not-started stages are rendered
-    // as a compact fixed-size chip strip (see below), not plotted by date,
-    // so including their chained placeholder end dates here would just
-    // pointlessly widen the whole board.
+    // The Planned row now covers the WHOLE schedule for every project
+    // (not just done/current, unlike the old single-row design), so it
+    // alone is enough to size the calendar range — no more separate
+    // future-chip strip needed; everything is a real continuous block
+    // on the date axis now.
     const allDates = [todayIso];
-    withBlocks.forEach(({ blocks }) => {
-      blocks.forEach((b) => {
-        if (b.kind === "future") return;
+    withBlocks.forEach(({ plannedBlocks, actualBlocks }) => {
+      plannedBlocks.forEach((b) => {
+        allDates.push(b.start);
+        allDates.push(b.end);
+      });
+      actualBlocks.forEach((b) => {
         allDates.push(b.start);
         allDates.push(b.end);
       });
@@ -2010,12 +2082,12 @@
             "Current — past planned end date",
           ]),
           el("span", { class: "hawkeye-legend-item" }, [
-            el("span", { class: "hawkeye-legend-swatch is-future" }),
-            "Not started (planned)",
+            el("span", { class: "hawkeye-legend-swatch is-plan" }),
+            "Planned row (baseline schedule)",
           ]),
           el("span", { class: "hawkeye-legend-item" }, [
-            el("span", { class: "hawkeye-legend-swatch is-future is-plan-overdue" }),
-            "Plan passed, not yet reported started",
+            el("span", { class: "hawkeye-legend-swatch is-plan is-plan-estimated" }),
+            "Planned row, estimated (no plan date on record yet)",
           ]),
         ]),
         el("div", { class: "hawkeye-zoom-toggle", role: "tablist", title: "Timeline zoom" }, [
@@ -2105,19 +2177,29 @@
     const CHAR_PX = 6.5;
     const BLOCK_CHROME_PX = 12;
     const fitsPx = (text) => text.length * CHAR_PX + BLOCK_CHROME_PX;
-    const FUTURE_CHAR_PX = 6.2; // 10px mono font is still slightly narrower than the 10.5px dated-block font
-    const FUTURE_CHIP_CHROME_PX = 18; // 7px+7px padding + ~4px border/rounding
-    const FUTURE_CHIP_GAP_PX = 3;
     const MIN_BLOCK_PX = 4;
 
     // Pass 1: lay out every row's blocks in real pixels (independent of
-    // final board width), while tracking the widest a row's content
-    // actually needs to be (nominal date-range width, or further out if
-    // some row's future-strip chips need more room past the last dated
-    // block) — then EVERY row's track gets built at that same shared
-    // width, so nothing is ever clipped/hidden and every row still lines
-    // up under the same gridlines.
+    // final board width), while tracking the widest any row's content
+    // actually needs to be — then EVERY row's track gets built at that
+    // same shared width, so nothing is ever clipped/hidden and every row
+    // still lines up under the same gridlines. Each project now gets
+    // TWO independent block sequences (Planned, Actual) laid out with
+    // their own collision-avoiding cursor — they're separate rows, so
+    // one's blocks never need to dodge the other's.
     let timelineWidthPx = ((maxTime - minTime) / DAY) * pxPerDay;
+
+    function layoutBlocks(blocks) {
+      let cursorPx = 0;
+      const placed = blocks.map((b) => {
+        const rawLeft = xPx(b.start);
+        const left = Math.max(rawLeft, cursorPx);
+        const width = Math.max(xPx(b.end) - left, MIN_BLOCK_PX);
+        cursorPx = left + width;
+        return { b, left, width };
+      });
+      return { placed, endPx: cursorPx };
+    }
 
     const rowPlans = rows
       .slice()
@@ -2126,69 +2208,42 @@
         const tb = b.p.goLive ? new Date(b.p.goLive).getTime() : Infinity;
         return ta - tb;
       })
-      .map(({ p, blocks }) => {
-        if (!blocks.length) return { p, empty: true };
-
-        const datedBlocks = blocks.filter((b) => b.kind !== "future");
-        const futureBlocks = blocks.filter((b) => b.kind === "future");
-
-        // Sequential collision-avoiding layout — same reasoning as
-        // before, just in px instead of %: `cursorPx` tracks where the
-        // previous block visually ended so each subsequent block's left
-        // is clamped forward if needed (dates stay accurate for blocks
-        // with real room; only blocks that would've overlapped get
-        // nudged).
-        let cursorPx = 0;
-        const placedDated = datedBlocks.map((b) => {
-          const rawLeft = xPx(b.start);
-          const left = Math.max(rawLeft, cursorPx);
-          const width = Math.max(xPx(b.end) - left, MIN_BLOCK_PX);
-          cursorPx = left + width;
-          return { b, left, width };
-        });
-
-        let stripAnchorPx = null;
-        let stripWidthPx = 0;
-        if (futureBlocks.length) {
-          // Anchor right after the last dated block ends (its clamped
-          // visual position, not its raw date) — or at "today" if there
-          // are no dated blocks at all yet.
-          stripAnchorPx = datedBlocks.length ? cursorPx : xPx(todayIso);
-          stripWidthPx =
-            futureBlocks.reduce((sum, b) => {
-              const code = STAGE_SHORT_CODE[b.stage] || b.stage;
-              return sum + code.length * FUTURE_CHAR_PX + FUTURE_CHIP_CHROME_PX;
-            }, 0) + FUTURE_CHIP_GAP_PX * Math.max(futureBlocks.length - 1, 0);
-          timelineWidthPx = Math.max(timelineWidthPx, stripAnchorPx + stripWidthPx + 16);
-        } else if (placedDated.length) {
-          timelineWidthPx = Math.max(timelineWidthPx, cursorPx + 16);
-        }
-
-        return { p, placedDated, futureBlocks, stripAnchorPx };
+      .map(({ p, plannedBlocks, actualBlocks }) => {
+        if (!plannedBlocks.length) return { p, empty: true };
+        const plannedLayout = layoutBlocks(plannedBlocks);
+        const actualLayout = layoutBlocks(actualBlocks);
+        timelineWidthPx = Math.max(timelineWidthPx, plannedLayout.endPx + 16, actualLayout.endPx + 16);
+        return {
+          p,
+          plannedPlaced: plannedLayout.placed,
+          actualPlaced: actualLayout.placed,
+          hasActual: actualBlocks.length > 0,
+        };
       });
 
     // Pass 2: build the DOM at the final shared timelineWidthPx. Header +
     // gridlines + today-line live in a separate wide "scroll" wrapper
     // (not the toolbar above, which stays put) so the project-name label
-    // column can stick to the left edge of THAT wrapper while its
-    // timeline content scrolls underneath/beside it.
+    // + Planned/Actual tag columns can stick to the left edge of THAT
+    // wrapper while timeline content scrolls underneath/beside them.
+    const prefixWidth = HAWKEYE_LABEL_WIDTH + HAWKEYE_SUBROW_TAG_WIDTH;
     const scrollInner = el("div", { class: "hawkeye-scroll-inner" });
-    const fullWidthPx = HAWKEYE_LABEL_WIDTH + timelineWidthPx;
+    const fullWidthPx = prefixWidth + timelineWidthPx;
 
     const header = el("div", { class: "hawkeye-months", style: `width:${fullWidthPx}px` });
     marks.forEach((m) => {
       header.appendChild(
-        el("div", { class: "hawkeye-month-mark", style: `left:${HAWKEYE_LABEL_WIDTH + m.px}px` }, [m.label])
+        el("div", { class: "hawkeye-month-mark", style: `left:${prefixWidth + m.px}px` }, [m.label])
       );
     });
     scrollInner.appendChild(header);
 
     const rowsWrap = el("div", { class: "hawkeye-rows", style: `width:${fullWidthPx}px` });
     marks.forEach((m) => {
-      rowsWrap.appendChild(el("div", { class: "hawkeye-grid-line", style: `left:${HAWKEYE_LABEL_WIDTH + m.px}px` }));
+      rowsWrap.appendChild(el("div", { class: "hawkeye-grid-line", style: `left:${prefixWidth + m.px}px` }));
     });
     rowsWrap.appendChild(
-      el("div", { class: "hawkeye-today-line", style: `left:${HAWKEYE_LABEL_WIDTH + xPx(todayIso)}px` }, [
+      el("div", { class: "hawkeye-today-line", style: `left:${prefixWidth + xPx(todayIso)}px` }, [
         el("span", { class: "hawkeye-today-label" }, ["Today"]),
       ])
     );
@@ -2196,90 +2251,78 @@
     rowPlans.forEach((plan) => {
       const { p } = plan;
       const projectDelay = p.delayDays || 0;
-        const row = el("div", { class: "hawkeye-row", "data-project-id": p.id, tabindex: "0", role: "button" }, [
-          el("div", { class: "hawkeye-row-label" }, [
+      const row = el("div", { class: "hawkeye-row", "data-project-id": p.id, tabindex: "0", role: "button" }, [
+        el("div", { class: "hawkeye-row-label" }, [
           el("span", { class: "timeline-dot", style: `background:var(--${effectiveStatus(p)})` }),
-            el("div", null, [
-              el("strong", null, [p.name]),
+          el("div", null, [
+            el("strong", null, [p.name]),
             el("div", { class: "hawkeye-row-sub" }, [
               projectDelay > 0 ? `${projectDelay}d delayed` : "On pace",
             ]),
-            ]),
           ]),
-        ]);
+        ]),
+      ]);
 
       if (plan.empty) {
         row.appendChild(
-          el("div", { class: "hawkeye-row-track hawkeye-row-track-empty", style: `width:${timelineWidthPx}px` }, [
-            "No pipeline stage set yet",
+          el("div", { class: "hawkeye-row-tracks" }, [
+            el("div", { class: "hawkeye-subrow" }, [
+              el("div", { class: "hawkeye-subrow-tag" }, ["Planned"]),
+              el("div", { class: "hawkeye-row-track hawkeye-row-track-empty", style: `width:${timelineWidthPx}px` }, [
+                "No pipeline stage set yet",
+              ]),
+            ]),
           ])
         );
         rowsWrap.appendChild(row);
         return;
       }
 
-      const track = el("div", { class: "hawkeye-row-track", style: `width:${timelineWidthPx}px` });
-
-      plan.placedDated.forEach(({ b, left, width }) => {
-        const kindClass = b.kind === "done" ? "is-done" : "is-current" + (b.flag && b.flag !== "ok" ? " is-" + b.flag : "");
-        const code = STAGE_SHORT_CODE[b.stage] || b.stage;
-        // Only ever render text that's actually measured (in real px) to
-        // fit, so it's never partial/illegible. Just the stage code — no
-        // more per-stage SLA overage number (see renderStageGridLegend).
-        const label = width >= fitsPx(code) ? code : "";
-        const title = `${p.name} — ${b.stage}: ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)}`;
-          track.appendChild(
-          el("div", { class: "hawkeye-stage-block " + kindClass, style: `left:${left}px;width:${width}px`, title }, [label])
-          );
-        });
-
-      if (plan.futureBlocks.length) {
-        const strip = el("div", { class: "hawkeye-future-strip", style: `left:${plan.stripAnchorPx}px` });
-        plan.futureBlocks.forEach((b) => {
+      // One stage block, built either for the Planned row (dashed
+      // "is-plan" overlay on top of its done/current/future status
+      // color, since the Planned row alone covers all 9 stages — an
+      // extra "is-plan-estimated" modifier marks stages chained from a
+      // generic SLA guess rather than a real stagePlan date) or the
+      // Actual row (plain solid status color — it's only ever done/
+      // current, "future" never reaches this row at all).
+      function buildTrack(placedList, isPlanned) {
+        const track = el("div", { class: "hawkeye-row-track", style: `width:${timelineWidthPx}px` });
+        placedList.forEach(({ b, left, width }) => {
+          let kindClass =
+            b.kind === "done" ? "is-done" : b.kind === "current" ? "is-current" + (b.flag && b.flag !== "ok" ? " is-" + b.flag : "") : "is-future";
+          if (isPlanned) kindClass += " is-plan" + (b.estimated ? " is-plan-estimated" : "");
           const code = STAGE_SHORT_CODE[b.stage] || b.stage;
-          const targetLabel = b.overdue
-            ? `planned ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)} — already past, but not yet reported started`
-            : b.planned
-            ? `planned target ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)}`
-            : `potential target ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)} (estimated — not yet planned)`;
-          strip.appendChild(
-            el(
-              "div",
-              {
-                class: "hawkeye-stage-block is-future" + (b.overdue ? " is-plan-overdue" : ""),
-                title: `${p.name} — ${b.stage}: ${targetLabel}`,
-                "data-project-id": p.id,
-                "data-stage": b.stage,
-                tabindex: "0",
-                role: "button",
-              },
-              [code]
-            )
+          // Only ever render text that's actually measured (in real px)
+          // to fit, so it's never partial/illegible. Just the stage
+          // code — no more per-stage SLA overage number (see
+          // renderStageGridLegend).
+          const label = width >= fitsPx(code) ? code : "";
+          const rowKindLabel = isPlanned ? (b.estimated ? "Planned, estimated" : "Planned") : "Actual";
+          const title = `${p.name} — ${b.stage} (${rowKindLabel}): ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)}`;
+          track.appendChild(
+            el("div", { class: "hawkeye-stage-block " + kindClass, style: `left:${left}px;width:${width}px`, title }, [label])
           );
         });
-        track.appendChild(strip);
-        // Clicking a specific future chip opens that stage's own detail
-        // (with the potential-target date front and center) instead of
-        // just the row's general project detail — one click straight to
-        // "what's the target for this specific upcoming stage."
-        strip.querySelectorAll(".hawkeye-stage-block").forEach((chip) => {
-          chip.addEventListener("click", (e) => {
-            e.stopPropagation();
-            openStageDetail(chip.getAttribute("data-project-id"), chip.getAttribute("data-stage"));
-          });
-          chip.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              e.stopPropagation();
-              openStageDetail(chip.getAttribute("data-project-id"), chip.getAttribute("data-stage"));
-            }
-          });
-        });
-        }
+        return track;
+      }
 
-        row.appendChild(track);
-        rowsWrap.appendChild(row);
-      });
+      const tracksWrap = el("div", { class: "hawkeye-row-tracks" }, [
+        el("div", { class: "hawkeye-subrow" }, [
+          el("div", { class: "hawkeye-subrow-tag" }, ["Planned"]),
+          buildTrack(plan.plannedPlaced, true),
+        ]),
+        el("div", { class: "hawkeye-subrow" }, [
+          el("div", { class: "hawkeye-subrow-tag" }, ["Actual"]),
+          plan.hasActual
+            ? buildTrack(plan.actualPlaced, false)
+            : el("div", { class: "hawkeye-row-track hawkeye-row-track-empty", style: `width:${timelineWidthPx}px` }, [
+                "No progress recorded yet",
+              ]),
+        ]),
+      ]);
+      row.appendChild(tracksWrap);
+      rowsWrap.appendChild(row);
+    });
 
     scrollInner.appendChild(rowsWrap);
     board.appendChild(scrollInner);

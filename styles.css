@@ -1909,8 +1909,7 @@ table.deps-drill-table th {
 .hawkeye-row {
   position: relative;
   display: flex;
-  align-items: center;
-  min-height: 58px;
+  align-items: stretch;
   border-bottom: 1px solid var(--line);
   cursor: pointer;
   transition: background 0.12s ease;
@@ -1918,7 +1917,8 @@ table.deps-drill-table th {
 
 .hawkeye-row:last-child { border-bottom: none; }
 .hawkeye-row:hover, .hawkeye-row:focus-visible { background: var(--bg); outline: none; }
-.hawkeye-row:hover .hawkeye-row-label, .hawkeye-row:focus-visible .hawkeye-row-label { background: var(--bg); }
+.hawkeye-row:hover .hawkeye-row-label, .hawkeye-row:focus-visible .hawkeye-row-label,
+.hawkeye-row:hover .hawkeye-subrow-tag, .hawkeye-row:focus-visible .hawkeye-subrow-tag { background: var(--bg); }
 
 /* Sticks to the left edge of .hawkeye-scroll-inner as the timeline
    content scrolls horizontally underneath/beside it — an opaque
@@ -1955,10 +1955,51 @@ table.deps-drill-table th {
   color: var(--ink-faint);
 }
 
+/* Two stacked sub-rows per project (2026-11-03 calendar redesign — "two
+   lines one planned and one actual"): Planned on top (the baseline
+   schedule), Actual underneath (real recorded history, blank for
+   stages not yet reached). */
+.hawkeye-row-tracks {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
+.hawkeye-subrow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 46px;
+}
+
+.hawkeye-subrow + .hawkeye-subrow {
+  border-top: 1px dashed var(--line);
+}
+
+/* Small sticky "Planned"/"Actual" tag, right after the project-name
+   column — same sticky-left reasoning as .hawkeye-row-label, just a
+   narrower second sticky column (HAWKEYE_SUBROW_TAG_WIDTH in app.js). */
+.hawkeye-subrow-tag {
+  position: sticky;
+  left: 220px;
+  z-index: 3;
+  flex: 0 0 60px;
+  width: 60px;
+  background: var(--bg-panel);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding-left: 2px;
+  box-shadow: 4px 0 8px -6px rgba(20, 28, 45, 0.15);
+}
+
 .hawkeye-row-track {
   position: relative;
   flex: 0 0 auto;
-  height: 58px;
+  height: 46px;
 }
 
 .hawkeye-row-track-empty {
@@ -1977,7 +2018,7 @@ table.deps-drill-table th {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  height: 30px;
+  height: 26px;
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -2019,47 +2060,31 @@ table.deps-drill-table th {
 }
 
 .hawkeye-stage-block.is-future {
-  /* Was transparent + var(--line-strong) (#d2ddec, very light) + faint
-     text — nearly invisible against the panel's white/light background,
-     especially at the future-strip's small chip size. Tinted fill +
-     darker dashed border + darker text keeps the "outline-only, this is
-     just a plan not a real date range" meaning while actually being
-     legible. */
+  /* Only ever reached by the Planned row now (2026-11-03 calendar
+     redesign) — a stage the project hasn't reached yet still gets a
+     real continuous block on the Planned row (there's no more separate
+     future-strip chip step; the Actual row just leaves it blank
+     entirely instead). Tinted fill + dashed border + darker text keeps
+     the "this is a plan, not a real date range" meaning legible. */
   background: var(--bg);
   border: 1.5px dashed #7c8ba8;
   color: #4a5878;
   font-weight: 600;
 }
-/* Same "plan window already passed, project hasn't reported moving into
-   this stage yet" callout as the per-project Stage-gate timeline's
-   .stagegantt-block.is-plan-overdue (2026-10-06). */
-.hawkeye-stage-block.is-future.is-plan-overdue {
-  border-color: var(--red);
-  color: var(--red);
-  background: var(--red-bg);
-}
 
-/* Future/not-started stages are chained by planned SLA days, which can be
-   as little as 5 days each — plotting them individually by date % at a
-   multi-month zoom level squeezed them into unreadable, overlapping
-   slivers (worse now that there are up to 6 remaining stages instead of
-   3). Render them instead as one compact chip strip, sized by content via
-   normal flex flow, anchored at a single % position rather than each
-   chip having its own tiny date-derived width. */
-.hawkeye-future-strip {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  gap: 3px;
+/* Planned-row-only modifiers (2026-11-03): dashed border overlay on top
+   of whatever done/current/future status color the block already has,
+   so the Planned row is visually distinct from the solid-colored Actual
+   row at a glance, without losing the status color coding. The extra
+   "estimated" modifier (lower opacity) marks a stage chained from a
+   generic SLA guess because no real stagePlan date exists for it yet —
+   "is-future" blocks already look this way by default, so it mostly
+   matters for done/current blocks shown on the Planned row. */
+.hawkeye-stage-block.is-plan {
+  border-style: dashed;
 }
-
-.hawkeye-future-strip .hawkeye-stage-block {
-  position: static;
-  height: 24px;
-  padding: 0 7px;
-  font-size: 10px;
-  flex: 0 0 auto;
+.hawkeye-stage-block.is-plan.is-plan-estimated {
+  opacity: 0.65;
 }
 
 .hawkeye-stage-block:hover {
@@ -2092,8 +2117,8 @@ table.deps-drill-table th {
 .hawkeye-legend-swatch.is-current { background: var(--accent-soft); border-color: var(--accent); }
 .hawkeye-legend-swatch.is-warn { background: var(--amber-bg); border-color: var(--amber); }
 .hawkeye-legend-swatch.is-breach { background: var(--red-bg); border-color: var(--red); }
-.hawkeye-legend-swatch.is-future { background: var(--bg); border-color: #7c8ba8; border-style: dashed; }
-.hawkeye-legend-swatch.is-future.is-plan-overdue { background: var(--red-bg); border-color: var(--red); border-style: dashed; }
+.hawkeye-legend-swatch.is-plan { background: var(--accent-soft); border-color: var(--accent); border-style: dashed; }
+.hawkeye-legend-swatch.is-plan.is-plan-estimated { background: var(--bg); border-color: #7c8ba8; opacity: 0.75; }
 
 /* No small-screen label-column narrowing needed anymore — the label
    column is a fixed 220px sticky sidebar regardless of viewport, and the

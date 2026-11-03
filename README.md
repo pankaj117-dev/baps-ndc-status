@@ -1123,11 +1123,11 @@ own design system.
 ## Tab 3 — 🦅 Hawk-eye (live)
 
 A cross-project **stage-gate calendar**: every project on one shared
-timeline, one row each, sorted by go-live date — but instead of a couple of
-milestone dots, each row is the project's actual pipeline stages laid out
-end to end as blocks, built from the same stage-segment reconstruction used
-by the Grid tab / each project's Stage-gate timeline, so all three stage-gate
-views always agree.
+timeline, two rows each (**Planned** baseline schedule, **Actual**
+recorded history — see the 2026-11-03 entry below), sorted by go-live
+date, built from the same stage-segment reconstruction used by the Grid
+tab / each project's Stage-gate timeline, so all three stage-gate views
+always agree.
 
 - **Solid block, green** — a stage already completed, positioned at its
   real date range.
@@ -1263,6 +1263,68 @@ un-clamped pixel positions, including the previously-clipped `MyBKY
 (Phase 1)` Requirements block, which now renders at its full real width;
 the Month↔Week zoom toggle was also exercised via a simulated click and
 correctly re-renders at the new density.
+
+**Rebuilt as a calendar with separate Planned/Actual rows (2026-11-03,
+"update the hawk-eye to be a calendar view like the second screenshot
+but there should be two lines one planned and one actual").** Each
+project previously got ONE row mixing real history (done/current
+stages) with a compact chip strip for not-yet-reached stages. Confirmed
+via follow-up questions: replace the view entirely (not a toggle); the
+Actual row should be blank for any stage not actually reached yet (no
+estimated placeholder); keep the Quarter/Month/Week zoom toggle, with
+continuous date-positioned blocks (not the raw spreadsheet's discrete
+one-stage-per-month-cell look).
+
+- Each project now renders **two stacked sub-rows** under one shared
+  name/delay label — **Planned** on top, **Actual** underneath — each
+  with its own sticky `.hawkeye-subrow-tag` so both stay legible while
+  the timeline scrolls horizontally.
+- **Planned row** (`buildHawkeyePlannedBlocks(p)`, new): one continuous
+  block for every one of the 9 `PIPELINE_STAGES`, chained end-to-end,
+  using ONLY plan dates — `stagePlan`'s `latestStart`/`latestEnd`
+  (falling back to `initialStart`/`initialEnd`) when a real plan date
+  is on record, or a generic SLA-chained estimate (marked with an
+  `is-plan-estimated` modifier — lower opacity) when it isn't. This
+  never substitutes real history for done/current stages — it's always
+  the baseline schedule, so it can be compared directly against the
+  separate Actual row below it. Blocks are colored by the same done/
+  current/future status logic as before, with a dashed `is-plan`
+  border overlay added so the Planned row is visually distinct from
+  Actual's solid colors at a glance.
+- **Actual row** (`buildHawkeyeBlocks(p)` filtered to its non-"future"
+  blocks): real recorded history only — done stages at their real
+  dates, the current stage running to today. A stage not yet reached is
+  simply **absent** from this row (not estimated, not a placeholder) —
+  confirmed as the intended behavior. A project with literally zero
+  recorded progress yet shows "No progress recorded yet" in place of a
+  track.
+- The old **future-stage chip strip** (`.hawkeye-future-strip`) is gone
+  entirely — every stage, reached or not, is now a real continuous
+  block on the Planned row, so there's no more need for a separate
+  fixed-size chip mechanism. `buildHawkeyeBlocks()` and
+  `computeStageSegments()` themselves were **not touched** — only a new
+  sibling function (`buildHawkeyePlannedBlocks()`) and the rendering
+  layer changed, keeping the data layer's existing guarantees intact.
+- The calendar's date range is now sized from the Planned row's full
+  schedule (previously only done/current blocks counted; future blocks
+  were deliberately excluded since they weren't date-plotted at all) —
+  the whole point of the redesign is that every stage, including
+  not-yet-reached ones, is now a real dated block.
+
+Verified headlessly against real `data.json`: every one of the 10
+visible projects renders exactly 2 sub-rows tagged "Planned"/"Actual";
+the Planned row always has exactly 9 blocks (one per stage, continuous,
+each carrying the `is-plan` modifier); the Actual row never contains an
+`is-future` block; row-level click-through to the project's Stage-gate
+timeline still works unchanged. Separately spot-checked one real
+project's rendered block titles/dates directly — confirmed the Planned
+row reads as a clean, continuous 9-stage schedule, and flagged (but did
+not change, since it's pre-existing `computeStageSegments()` output, not
+something this redesign introduced) that GMS 1.4's own recorded history
+has a couple of out-of-chronological-order segments (UAT/Rollout dated
+earlier than Development) — a pre-existing data/backfill quirk that now
+surfaces visually on its Actual row rather than being hidden by the old
+single-row collision-avoidance layout.
 
 ## Tab 4 — Status History (live)
 
