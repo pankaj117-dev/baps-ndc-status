@@ -1,6 +1,6 @@
 {
-  "asOf": "2026-11-02",
-  "lastUpdated": "2026-11-03T04:07:35.823676Z",
+  "asOf": "2026-11-03",
+  "lastUpdated": "2026-11-03T05:54:40.337045Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -930,7 +930,7 @@
           "name": "Milestone 2 \u2013 Nov 2026 release",
           "date": "2026-11-15",
           "status": "green",
-          "progress": 10
+          "progress": 70
         }
       ],
       "raidLog": []
