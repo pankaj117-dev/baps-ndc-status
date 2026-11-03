@@ -7140,7 +7140,7 @@
         "delayDays": 0,
         "delayNote": "22-Sep review: UAT/VAPT/Load stages slipped (UAT +7d, VAPT +6d, Load +6d per deck); go-live planned 05-Oct-2026; blocked on mobile VAPT sign-off and DevOps/NAHQ production readiness.",
         "statusChangeReason": "",
-        "phase": "Hypercare",
+        "phase": "Hypercare (55% complete)",
         "nextMilestone": {
           "name": "Project Closure",
           "date": "2026-11-06"
@@ -8562,12 +8562,12 @@
         "id": "mybky-phase1",
         "name": "MyBKY (Phase 1)",
         "status": "green",
-        "progress": 97,
+        "progress": 99,
         "stage": "Hypercare",
         "delayDays": 0,
-        "delayNote": "22-Sep review: UAT/VAPT/Load stages slipped (UAT +7d, VAPT +6d, Load +6d per deck); go-live planned 05-Oct-2026; blocked on mobile VAPT sign-off and DevOps/NAHQ production readiness.",
+        "delayNote": "Go-live achieved 01-Oct-2026; no delay.",
         "statusChangeReason": "",
-        "phase": "Hypercare",
+        "phase": "Hypercare (95% complete)",
         "nextMilestone": {
           "name": "Project Closure",
           "date": "2026-11-06"
@@ -8590,31 +8590,31 @@
             "id": "RISK-101",
             "text": "Mobile VAPT sign-off pending (VAPT \u2014 Critical)",
             "mitigation": "",
-            "resolved": false
+            "resolved": true
           },
           {
             "id": "RISK-102",
             "text": "UAT sign-off received but ~25% of items still need updates in tracking sheet (Stakeholders \u2014 Critical)",
             "mitigation": "UAT team updating tracking sheet",
-            "resolved": false
+            "resolved": true
           },
           {
             "id": "RISK-103",
             "text": "Production integration keys needed for SSO, SFS, MIS, MDS (DevOps \u2014 Critical)",
             "mitigation": "DevOps/NAHQ chasing keys and access",
-            "resolved": false
+            "resolved": true
           },
           {
             "id": "RISK-104",
             "text": "Read-only MIS access, Google Maps API key, Apple Pay for Stripe, n8n pipelines (DevOps \u2014 Critical)",
             "mitigation": "",
-            "resolved": false
+            "resolved": true
           },
           {
             "id": "RISK-105",
             "text": "SSO user accounts for Kishor/Kishori participants still need creation (NAHQ \u2014 Critical)",
             "mitigation": "NAHQ creating SSO accounts",
-            "resolved": false
+            "resolved": true
           }
         ],
         "fastFollowItems": [],
@@ -8727,14 +8727,14 @@
         },
         "sprintStatus": {
           "completed": [
-            "CRs implemented",
-            "Hypercare issues fixed"
+            "Hypercare triage of 27 reported issues: 8 fixed, 19 closed (not a bug / not reproducible / out of scope)"
           ],
           "inProgress": [
-            "Hypercare (55% complete)"
+            "Hypercare (95% complete)"
           ],
           "nextPlan": [
-            "Phase 1 closure",
+            "Phase 1 closure (06-Nov)",
+            "Handover to support",
             "myBKY 2A work continues"
           ]
         }
