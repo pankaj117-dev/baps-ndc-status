@@ -10981,7 +10981,7 @@
     ]
   },
   "2026-11-03": {
-    "capturedAt": "2026-11-03T06:03:26.708041Z",
+    "capturedAt": "2026-11-03T06:06:39.793888Z",
     "projects": [
       {
         "id": "webnext",
@@ -11730,7 +11730,7 @@
           "name": "Milestone 2 \u2013 Nov 2026 release",
           "date": "2026-11-06"
         },
-        "goLive": "2026-12-31",
+        "goLive": "2026-11-30",
         "originalGoLive": "2026-10-30",
         "delayImpact": "TDD +2d slip may impact downstream development start (22-Sep deck)",
         "delayMitigation": [

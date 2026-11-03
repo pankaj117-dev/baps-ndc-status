@@ -1,6 +1,6 @@
 {
   "asOf": "2026-11-03",
-  "lastUpdated": "2026-11-03T06:03:26.708041Z",
+  "lastUpdated": "2026-11-03T06:06:39.793888Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -816,7 +816,7 @@
         "name": "Milestone 2 \u2013 Nov 2026 release",
         "date": "2026-11-06"
       },
-      "goLive": "2026-12-31",
+      "goLive": "2026-11-30",
       "originalGoLive": "2026-10-30",
       "delayDays": 0,
       "delayNote": "TDD end revised from 22-Sep to 25-Sep (+2 days) per 22-Sep deck; Amber status.",
