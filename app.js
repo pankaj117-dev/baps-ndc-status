@@ -143,6 +143,14 @@
   // (2026-10-16) so the Weekly Status Report widget's Progress row can
   // reuse the exact same facts instead of just a bar + percentage ("I want
   // to see the full progress of how I see the weekly here").
+  // "On schedule" / "+N days", plus an optional per-project qualifier
+  // (p.scheduleScope, e.g. "hotfix") so a project in Hypercare can say
+  // what the schedule status is actually tracking.
+  function scheduleStatusText(p) {
+    const base = (p.delayDays || 0) > 0 ? "+" + p.delayDays + " days" : "On schedule";
+    return p.scheduleScope ? base + " (" + p.scheduleScope + ")" : base;
+  }
+
   function buildProgressFactsList(p) {
     const isLate = p.delayDays > 0;
     return el("dl", { class: "card-facts detail-facts" }, [
@@ -157,7 +165,7 @@
       ]),
       el("dt", null, ["Status"]),
       el("dd", { class: "delay-flag " + (isLate ? "is-late" : "is-ontime") }, [
-        isLate ? "+" + p.delayDays + " days" : "On schedule",
+        scheduleStatusText(p),
       ]),
       ...(isLate
         ? [
@@ -1016,7 +1024,7 @@
           el("dd", null, [fmtDate(p.goLive)]),
           el("dt", null, ["Status"]),
           el("dd", { class: "delay-flag " + (isLate ? "is-late" : "is-ontime") }, [
-            isLate ? "+" + p.delayDays + " days" : "On schedule",
+            scheduleStatusText(p),
           ]),
           ...((p.timeSavedDays || 0) > 0
             ? [
@@ -4163,7 +4171,7 @@
       case "delay": {
         const isLateP = (p.delayDays || 0) > 0;
         const count = (p.delayItemLog || []).length + (p.delayLog || []).length;
-        const statusText = isLateP ? "+" + p.delayDays + " days" : "On schedule";
+        const statusText = scheduleStatusText(p);
         return statusText + (count ? " · " + plural(count, "logged delay") : "");
       }
       case "weekoverweek": {
