@@ -1927,7 +1927,7 @@
         {
           "title": "Old contacts kept after changing campaign contact lists",
           "summary": "With custom variables, swapped lists stayed attached (30 sent instead of 10).",
-          "rca": "Not reproducible in QA",
+          "rca": "Under RCA review",
           "reportedBy": "Vyom",
           "status": "Resolved"
         },
