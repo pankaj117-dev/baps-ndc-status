@@ -1842,6 +1842,8 @@ table.deps-drill-table th {
   font-size: 12px;
 }
 
+.schedule-timeline-note.is-reason { flex-basis: 100%; }
+
 @media (max-width: 640px) {
   .schedule-timeline-row { grid-template-columns: 1fr; }
   .schedule-timeline-delta { margin-left: 0; }
@@ -3101,6 +3103,27 @@ body.no-scroll { overflow: hidden; }
   fill: var(--ink);
 }
 
+.trend-graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  padding: 4px 0 8px;
+  font-size: 12px;
+  color: var(--ink);
+}
+
+.trend-graph-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trend-graph-legend-swatch {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+}
+
 .changelog {
   background: var(--bg-panel);
   border: 1px solid var(--line);
@@ -4113,6 +4136,14 @@ dd.is-missing {
 .cr-log-status.is-approved { background: var(--green-bg); color: var(--green); }
 .cr-log-status.is-pending { background: var(--amber-bg); color: var(--amber); }
 
+.hotfix-plan { margin-top: 20px; }
+.hotfix-plan-title { margin: 0 0 8px; font-size: 15px; font-weight: 700; }
+.hotfix-plan-actual { color: var(--red); }
+
+.postprod-bugs { margin-bottom: 28px; }
+.postprod-bugs .hotfix-plan-title { margin-top: 16px; }
+.postprod-bugs-note { margin: 10px 0 0; color: var(--ink-soft); }
+
 /* ---------- Wide log tables (Delay, RAID, Change Request, Decision logs)
    — a real <table> + horizontal scroll wrapper, used for every log that
    was rebuilt (2026-10-15) to match the deck's own sample tables exactly,
@@ -4269,3 +4300,11 @@ dd.is-missing {
 .feature-reference-note li:last-child {
   margin-bottom: 0;
 }
+
+.postrelease-issues { margin-top: 32px; }
+.postrelease-summary { margin-top: 4px; color: var(--ink-soft); font-size: 13px; }
+.cr-log-status.is-missed { background: var(--red-bg); color: var(--red); }
+.postrelease-issues .wide-log-full-table { min-width: 640px; }
+.postrelease-issues .wide-log-full-table td:first-child { width: 55%; }
+.postrelease-issues.is-nested { margin-top: 20px; }
+.postrelease-issues .cr-log-status { white-space: normal; text-align: left; }

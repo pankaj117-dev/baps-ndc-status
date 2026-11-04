@@ -1,6 +1,6 @@
 {
-  "asOf": "2026-11-02",
-  "lastUpdated": "2026-11-03T04:07:35.823676Z",
+  "asOf": "2026-11-03",
+  "lastUpdated": "2026-11-03T07:34:44.121215Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -498,8 +498,8 @@
       "name": "MyBKY (Phase 1)",
       "owner": "Satish Buddhadev",
       "status": "green",
-      "progress": 97,
-      "phase": "Hypercare",
+      "progress": 99,
+      "phase": "Hypercare (95% complete)",
       "nextMilestone": {
         "name": "Project Closure",
         "date": "2026-11-06"
@@ -508,7 +508,7 @@
       "originalGoLive": "2026-09-21",
       "recoveryNote": "",
       "delayDays": 0,
-      "delayNote": "22-Sep review: UAT/VAPT/Load stages slipped (UAT +7d, VAPT +6d, Load +6d per deck); go-live planned 05-Oct-2026; blocked on mobile VAPT sign-off and DevOps/NAHQ production readiness.",
+      "delayNote": "Go-live achieved 01-Oct-2026; no delay.",
       "dependencies": [
         {
           "id": "DEP-101",
@@ -579,14 +579,14 @@
       ],
       "sprintStatus": {
         "completed": [
-          "CRs implemented",
-          "Hypercare issues fixed"
+          "Hypercare triage of 27 reported issues: 8 fixed, 19 closed (not a bug / not reproducible / out of scope)"
         ],
         "inProgress": [
-          "Hypercare (55% complete)"
+          "Hypercare (95% complete)"
         ],
         "nextPlan": [
-          "Phase 1 closure",
+          "Phase 1 closure (06-Nov)",
+          "Handover to support",
           "myBKY 2A work continues"
         ]
       },
@@ -595,35 +595,35 @@
           "id": "RISK-101",
           "text": "Mobile VAPT sign-off pending (VAPT \u2014 Critical)",
           "mitigation": "",
-          "resolved": false,
+"resolved": true,
           "stage": "VAPT"
         },
         {
           "id": "RISK-102",
           "text": "UAT sign-off received but ~25% of items still need updates in tracking sheet (Stakeholders \u2014 Critical)",
           "mitigation": "UAT team updating tracking sheet",
-          "resolved": false,
+"resolved": true,
           "stage": "UAT"
         },
         {
           "id": "RISK-103",
           "text": "Production integration keys needed for SSO, SFS, MIS, MDS (DevOps \u2014 Critical)",
           "mitigation": "DevOps/NAHQ chasing keys and access",
-          "resolved": false,
+"resolved": true,
           "stage": "Rollout"
         },
         {
           "id": "RISK-104",
           "text": "Read-only MIS access, Google Maps API key, Apple Pay for Stripe, n8n pipelines (DevOps \u2014 Critical)",
           "mitigation": "",
-          "resolved": false,
+"resolved": true,
           "stage": "Rollout"
         },
         {
           "id": "RISK-105",
           "text": "SSO user accounts for Kishor/Kishori participants still need creation (NAHQ \u2014 Critical)",
           "mitigation": "NAHQ creating SSO accounts",
-          "resolved": false,
+"resolved": true,
           "stage": "Rollout"
         }
       ],
@@ -688,30 +688,383 @@
       },
       "riskSeq": 105,
       "delayLogSeq": 100,
-      "changeRequests": [],
+      "changeRequests": [
+        {
+          "title": "Rooming Validation Enhancements",
+          "description": "Additional rooming validation requirements were identified after scope finalization. The enhancements include new validation rules for room charges",
+          "submittedDate": "2026-06-09",
+          "by": "Aksharbhai",
+          "actionItem": "Review the detailed requirements, assess development and testing effort, obtain CR approval, and finalize implementation timeline.",
+          "approvalStatus": "Approved for current phase",
+          "impact": "Go-Live date will be impacted by 10 working days",
+          "id": "CR-101"
+        },
+        {
+          "title": "Event Registration - Include incoming graduates in Invitees list",
+          "description": "The Business Team now wants the invitation logic to consider the delegate\u2019s next Mandal progression as well. Accordingly, delegates who are expected to graduate to the next Mandal should be invited to the corresponding next-level event.\n\nFor example:\n\n1. Bal_3 delegates graduating to Kishore_K1 \u2192 invited to the Kishore_K1 event\n2. Kishore_K1 delegates graduating to Kishore_K2 \u2192 invited to the Kishore_K2 event\n3. Kishore_K2 delegates graduating to Yuvak \u2192 invited to the Yuvak event",
+          "submittedDate": "2026-08-21",
+          "by": "Bhargavbhai",
+          "actionItem": "Review the detailed requirements, assess development and testing effort, obtain CR approval, and finalize implementation timeline.",
+          "approvalStatus": "Approved for current phase",
+          "impact": "Go-Live date will be impacted by 6 working days",
+          "id": "CR-102"
+        },
+        {
+          "title": "Daycare Age range change",
+          "description": "Currently we have daycate range from 2 to 9",
+          "submittedDate": "2026-08-28",
+          "by": "Kishanbhai",
+          "actionItem": "Change day care rannge from 2 to 9 to 0 to 17",
+          "approvalStatus": "Approved for current phase",
+          "impact": "No impact on Go-Live date",
+          "id": "CR-103"
+        },
+        {
+          "title": "Spelling Grammer correction in Mobile App",
+          "description": "Kishanbhai shared the \u201cmyBKY \u2013 Grammar-Spelling Errors\u201d feedback file with us, which includes the grammar/spelling correction changes.\n\nWhile reviewing the file, we observed that there are some changes where entire sentences have been revised/replaced, beyond the regular grammar and spelling corrections.\n\nThe Figma designs have already been reviewed and approved",
+          "submittedDate": "2026-08-09",
+          "by": "Kishanbhai",
+          "actionItem": "Update the spelling / Grammer / Sentences as per the shared documents",
+          "approvalStatus": "Approved for current phase",
+          "impact": "No impact on Go-Live date",
+          "id": "CR-104"
+        },
+        {
+          "title": "Rooming splash screen update",
+          "description": "As per the approved Figma design, the Rooming splash screen displayed all room types configured for the respective event. However, upon proceeding to room selection, users could only view the room types they were eligible to select, which created confusion and an inconsistent user experience.\n\nTo address this, a validation has been introduced on the splash screen itself. The screen will now display only those room types for which the user is eligible, ensuring consistency between the splash screen and the room selection page and providing a clearer user experience.",
+          "submittedDate": "2026-08-07",
+          "by": "Kishanbhai",
+          "actionItem": "Apply the validation on Rooming Splash screen as well",
+          "approvalStatus": "Approved for current phase",
+          "impact": "No impact on Go-Live date",
+          "id": "CR-105"
+        },
+        {
+          "title": "Additional filters, announcement visibility to parents and App level consent",
+          "description": "1. Add filters for Delegate registration data grid\nFilters: Department, Locations (same as event filters)\n2. Add filters for Volunteer registration data grid\nFilters: Personal Department, Seva Department, Seva Roles, Locations\n3. Make news feed and announcements in mobile app accessible to all parents without any personal invitation for an event\n4. Mobile App first time login consent capture (Proposed by Pravinbhai and Board)",
+          "submittedDate": "2026-09-29",
+          "by": "Kishanbhai",
+          "actionItem": "Review the detailed requirements, assess development and testing effort, obtain CR approval, and finalize implementation timeline.",
+          "approvalStatus": "Approved for phase 1 (immediate release)",
+          "impact": "Either scope to be reduced or Phase 2A Go-live will be impacted by 4 working days",
+          "id": "CR-106"
+        },
+        {
+          "title": "Multiple items",
+          "description": "CR 1: Web - Allow Sanyukt/Premvati members to be manually invited for Yuvak/Yuvati Shibir\nCR 2: Web - Remove position checking while manually inviting volunteers (Currently system looks for at least one active position)\nCR 3: Mobile: Make Allergy/Dietary Restriction questions optional",
+          "submittedDate": "2026-10-05",
+          "by": "Kishanbhai",
+          "actionItem": "Review the detailed requirements, assess development and testing effort, obtain CR approval, and finalize implementation timeline.",
+          "approvalStatus": "Approved for phase 1 (immediate release)",
+          "impact": "Either scope to be reduced or Phase 2A Go-live will be impacted by 5 working days",
+          "id": "CR-107"
+        },
+        {
+          "title": "Multiple items",
+          "description": "1. Relax the family room rule to allow couples without children or daycare requirements to opt for shared rooms instead of being restricted to family rooms.\n2. Include a detailed pricing breakdown on the payment summary screen.",
+          "submittedDate": "2026-10-14",
+          "by": "Kishanbhai / Bhargavbhai",
+          "actionItem": "Fix the production bugs and release ASAP",
+          "approvalStatus": "Approved for phase 1 (immediate release)",
+          "impact": "Either scope to be reduced or Phase 2A Go-live will be impacted by 1.5 working days",
+          "id": "CR-108"
+        }
+      ],
       "decisions": [],
       "goLiveChecklist": [],
-      "features": [],
+      "features": [
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Promo codes not working",
+          "status": "Excluded",
+          "notes": "Not a bug",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Invited kids not visible to parents",
+          "status": "Done",
+          "notes": "Fixed",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "BAPSID changed for delegate, can\u2019t register",
+          "status": "Excluded",
+          "notes": "Not reproducible in QA",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Parent registered as volunteer, can\u2019t select room for kid",
+          "status": "Excluded",
+          "notes": "Not a bug",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Cross-department access (BKY / iBKY / Yuvak-Yuvati)",
+          "status": "Done",
+          "notes": "Fixed",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Event roles not working",
+          "status": "Excluded",
+          "notes": "Not a bug - Out of scope",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Permissions not working for P. Sant and some karyakars",
+          "status": "Excluded",
+          "notes": "Not reproducible in QA",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Payment successful, admin portal shows \u201cPending\u201d",
+          "status": "Done",
+          "notes": "Fixed",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Graduating members: rooming and other data not moved",
+          "status": "Excluded",
+          "notes": "Not reproducible in QA",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Empty member / payee names in payment transactions",
+          "status": "Done",
+          "notes": "Fixed",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Paid twice (link + credit card)",
+          "status": "Excluded",
+          "notes": "Not reproducible in QA",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Parent\u2019s name in registration success email",
+          "status": "Excluded",
+          "notes": "Not a bug",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Script to fix registration status where payment is done",
+          "status": "Excluded",
+          "notes": "Not a bug",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "View newsfeed role: unauthorized on opening a feed",
+          "status": "Excluded",
+          "notes": "Not a bug",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Sub-event selection unauthorized the first time",
+          "status": "Excluded",
+          "notes": "Not a bug",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Communication manager event role can\u2019t access news feeds",
+          "status": "Excluded",
+          "notes": "Not a bug - Out of scope",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Event ID shown instead of event name on summary",
+          "status": "Excluded",
+          "notes": "Not reproducible in QA",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "2 children, 2 events, total $100: is this correct? (amount mismatch)",
+          "status": "Excluded",
+          "notes": "Not reproducible in QA",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Deleted person still shown in family (mobile)",
+          "status": "Done",
+          "notes": "Fixed",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Login screen freeze on many devices",
+          "status": "Excluded",
+          "notes": "Not a bug",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Stuck at payment summary despite successful payment",
+          "status": "Excluded",
+          "notes": "Not reproducible in QA",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Cancelling one event cancels multiple events (family)",
+          "status": "Excluded",
+          "notes": "Not reproducible in QA",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Daycare consent label wording",
+          "status": "Done",
+          "notes": "Fixed",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "1Password autofill turns payment screen white",
+          "status": "Excluded",
+          "notes": "Not reproducible in QA",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Stuck on biometric screen after first login",
+          "status": "Excluded",
+          "notes": "Not a bug",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Daycare option not shown for eligible child",
+          "status": "Done",
+          "notes": "Fixed",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Hypercare bug",
+          "feature": "Person missing on Edit Registration summary",
+          "status": "Done",
+          "notes": "Fixed",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        }
+      ],
       "delayItemLog": [],
       "delayLog": [],
       "milestones": [],
-      "raidLog": []
+      "raidLog": [],
+      "changeRequestSeq": 108
     },
     {
       "id": "mybky-phase2",
       "name": "myBKY 2A",
       "owner": "Satish Buddhadev",
-      "status": "red",
-      "progress": 45,
-      "phase": "Requirements through 02-Oct-2026; TDD through 23-Oct-2026 (per 22-Sep deck)",
+      "status": "amber",
+      "progress": 51,
+      "phase": "Requirements 97% | Design 75% | Dev & QA 40%",
       "nextMilestone": {
-        "name": "Requirements completion",
-        "date": "2026-10-02"
+        "name": "Development & QA completion",
+        "date": "2026-12-18"
       },
       "goLive": "2027-01-28",
-      "originalGoLive": "2026-12-20",
-      "delayDays": 14,
-      "delayNote": "22-Sep deck: requirement end 02-Oct-2026; TDD end 23-Oct-2026; go-live window 11-Jan\u201328-Jan-2027.",
+      "originalGoLive": "2027-01-28",
+      "delayDays": 22,
+      "delayNote": "Team on Phase 1 bugs and 9 CR items from 29-Sep to 18-Oct (~16 working days); Event Management Figma approved 6 days late (19-Oct); GL & Chaperon requirements late (planned 21-Oct).",
       "dependencies": [
         {
           "id": "DEP-101",
@@ -721,25 +1074,57 @@
           "dueBy": "2026-09-25",
           "priority": "Critical",
           "escalated": false,
+          "resolved": true
+        },
+        {
+          "id": "DEP-102",
+          "text": "RGC team to provide 1.5 additional QAs (for one month) to meet the functional / QA sign-off timeline (Dev & QA completion 18-Dec-2026)",
+          "team": "RGC",
+          "mitigation": "Requested 1.5 additional QAs from RGC; test plan being reprioritized for the remaining ~7 person-day gap",
+          "dueBy": "2026-11-09",
+          "priority": "Critical",
+          "escalated": false,
+          "resolved": false
+        },
+        {
+          "id": "DEP-103",
+          "text": "Implement UI/UX changes received for Group Lead module \u2014 Abhishek Patel, Pranay Gauda",
+          "team": "Dev Team",
+          "mitigation": "",
+          "dueBy": "2026-11-05",
+          "priority": "High",
+          "escalated": false,
+          "resolved": false
+        },
+        {
+          "id": "DEP-104",
+          "text": "2nd session needed with the Architecture Board for Global guideline \u2014 Pratik Gohil, Vishal Patel (Tampa)",
+          "team": "Architecture Board",
+          "mitigation": "",
+          "dueBy": "2026-11-06",
+          "priority": "High",
+          "escalated": false,
           "resolved": false
         }
       ],
       "sprintStatus": {
         "completed": [
-          "Sprint 1 Dev started",
-          "Transportation Module Frontend development completed",
-          "Transportation Backend development completed"
+          "Requirements: all 6 modules (Transportation, Accommodation, GL and Chaperon, GMS, Event Management, Form)",
+          "UI/UX: Transportation, Accommodation, GMS, Event Management, Form",
+          "TDD: Transportation, GMS, Event Management, Form",
+          "Development: Transportation, GMS, Form"
         ],
         "inProgress": [
-          "Requirement completion",
-          "Sprint 1 TDD submission & approval",
-          "Web Transportation TDD review",
-          "GMS FRD review",
-          "Guest Registration FRD creation"
+          "QA: Transportation, Form",
+          "TDD: Accommodation",
+          "UI/UX: GL and Chaperon"
         ],
         "nextPlan": [
-          "Transportation module API integration \u2014 pending release dependency",
-          "Partial GMS module + Response form module (Phase 1 carryover) development"
+          "Complete QA (QA sign-off) for Transportation and Form",
+          "Start QA for GMS",
+          "Start development for Event Management",
+          "Complete Accommodation TDD, then start development",
+          "Complete GL and Chaperon UI/UX, then TDD"
         ]
       },
       "risks": [
@@ -747,41 +1132,150 @@
           "id": "RISK-101",
           "text": "Scope creep \u2014 requirement gaps in approved transportation module (RGC, Critical)",
           "mitigation": "",
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "RISK-102",
           "text": "Timely requirement reviews/approvals \u2014 stakeholder availability (RGC, Critical)",
           "mitigation": "",
+          "resolved": true
+        },
+        {
+          "id": "RISK-103",
+          "text": "Resource overlap with Phase 1: 2 QAs and 1 developer on Phase 1; Kishanbhai partly on Phase 1 support",
+          "mitigation": "Prioritize Phase 1 closure and optimize resource allocation for Phase 2A",
+          "resolved": false
+        },
+        {
+          "id": "RISK-104",
+          "text": "Kishanbhai unavailability impacting Phase 2A requirement and development work",
+          "mitigation": "Confirm availability, assess impact and plan alternate support",
+          "resolved": false
+        },
+        {
+          "id": "RISK-105",
+          "text": "Pending review/approval of Guest Registration and Event Management requirements",
+          "mitigation": "Follow up with stakeholders to complete review and approval",
+          "resolved": true
+        },
+        {
+          "id": "RISK-106",
+          "text": "Delay in Group Lead and Chaperon UI/UX",
+          "mitigation": "Expedite UI/UX completion and align with development",
+          "resolved": false
+        },
+        {
+          "id": "RISK-107",
+          "text": "Kishanbhai occupied with NC27 activities; TDD reviews and requirement finalization for his modules pending",
+          "mitigation": "Confirm open issues, assign owners, track actions",
+          "resolved": false
+        },
+        {
+          "id": "RISK-108",
+          "text": "Transportation mobile TDD review pending Kishanbhai",
+          "mitigation": "Start development on TDDs by senior developer; get review when available",
+          "resolved": true
+        },
+        {
+          "id": "RISK-109",
+          "text": "GMS TDD review pending Kishanbhai",
+          "mitigation": "Start development on TDDs by senior developer; get review when available",
+          "resolved": true
+        },
+        {
+          "id": "RISK-110",
+          "text": "Accommodation TDD review pending Kishanbhai",
+          "mitigation": "Start development on TDDs by senior developer; get review when available",
+          "resolved": false
+        },
+        {
+          "id": "RISK-111",
+          "text": "Production issues reported by NC27 Hub team pulling developers off Phase 2A",
+          "mitigation": "Log and prioritize incidents, assign owners, resolve, document root causes",
+          "resolved": true
+        },
+        {
+          "id": "RISK-112",
+          "text": "Transportation mobile and Response form development delay (requirement gaps, Kishanbhai on NC27, production bugs, 2 new CRs with 5 user stories)",
+          "mitigation": "Prioritize Phase 1 bugs and CRs; reduce scope (My Team removed; Guest Registration pending)",
+          "resolved": false
+        },
+        {
+          "id": "RISK-113",
+          "text": "Phase 1 defects and CRs may impact the Phase 2A timeline",
+          "mitigation": "Balance resources between Phase 1 defects/CRs and Phase 2A development",
+          "resolved": false
+        },
+        {
+          "id": "RISK-114",
+          "text": "Incomplete Chaperon requirements may delay requirements and TDD closure",
+          "mitigation": "Validate Chaperon requirements against scope and expedite sign-off",
+          "resolved": false
+        },
+        {
+          "id": "RISK-115",
+          "text": "Event Management TDD completion delay (Kishanbhai on Phase 1; user stories pending)",
+          "mitigation": "Complete pending user stories and prioritize Kishanbhai for TDD",
+          "resolved": false
+        },
+        {
+          "id": "RISK-116",
+          "text": "Transportation development delay: new edge cases need one extra screen and user story updates",
+          "mitigation": "Finalize edge cases, design the extra screen, update user stories",
+          "resolved": false
+        },
+        {
+          "id": "RISK-117",
+          "text": "Response form development delay: defects found in development demo",
+          "mitigation": "Analyze and fix defects, validate in a follow-up demo",
+          "resolved": false
+        },
+        {
+          "id": "RISK-118",
+          "text": "GMS development delay: user story gaps need development rework",
+          "mitigation": "Close gaps, finalize user stories, complete rework",
+          "resolved": false
+        },
+        {
+          "id": "RISK-119",
+          "text": "Accommodation development delay: requirement gaps from user story grooming",
+          "mitigation": "Close requirement gaps, update user stories, share with developers",
+          "resolved": false
+        },
+        {
+          "id": "RISK-120",
+          "text": "If RGC does not provide the 1.5 additional QAs, functional / QA sign-off by 18-Dec-2026 is at risk: 77 QA person-days needed vs 40 available (70 with the extra 1.5 QAs)",
+          "mitigation": "Follow up with RGC on DEP-102; reprioritize the test plan for the remaining ~7 person-day gap; escalate if not confirmed",
           "resolved": false
         }
       ],
-      "delayImpact": "Current Phase 2A go-live date is very challenging to hold; a revised, realistic go-live date is being proposed",
+      "delayImpact": "Phase 1 CRs and bugs took ~17.5 working days (Change Request log): development can still complete by 18-Dec, but completion of testing (QA sign-off) is at risk.",
       "delayMitigation": [
-        "Highlighted to Aksharbhai that current go-live date is very challenging to achieve",
-        "Aksharbhai asked for a proposed revised, realistic go-live date to discuss with the BKY team",
-        "Satish and Kishanbhai finalizing the realistic go-live date to share with Aksharbhai"
+        "Scope reduction approved 19-Oct: Bulk Update of Transport Details and Guest Registration removed from Phase 2A",
+        "Phase 1 bugs and CRs implemented (18-Oct); production fixes deployed 25-Oct",
+        "Chaperon requirements added to FRD on priority",
+        "Fixing Response form demo defects, GMS user story gaps and Accommodation requirement gaps"
       ],
-      "delayTradeoffs": "",
+      "delayTradeoffs": "19-Oct: Aksharbhai approved removing Bulk Update of Transport Details by Karyakars and Guest Registration from Phase 2A to compensate CR effort.",
       "stage": "Requirements",
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
-      "scopeReduced": false,
-      "statusChangeReason": "22-Sep deck marks Phase 2A RED with open critical RGC scope/approval blockers on transportation requirements.",
-      "dependencySeq": 101,
+      "scopeReduced": true,
+      "statusChangeReason": "Requirements and TDD (design) delayed.",
+      "dependencySeq": 104,
       "stagePlan": {
         "Requirements": {
           "initialStart": "2026-06-12",
           "latestStart": "2026-06-12",
           "initialEnd": "2026-10-02",
-          "latestEnd": "2026-10-02"
+          "latestEnd": "2026-11-05"
         },
         "Tech. Design": {
           "initialStart": "2026-08-10",
           "latestStart": "2026-08-10",
           "initialEnd": "2026-10-23",
-          "latestEnd": "2026-10-23"
+          "latestEnd": "2026-11-05"
         },
         "Development": {
           "initialStart": "2026-08-24",
@@ -790,6 +1284,12 @@
           "latestEnd": "2026-12-18"
         },
         "UAT": {
+          "initialStart": "2026-12-21",
+          "latestStart": "2026-12-21",
+          "initialEnd": "2027-01-08",
+          "latestEnd": "2027-01-08"
+        },
+        "VAPT": {
           "initialStart": "2026-12-21",
           "latestStart": "2026-12-21",
           "initialEnd": "2027-01-08",
@@ -808,29 +1308,77 @@
           "latestEnd": "2027-03-05"
         }
       },
-      "riskSeq": 102,
+      "riskSeq": 120,
       "changeRequests": [],
-      "decisions": [],
+      "decisions": [
+        {
+          "decision": "Go-Live Date Extension",
+          "description": "Approval has been received to extend the project Go-Live date from 31 Dec 2026 to 31 Jan 2027 due to delayed requirement completion and Change requests during phase 1 UAT",
+          "dateTaken": "2026-09-19",
+          "by": "Aksharbhai Patel",
+          "id": "DEC-101"
+        },
+        {
+          "decision": "Scope Reduction",
+          "description": "The following two items under NC27 Hub \u2013 Phase 2A are to be removed from the current scope:\n1. Bulk Update of Transport Details by Karyakars\n2. Guest Registration\n\nReason - To compensate the efforts required in implementing the change requests",
+          "dateTaken": "2026-10-19",
+          "by": "Aksharbhai Patel",
+          "id": "DEC-102"
+        }
+      ],
       "goLiveChecklist": [],
       "features": [],
       "delayItemLog": [],
-      "milestones": [],
-      "raidLog": []
+      "milestones": [
+        {
+          "name": "Requirements",
+          "date": "2026-11-05",
+          "status": "amber",
+          "progress": 97
+        },
+        {
+          "name": "Design",
+          "date": "2026-11-05",
+          "status": "amber",
+          "progress": 75
+        },
+        {
+          "name": "Development & QA",
+          "date": "2026-12-18",
+          "status": "amber",
+          "progress": 40
+        }
+      ],
+      "raidLog": [],
+      "fastFollowItems": [
+        "My Team",
+        "Guest Registration",
+        "Bulk Update of Transport Details"
+      ],
+      "milestoneOverlay": false,
+      "scheduleBaseline": true,
+      "parallelStages": {
+        "Requirements": "Requirements",
+        "Tech. Design": "Design",
+        "Development": "Development & QA"
+      },
+      "decisionSeq": 102,
+      "usePmStatus": true
     },
     {
       "id": "mymandir",
       "name": "myMandir 1B",
       "owner": "Aniket Udgaonkar",
-      "status": "amber",
-      "progress": 30,
-      "phase": "Development",
+      "status": "green",
+      "progress": 75,
+      "phase": "Milestone 1 delivered on UAT to stakeholders on 27 Oct 2026 \u00b7 Milestone 1: 100%, Milestone 2: 70%",
       "nextMilestone": {
-        "name": "QA",
-        "date": "2026-10-20"
+        "name": "Milestone 2 \u2013 Nov 2026 release",
+        "date": "2026-11-06"
       },
-      "goLive": "2026-12-31",
+      "goLive": "2026-11-30",
       "originalGoLive": "2026-10-30",
-      "delayDays": 1,
+      "delayDays": 0,
       "delayNote": "TDD end revised from 22-Sep to 25-Sep (+2 days) per 22-Sep deck; Amber status.",
       "dependencies": [
         {
@@ -841,17 +1389,26 @@
           "dueBy": "2026-09-28",
           "priority": "Critical",
           "escalated": false,
+          "resolved": true
+        },
+        {
+          "id": "DEP-102",
+          "text": "Restructure Teams as department/sub-department with coordinator + members (Nov 2026 user story) \u2014 the only user story still pending from Milestone 2; depends on Satyanishtha Swami and Shreyank bhai.",
+          "team": "Satyanishtha Swami / Shreyank bhai",
+          "mitigation": "Awaiting inputs from Satyanishtha Swami and Shreyank bhai to complete this user story; not resolved yet.",
+          "dueBy": "",
+          "escalated": false,
           "resolved": false
         }
       ],
       "sprintStatus": {
         "completed": [
-          "Majority of TDD completed with creation and approval.",
-          "Majority of test cases are prepared now.",
-          "front end development done for independent user stories and we have sheduled dev demo to QA on 6 oct 2026"
+          "Milestone 1 \u2013 UAT release to stakeholders on 27 Oct 2026",
+          "Milestone 2 \u2013 development completed on 29 Oct 2026",
+          "Milestone 1 \u2013 UAT bugs received from stakeholders on 3 Nov 2026"
         ],
         "inProgress": [
-          "For the milestone 1- OCt 2026 release- development is in progress from back end and front end ."
+          "Milestone 2 (Nov 2026 release) \u2013 70% complete; UAT release revised to 6 Nov 2026 (from 15 Nov 2026)"
         ],
         "nextPlan": [
           "from next week,",
@@ -863,17 +1420,17 @@
           "id": "RISK-101",
           "text": "API blocker-",
           "mitigation": "we can complete story-575 in October,  user have to generate QR by themselves. our system will not be able to generate QR due to this technical blocker. Other than that, whole flow of Tap/Scan to create request will work as it is.",
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "RISK-102",
           "text": "API blocker which developer  raised for User Story 575.Below are the  findings from that discussion below:",
           "mitigation": "Aniket driving weekly pace checks to hold the Oct/Nov timeline",
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "RISK-103",
-          "resolved": false,
+          "resolved": true,
           "text": "The QR Code utility currently used to generate ZIP files for  assets is hosted on the Project Tree server currently  and is no longer available for use. Replicating the same functionality on the FMS server will require additional development effort and time. We can treat this as a known issue.",
           "mitigation": ""
         }
@@ -883,13 +1440,13 @@
         "Aniket connected with Sameep during BA's leave period to secure FRD sign-off"
       ],
       "delayTradeoffs": "",
-      "stage": "Development",
+      "stage": "UAT",
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
       "statusChangeReason": "",
-      "dependencySeq": 101,
+      "dependencySeq": 102,
       "stagePlan": {
         "Tech. Design": {
           "initialStart": "2026-09-17",
@@ -911,9 +1468,9 @@
         },
         "UAT": {
           "initialStart": "2026-10-23",
-          "latestStart": "2026-10-23",
+          "latestStart": "2026-10-27",
           "initialEnd": "2026-10-26",
-          "latestEnd": "2026-10-26"
+          "latestEnd": "2026-11-06"
         },
         "Rollout": {
           "initialStart": "2026-10-28",
@@ -923,9 +1480,9 @@
         },
         "VAPT": {
           "initialStart": "2026-10-16",
-          "latestStart": "2026-10-16",
+          "latestStart": "2026-11-16",
           "initialEnd": "2026-10-28",
-          "latestEnd": "2026-10-28"
+          "latestEnd": "2026-11-20"
         }
       },
       "riskSeq": 103,
@@ -934,7 +1491,34 @@
       "goLiveChecklist": [],
       "features": [],
       "delayItemLog": [],
-      "milestones": [],
+      "milestones": [
+        {
+          "name": "Milestone 1 \u2013 Oct 2026 release",
+          "status": "green",
+          "progress": 100
+        },
+        {
+          "name": "Milestone 2 \u2013 Nov 2026 release",
+          "date": "2026-11-06",
+          "status": "green",
+          "progress": 70
+        },
+        {
+          "name": "Milestone 1 \u2013 UAT release to stakeholders",
+          "date": "2026-10-27",
+          "status": "green"
+        },
+        {
+          "name": "Milestone 2 \u2013 Development complete",
+          "date": "2026-10-29",
+          "status": "green"
+        },
+        {
+          "name": "Milestone 1 \u2013 UAT bugs received from stakeholders",
+          "date": "2026-11-03",
+          "status": "green"
+        }
+      ],
       "raidLog": []
     },
     {
@@ -946,7 +1530,7 @@
       "phase": "Hypercare",
       "nextMilestone": {
         "name": "Hotfix deployment",
-        "date": "2026-11-18"
+        "date": "2026-11-30"
       },
       "goLive": "2026-10-12",
       "originalGoLive": "2026-10-19",
@@ -1010,12 +1594,6 @@
       "statusChangeReason": "Time was used to address post-production bugs, which pushed the hotfix timeline.",
       "dependencySeq": 102,
       "stagePlan": {
-        "Development": {
-          "initialStart": "2026-09-15",
-          "latestStart": "2026-09-23",
-          "initialEnd": "2026-09-24",
-          "latestEnd": "2026-10-05"
-        },
         "Requirements": {
           "initialStart": "2026-09-03",
           "latestStart": "2026-09-03",
@@ -1028,11 +1606,23 @@
           "initialEnd": "2026-09-14",
           "latestEnd": "2026-09-22"
         },
+        "Development": {
+          "initialStart": "2026-09-15",
+          "latestStart": "2026-09-23",
+          "initialEnd": "2026-09-24",
+          "latestEnd": "2026-10-05"
+        },
         "UAT": {
-          "initialStart": "2026-09-17",
+          "initialStart": "2026-09-27",
           "latestStart": "2026-10-07",
-          "initialEnd": "2026-10-08",
+          "initialEnd": "2026-10-06",
           "latestEnd": "2026-10-12"
+        },
+        "VAPT": {
+          "initialStart": "2026-09-27",
+          "latestStart": "2026-10-07",
+          "initialEnd": "2026-10-09",
+          "latestEnd": "2026-10-09"
         },
         "Rollout": {
           "initialStart": "2026-10-11",
@@ -1043,19 +1633,382 @@
         "Hypercare": {
           "initialStart": "2026-10-12",
           "latestStart": "2026-10-12",
-          "initialEnd": "2026-11-20",
-          "latestEnd": "2026-11-20"
+          "initialEnd": "2026-11-12",
+          "latestEnd": "2026-11-12"
         }
       },
       "riskSeq": 101,
-      "changeRequests": [],
+      "changeRequests": [
+        {
+          "title": "FE-7 (7829.003) Template editor: no way to replace an image",
+          "description": "The only option was to delete the image block and add it again. Added a replace image option.",
+          "submittedDate": "2026-10-20",
+          "by": "Pinkle Patel (Minneapolis Admin Sec.)",
+          "actionItem": "Approved",
+          "approvalStatus": "Resolved",
+          "impact": "",
+          "id": "CR-101"
+        },
+        {
+          "title": "FE-8 (7996.013) Unsubscribe: footer text couldn't be edited",
+          "description": "No one could change the unsubscribe footer text; super admins can now edit it.",
+          "submittedDate": "2026-10-19",
+          "by": "Satyanishth Swami",
+          "actionItem": "Approved",
+          "approvalStatus": "Resolved",
+          "impact": "",
+          "id": "CR-102"
+        },
+        {
+          "title": "FE-1 Access & permissions: granting access by position didn't show who was getting access (FE side)",
+          "description": "Only the position and MIS ID were shown, so it was hard to tell which person the access went to. Added first and last name, and replaced the MIS ID with the BAPS ID. FE side of BE-1.",
+          "submittedDate": "2026-10-01",
+          "by": "Vasu Champaneria",
+          "actionItem": "Approved",
+          "approvalStatus": "Resolved",
+          "impact": "",
+          "id": "CR-103"
+        },
+        {
+          "title": "BE-15 Contact lists: campaign contact-list export for user variables lacked identifiers",
+          "description": "Import/export of a campaign's contact list for user variables showed only the contact ID and other fields. Masked emails and person ID are now included.",
+          "submittedDate": "2026-10-17",
+          "by": "Vasu Champaneria",
+          "actionItem": "Approved",
+          "approvalStatus": "Resolved",
+          "impact": "",
+          "id": "CR-104"
+        }
+      ],
       "decisions": [],
       "goLiveChecklist": [],
-      "features": [],
-      "delayItemLog": [],
+      "features": [
+        {
+          "sprint": "Hypercare",
+          "type": "Development",
+          "feature": "SSO (WSO2) implementation for GMS and AMS",
+          "status": "Done",
+          "notes": "",
+          "plannedDate": "2026-10-27",
+          "actualDate": "2026-10-25",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Development",
+          "feature": "SSO (WSO2) QA testing",
+          "status": "In Progress",
+          "notes": "",
+          "plannedDate": "2026-10-05",
+          "actualDate": "2026-11-05",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hotfix",
+          "type": "Development",
+          "feature": "Unsubscribe: TM user story development",
+          "status": "In Progress",
+          "notes": "",
+          "plannedDate": "2026-11-02",
+          "actualDate": "2026-11-06",
+          "delayReason": "Resolving priority post-prod issues"
+        },
+        {
+          "sprint": "Hotfix",
+          "type": "Development",
+          "feature": "Unsubscribe: MIS opt-out user story development",
+          "status": "In Progress",
+          "notes": "",
+          "plannedDate": "2026-11-02",
+          "actualDate": "2026-11-06",
+          "delayReason": "Resolving priority post-prod issues"
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Development",
+          "feature": "Post-production defects (3)",
+          "status": "Done",
+          "notes": "3 defects resolved",
+          "plannedDate": "2026-11-02",
+          "actualDate": "2026-11-02",
+          "delayReason": ""
+        }
+      ],
+      "delayItemLog": [
+        {
+          "delayedItem": "Stage delays up to Go-Live (Requirements \u2192 UAT)",
+          "description": "Requirements, TDD, Development, QA and UAT each finished 3\u20137 days late.",
+          "reportedDate": "2026-10-12",
+          "impactedPhase": "Requirements \u2192 UAT",
+          "impact": "None on go-live: Oct 12 go-live achieved as planned.",
+          "rootCause": "Issues found during the pilot phase.",
+          "responsible": "",
+          "actionItem": "Cut scope to hold the go-live date.",
+          "actionTaken": "Dropped Contact Reorder; moved the Unsubscribe in TM and MIS opt-out user stories to the hotfix.",
+          "status": "Closed",
+          "closureRemarks": "Go-live achieved Oct 12 as per plan.",
+          "id": "DL-ITEM-101"
+        },
+        {
+          "delayedItem": "Hotfix deployment",
+          "description": "Hotfix deployment moved from Nov 23 to Nov 30.",
+          "reportedDate": "2026-11-02",
+          "impactedPhase": "Hypercare (hotfix)",
+          "impact": "Hotfix go-live +7 days.",
+          "rootCause": "Team time went to resolving post-prod issues.",
+          "responsible": "",
+          "actionItem": "",
+          "actionTaken": "",
+          "status": "Open",
+          "closureRemarks": "",
+          "id": "DL-ITEM-102"
+        }
+      ],
       "milestones": [],
       "raidLog": [],
-      "scheduleScope": "hotfix"
+      "scheduleScope": "hotfix",
+      "stageDatesFromPlan": true,
+      "changeRequestSeq": 104,
+      "scheduleLog": [
+        {
+          "date": "2026-09-09",
+          "label": "Requirements completion",
+          "from": "2026-09-09",
+          "to": "2026-09-13",
+          "stage": "Requirements",
+          "deltaDays": 3,
+          "reason": "Issues found during the pilot phase."
+        },
+        {
+          "date": "2026-09-14",
+          "label": "TDD completion",
+          "from": "2026-09-14",
+          "to": "2026-09-22",
+          "stage": "Tech. Design",
+          "deltaDays": 6,
+          "reason": "Issues found during the pilot phase."
+        },
+        {
+          "date": "2026-09-24",
+          "label": "Development completion",
+          "from": "2026-09-24",
+          "to": "2026-10-05",
+          "stage": "Development",
+          "deltaDays": 7,
+          "reason": "Issues found during the pilot phase."
+        },
+        {
+          "date": "2026-09-26",
+          "label": "QA completion",
+          "from": "2026-09-26",
+          "to": "2026-10-07",
+          "stage": null,
+          "deltaDays": 7,
+          "reason": "Issues found during the pilot phase."
+        },
+        {
+          "date": "2026-10-06",
+          "label": "UAT completion",
+          "from": "2026-10-06",
+          "to": "2026-10-12",
+          "stage": "UAT",
+          "deltaDays": 4,
+          "reason": "Issues found during the pilot phase."
+        },
+        {
+          "date": "2026-11-02",
+          "label": "Hotfix deployment",
+          "from": "2026-11-23",
+          "to": "2026-11-30",
+          "stage": "Hypercare",
+          "reason": "Team time went to resolving post-prod issues, so the hotfix is running late."
+        },
+        {
+          "date": "2026-10-12",
+          "label": "Go-Live (Rollout)",
+          "from": "2026-10-12",
+          "to": "2026-10-12",
+          "stage": "Rollout",
+          "vsPlanWorkingDays": 0,
+          "reason": "Held as planned by cutting scope: dropped Contact Reorder, and moved the Unsubscribe in TM and MIS opt-out user stories to the hotfix."
+        }
+      ],
+      "hotfixPlan": {
+        "title": "Hotfix timeline",
+        "rows": [
+          {
+            "stage": "Development",
+            "plannedStart": "2026-10-19",
+            "actualStart": "2026-10-19",
+            "plannedEnd": "2026-11-02",
+            "actualEnd": "2026-11-06",
+            "delayDays": 4,
+            "note": ""
+          },
+          {
+            "stage": "QA",
+            "plannedStart": "2026-10-20",
+            "actualStart": "2026-10-20",
+            "plannedEnd": "2026-11-06",
+            "actualEnd": "2026-11-20",
+            "delayDays": null,
+            "note": "Diwali vacation"
+          },
+          {
+            "stage": "UAT",
+            "plannedStart": "2026-11-07",
+            "actualStart": "2026-11-21",
+            "plannedEnd": "2026-11-08",
+            "actualEnd": "2026-11-22",
+            "delayDays": null,
+            "note": ""
+          },
+          {
+            "stage": "VAPT & Load Testing",
+            "plannedStart": "2026-11-16",
+            "actualStart": "2026-11-21",
+            "plannedEnd": "2026-11-22",
+            "actualEnd": "2026-11-27",
+            "delayDays": null,
+            "note": ""
+          },
+          {
+            "stage": "Go-Live",
+            "plannedStart": "2026-11-23",
+            "actualStart": "2026-11-30",
+            "plannedEnd": "",
+            "actualEnd": "",
+            "delayDays": null,
+            "note": ""
+          }
+        ]
+      },
+      "postProdBugs": {
+        "summary": "Post-release issues: total reported 15 (10 bugs, 5 CRs)",
+        "groups": [
+          {
+            "title": "Post-release bugs",
+            "metrics": [
+              {
+                "label": "Reported",
+                "num": 10
+              },
+              {
+                "label": "Fixed",
+                "num": 10,
+                "tone": "tone-green"
+              },
+              {
+                "label": "Not reproducible in QA",
+                "num": 2
+              },
+              {
+                "label": "Open / WIP",
+                "num": 0,
+                "tone": "tone-green"
+              }
+            ]
+          },
+          {
+            "title": "Change requests",
+            "metrics": [
+              {
+                "label": "Total",
+                "num": 5
+              },
+              {
+                "label": "Fixed",
+                "num": 4,
+                "tone": "tone-green"
+              },
+              {
+                "label": "Open / WIP",
+                "num": 0,
+                "tone": "tone-green"
+              },
+              {
+                "label": "Deferred",
+                "num": 1,
+                "tone": "tone-amber"
+              }
+            ],
+            "note": "Deferred: \"Test your email\" \u2014 send the current user the email or inbox message instantly, without going through the full campaign process."
+          }
+        ]
+      },
+      "postReleaseIssues": [
+        {
+          "title": "Default preview body could break a variable",
+          "summary": "Auto preview could split a variable, failing variable replacement on send.",
+          "rca": "Under RCA review",
+          "reportedBy": "My Mandir",
+          "status": "Resolved"
+        },
+        {
+          "title": "Device tokens not fetched from SID",
+          "summary": "Push notifications failed with \"SID API error: 200 OK OK\".",
+          "rca": "Under RCA review",
+          "reportedBy": "Vasu",
+          "status": "Resolved"
+        },
+        {
+          "title": "Duplicate emails in campaign user variables",
+          "summary": "Same email repeated, so user variables had to be filled again and again.",
+          "rca": "Under RCA review",
+          "reportedBy": "Vasu",
+          "status": "Resolved"
+        },
+        {
+          "title": "Center-scoped \"Volunteer\" list pulled whole MIS database",
+          "summary": "List limited to one center returned records for all US.",
+          "rca": "Under RCA review",
+          "reportedBy": "Pratik Patel (IT support karyakar)",
+          "status": "Resolved"
+        },
+        {
+          "title": "Emails not masked in analytics",
+          "summary": "Prod Vault configuration issue; worked in QA and UAT.",
+          "rca": "Prod Vault configuration issue",
+          "reportedBy": "Vasu",
+          "status": "Resolved"
+        },
+        {
+          "title": "Old contacts kept after changing campaign contact lists",
+          "summary": "In a campaign, the old contact list is retained even after changing the contact list.",
+          "rca": "Under RCA review",
+          "reportedBy": "Vyom",
+          "status": "Resolved"
+        },
+        {
+          "title": "Template editor project dropdown stops at 20",
+          "summary": "Only the first 20 projects load.",
+          "rca": "Under RCA review",
+          "reportedBy": "Vasu",
+          "status": "Resolved"
+        },
+        {
+          "title": "Division and Region names swapped in async TM",
+          "summary": "Reserved variables show each other's values in async mode.",
+          "rca": "Missed",
+          "reportedBy": "Satyanishth Swami",
+          "status": "WIP"
+        },
+        {
+          "title": "Template editor images with special/non-English filenames don't show",
+          "summary": "Upload succeeds but the public link breaks (SFS doesn't encode the name).",
+          "rca": "Under RCA review",
+          "reportedBy": "Vyom Suthar",
+          "status": "Resolved"
+        },
+        {
+          "title": "App Inbox attachments with special/non-English filenames don't load",
+          "summary": "Same SFS link issue for inbox attachment copies.",
+          "rca": "Missed",
+          "reportedBy": "Vyom Suthar",
+          "status": "Resolved"
+        }
+      ],
+      "delayItemLogSeq": 102
     },
     {
       "id": "baps-sso",
@@ -1063,7 +2016,7 @@
       "owner": "Aniket Udgaonkar",
       "status": "amber",
       "progress": 80,
-      "phase": "Development track Amber; Implementation/onboarding phases Green (22-Sep deck)",
+      "phase": "Dev to QA for Karyakar and Satsangi flow",
       "nextMilestone": {
         "name": "UAT",
         "date": "2026-12-21"
@@ -1219,7 +2172,48 @@
       "changeRequests": [],
       "decisions": [],
       "goLiveChecklist": [],
-      "features": [],
+      "features": [
+        {
+          "sprint": null,
+          "type": "QA",
+          "feature": "Test case creation \u2013 Karyakar flow",
+          "status": "Done",
+          "notes": "Planned 14 Oct \u2013 19 Oct 2026; actual 14 Oct \u2013 19 Oct 2026 (on plan)",
+          "plannedDate": "2026-10-19",
+          "actualDate": "2026-10-19",
+          "delayReason": ""
+        },
+        {
+          "sprint": null,
+          "type": "QA",
+          "feature": "Functional testing \u2013 Karyakar flow",
+          "status": "In Progress",
+          "notes": "Planned 22 Oct \u2013 28 Oct 2026; actual start 22 Oct 2026, still in QA",
+          "plannedDate": "2026-10-28",
+          "actualDate": "",
+          "delayReason": "Blockers and defects"
+        },
+        {
+          "sprint": null,
+          "type": "QA",
+          "feature": "Test case creation \u2013 Satsangi flow",
+          "status": "Done",
+          "notes": "Planned 26 Oct \u2013 29 Oct 2026; actual 27 Oct \u2013 28 Oct 2026",
+          "plannedDate": "2026-10-29",
+          "actualDate": "2026-10-28",
+          "delayReason": ""
+        },
+        {
+          "sprint": null,
+          "type": "QA",
+          "feature": "Functional testing \u2013 Satsangi flow",
+          "status": "In Progress",
+          "notes": "Planned 29 Oct \u2013 04 Nov 2026; actual start 02 Nov 2026, still in QA",
+          "plannedDate": "2026-11-04",
+          "actualDate": "",
+          "delayReason": "Started 2 Nov instead of planned 29 Oct"
+        }
+      ],
       "delayItemLog": [],
       "milestones": [],
       "raidLog": []

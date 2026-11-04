@@ -13,6 +13,11 @@
   // manual call that isn't about schedule delay, so it's preserved as-is.
   function effectiveStatus(p) {
     if (p.status === "black") return "black";
+    // A project can set `usePmStatus: true` (2026-11-04, myBKY 2A) to show
+    // the status its PM reported instead of the delay-days rule below.
+    // Weekly snapshots don't carry the flag, so look it up on the project.
+    const owner = p.usePmStatus != null ? p : DATA && (DATA.projects || []).find((x) => x.id === p.id);
+    if (owner && owner.usePmStatus && p.status) return p.status;
     const d = p.delayDays || 0;
     if (d > 10) return "red";
     if (d > 0) return "amber";
@@ -1404,6 +1409,7 @@
   // plus the full caption text is always available via the block's own
   // `title` tooltip regardless of how cramped it looks on screen.
   function buildStageGateTimeline(p) {
+    if (p.parallelStages) return buildParallelStageGateTimeline(p);
     const DAY = 86400000;
     const blocks = buildHawkeyeBlocks(p);
     if (!blocks.length) {
@@ -1671,6 +1677,141 @@
     return wrap;
   }
 
+  // Parallel-stage version of the Stage-gate timeline (2026-11-04, myBKY
+  // 2A — Requirements, Design and Dev & QA run at the same time). The
+  // single-row layout above shifts blocks right so captions never collide,
+  // which can't show overlapping stages, so here every planned stage gets
+  // its own lane on its real `stagePlan` dates. A stage counts as started
+  // once its planned start has passed; its % comes from the milestone of
+  // the same name (the weekly stage progress). `p.parallelStages` maps a
+  // pipeline stage to that display name, e.g. {"Tech. Design": "Design"}.
+  function buildParallelStageGateTimeline(p) {
+    const DAY = 86400000;
+    const todayIso = todayISO();
+    const labels = p.parallelStages || {};
+    const plan = p.stagePlan || {};
+    const pctByName = {};
+    (p.milestones || []).forEach((m) => {
+      if (m.progress != null && m.progress !== "") pctByName[m.name] = Number(m.progress);
+    });
+    const blocks = PIPELINE_STAGES.map((stage) => {
+      const sp = plan[stage];
+      const start = sp && (sp.latestStart || sp.initialStart);
+      const end = sp && (sp.latestEnd || sp.initialEnd);
+      if (!start || !end) return null;
+      const label = typeof labels === "object" && labels[stage] ? labels[stage] : stage;
+      const pct = pctByName[label];
+      const kind = pct >= 100 ? "done" : start <= todayIso ? "current" : "future";
+      return { stage, label, start, end, plannedEnd: sp.initialEnd, pct, kind, late: kind === "current" && end < todayIso };
+    }).filter(Boolean);
+    if (!blocks.length) {
+      return el("p", { class: "empty-note" }, ["No stage plan dates to plot yet."]);
+    }
+
+    const times = [new Date(todayIso + "T00:00:00").getTime()];
+    blocks.forEach((b) => {
+      times.push(new Date(b.start + "T00:00:00").getTime());
+      times.push(new Date(b.end + "T00:00:00").getTime());
+    });
+    const minTime = Math.min(...times) - 4 * DAY;
+    let maxTime = Math.max(...times) + 4 * DAY;
+    if (maxTime - minTime < 20 * DAY) maxTime = minTime + 20 * DAY;
+    const PX_PER_DAY = Math.min(6, Math.max(0.45, 900 / ((maxTime - minTime) / DAY)));
+    const xPx = (iso) => ((new Date(iso + "T00:00:00").getTime() - minTime) / DAY) * PX_PER_DAY;
+
+    const marks = [];
+    const cursor = new Date(minTime);
+    cursor.setDate(1);
+    cursor.setHours(0, 0, 0, 0);
+    cursor.setMonth(Math.floor(cursor.getMonth() / 3) * 3);
+    while (cursor.getTime() <= maxTime) {
+      if (cursor.getTime() >= minTime) {
+        marks.push({
+          px: ((cursor.getTime() - minTime) / DAY) * PX_PER_DAY,
+          label: `Q${Math.floor(cursor.getMonth() / 3) + 1} ${cursor.getFullYear()}`,
+        });
+      }
+      cursor.setMonth(cursor.getMonth() + 3);
+    }
+
+    const STATUS_TEXT = { done: "done", future: "not started" };
+    const lanes = blocks.map((b) => {
+      const left = xPx(b.start);
+      const width = Math.max(xPx(b.end) - left, 10);
+      const meta =
+        fmtDateShort(b.start) + " → " + fmtDateShort(b.end) +
+        (b.plannedEnd && b.plannedEnd !== b.end ? " (planned " + fmtDateShort(b.plannedEnd) + ")" : "") +
+        (b.pct != null ? "  ·  " + b.pct + "%" : "") +
+        "  ·  " + (b.kind === "current" ? (b.late ? "past planned end" : "in progress") : STATUS_TEXT[b.kind]);
+      return { b, left, width, meta, capWidth: Math.max(b.label.length * 7.1, meta.length * 6.3) };
+    });
+    const timelineWidthPx = Math.max(xPx(todayIso), ...lanes.map((l) => l.left + Math.max(l.width, l.capWidth))) + 24;
+
+    const wrap = el("div", { class: "stagegantt-scroll" });
+    const inner = el("div", { class: "stagegantt-inner", style: `width:${timelineWidthPx}px` });
+    const header = el("div", { class: "stagegantt-months" });
+    marks.forEach((m) => header.appendChild(el("div", { class: "stagegantt-month-mark", style: `left:${m.px}px` }, [m.label])));
+    inner.appendChild(header);
+
+    lanes.forEach(({ b, left, width, meta }, i) => {
+      const track = el("div", { class: "stagegantt-track" });
+      marks.forEach((m) => track.appendChild(el("div", { class: "stagegantt-grid-line", style: `left:${m.px}px` })));
+      track.appendChild(
+        el("div", { class: "stagegantt-today-line", style: `left:${xPx(todayIso)}px` },
+          i === 0 ? [el("span", { class: "stagegantt-today-label" }, ["Today"])] : [])
+      );
+      const kindClass =
+        b.kind === "done" ? "is-done" : b.kind === "current" ? "is-current is-" + (b.late ? "breach" : "warn") : "is-future";
+      track.appendChild(
+        el(
+          "div",
+          {
+            class: "stagegantt-block " + kindClass,
+            style: `left:${left}px;width:${width}px`,
+            "data-project-id": p.id,
+            "data-stage": b.stage,
+            role: "button",
+            tabindex: "0",
+            title: "Click for stage detail — " + b.label,
+            "aria-label": "View full stage detail for " + b.label,
+          },
+          [width >= 32 ? STAGE_SHORT_CODE[b.stage] || b.stage : ""]
+        )
+      );
+      track.appendChild(
+        el("div", { class: "stagegantt-caption", style: `left:${left}px` }, [
+          el("span", { class: "stagegantt-caption-stage" }, [b.label]),
+          el("span", { class: "stagegantt-caption-meta" + (b.late ? " is-plan-overdue" : "") }, [meta]),
+        ])
+      );
+      inner.appendChild(track);
+    });
+    wrap.appendChild(inner);
+
+    wrap.querySelectorAll(".stagegantt-block").forEach((blockEl) => {
+      const open = () => openStageDetail(blockEl.getAttribute("data-project-id"), blockEl.getAttribute("data-stage"));
+      blockEl.addEventListener("click", open);
+      blockEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          open();
+        }
+      });
+    });
+    requestAnimationFrame(() => {
+      wrap.scrollLeft = Math.max(0, xPx(todayIso) - 260);
+    });
+    return wrap;
+  }
+
+  // The "Who leads each stage" (RACI) reference and "Go-Live readiness"
+  // checklist that follow `buildParallelStageGateTimeline` on origin/main
+  // are intentionally NOT brought in here — both were removed for all
+  // projects on 2026-11-04 per explicit request (see the note near the old
+  // RACI_STAGES/GOLIVE_CHECKLIST_ITEMS constants). Their functions and the
+  // constants they depend on are gone on this branch, so re-adding them
+  // would reference undefined names.
+
   // "Recovery note" (2026-11-04) — sits right under the Stage Dates table.
   // Per explicit request: "below this allow the PMs to type a message on
   // how they were able to catch up and finish ontime regardless of all the
@@ -1762,6 +1903,43 @@
   // Approved for current phase / Moved to next phase, Impact — 7
   // distinct columns, none merged into another cell (the first version
   // of this table condensed Description/Action Item into one cell).
+  // Hotfix timeline (2026-11-03, GMS 1.4) — a follow-on release's own
+  // stage table, shown under the Schedule timeline exactly as the PM's
+  // deck lays it out: planned dates, with the post-delay date underneath
+  // in red when it moved. Rows: { stage, plannedStart, actualStart,
+  // plannedEnd, actualEnd, delayDays, note }.
+  function buildHotfixPlan(plan) {
+    const dateCell = (planned, actual) =>
+      el("td", null, [
+        el("div", null, [planned ? fmtDateShort(planned) : "—"]),
+        actual && actual !== planned ? el("div", { class: "hotfix-plan-actual" }, [fmtDateShort(actual)]) : null,
+      ]);
+    const wrap = el("div", { class: "hotfix-plan" }, [
+      el("h4", { class: "hotfix-plan-title" }, [plan.title || "Hotfix timeline"]),
+    ]);
+    const scroll = el("div", { class: "wide-log-table-scroll" });
+    scroll.appendChild(
+      el("table", { class: "wide-log-full-table" }, [
+        el("thead", null, [el("tr", null, ["Stage", "Start", "End", "Delay (days)", "Notes"].map((c) => el("th", null, [c])))]),
+        el(
+          "tbody",
+          null,
+          plan.rows.map((r) =>
+            el("tr", null, [
+              el("td", { class: "wide-log-title-cell" }, [r.stage]),
+              dateCell(r.plannedStart, r.actualStart),
+              dateCell(r.plannedEnd, r.actualEnd),
+              el("td", null, [r.delayDays ? String(r.delayDays) : "—"]),
+              el("td", null, [r.note || "—"]),
+            ])
+          )
+        ),
+      ])
+    );
+    wrap.appendChild(scroll);
+    return wrap;
+  }
+
   function buildChangeRequestLog(p) {
     const items = p.changeRequests || [];
     if (!items.length) {
@@ -1777,7 +1955,7 @@
           null,
           items.map((cr) => {
             const statusClass =
-              /approved/i.test(cr.approvalStatus || "") ? "is-approved" : /pending|tbd/i.test(cr.approvalStatus || "") ? "is-pending" : "";
+              /approved|resolved|closed/i.test(cr.approvalStatus || "") ? "is-approved" : /pending|tbd/i.test(cr.approvalStatus || "") ? "is-pending" : "";
             return el("tr", null, [
               el("td", { class: "wide-log-title-cell" }, [cr.title || "—"]),
               el("td", null, [cr.description || "—"]),
@@ -1974,6 +2152,71 @@
     const sprints = Array.from(new Set(items.map((f) => f.sprint).filter((s) => s != null))).sort();
     if (sprints.length) return "Sprint" + (sprints.length === 1 ? "" : "s") + " " + sprints.join(", ");
     return "";
+  }
+
+  // Post-prod bugs (2026-11-03, GMS 1.4) — the deck's post-release
+  // issue tally: an optional summary line, then one row of counts per
+  // group (bugs, CRs, …) with an optional note underneath. Shape:
+  // { summary, groups: [{ title, metrics: [{ label, num, tone? }], note }] }.
+  // The Post-Release Issues & RCA table, when given, slots in right after
+  // the first group (the bug tiles), ahead of the CR tiles.
+  function buildPostProdBugs(data, issues) {
+    const wrap = el("div", { class: "postprod-bugs" }, [
+      el("h3", { class: "weekly-subhead", id: "postprod-bugs-section" }, ["Post-prod bugs"]),
+      data.summary ? el("p", { class: "section-subhead" }, [data.summary]) : null,
+    ]);
+    (data.groups || []).forEach((g, i) => {
+      wrap.appendChild(el("h4", { class: "hotfix-plan-title" }, [g.title]));
+      const row = el("div", { class: "feature-kpi-row" });
+      g.metrics.forEach((m) => {
+        row.appendChild(
+          el("div", { class: ["metric-card", m.tone].filter(Boolean).join(" ") }, [
+            el("div", { class: "num" }, [String(m.num)]),
+            el("div", { class: "label" }, [m.label]),
+          ])
+        );
+      });
+      wrap.appendChild(row);
+      if (g.note) wrap.appendChild(el("p", { class: "postprod-bugs-note" }, [g.note]));
+      if (i === 0 && (issues || []).length) wrap.appendChild(buildPostReleaseIssues(issues, true));
+    });
+    return wrap;
+  }
+
+  // Post-Release Issues & RCA (2026-11-03, GMS 1.4) — production issues
+  // only, kept deliberately light: issue + one-line summary, RCA result,
+  // who reported it, status. Items: { title, summary, rca, reportedBy, status }.
+  function buildPostReleaseIssues(items, nested) {
+    const rcaClass = (r) => (/missed/i.test(r || "") ? "is-missed" : /review|pending/i.test(r || "") ? "is-pending" : "");
+    const statusClass = (s) => (/resolved|closed|done/i.test(s || "") ? "is-approved" : /wip|progress|open/i.test(s || "") ? "is-pending" : "");
+    const scroll = el("div", { class: "wide-log-table-scroll" });
+    scroll.appendChild(
+      el("table", { class: "wide-log-full-table" }, [
+        el("thead", null, [el("tr", null, ["Issue", "RCA", "Reported by", "Status"].map((c) => el("th", null, [c])))]),
+        el(
+          "tbody",
+          null,
+          items.map((it) =>
+            el("tr", null, [
+              el("td", null, [
+                el("div", { class: "wide-log-title-cell" }, [it.title]),
+                it.summary ? el("div", { class: "postrelease-summary" }, [it.summary]) : null,
+              ]),
+              el("td", null, [it.rca ? el("span", { class: "cr-log-status " + rcaClass(it.rca) }, [it.rca]) : "—"]),
+              el("td", null, [it.reportedBy || "—"]),
+              el("td", null, [el("span", { class: "cr-log-status " + statusClass(it.status) }, [it.status || "—"])]),
+            ])
+          )
+        ),
+      ])
+    );
+    return el("div", { class: "postrelease-issues" + (nested ? " is-nested" : "") }, [
+      nested
+        ? el("h4", { class: "hotfix-plan-title", id: "postrelease-issues-section" }, ["Post-Release Issues & RCA"])
+        : el("h3", { class: "weekly-subhead", id: "postrelease-issues-section" }, ["Post-Release Issues & RCA"]),
+      el("p", { class: "section-subhead" }, ["Production issues reported since go-live, with the root-cause result for each."]),
+      scroll,
+    ]);
   }
 
   function buildFeatureKpis(p) {
@@ -3765,7 +4008,8 @@
         // 10-12, captured in the 10-14 snapshot) — it wins over the key.
         return snap ? { asOf, ...snap } : null;
       })
-      .filter(Boolean);
+      .filter(Boolean)
+      .sort((a, b) => (a.asOf < b.asOf ? -1 : a.asOf > b.asOf ? 1 : 0));
   }
 
   /* ---------------- Stage-gate timeline ---------------- */
@@ -3884,6 +4128,7 @@
   // don't know how long the project was in that stage before tracking began.
   function computeStageSegments(p) {
     const today = todayISO();
+    if (p.stageDatesFromPlan) return stageSegmentsFromPlan(p, today);
     const points = historyForProject(p.id).map((w) => ({ asOf: w.asOf, stage: w.stage || "Unstaged" }));
     const currentStage = p.stage || "Unstaged";
     // Track this explicitly (rather than re-deriving it later) — needed
@@ -4003,6 +4248,27 @@
     return combined;
   }
 
+  // `p.stageDatesFromPlan` (2026-11-03, GMS 1.4): the PM's own stage table
+  // is the source of truth, so every stage up to the current one is
+  // plotted straight from stagePlan's latest (post-delay) dates instead of
+  // being reconstructed from weekly snapshots — which, for GMS, still
+  // carried the previous release's UAT/Rollout and a stale Development
+  // stretch. The current stage runs from its latest start to today.
+  function stageSegmentsFromPlan(p, today) {
+    const currentIndex = PIPELINE_STAGES.indexOf(p.stage || "Unstaged");
+    const segments = [];
+    PIPELINE_STAGES.slice(0, currentIndex + 1).forEach((stage, i) => {
+      const plan = p.stagePlan && p.stagePlan[stage];
+      const start = plan && (plan.latestStart || plan.initialStart);
+      if (!start) return;
+      const ongoing = i === currentIndex;
+      const end = ongoing ? today : plan.latestEnd || plan.initialEnd;
+      if (!end) return;
+      segments.push({ stage, start, end, ongoing, days: Math.max(0, daysBetweenIso(start, end)) });
+    });
+    return segments;
+  }
+
   /* ---------------- Stage detail modal (per-stage planned/actual dates,
      delay attribution, delay log) ---------------- */
 
@@ -4091,7 +4357,7 @@
   // entries (which have a reason/team/member) since this data has none of
   // that — it's purely "the date moved, and by how much."
   function stageAutoScheduleShifts(p, stage) {
-    return buildScheduleTimeline(historyForProject(p.id))
+    return buildScheduleTimeline(historyForProject(p.id), p)
       .filter((e) => e.kind !== "timesaved" && e.stage === stage)
       .map((e) => Object.assign({ deltaDays: daysBetweenIso(e.from, e.to) }, e))
       .filter((e) => e.deltaDays > 0);
@@ -4102,7 +4368,7 @@
   // stages)" breakdown, instead of needing to click into one stage at a
   // time via the Grid.
   function projectAutoScheduleShifts(p) {
-    return buildScheduleTimeline(historyForProject(p.id))
+    return buildScheduleTimeline(historyForProject(p.id), p)
       .filter((e) => e.kind !== "timesaved")
       .map((e) => Object.assign({ deltaDays: daysBetweenIso(e.from, e.to) }, e))
       .filter((e) => e.deltaDays > 0);
@@ -4124,7 +4390,19 @@
 
   const STATUS_COLOR = { green: "#2f6b4f", amber: "#a6650f", red: "#b5342a", black: "#1c1d24" };
 
-  function buildTrendGraph(weeks) {
+  // Line colors for per-milestone series overlaid on the project chart —
+  // deliberately not status colors, so a milestone line can't be misread
+  // as the project's own Green/Amber/Red.
+  const MILESTONE_SERIES_COLORS = ["#2f62c4", "#8a4fd0", "#0f8a8a", "#c2410c"];
+
+  // `fillId` keeps each chart's gradient id unique in case several of
+  // these render on one page (duplicate SVG ids would share one fill).
+  // `extraSeries` ([{name, color, points: [{asOf, progress}]}]) overlays
+  // additional lines — e.g. one per milestone — plotted on the same weekly
+  // x positions as `weeks`; weeks a series has no value for are skipped,
+  // so its line joins its known points. `lineColor` overrides the
+  // status-based coloring (used for the standalone per-milestone charts).
+  function buildTrendGraph(weeks, fillId = "trendFill", extraSeries = [], lineColor = null) {
     const width = 700;
     const height = 210;
     const padL = 38;
@@ -4151,66 +4429,159 @@
       `<text x="${p.x}" y="${height - 8}" text-anchor="middle" class="graph-axis-label">${fmtDateShort(p.w.asOf)}</text>`
     ).join("");
 
-    const latestColor = STATUS_COLOR[weeks[weeks.length - 1].status] || "var(--accent)";
+    const latestColor = lineColor || STATUS_COLOR[weeks[weeks.length - 1].status] || "var(--accent)";
 
     const dots = points.map((p) => {
       // Flip the label below the dot when it's too close to the top edge
       // (and thus the "100" axis label) to avoid the two overlapping.
       const tooHigh = p.y - 12 < padT + 10;
       const labelY = tooHigh ? p.y + 18 : p.y - 12;
-      return `<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="${STATUS_COLOR[p.w.status] || latestColor}" stroke="#fff" stroke-width="2" />` +
+      return `<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="${lineColor || STATUS_COLOR[p.w.status] || latestColor}" stroke="#fff" stroke-width="2" />` +
         `<text x="${p.x}" y="${labelY}" text-anchor="middle" class="graph-point-label">${p.w.progress}%</text>`;
+    }).join("");
+
+    const indexByAsOf = {};
+    weeks.forEach((w, i) => { indexByAsOf[w.asOf] = i; });
+    const seriesSvg = extraSeries.map((s) => {
+      const pts = s.points
+        .filter((pt) => indexByAsOf[pt.asOf] != null)
+        .map((pt) => ({ x: xFor(indexByAsOf[pt.asOf]), y: yFor(pt.progress), progress: pt.progress }));
+      if (!pts.length) return "";
+      const d = pts.map((pt, i) => (i === 0 ? `M ${pt.x} ${pt.y}` : `L ${pt.x} ${pt.y}`)).join(" ");
+      return `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-dasharray="6 4" stroke-linejoin="round" stroke-linecap="round" />` +
+        pts.map((pt) => {
+          const tooHigh = pt.y - 12 < padT + 10;
+          const labelY = tooHigh ? pt.y + 18 : pt.y - 12;
+          return `<circle cx="${pt.x}" cy="${pt.y}" r="4.5" fill="${s.color}" stroke="#fff" stroke-width="2" />` +
+            `<text x="${pt.x}" y="${labelY}" text-anchor="middle" class="graph-point-label" style="fill:${s.color}">${pt.progress}%</text>`;
+        }).join("");
     }).join("");
 
     const svg = `
       <svg viewBox="0 0 ${width} ${height}" class="trend-graph" preserveAspectRatio="none">
         <defs>
-          <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id="${fillId}" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stop-color="${latestColor}" stop-opacity="0.16" />
             <stop offset="100%" stop-color="${latestColor}" stop-opacity="0" />
           </linearGradient>
         </defs>
         ${gridLines}
-        <path d="${areaD}" fill="url(#trendFill)" stroke="none" />
+        <path d="${areaD}" fill="url(#${fillId})" stroke="none" />
         <path d="${lineD}" fill="none" stroke="${latestColor}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
         ${dots}
+        ${seriesSvg}
         ${xLabels}
       </svg>`;
 
-    return el("div", { class: "trend-graph-wrap", html: svg });
+    const wrap = el("div", { class: "trend-graph-wrap", html: svg });
+    if (extraSeries.length) {
+      wrap.appendChild(
+        el("div", { class: "trend-graph-legend" }, [
+          el("span", { class: "trend-graph-legend-item" }, [
+            el("span", { class: "trend-graph-legend-swatch", style: `background:${latestColor}` }),
+            "Overall project",
+          ]),
+          ...extraSeries.map((s) =>
+            el("span", { class: "trend-graph-legend-item" }, [
+              el("span", { class: "trend-graph-legend-swatch", style: `background:${s.color}` }),
+              s.name,
+            ])
+          ),
+        ])
+      );
+    }
+    return wrap;
   }
 
-  function buildScheduleTimeline(weeks) {
+  // Working days (Mon–Fri) from `aIso` to `bIso`, not counting `aIso`
+  // itself; negative when `bIso` is earlier.
+  function workingDaysBetweenIso(aIso, bIso) {
+    const sign = bIso < aIso ? -1 : 1;
+    const [from, to] = sign > 0 ? [aIso, bIso] : [bIso, aIso];
+    const d = new Date(from + "T00:00:00");
+    const end = new Date(to + "T00:00:00");
+    let count = 0;
+    while (d < end) {
+      d.setDate(d.getDate() + 1);
+      const day = d.getDay();
+      if (day !== 0 && day !== 6) count++;
+    }
+    return sign * count;
+  }
+
+  const BASELINE_STAGE_LABELS = {
+    Requirements: "Requirements completion",
+    "Tech. Design": "Design (TDD) completion",
+    Development: "Development & QA completion",
+    Rollout: "Go-Live",
+  };
+
+  // `p.scheduleBaseline` (2026-11-03, myBKY 2A): instead of comparing each
+  // week's go-live / next milestone with the week before, log every week a
+  // stage's latest end date moved, shown against that stage's ORIGINAL
+  // planned end (`stagePlan[stage].initialEnd`) in working days. Weeks
+  // before the project had a stage plan keep the usual go-live / milestone
+  // comparison. `deltaDays` stays the week-on-week move, so the per-stage
+  // delay analysis doesn't double-count the cumulative slip.
+  function buildScheduleTimeline(weeks, p) {
+    // A hand-curated log (2026-11-03, GMS 1.4 — from the PM's stage table)
+    // replaces the snapshot-diff reconstruction entirely. Entries are
+    // { date, label, from, to, stage?, deltaDays? }; deltaDays, when given,
+    // is the PM's own delay count and wins over the calendar-day diff.
+    if (p && Array.isArray(p.scheduleLog)) {
+      return p.scheduleLog.map((e) => ({ ...e })).sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+    }
     const events = [];
     let prevGoLive = null;
     let prevMilestoneName = null;
     let prevMilestoneDate = null;
+    let prevPlan = null;
+    const baseline = !!(p && p.scheduleBaseline);
 
     weeks.forEach((w) => {
       const goLive = w.goLive || null;
       const milestoneName = (w.nextMilestone && w.nextMilestone.name) || null;
       const milestoneDate = (w.nextMilestone && w.nextMilestone.date) || null;
+      const plan = w.stagePlan && Object.keys(w.stagePlan).length ? w.stagePlan : null;
 
-      // `stage` records which pipeline stage the project was reported in
-      // during the week the shift happened — this is what lets a shift get
-      // attributed to a specific stage's Delay Log (see
-      // stageAutoScheduleShifts) without having to guess from the
-      // free-text milestone label.
-      if (prevGoLive && goLive && goLive !== prevGoLive) {
-        events.push({ date: w.asOf, label: "Go-Live", from: prevGoLive, to: goLive, stage: w.stage || null });
-      }
-      if (
-        prevMilestoneDate &&
-        milestoneDate &&
-        (milestoneDate !== prevMilestoneDate || milestoneName !== prevMilestoneName)
-      ) {
-        events.push({
-          date: w.asOf,
-          label: milestoneName || prevMilestoneName || "Milestone",
-          from: prevMilestoneDate,
-          to: milestoneDate,
-          stage: w.stage || null,
+      if (baseline && plan && prevPlan) {
+        Object.keys(plan).forEach((stage) => {
+          const cur = plan[stage];
+          const before = prevPlan[stage];
+          if (!cur || !before || !cur.latestEnd || !before.latestEnd || cur.latestEnd === before.latestEnd) return;
+          const planned = cur.initialEnd || before.latestEnd;
+          events.push({
+            date: w.asOf,
+            label: BASELINE_STAGE_LABELS[stage] || stage + " completion",
+            from: planned,
+            to: cur.latestEnd,
+            stage,
+            vsPlanWorkingDays: workingDaysBetweenIso(planned, cur.latestEnd),
+            deltaDays: workingDaysBetweenIso(before.latestEnd, cur.latestEnd),
+          });
         });
+      } else {
+        // `stage` records which pipeline stage the project was reported in
+        // during the week the shift happened — this is what lets a shift get
+        // attributed to a specific stage's Delay Log (see
+        // stageAutoScheduleShifts) without having to guess from the
+        // free-text milestone label.
+        if (prevGoLive && goLive && goLive !== prevGoLive) {
+          events.push({ date: w.asOf, label: "Go-Live", from: prevGoLive, to: goLive, stage: w.stage || null });
+        }
+        if (
+          prevMilestoneDate &&
+          milestoneDate &&
+          (milestoneDate !== prevMilestoneDate || milestoneName !== prevMilestoneName)
+        ) {
+          events.push({
+            date: w.asOf,
+            label: milestoneName || prevMilestoneName || "Milestone",
+            from: prevMilestoneDate,
+            to: milestoneDate,
+            stage: w.stage || null,
+          });
+        }
       }
 
       if (goLive) prevGoLive = goLive;
@@ -4218,6 +4589,7 @@
         prevMilestoneDate = milestoneDate;
         prevMilestoneName = milestoneName;
       }
+      if (plan) prevPlan = plan;
 
       // Time pulled back IN this week — tracked the same way as a delay:
       // one event per week it's reported, not a diff.
@@ -4261,9 +4633,15 @@
         return;
       }
 
-      const deltaDays = Math.round(
-        (new Date(e.to + "T00:00:00") - new Date(e.from + "T00:00:00")) / 86400000
-      );
+      // Baseline events (see buildScheduleTimeline) show the slip against
+      // the original plan in working days; everything else, calendar days.
+      const vsPlan = e.vsPlanWorkingDays != null;
+      const deltaDays = vsPlan
+        ? e.vsPlanWorkingDays
+        : e.deltaDays != null
+        ? e.deltaDays
+        : Math.round((new Date(e.to + "T00:00:00") - new Date(e.from + "T00:00:00")) / 86400000);
+      const unit = vsPlan ? " working days vs plan" : " days";
       box.appendChild(
         el("div", { class: "schedule-timeline-row" }, [
           el("div", { class: "schedule-timeline-date" }, [fmtDate(e.date)]),
@@ -4273,8 +4651,9 @@
             el("span", { class: "golive-arrow" }, ["→"]),
             el("span", { class: "golive-date-current" }, [fmtDate(e.to)]),
             el("span", { class: "schedule-timeline-delta " + (deltaDays > 0 ? "is-late" : deltaDays < 0 ? "is-early" : "") }, [
-              deltaDays === 0 ? "No change in days" : (deltaDays > 0 ? "+" : "") + deltaDays + " days",
+              deltaDays === 0 ? (vsPlan ? "On plan" : "No change in days") : (deltaDays > 0 ? "+" : "") + deltaDays + unit,
             ]),
+            e.reason ? el("span", { class: "schedule-timeline-note is-reason" }, ["Reason: " + e.reason]) : null,
           ]),
         ])
       );
@@ -4744,12 +5123,39 @@
       );
     }
 
-    // Progress trend chart
+    // Progress trend chart. Per-milestone lines (2026-11-03) — a project
+    // running several milestones in parallel (e.g. myMandir 1B's Oct + Nov
+    // releases) can't express both in one project-level %, so each
+    // milestone with a `progress` value in any weekly snapshot is overlaid
+    // as its own line, built from history.json like the project line.
     schedulePanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Progress over time"]));
     if (!weeks.length) {
       schedulePanel.appendChild(el("p", { class: "empty-note" }, ["No history yet — it'll build up week over week as updates get ingested."]));
     } else {
-      schedulePanel.appendChild(buildTrendGraph(weeks));
+      const milestonePoints = {};
+      weeks.forEach((w) => {
+        (w.milestones || []).forEach((m) => {
+          if (m.progress == null || m.progress === "") return;
+          (milestonePoints[m.name] || (milestonePoints[m.name] = [])).push({ asOf: w.asOf, progress: Number(m.progress) });
+        });
+      });
+      const milestoneSeries = Object.keys(milestonePoints).map((name, i) => ({
+        name,
+        color: MILESTONE_SERIES_COLORS[i % MILESTONE_SERIES_COLORS.length],
+        points: milestonePoints[name],
+      }));
+      // A project can set `milestoneOverlay: false` to keep the project chart
+      // to the overall line only and show its milestones just in their own
+      // charts below (e.g. myBKY 2A's parallel Requirements / Design / Dev stages).
+      const overlaySeries = p.milestoneOverlay === false ? [] : milestoneSeries;
+      schedulePanel.appendChild(buildTrendGraph(weeks, "trendFill", overlaySeries));
+
+      // Plus one standalone chart per milestone, in that milestone's line
+      // color, so each one's trend can be read on its own.
+      milestoneSeries.forEach((s, i) => {
+        schedulePanel.appendChild(el("h3", { class: "weekly-subhead" }, [s.name + " — progress over time"]));
+        schedulePanel.appendChild(buildTrendGraph(s.points, "trendFillMilestone" + i, [], s.color));
+      });
     }
 
     // Delay tab (2026-10-15) — everything delay-related lives here now,
@@ -4776,10 +5182,11 @@
         "A log of every time this project's go-live or a milestone date moved — e.g. a CR pushing the timeline.",
       ])
     );
-    const scheduleEvents = buildScheduleTimeline(weeks);
+    const scheduleEvents = buildScheduleTimeline(weeks, p);
     scheduleSection.appendChild(
       scheduleEvents.length ? buildCollapsibleChangelog(scheduleEvents) : renderScheduleTimeline(scheduleEvents)
     );
+    if (p.hotfixPlan && (p.hotfixPlan.rows || []).length) scheduleSection.appendChild(buildHotfixPlan(p.hotfixPlan));
     delayPanel.appendChild(scheduleSection);
 
     // Delay Log — narrative companion to the auto-detected shift log
@@ -4968,6 +5375,9 @@
     const liveSnapshotSections = el("div", { class: "snapshot-sections" });
     renderSnapshotSections(liveSnapshotSections, p, null, true, { weeklyStatus: false });
     depsRisksPanel.appendChild(liveSnapshotSections);
+
+    if (p.postProdBugs) depsRisksPanel.appendChild(buildPostProdBugs(p.postProdBugs, p.postReleaseIssues));
+    else if ((p.postReleaseIssues || []).length) depsRisksPanel.appendChild(buildPostReleaseIssues(p.postReleaseIssues));
 
     // RAID Log — Risks, Assumptions, Issues, Dependencies consolidated
     // into one log (slide 18), appended below the existing
