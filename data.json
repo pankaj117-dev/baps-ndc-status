@@ -1626,7 +1626,28 @@
         }
       },
       "riskSeq": 101,
-      "changeRequests": [],
+      "changeRequests": [
+        {
+          "title": "FE-7 (7829.003) Template editor: no way to replace an image",
+          "description": "The only option was to delete the image block and add it again. Added a replace image option.",
+          "submittedDate": "",
+          "by": "",
+          "actionItem": "",
+          "approvalStatus": "Resolved",
+          "impact": "",
+          "id": "CR-101"
+        },
+        {
+          "title": "FE-8 (7996.013) Unsubscribe: footer text couldn't be edited",
+          "description": "No one could change the unsubscribe footer text; super admins can now edit it.",
+          "submittedDate": "",
+          "by": "",
+          "actionItem": "",
+          "approvalStatus": "Resolved",
+          "impact": "",
+          "id": "CR-102"
+        }
+      ],
       "decisions": [],
       "goLiveChecklist": [],
       "features": [],
@@ -1634,7 +1655,8 @@
       "milestones": [],
       "raidLog": [],
       "scheduleScope": "hotfix",
-      "stageDatesFromPlan": true
+      "stageDatesFromPlan": true,
+      "changeRequestSeq": 102
     },
     {
       "id": "baps-sso",

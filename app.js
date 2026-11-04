@@ -1769,7 +1769,7 @@
           null,
           items.map((cr) => {
             const statusClass =
-              /approved/i.test(cr.approvalStatus || "") ? "is-approved" : /pending|tbd/i.test(cr.approvalStatus || "") ? "is-pending" : "";
+              /approved|resolved|closed/i.test(cr.approvalStatus || "") ? "is-approved" : /pending|tbd/i.test(cr.approvalStatus || "") ? "is-pending" : "";
             return el("tr", null, [
               el("td", { class: "wide-log-title-cell" }, [cr.title || "—"]),
               el("td", null, [cr.description || "—"]),
