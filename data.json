@@ -1677,8 +1677,8 @@
           "feature": "SSO (WSO2) implementation for GMS and AMS",
           "status": "Done",
           "notes": "",
-          "plannedDate": "",
-          "actualDate": "",
+          "plannedDate": "2026-10-27",
+          "actualDate": "2026-10-25",
           "delayReason": ""
         },
         {
@@ -1687,8 +1687,8 @@
           "feature": "SSO (WSO2) QA testing",
           "status": "In Progress",
           "notes": "",
-          "plannedDate": "",
-          "actualDate": "",
+          "plannedDate": "2026-10-05",
+          "actualDate": "2026-11-05",
           "delayReason": ""
         },
         {
@@ -1697,9 +1697,9 @@
           "feature": "Unsubscribe: TM user story development",
           "status": "In Progress",
           "notes": "",
-          "plannedDate": "",
-          "actualDate": "",
-          "delayReason": ""
+          "plannedDate": "2026-11-02",
+          "actualDate": "2026-11-06",
+          "delayReason": "4 days"
         },
         {
           "sprint": "Hotfix",
@@ -1707,9 +1707,9 @@
           "feature": "Unsubscribe: MIS opt-out user story development",
           "status": "In Progress",
           "notes": "",
-          "plannedDate": "",
-          "actualDate": "",
-          "delayReason": ""
+          "plannedDate": "2026-11-02",
+          "actualDate": "2026-11-06",
+          "delayReason": "4 days"
         },
         {
           "sprint": "Hypercare",
@@ -1717,38 +1717,8 @@
           "feature": "Post-production defects (3)",
           "status": "Done",
           "notes": "3 defects resolved",
-          "plannedDate": "",
-          "actualDate": "",
-          "delayReason": ""
-        },
-        {
-          "sprint": "Hotfix",
-          "type": "QA",
-          "feature": "QA for both Unsubscribe user stories",
-          "status": "Upcoming",
-          "notes": "",
-          "plannedDate": "",
-          "actualDate": "",
-          "delayReason": ""
-        },
-        {
-          "sprint": "Hotfix",
-          "type": "QA",
-          "feature": "End-to-end regression and load testing",
-          "status": "Upcoming",
-          "notes": "",
-          "plannedDate": "",
-          "actualDate": "",
-          "delayReason": ""
-        },
-        {
-          "sprint": "Hotfix",
-          "type": "Security",
-          "feature": "VAPT",
-          "status": "Upcoming",
-          "notes": "",
-          "plannedDate": "",
-          "actualDate": "",
+          "plannedDate": "2026-11-02",
+          "actualDate": "2026-11-02",
           "delayReason": ""
         }
       ],
