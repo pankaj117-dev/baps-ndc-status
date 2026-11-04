@@ -4108,3 +4108,9 @@ dd.is-missing {
 .feature-reference-note li:last-child {
   margin-bottom: 0;
 }
+
+.postrelease-issues { margin-top: 32px; }
+.postrelease-summary { margin-top: 4px; color: var(--ink-soft); font-size: 13px; }
+.cr-log-status.is-missed { background: var(--red-bg); color: var(--red); }
+.postrelease-issues .wide-log-full-table { min-width: 640px; }
+.postrelease-issues .wide-log-full-table td:first-child { width: 55%; }

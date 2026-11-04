@@ -1887,7 +1887,79 @@
             "note": "Deferred: \"Test your email\" \u2014 send the current user the email or inbox message instantly, without going through the full campaign process."
           }
         ]
-      }
+      },
+      "postReleaseIssues": [
+        {
+          "title": "Default preview body could break a variable",
+          "summary": "Auto preview could split a variable, failing variable replacement on send.",
+          "rca": "As per expectation",
+          "reportedBy": "My Mandir",
+          "status": "Resolved"
+        },
+        {
+          "title": "Device tokens not fetched from SID",
+          "summary": "Push notifications failed with \"SID API error: 200 OK OK\".",
+          "rca": "Under RCA review",
+          "reportedBy": "Vasu",
+          "status": "Resolved"
+        },
+        {
+          "title": "Duplicate emails in campaign user variables",
+          "summary": "Same email repeated, so user variables had to be filled again and again.",
+          "rca": "Under RCA review",
+          "reportedBy": "Vasu",
+          "status": "Resolved"
+        },
+        {
+          "title": "Center-scoped \"Volunteer\" list pulled whole MIS database",
+          "summary": "List limited to one center returned records for all US.",
+          "rca": "Under RCA review",
+          "reportedBy": "Pratik Patel (IT support karyakar)",
+          "status": "Resolved"
+        },
+        {
+          "title": "Emails not masked in analytics",
+          "summary": "Prod Vault configuration issue; worked in QA and UAT.",
+          "rca": "New requirement / not in requirement",
+          "reportedBy": "Vasu",
+          "status": "Resolved"
+        },
+        {
+          "title": "Old contacts kept after changing campaign contact lists",
+          "summary": "With custom variables, swapped lists stayed attached (30 sent instead of 10).",
+          "rca": "Not reproducible in QA",
+          "reportedBy": "Vyom",
+          "status": "Resolved"
+        },
+        {
+          "title": "Template editor project dropdown stops at 20",
+          "summary": "Only the first 20 projects load.",
+          "rca": "Under RCA review",
+          "reportedBy": "Vasu",
+          "status": "Resolved"
+        },
+        {
+          "title": "Division and Region names swapped in async TM",
+          "summary": "Reserved variables show each other's values in async mode.",
+          "rca": "Missed",
+          "reportedBy": "Satyanishth Swami",
+          "status": "WIP"
+        },
+        {
+          "title": "Template editor images with special/non-English filenames don't show",
+          "summary": "Upload succeeds but the public link breaks (SFS doesn't encode the name).",
+          "rca": "Under RCA review",
+          "reportedBy": "",
+          "status": "Resolved"
+        },
+        {
+          "title": "App Inbox attachments with special/non-English filenames don't load",
+          "summary": "Same SFS link issue for inbox attachment copies.",
+          "rca": "Missed",
+          "reportedBy": "",
+          "status": "Resolved"
+        }
+      ]
     },
     {
       "id": "baps-sso",

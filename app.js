@@ -2031,6 +2031,40 @@
     return wrap;
   }
 
+  // Post-Release Issues & RCA (2026-11-03, GMS 1.4) — production issues
+  // only, kept deliberately light: issue + one-line summary, RCA result,
+  // who reported it, status. Items: { title, summary, rca, reportedBy, status }.
+  function buildPostReleaseIssues(items) {
+    const rcaClass = (r) => (/missed/i.test(r || "") ? "is-missed" : /review|pending/i.test(r || "") ? "is-pending" : "");
+    const statusClass = (s) => (/resolved|closed|done/i.test(s || "") ? "is-approved" : /wip|progress|open/i.test(s || "") ? "is-pending" : "");
+    const scroll = el("div", { class: "wide-log-table-scroll" });
+    scroll.appendChild(
+      el("table", { class: "wide-log-full-table" }, [
+        el("thead", null, [el("tr", null, ["Issue", "RCA", "Reported by", "Status"].map((c) => el("th", null, [c])))]),
+        el(
+          "tbody",
+          null,
+          items.map((it) =>
+            el("tr", null, [
+              el("td", null, [
+                el("div", { class: "wide-log-title-cell" }, [it.title]),
+                it.summary ? el("div", { class: "postrelease-summary" }, [it.summary]) : null,
+              ]),
+              el("td", null, [it.rca ? el("span", { class: "cr-log-status " + rcaClass(it.rca) }, [it.rca]) : "—"]),
+              el("td", null, [it.reportedBy || "—"]),
+              el("td", null, [el("span", { class: "cr-log-status " + statusClass(it.status) }, [it.status || "—"])]),
+            ])
+          )
+        ),
+      ])
+    );
+    return el("div", { class: "postrelease-issues" }, [
+      el("h3", { class: "weekly-subhead", id: "postrelease-issues-section" }, ["Post-Release Issues & RCA"]),
+      el("p", { class: "section-subhead" }, ["Production issues reported since go-live, with the root-cause result for each."]),
+      scroll,
+    ]);
+  }
+
   function buildFeatureKpis(p) {
     const items = p.features || [];
     const row = el("div", { class: "feature-kpi-row" });
@@ -5215,6 +5249,7 @@
       // tab is already showing); click an older row above to rewind.
       renderSnapshotSections(historySnapshotSections, p, weeks[weeks.length - 1].asOf, true, { readOnly: true, depsAndRisks: false });
     }
+    if ((p.postReleaseIssues || []).length) weekOverWeekPanel.appendChild(buildPostReleaseIssues(p.postReleaseIssues));
 
     // Full feedback history
     feedbackPanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Feedback history"]));

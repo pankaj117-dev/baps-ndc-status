@@ -1641,6 +1641,8 @@ Everything lives in three files:
                                 // actualEnd, delayDays, note}]} — table under the Schedule timeline
   "postProdBugs": null,        // optional {summary, groups:[{title, metrics:[{label, num, tone?}], note}]}
                                 // — "Post-prod bugs" section on the Dependencies & Risks tab
+  "postReleaseIssues": [],     // optional production issues [{title, summary, rca, reportedBy, status}]
+                                // — "Post-Release Issues & RCA" section on the Week-over-week tab
   "scheduleScope": "",         // optional qualifier shown after the Status line, e.g. "hotfix" →
                                 // "On schedule (hotfix)" / "+4 days (hotfix)"; set by hand in data.json
   "scopeReduced": false,       // true if scope is being cut/deferred this week to hold the go-live
