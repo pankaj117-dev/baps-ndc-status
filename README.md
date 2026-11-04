@@ -1441,15 +1441,11 @@ chip from running past its own `stagePlan` end date.
 
 ## Tab 3 — 🦅 Hawk-eye (live)
 
-A cross-project **stage-gate calendar**: every project on one shared
-timeline, one row each — blocks positioned/sized by **PLANNED**
-start/end dates, with a small caption underneath each showing when the
-stage **actually** finished (see the 2026-11-04 entry below for the
-current design; the 2026-11-03 entries describe an earlier two-row
-Planned/Actual attempt that was superseded by it) — sorted by go-live
-date, built from the same stage-segment reconstruction used by the Grid
-tab / each project's Stage-gate timeline, so all three stage-gate views
-always agree.
+A cross-project **stage-gate calendar**: every project's Stage-gate
+timeline stacked on one shared calendar — one lane per stage, sorted by
+go-live date. See the last 2026-11-04 entry below ("Every project's
+Stage-gate lanes") for the current design; the entries before it
+describe earlier layouts it replaced.
 
 - **Solid block, green** — a stage already completed, positioned at its
   real date range.
@@ -1752,6 +1748,44 @@ variance where it exists (e.g. `webnext-2`, `pledge-1a`, and `spm`'s
 current stage captioned "Past planned end" in red, matching
 `currentStageOverdue()`). Row click-through to the project's Stage-gate
 timeline confirmed still working, unchanged.
+
+**Every project's Stage-gate lanes on one board (2026-11-04, later the
+same day).** Per explicit request, with a screenshot of myBKY 2A's
+Stage-gate timeline: *"I want this view to show across all projects,
+like this overall UI view so its easy to view things."* Hawk-eye now
+renders each project as a group — a sticky header (status dot, name,
+PM · delay · Go-Live) followed by one lane per stage, exactly like that
+project's own Stage-gate tab — all on one shared quarter-gridded
+calendar with a single Today line, so projects line up against each
+other.
+
+- The lane logic was pulled out of `buildParallelStageGateTimeline()`
+  into shared helpers — `stageLaneBlocks(p)`, `stageLaneMeta(b)`,
+  `stageLaneExtentPx(b, xPx)`, `stageLaneTrack(...)` — used by both the
+  single-project view and Hawk-eye, so they can't drift apart.
+- `stageLaneBlocks()` keeps the parallel-project rules (started once the
+  planned start passes, done at 100% on the same-named milestone) for
+  `parallelStages` and unstaged projects; every other project uses its
+  reported `p.stage` for done/current/future. Lanes sit on `stagePlan`
+  dates; a done/current stage with no plan entry falls back to its
+  recorded segment, and a done stage whose recorded finish differs from
+  the plan adds "· finished <date>" to its caption (e.g. EMM's UAT).
+  A future stage whose planned window has already passed gets the red
+  "plan passed, not yet reported started" style the legend already
+  described.
+- Replaced and removed: `buildHawkeyePlanActualBlocks()`,
+  `hawkeyeBlockCaption()`, `HAWKEYE_LABEL_WIDTH`, and all the old
+  `.hawkeye-row*` / `.hawkeye-stage-block*` / `.hawkeye-stage-caption` /
+  `.hawkeye-legend*` CSS. New: `.hawkeye-lanes*`, `.hawkeye-project*`,
+  and `.stagegantt-track.is-compact` (72px lanes, one caption line, so
+  more projects fit per screen than the single-project view's two-tier
+  wrap). The Quarter/Month zoom toggle stays.
+- Clicking a stage block opens that stage's detail; clicking a project
+  header opens the project's Stage-gate tab.
+
+Verified in headless Chrome: 10 project groups, 45 lanes; opening myBKY
+2A from its header shows the same 7 lanes and captions as before the
+refactor.
 
 ## Tab 4 — Status History (live)
 

@@ -1876,7 +1876,7 @@ table.deps-drill-table th {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 10px;
-  margin: 0 0 14px 220px;
+  margin: 0 0 14px;
 }
 
 .hawkeye-zoom-toggle {
@@ -1918,50 +1918,22 @@ table.deps-drill-table th {
   position: relative;
 }
 
-.hawkeye-months {
-  position: relative;
-  height: 22px;
-  border-bottom: 1px solid var(--line-strong);
-  margin-bottom: 6px;
-}
+/* Cross-project lane board (2026-11-04) — reuses the single-project
+   Stage-gate timeline's .stagegantt-* lane/block/caption styles, so each
+   project's group reads exactly like its own Stage-gate tab. */
+.hawkeye-lanes { position: relative; }
 
-.hawkeye-month-mark {
-  position: absolute;
+.hawkeye-lanes-header {
+  position: sticky;
   top: 0;
-  transform: translateX(-2px);
-  border-left: 1px solid var(--line-strong);
-  padding-left: 5px;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  color: var(--ink-faint);
-  white-space: nowrap;
+  z-index: 4;
+  background: var(--bg-panel);
 }
 
-.hawkeye-rows {
-  position: relative;
-}
-
-.hawkeye-grid-line {
+.hawkeye-lanes-today {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  background: var(--line);
-}
-
-.hawkeye-today-line {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--accent);
-  z-index: 2;
-}
-
-.hawkeye-today-label {
-  position: absolute;
-  top: -20px;
-  left: 4px;
+  top: 2px;
+  transform: translateX(4px);
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
@@ -1969,209 +1941,51 @@ table.deps-drill-table th {
   white-space: nowrap;
 }
 
-.hawkeye-row {
-  position: relative;
-  display: flex;
-  align-items: stretch;
-  border-bottom: 1px solid var(--line);
-  cursor: pointer;
-  transition: background 0.12s ease;
+.hawkeye-project {
+  border-top: 1px solid var(--line);
+  padding: 4px 0 6px;
 }
+.hawkeye-project:first-of-type { border-top: none; }
 
-.hawkeye-row:last-child { border-bottom: none; }
-.hawkeye-row:hover, .hawkeye-row:focus-visible { background: var(--bg); outline: none; }
-.hawkeye-row:hover .hawkeye-row-label, .hawkeye-row:focus-visible .hawkeye-row-label { background: var(--bg); }
-
-/* Sticks to the left edge of .hawkeye-scroll-inner as the timeline
-   content scrolls horizontally underneath/beside it — an opaque
-   background + z-index above the row tracks is what makes scrolled-under
-   content actually disappear behind it instead of showing through. */
-.hawkeye-row-label {
+/* Sticky so the project name stays readable while the shared calendar
+   scrolls sideways underneath it. */
+.hawkeye-project-head {
   position: sticky;
   left: 0;
   z-index: 3;
-  flex: 0 0 220px;
-  width: 220px;
-  background: var(--bg-panel);
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
-  padding-right: 8px;
-  box-shadow: 4px 0 8px -6px rgba(20, 28, 45, 0.15);
+  width: max-content;
+  margin: 6px 0 8px;
+  padding: 4px 10px 4px 6px;
+  border-radius: 8px;
+  background: var(--bg-panel);
+  cursor: pointer;
 }
-
-.hawkeye-row-label strong {
-  display: block;
+.hawkeye-project-head:hover,
+.hawkeye-project-head:focus-visible { background: var(--bg); outline: none; }
+.hawkeye-project-head strong {
   font-family: var(--font-display);
+  font-size: 13.5px;
   font-weight: 700;
   color: var(--ink);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 175px;
 }
-
-.hawkeye-row-sub {
+.hawkeye-project-meta {
+  font-family: var(--font-mono);
   font-size: 11px;
   color: var(--ink-faint);
 }
+.hawkeye-project-empty { margin: 0 0 6px 6px; }
 
-/* Single merged row per project (2026-11-04, replacing the earlier
-   two-subrow "Planned"/"Actual" design): one track whose blocks are
-   positioned/sized by PLANNED dates, each with an actual-completion
-   caption stacked underneath — see .hawkeye-stage-caption below. */
-.hawkeye-row-tracks {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-}
-
-.hawkeye-row-track {
-  position: relative;
-  flex: 0 0 auto;
-  height: 64px;
-}
-
-.hawkeye-row-track-empty {
-  display: flex;
-  align-items: center;
-  font-size: 12px;
-  color: var(--ink-faint);
-  font-style: italic;
-}
-
-/* Per-stage block on the calendar strip, positioned/sized by its
-   PLANNED start/end. Done stages get a solid fill, the current stage is
-   colored by its SLA flag, future/not-yet-reached stages are
-   outline-only (shown only when a real stagePlan date is on record —
-   see buildHawkeyePlanActualBlocks()). Fixed (not vertically centered)
-   top offset leaves room below for .hawkeye-stage-caption. */
-.hawkeye-stage-block {
-  position: absolute;
-  top: 10px;
-  height: 26px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  padding: 0 4px;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 700;
+/* One caption line per lane on the cross-project board (the
+   single-project view wraps into two tiers instead), so lanes can be
+   shorter and many projects fit on one screen. */
+.stagegantt-track.is-compact { height: 72px; }
+.stagegantt-track.is-compact .stagegantt-caption {
+  max-width: none;
   white-space: nowrap;
-  cursor: pointer;
-  box-sizing: border-box;
 }
-
-/* "Second date underneath" (2026-11-04, explicit request: "this view
-   should show the planned dates in start and end and there is second
-   date underneath that is the actual date so you can see when things
-   finished"). Sits directly beneath its block at the same left offset,
-   colored by how the real finish date compares to that stage's own
-   plan — red/green mirror the Stage Dates table's delay-chip semantics,
-   just phrased as a finish date instead of a day count. */
-.hawkeye-stage-caption {
-  position: absolute;
-  top: 40px;
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 600;
-  white-space: nowrap;
-  cursor: pointer;
-}
-.hawkeye-stage-caption.is-late { color: var(--red); }
-.hawkeye-stage-caption.is-early { color: var(--green); }
-.hawkeye-stage-caption.is-ontime { color: var(--ink-faint); }
-.hawkeye-stage-caption.is-inprogress { color: var(--accent); }
-
-.hawkeye-stage-block.is-done {
-  background: var(--green-bg);
-  border: 1px solid var(--green);
-  color: var(--green);
-}
-
-.hawkeye-stage-block.is-current {
-  background: var(--accent-soft);
-  border: 1.5px solid var(--accent);
-  color: var(--accent);
-  box-shadow: var(--shadow);
-  z-index: 1;
-}
-
-.hawkeye-stage-block.is-current.is-warn {
-  background: var(--amber-bg);
-  border-color: var(--amber);
-  color: var(--amber);
-}
-
-.hawkeye-stage-block.is-current.is-breach {
-  background: var(--red-bg);
-  border-color: var(--red);
-  color: var(--red);
-}
-
-.hawkeye-stage-block.is-future {
-  /* A not-yet-reached stage still gets a real continuous block (plotted
-     from its own stagePlan dates — see buildHawkeyePlanActualBlocks(),
-     which skips rendering it entirely when no real plan date exists at
-     all, rather than guessing). Tinted fill + dashed border + darker
-     text keeps the "this is a plan, not a real date range yet" meaning
-     legible, and it never gets a caption underneath (nothing to report
-     yet). */
-  background: var(--bg);
-  border: 1.5px dashed #7c8ba8;
-  color: #4a5878;
-  font-weight: 600;
-}
-
-/* Lower opacity marks a stage plotted from a generic SLA-guess chain
-   (no confirmed stagePlan date on record for it) rather than a real
-   committed date — "not a hard commitment," same meaning it had in the
-   old two-row design. */
-.hawkeye-stage-block.is-plan-estimated {
-  opacity: 0.65;
-}
-
-.hawkeye-stage-block:hover {
-  box-shadow: 0 0 0 2px var(--accent);
-}
-
-.hawkeye-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  font-size: 12px;
-  color: var(--ink-soft);
-}
-
-.hawkeye-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.hawkeye-legend-swatch {
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
-  display: inline-block;
-  border: 1.5px solid var(--line);
-}
-
-.hawkeye-legend-swatch.is-done { background: var(--green-bg); border-color: var(--green); }
-.hawkeye-legend-swatch.is-current { background: var(--accent-soft); border-color: var(--accent); }
-.hawkeye-legend-swatch.is-warn { background: var(--amber-bg); border-color: var(--amber); }
-.hawkeye-legend-swatch.is-breach { background: var(--red-bg); border-color: var(--red); }
-.hawkeye-legend-swatch.is-plan { background: var(--accent-soft); border-color: var(--accent); border-style: dashed; }
-.hawkeye-legend-swatch.is-plan.is-plan-estimated { background: var(--bg); border-color: #7c8ba8; opacity: 0.75; }
-
-/* No small-screen label-column narrowing needed anymore — the label
-   column is a fixed 220px sticky sidebar regardless of viewport, and the
-   timeline area (which is real-pixel-wide, not squeeze-to-fit) already
-   scrolls horizontally on any screen size too narrow to show it all at
-   once. That's the whole point of this being scrollable now. */
 
 /* ---------- Shared status dot (used on cards, stage board, go-live tracker) ---------- */
 
