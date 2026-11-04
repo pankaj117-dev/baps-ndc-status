@@ -1632,7 +1632,8 @@
   // reads (e.g. `buildHawkeyeBlocks`'s `plan.latestStart || plan.initialStart`),
   // just laid out as a table instead of a chart. "Delay (Days)" is the
   // shift in the planned COMPLETION date specifically (latestEnd minus
-  // initialEnd) — not a start-date shift, and not the real/actual
+  // initialEnd, in business days only — weekends don't count, 2026-11-04)
+  // — not a start-date shift, and not the real/actual
   // duration from `computeStageSegments` (that's what the Grid tab and
   // the timeline above already show) — this table is purely "how has
   // THIS stage's own plan moved since it was first committed." A stage
@@ -1657,7 +1658,7 @@
       const latestEnd = plan && (plan.latestEnd || plan.initialEnd);
       const startChanged = initialStart && latestStart && latestStart !== initialStart;
       const endChanged = initialEnd && latestEnd && latestEnd !== initialEnd;
-      const delayDays = endChanged ? daysBetweenIso(initialEnd, latestEnd) : null;
+      const delayDays = endChanged ? businessDaysBetweenIso(initialEnd, latestEnd) : null;
 
       wrap.appendChild(
         el("div", { class: "stagedates-row" }, [
@@ -3795,6 +3796,28 @@
     return Math.round((new Date(bIso + "T00:00:00") - new Date(aIso + "T00:00:00")) / DAY);
   }
 
+  // Same idea as `daysBetweenIso`, but only counts Mon–Fri (2026-11-04,
+  // per explicit request: "delays should not count weekends, just
+  // weekdays"). Used specifically for DELAY/variance figures — how much a
+  // stage's actual or revised dates slipped against its own plan — not for
+  // plain elapsed-time counts (lifecycle age, a stage's raw duration, or
+  // "this date moved by Xd" schedule-shift logs), which are left as
+  // calendar days since those aren't "delay," just distance between dates.
+  function businessDaysBetweenIso(aIso, bIso) {
+    const DAY = 86400000;
+    const a = new Date(aIso + "T00:00:00").getTime();
+    const b = new Date(bIso + "T00:00:00").getTime();
+    const sign = b >= a ? 1 : -1;
+    const start = sign === 1 ? a : b;
+    const end = sign === 1 ? b : a;
+    let count = 0;
+    for (let t = start; t < end; t += DAY) {
+      const dow = new Date(t).getDay(); // 0 = Sun, 6 = Sat
+      if (dow !== 0 && dow !== 6) count++;
+    }
+    return count * sign;
+  }
+
   // Is the CURRENT stage running past its own committed end date (2026-10-06)?
   // Compares today against THIS project's own stagePlan.latestEnd for the
   // stage it's actually in right now — not a flat per-stage-name constant
@@ -3834,10 +3857,15 @@
     if (seg.ongoing) {
       const today = todayISO();
       if (today <= plannedEnd) return null;
-      return daysBetweenIso(plannedEnd, today);
+      return businessDaysBetweenIso(plannedEnd, today);
     }
-    const plannedDays = Math.max(0, daysBetweenIso(plannedStart, plannedEnd));
-    return seg.days - plannedDays;
+    // Weekday-only on both sides (2026-11-04) — recompute the segment's
+    // own actual duration in business days here rather than reusing
+    // `seg.days` (that's the plain calendar duration shown separately as
+    // "✓ 35d", which stays calendar since it's not a delay figure).
+    const actualDays = Math.max(0, businessDaysBetweenIso(seg.start, seg.end));
+    const plannedDays = Math.max(0, businessDaysBetweenIso(plannedStart, plannedEnd));
+    return actualDays - plannedDays;
   }
 
   // Reconstructs how long a project has spent in each pipeline stage, using
@@ -5320,7 +5348,7 @@
     let varianceLabel = "—";
     let varianceClass = "";
     if (actual && latest) {
-      const delta = daysBetweenIso(latest, actual);
+      const delta = businessDaysBetweenIso(latest, actual);
       if (delta === 0) {
         varianceLabel = "On schedule";
         varianceClass = "is-ontime";

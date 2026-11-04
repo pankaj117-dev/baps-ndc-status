@@ -1086,6 +1086,32 @@ that `delayDays: 4` / its `delayNote` ("Hotfix deployment moved from
 Nov 8 to Nov 18...") is about a separate, later post-launch hotfix
 milestone — nothing to do with the go-live date at all. Left untouched.
 
+**Delay figures now count weekdays only (2026-11-04):** per explicit
+request, every DELAY/variance figure in the app (not plain elapsed-day
+counts) now excludes weekends. Added `businessDaysBetweenIso(aIso, bIso)`
+next to `daysBetweenIso` and switched three call sites to it:
+- Stage Dates table's "Delay (Days)" chip (`buildStageDatesTable`) —
+  `latestEnd` vs `initialEnd`.
+- Grid tab's per-stage "+Xd over its own plan" / "-Xd pulled up" chip
+  (`stagePlanDelayDays`) — actual stage duration vs its own planned
+  duration, both recomputed in business days (the plain `✓ 35d` actual-
+  duration label shown next to it is untouched — that's a duration, not a
+  delay).
+- Stage-detail modal's "Xd late" / "Xd early" variance label
+  (`dateVarianceCell`).
+
+Deliberately left as calendar days: lifecycle age, a stage's raw actual
+duration, and every "this date moved/shifted by Xd" schedule-change log
+(`computeScheduleShifts`, `stagePlanRevisions`, the Date change log,
+Status History tab) — those describe calendar distance between two plan
+dates, not accrued workday delay, so weekends still count there.
+
+Confirms the earlier "NC27 Hub Phase 1" spreadsheet comparison above: its
+own Delay (Days) column (25 / 15 / 6 for Development / UAT / VAPT) didn't
+match this app's calendar-day math at the time, but matches **exactly**
+once business days are used — the spreadsheet was counting weekdays all
+along.
+
 **MyBKY (Phase 1) stage dates corrected against source spreadsheet (2026-11-03):**
 the PM's "NC27 Hub Phase 1" Stage Dates tracker (the source of truth for this
 project) didn't match `mybky-phase1`'s `stagePlan` in a few spots. Fixed in
