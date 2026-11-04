@@ -4114,3 +4114,5 @@ dd.is-missing {
 .cr-log-status.is-missed { background: var(--red-bg); color: var(--red); }
 .postrelease-issues .wide-log-full-table { min-width: 640px; }
 .postrelease-issues .wide-log-full-table td:first-child { width: 55%; }
+.postrelease-issues.is-nested { margin-top: 20px; }
+.postrelease-issues .cr-log-status { white-space: normal; text-align: left; }

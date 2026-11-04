@@ -2009,12 +2009,14 @@
   // issue tally: an optional summary line, then one row of counts per
   // group (bugs, CRs, …) with an optional note underneath. Shape:
   // { summary, groups: [{ title, metrics: [{ label, num, tone? }], note }] }.
-  function buildPostProdBugs(data) {
+  // The Post-Release Issues & RCA table, when given, slots in right after
+  // the first group (the bug tiles), ahead of the CR tiles.
+  function buildPostProdBugs(data, issues) {
     const wrap = el("div", { class: "postprod-bugs" }, [
       el("h3", { class: "weekly-subhead", id: "postprod-bugs-section" }, ["Post-prod bugs"]),
       data.summary ? el("p", { class: "section-subhead" }, [data.summary]) : null,
     ]);
-    (data.groups || []).forEach((g) => {
+    (data.groups || []).forEach((g, i) => {
       wrap.appendChild(el("h4", { class: "hotfix-plan-title" }, [g.title]));
       const row = el("div", { class: "feature-kpi-row" });
       g.metrics.forEach((m) => {
@@ -2027,6 +2029,7 @@
       });
       wrap.appendChild(row);
       if (g.note) wrap.appendChild(el("p", { class: "postprod-bugs-note" }, [g.note]));
+      if (i === 0 && (issues || []).length) wrap.appendChild(buildPostReleaseIssues(issues, true));
     });
     return wrap;
   }
@@ -2034,7 +2037,7 @@
   // Post-Release Issues & RCA (2026-11-03, GMS 1.4) — production issues
   // only, kept deliberately light: issue + one-line summary, RCA result,
   // who reported it, status. Items: { title, summary, rca, reportedBy, status }.
-  function buildPostReleaseIssues(items) {
+  function buildPostReleaseIssues(items, nested) {
     const rcaClass = (r) => (/missed/i.test(r || "") ? "is-missed" : /review|pending/i.test(r || "") ? "is-pending" : "");
     const statusClass = (s) => (/resolved|closed|done/i.test(s || "") ? "is-approved" : /wip|progress|open/i.test(s || "") ? "is-pending" : "");
     const scroll = el("div", { class: "wide-log-table-scroll" });
@@ -2058,8 +2061,10 @@
         ),
       ])
     );
-    return el("div", { class: "postrelease-issues" }, [
-      el("h3", { class: "weekly-subhead", id: "postrelease-issues-section" }, ["Post-Release Issues & RCA"]),
+    return el("div", { class: "postrelease-issues" + (nested ? " is-nested" : "") }, [
+      nested
+        ? el("h4", { class: "hotfix-plan-title", id: "postrelease-issues-section" }, ["Post-Release Issues & RCA"])
+        : el("h3", { class: "weekly-subhead", id: "postrelease-issues-section" }, ["Post-Release Issues & RCA"]),
       el("p", { class: "section-subhead" }, ["Production issues reported since go-live, with the root-cause result for each."]),
       scroll,
     ]);
@@ -5153,7 +5158,8 @@
     renderSnapshotSections(liveSnapshotSections, p, null, true, { weeklyStatus: false });
     depsRisksPanel.appendChild(liveSnapshotSections);
 
-    if (p.postProdBugs) depsRisksPanel.appendChild(buildPostProdBugs(p.postProdBugs));
+    if (p.postProdBugs) depsRisksPanel.appendChild(buildPostProdBugs(p.postProdBugs, p.postReleaseIssues));
+    else if ((p.postReleaseIssues || []).length) depsRisksPanel.appendChild(buildPostReleaseIssues(p.postReleaseIssues));
 
     // RAID Log — Risks, Assumptions, Issues, Dependencies consolidated
     // into one log (slide 18), appended below the existing
@@ -5249,7 +5255,6 @@
       // tab is already showing); click an older row above to rewind.
       renderSnapshotSections(historySnapshotSections, p, weeks[weeks.length - 1].asOf, true, { readOnly: true, depsAndRisks: false });
     }
-    if ((p.postReleaseIssues || []).length) weekOverWeekPanel.appendChild(buildPostReleaseIssues(p.postReleaseIssues));
 
     // Full feedback history
     feedbackPanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Feedback history"]));
