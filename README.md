@@ -1086,6 +1086,29 @@ that `delayDays: 4` / its `delayNote` ("Hotfix deployment moved from
 Nov 8 to Nov 18...") is about a separate, later post-launch hotfix
 milestone — nothing to do with the go-live date at all. Left untouched.
 
+**MyBKY (Phase 1) dependencies/risks now link to their pipeline stage
+(2026-11-04):** per explicit request ("add the actual ... dependencies and
+risks - so that I can click on them and they will land on the details in
+the icon page"). Added a `stage` field (optional, any `PIPELINE_STAGES`
+name) to each `dependencies`/`risks` item; inferred per-item for every one
+of MyBKY (Phase 1)'s 6 dependencies and 5 risks from its own text (e.g.
+RISK-101 explicitly says "VAPT sign-off" → `VAPT`; DEP-103/104's due dates
+land exactly on VAPT's own `latestEnd` → `VAPT`; SSO/MIS account-creation
+items needed for testing → `UAT`; production-integration-key/end-user-
+account items → `Rollout`). Change Requests were explicitly left out of
+this pass — `changeRequests` stays `[]` for every project, including this
+one, until real CR content is provided.
+
+In `dependencyListItems()`/`riskListItems()`: a row with a `stage` tag now
+shows a small green "`STAGE →`" pill and, when clicked, opens that stage's
+own detail popup (`openStageDetail` — the same one opened from a Grid-tab
+or Stage-gate-timeline stage cell) instead of the item's own detail modal.
+Untagged items (every other project, for now) keep the old behavior
+(`openItemDetail`) unchanged. The item's own fields (team, priority, due
+date, mitigation, Update/Escalate/Resolve actions) are unaffected — those
+were already rendered inline in the row itself, not exclusive to the now-
+bypassed item-detail modal, so nothing is actually lost by this.
+
 **Delay figures now count weekdays only (2026-11-04):** per explicit
 request, every DELAY/variance figure in the app (not plain elapsed-day
 counts) now excludes weekends. Added `businessDaysBetweenIso(aIso, bIso)`
@@ -1977,7 +2000,11 @@ Everything lives in three files:
       "dueBy": "2026-10-05",        // "" if no hard date; invalid dates dropped at ingest
       "priority": "High",           // Critical | High | Medium | Low
       "escalated": false,           // per-dependency leadership escalation (🚨 badge on Tab 5)
-      "resolved": false             // true = hidden from Dependencies tab, kept for history
+      "resolved": false,            // true = hidden from Dependencies tab, kept for history
+      "stage": "UAT"                // OPTIONAL (2026-11-04) — any PIPELINE_STAGES name. When set,
+                                     // clicking this row opens that stage's detail popup
+                                     // (openStageDetail) instead of this item's own detail modal
+                                     // (openItemDetail) — see dependencyListItems() in app.js
     }
   ],
   "dependencySeq": 101,             // SYSTEM-MANAGED — counter for next DEP-* id (like delayLogSeq)
@@ -1991,7 +2018,8 @@ Everything lives in three files:
       "id": "RISK-101",             // SYSTEM-MANAGED — minted from riskSeq (starts at 100+)
       "text": "Security re-verification may miss UAT window",
       "mitigation": "Escalated to security lead — ~1 week slip if missed",
-      "resolved": false             // true = hidden from risk counts/detail, kept for history
+      "resolved": false,            // true = hidden from risk counts/detail, kept for history
+      "stage": "UAT"                // OPTIONAL (2026-11-04) — same as dependencies' `stage` above
     }
   ],
   "riskSeq": 101,                   // SYSTEM-MANAGED — counter for next RISK-* id

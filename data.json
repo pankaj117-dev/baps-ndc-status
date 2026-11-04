@@ -517,7 +517,8 @@
           "dueBy": "2026-09-24",
           "priority": "Critical",
           "escalated": false,
-          "resolved": true
+          "resolved": true,
+          "stage": "UAT"
         },
         {
           "id": "DEP-102",
@@ -527,7 +528,8 @@
           "dueBy": "2026-09-25",
           "priority": "High",
           "escalated": false,
-          "resolved": true
+          "resolved": true,
+          "stage": "UAT"
         },
         {
           "id": "DEP-103",
@@ -537,7 +539,8 @@
           "dueBy": "2026-09-24",
           "priority": "Critical",
           "escalated": false,
-          "resolved": true
+          "resolved": true,
+          "stage": "VAPT"
         },
         {
           "id": "DEP-104",
@@ -547,7 +550,8 @@
           "dueBy": "2026-09-24",
           "priority": "Critical",
           "escalated": false,
-          "resolved": true
+          "resolved": true,
+          "stage": "VAPT"
         },
         {
           "id": "DEP-105",
@@ -557,7 +561,8 @@
           "dueBy": "2026-09-25",
           "priority": "Medium",
           "escalated": false,
-          "resolved": true
+          "resolved": true,
+          "stage": "UAT"
         },
         {
           "id": "DEP-106",
@@ -567,7 +572,8 @@
           "mitigation": "",
           "dueBy": "",
           "priority": "Medium",
-          "escalated": false
+          "escalated": false,
+          "stage": "UAT"
         }
       ],
       "sprintStatus": {
@@ -588,31 +594,36 @@
           "id": "RISK-101",
           "text": "Mobile VAPT sign-off pending (VAPT \u2014 Critical)",
           "mitigation": "",
-          "resolved": false
+          "resolved": false,
+          "stage": "VAPT"
         },
         {
           "id": "RISK-102",
           "text": "UAT sign-off received but ~25% of items still need updates in tracking sheet (Stakeholders \u2014 Critical)",
           "mitigation": "UAT team updating tracking sheet",
-          "resolved": false
+          "resolved": false,
+          "stage": "UAT"
         },
         {
           "id": "RISK-103",
           "text": "Production integration keys needed for SSO, SFS, MIS, MDS (DevOps \u2014 Critical)",
           "mitigation": "DevOps/NAHQ chasing keys and access",
-          "resolved": false
+          "resolved": false,
+          "stage": "Rollout"
         },
         {
           "id": "RISK-104",
           "text": "Read-only MIS access, Google Maps API key, Apple Pay for Stripe, n8n pipelines (DevOps \u2014 Critical)",
           "mitigation": "",
-          "resolved": false
+          "resolved": false,
+          "stage": "Rollout"
         },
         {
           "id": "RISK-105",
           "text": "SSO user accounts for Kishor/Kishori participants still need creation (NAHQ \u2014 Critical)",
           "mitigation": "NAHQ creating SSO accounts",
-          "resolved": false
+          "resolved": false,
+          "stage": "Rollout"
         }
       ],
       "delayImpact": "Go_live slips",

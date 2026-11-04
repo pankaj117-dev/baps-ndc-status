@@ -2713,6 +2713,7 @@
           el("span", { class: "deps-badge deps-badge-due is-" + dueWindow.key }, [
             dep.dueBy ? `${dueWindow.label} · ${fmtDate(dep.dueBy)}` : "No date set",
           ]),
+          dep.stage ? el("span", { class: "stage-tag" }, [dep.stage + " →"]) : null,
         ].filter(Boolean)),
         el("div", { class: "paired-item-mitigation" + (mitigation ? "" : " is-missing") }, [
           el("span", { class: "mitigation-label" }, ["Mitigation / impact: "]),
@@ -2720,7 +2721,15 @@
         ]),
         actions.length ? el("div", { class: "dep-actions-row" }, actions) : null,
       ].filter(Boolean));
-      const open = () => openItemDetail("dependency", project, dep);
+      // 2026-11-04, explicit request: clicking a dependency should land
+      // directly on its own pipeline stage's detail popup (same one
+      // opened from a Grid-tab/Stage-gate-timeline stage cell) when the
+      // item has a `stage` tag — rather than this item's own (largely
+      // redundant — team/priority/due/mitigation are already inline in
+      // the row above) detail modal. Untagged items keep the old
+      // behavior so nothing else in the app changes.
+      const open = () =>
+        dep.stage ? openStageDetail(project.id, dep.stage) : openItemDetail("dependency", project, dep);
       li.addEventListener("click", (e) => {
         if (e.target.tagName === "A") return; // action links handle their own click
         open();
@@ -2749,13 +2758,17 @@
           risk.id ? el("span", { class: "dep-id-tag" }, [risk.id]) : null,
           risk.text,
           risk.track ? el("span", { class: "track-tag" }, [risk.track]) : null,
+          risk.stage ? el("span", { class: "stage-tag" }, [risk.stage + " →"]) : null,
         ].filter(Boolean)),
         el("div", { class: "paired-item-mitigation" + (mitigation ? "" : " is-missing") }, [
           el("span", { class: "mitigation-label" }, ["Mitigation plan: "]),
           mitigation || "Not yet documented",
         ]),
       ]);
-      const open = () => openItemDetail("risk", project, risk);
+      // Same stage-detail-first behavior as dependencyListItems() above —
+      // see the note there (2026-11-04).
+      const open = () =>
+        risk.stage ? openStageDetail(project.id, risk.stage) : openItemDetail("risk", project, risk);
       li.addEventListener("click", open);
       li.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") {

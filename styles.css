@@ -3302,6 +3302,25 @@ body.no-scroll { overflow: hidden; }
   vertical-align: middle;
 }
 
+/* Shown on a dependency/risk row when it carries a `stage` tag (2026-11-04,
+   "add the actual ... dependencies and risks - so that I can click on
+   them and they will land on the details in the icon page") — signals
+   that clicking the row opens that stage's detail popup instead of this
+   item's own (see `dependencyListItems()`/`riskListItems()` in app.js). */
+.stage-tag {
+  display: inline-block;
+  margin-left: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--green-bg);
+  color: var(--green);
+  vertical-align: middle;
+}
+
 .team-tag.is-missing {
   background: var(--amber-bg);
   color: var(--amber);
