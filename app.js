@@ -4446,6 +4446,7 @@
             el("span", { class: "schedule-timeline-delta " + (deltaDays > 0 ? "is-late" : deltaDays < 0 ? "is-early" : "") }, [
               deltaDays === 0 ? (vsPlan ? "On plan" : "No change in days") : (deltaDays > 0 ? "+" : "") + deltaDays + unit,
             ]),
+            e.reason ? el("span", { class: "schedule-timeline-note is-reason" }, ["Reason: " + e.reason]) : null,
           ]),
         ])
       );

@@ -1722,7 +1722,36 @@
           "delayReason": ""
         }
       ],
-      "delayItemLog": [],
+      "delayItemLog": [
+        {
+          "delayedItem": "Stage delays up to Go-Live (Requirements \u2192 UAT)",
+          "description": "Requirements, TDD, Development, QA and UAT each finished 3\u20137 days late.",
+          "reportedDate": "2026-10-12",
+          "impactedPhase": "Requirements \u2192 UAT",
+          "impact": "None on go-live: Oct 12 go-live achieved as planned.",
+          "rootCause": "Issues found during the pilot phase.",
+          "responsible": "",
+          "actionItem": "Cut scope to hold the go-live date.",
+          "actionTaken": "Dropped Contact Reorder; moved the Unsubscribe in TM and MIS opt-out user stories to the hotfix.",
+          "status": "Closed",
+          "closureRemarks": "Go-live achieved Oct 12 as per plan.",
+          "id": "DL-ITEM-101"
+        },
+        {
+          "delayedItem": "Hotfix deployment",
+          "description": "Hotfix deployment moved from Nov 23 to Nov 30.",
+          "reportedDate": "2026-11-02",
+          "impactedPhase": "Hypercare (hotfix)",
+          "impact": "Hotfix go-live +7 days.",
+          "rootCause": "Team time went to resolving post-prod issues.",
+          "responsible": "",
+          "actionItem": "",
+          "actionTaken": "",
+          "status": "Open",
+          "closureRemarks": "",
+          "id": "DL-ITEM-102"
+        }
+      ],
       "milestones": [],
       "raidLog": [],
       "scheduleScope": "hotfix",
@@ -1735,7 +1764,8 @@
           "from": "2026-09-09",
           "to": "2026-09-13",
           "stage": "Requirements",
-          "deltaDays": 3
+          "deltaDays": 3,
+          "reason": "Issues found during the pilot phase."
         },
         {
           "date": "2026-09-14",
@@ -1743,7 +1773,8 @@
           "from": "2026-09-14",
           "to": "2026-09-22",
           "stage": "Tech. Design",
-          "deltaDays": 6
+          "deltaDays": 6,
+          "reason": "Issues found during the pilot phase."
         },
         {
           "date": "2026-09-24",
@@ -1751,7 +1782,8 @@
           "from": "2026-09-24",
           "to": "2026-10-05",
           "stage": "Development",
-          "deltaDays": 7
+          "deltaDays": 7,
+          "reason": "Issues found during the pilot phase."
         },
         {
           "date": "2026-09-26",
@@ -1759,7 +1791,8 @@
           "from": "2026-09-26",
           "to": "2026-10-07",
           "stage": null,
-          "deltaDays": 7
+          "deltaDays": 7,
+          "reason": "Issues found during the pilot phase."
         },
         {
           "date": "2026-10-06",
@@ -1767,14 +1800,16 @@
           "from": "2026-10-06",
           "to": "2026-10-12",
           "stage": "UAT",
-          "deltaDays": 4
+          "deltaDays": 4,
+          "reason": "Issues found during the pilot phase."
         },
         {
           "date": "2026-11-02",
           "label": "Hotfix deployment",
           "from": "2026-11-23",
           "to": "2026-11-30",
-          "stage": "Hypercare"
+          "stage": "Hypercare",
+          "reason": "Team time went to resolving post-prod issues, so the hotfix is running late."
         },
         {
           "date": "2026-10-12",
@@ -1782,7 +1817,8 @@
           "from": "2026-10-12",
           "to": "2026-10-12",
           "stage": "Rollout",
-          "vsPlanWorkingDays": 0
+          "vsPlanWorkingDays": 0,
+          "reason": "Held as planned by cutting scope: dropped Contact Reorder, and moved the Unsubscribe in TM and MIS opt-out user stories to the hotfix."
         }
       ],
       "hotfixPlan": {
@@ -1959,7 +1995,8 @@
           "reportedBy": "Vyom Suthar",
           "status": "Resolved"
         }
-      ]
+      ],
+      "delayItemLogSeq": 102
     },
     {
       "id": "baps-sso",

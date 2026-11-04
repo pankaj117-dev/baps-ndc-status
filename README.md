@@ -1636,7 +1636,7 @@ Everything lives in three files:
   "stageDatesFromPlan": false, // true → Stage-gate timeline / Hawk-eye plot every reached stage from
                                 // stagePlan's latest dates instead of weekly-snapshot reconstruction
   "scheduleLog": [],           // optional hand-curated Date change log — replaces the snapshot-diff
-                                // version: [{date, label, from, to, stage?, deltaDays?}]
+                                // version: [{date, label, from, to, stage?, deltaDays?, reason?}]
   "hotfixPlan": null,          // optional {title, rows:[{stage, plannedStart, actualStart, plannedEnd,
                                 // actualEnd, delayDays, note}]} — table under the Schedule timeline
   "postProdBugs": null,        // optional {summary, groups:[{title, metrics:[{label, num, tone?}], note}]}

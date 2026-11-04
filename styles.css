@@ -1781,6 +1781,8 @@ table.deps-drill-table th {
   font-size: 12px;
 }
 
+.schedule-timeline-note.is-reason { flex-basis: 100%; }
+
 @media (max-width: 640px) {
   .schedule-timeline-row { grid-template-columns: 1fr; }
   .schedule-timeline-delta { margin-left: 0; }
