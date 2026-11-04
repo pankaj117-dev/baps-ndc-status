@@ -1843,7 +1843,7 @@
             "metrics": [
               {
                 "label": "Reported",
-                "num": 12
+                "num": 10
               },
               {
                 "label": "Fixed",
