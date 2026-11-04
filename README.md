@@ -1637,6 +1637,8 @@ Everything lives in three files:
                                 // stagePlan's latest dates instead of weekly-snapshot reconstruction
   "scheduleLog": [],           // optional hand-curated Date change log — replaces the snapshot-diff
                                 // version: [{date, label, from, to, stage?, deltaDays?}]
+  "hotfixPlan": null,          // optional {title, rows:[{stage, plannedStart, actualStart, plannedEnd,
+                                // actualEnd, delayDays, note}]} — table under the Schedule timeline
   "scheduleScope": "",         // optional qualifier shown after the Status line, e.g. "hotfix" →
                                 // "On schedule (hotfix)" / "+4 days (hotfix)"; set by hand in data.json
   "scopeReduced": false,       // true if scope is being cut/deferred this week to hold the go-live

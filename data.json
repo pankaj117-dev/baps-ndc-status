@@ -1784,7 +1784,57 @@
           "stage": "Rollout",
           "vsPlanWorkingDays": 0
         }
-      ]
+      ],
+      "hotfixPlan": {
+        "title": "Hotfix timeline",
+        "rows": [
+          {
+            "stage": "Development",
+            "plannedStart": "2026-10-19",
+            "actualStart": "2026-10-19",
+            "plannedEnd": "2026-11-02",
+            "actualEnd": "2026-11-06",
+            "delayDays": 4,
+            "note": ""
+          },
+          {
+            "stage": "QA",
+            "plannedStart": "2026-10-20",
+            "actualStart": "2026-10-20",
+            "plannedEnd": "2026-11-06",
+            "actualEnd": "2026-11-20",
+            "delayDays": 5,
+            "note": "Additional 5 days of delay due to Diwali vacation"
+          },
+          {
+            "stage": "UAT",
+            "plannedStart": "2026-11-07",
+            "actualStart": "2026-11-21",
+            "plannedEnd": "2026-11-08",
+            "actualEnd": "2026-11-22",
+            "delayDays": null,
+            "note": ""
+          },
+          {
+            "stage": "VAPT & Load Testing",
+            "plannedStart": "2026-11-16",
+            "actualStart": "2026-11-21",
+            "plannedEnd": "2026-11-22",
+            "actualEnd": "2026-11-27",
+            "delayDays": null,
+            "note": ""
+          },
+          {
+            "stage": "Go-Live",
+            "plannedStart": "2026-11-23",
+            "actualStart": "2026-11-30",
+            "plannedEnd": "",
+            "actualEnd": "",
+            "delayDays": null,
+            "note": ""
+          }
+        ]
+      }
     },
     {
       "id": "baps-sso",

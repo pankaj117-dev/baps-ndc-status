@@ -3944,6 +3944,10 @@ dd.is-missing {
 .cr-log-status.is-approved { background: var(--green-bg); color: var(--green); }
 .cr-log-status.is-pending { background: var(--amber-bg); color: var(--amber); }
 
+.hotfix-plan { margin-top: 20px; }
+.hotfix-plan-title { margin: 0 0 8px; font-size: 15px; font-weight: 700; }
+.hotfix-plan-actual { color: var(--red); }
+
 /* ---------- Wide log tables (Delay, RAID, Change Request, Decision logs)
    — a real <table> + horizontal scroll wrapper, used for every log that
    was rebuilt (2026-10-15) to match the deck's own sample tables exactly,

@@ -1754,6 +1754,43 @@
   // Approved for current phase / Moved to next phase, Impact — 7
   // distinct columns, none merged into another cell (the first version
   // of this table condensed Description/Action Item into one cell).
+  // Hotfix timeline (2026-11-03, GMS 1.4) — a follow-on release's own
+  // stage table, shown under the Schedule timeline exactly as the PM's
+  // deck lays it out: planned dates, with the post-delay date underneath
+  // in red when it moved. Rows: { stage, plannedStart, actualStart,
+  // plannedEnd, actualEnd, delayDays, note }.
+  function buildHotfixPlan(plan) {
+    const dateCell = (planned, actual) =>
+      el("td", null, [
+        el("div", null, [planned ? fmtDateShort(planned) : "—"]),
+        actual && actual !== planned ? el("div", { class: "hotfix-plan-actual" }, [fmtDateShort(actual)]) : null,
+      ]);
+    const wrap = el("div", { class: "hotfix-plan" }, [
+      el("h4", { class: "hotfix-plan-title" }, [plan.title || "Hotfix timeline"]),
+    ]);
+    const scroll = el("div", { class: "wide-log-table-scroll" });
+    scroll.appendChild(
+      el("table", { class: "wide-log-full-table" }, [
+        el("thead", null, [el("tr", null, ["Stage", "Start", "End", "Delay (days)", "Notes"].map((c) => el("th", null, [c])))]),
+        el(
+          "tbody",
+          null,
+          plan.rows.map((r) =>
+            el("tr", null, [
+              el("td", { class: "wide-log-title-cell" }, [r.stage]),
+              dateCell(r.plannedStart, r.actualStart),
+              dateCell(r.plannedEnd, r.actualEnd),
+              el("td", null, [r.delayDays ? String(r.delayDays) : "—"]),
+              el("td", null, [r.note || "—"]),
+            ])
+          )
+        ),
+      ])
+    );
+    wrap.appendChild(scroll);
+    return wrap;
+  }
+
   function buildChangeRequestLog(p) {
     const items = p.changeRequests || [];
     if (!items.length) {
@@ -4866,6 +4903,7 @@
     scheduleSection.appendChild(
       scheduleEvents.length ? buildCollapsibleChangelog(scheduleEvents) : renderScheduleTimeline(scheduleEvents)
     );
+    if (p.hotfixPlan && (p.hotfixPlan.rows || []).length) scheduleSection.appendChild(buildHotfixPlan(p.hotfixPlan));
     delayPanel.appendChild(scheduleSection);
 
     // Delay Log — narrative companion to the auto-detected shift log
