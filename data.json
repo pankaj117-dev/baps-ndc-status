@@ -1670,7 +1670,88 @@
       ],
       "decisions": [],
       "goLiveChecklist": [],
-      "features": [],
+      "features": [
+        {
+          "sprint": "Hypercare",
+          "type": "SSO",
+          "feature": "SSO (WSO2) implementation for GMS and AMS",
+          "status": "Done",
+          "notes": "",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "SSO",
+          "feature": "SSO (WSO2) QA testing",
+          "status": "In Progress",
+          "notes": "",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hotfix",
+          "type": "Hotfix",
+          "feature": "Unsubscribe: TM user story development",
+          "status": "In Progress",
+          "notes": "",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hotfix",
+          "type": "Hotfix",
+          "feature": "Unsubscribe: MIS opt-out user story development",
+          "status": "In Progress",
+          "notes": "",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Post-prod defect",
+          "feature": "Post-production defects (3)",
+          "status": "Done",
+          "notes": "3 defects resolved",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hotfix",
+          "type": "QA",
+          "feature": "QA for both Unsubscribe user stories",
+          "status": "Upcoming",
+          "notes": "",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hotfix",
+          "type": "Testing",
+          "feature": "End-to-end regression and load testing",
+          "status": "Upcoming",
+          "notes": "",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Hotfix",
+          "type": "Security",
+          "feature": "VAPT",
+          "status": "Upcoming",
+          "notes": "",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        }
+      ],
       "delayItemLog": [],
       "milestones": [],
       "raidLog": [],
