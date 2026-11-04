@@ -1920,7 +1920,7 @@
         {
           "title": "Emails not masked in analytics",
           "summary": "Prod Vault configuration issue; worked in QA and UAT.",
-          "rca": "New requirement / not in requirement",
+          "rca": "Prod Vault configuration issue",
           "reportedBy": "Vasu",
           "status": "Resolved"
         },
