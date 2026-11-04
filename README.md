@@ -1086,6 +1086,22 @@ that `delayDays: 4` / its `delayNote` ("Hotfix deployment moved from
 Nov 8 to Nov 18...") is about a separate, later post-launch hotfix
 milestone — nothing to do with the go-live date at all. Left untouched.
 
+**"Who leads each stage" (RACI) and "Go-Live readiness" checklist removed,
+all projects (2026-11-04):** per explicit request ("also remove these for
+all projects"), after seeing both sections still showing their fully-
+static/zeroed-out defaults. Both were fixed-playbook reference content
+(`RACI_STAGES`, `GOLIVE_CHECKLIST_ITEMS`), not project-specific data —
+`buildRaciReference()`/`buildGoLiveChecklist()` and their constants were
+deleted outright from app.js (nothing else called them), along with the
+`.raci-ref`/`.raci-ref-table`/`.raci-ref-row`/`.raci-ref-stage`/
+`.raci-ref-lead`/`.raci-ref-with` and `.golive-checklist-*` CSS (kept
+`.raci-ref-head` — still used by the "Stage dates" heading just above
+where this section used to sit) and the now-dead
+`"golive-checklist-section"` jump-link entry in `DETAIL_SECTION_TAB_MAP`.
+`p.goLiveChecklist` stays in data.json/README as an unused field, same
+precedent as `features`/`milestones` elsewhere in this file, in case it's
+revived later.
+
 **MyBKY (Phase 1) dependencies/risks now link to their pipeline stage
 (2026-11-04):** per explicit request ("add the actual ... dependencies and
 risks - so that I can click on them and they will land on the details in
@@ -2092,12 +2108,11 @@ Everything lives in three files:
                                   // closed-door call that was made, not an open item being resolved.
     { "id": "DEC-1", "decision": "Go-Live Date Extension by 1 Month", "description": "...", "dateTaken": "2026-04-09", "by": "Aksharbhai Patel" }
   ],
-  "goLiveChecklist": [           // OPTIONAL (2026-10-15) — Stage-gate tab's "Go-Live readiness"
-                                  // section. Only needs entries for items that have moved off
-                                  // "Not started" — see GOLIVE_CHECKLIST_ITEMS in app.js for the
-                                  // fixed 7-item list (SIT, Regression, UAT, Cyber Security,
-                                  // Performance, Change Management, RGC Approval); anything not
-                                  // listed here defaults to "Not started."
+  "goLiveChecklist": [           // CURRENTLY UNUSED (2026-11-04) — fed the Stage-gate tab's
+                                  // "Go-Live readiness" checklist (`buildGoLiveChecklist()`),
+                                  // removed for all projects per explicit request. Following this
+                                  // file's `milestones`/`features`-field precedent, left here
+                                  // unused rather than deleted in case it's revived later.
     { "item": "System Integration Testing (SIT)", "status": "Complete", "notes": "" } // status: "Not started" | "In progress" | "Complete"
   ],
   "delayItemLog": [              // OPTIONAL (2026-10-15) — the detail view's **Delay** tab's

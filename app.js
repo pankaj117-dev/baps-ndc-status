@@ -418,44 +418,16 @@
     "Hypercare": "Hypercare",
   };
 
-  // Canonical Go-Live approval package — from the IT App Dev Project
-  // Management playbook (slide 13, "Go-Live - Approval Package"): the
-  // fixed set of sign-offs every project needs before RGC grants a Permit
-  // to Rollout. A project's `goLiveChecklist` in data.json only needs to
-  // list the items that have moved off "Not started" — anything missing
-  // is assumed not started yet, so adding this list cost nothing to any
-  // existing project's data.
-  const GOLIVE_CHECKLIST_ITEMS = [
-    "System Integration Testing (SIT)",
-    "Regression Testing",
-    "User Acceptance Testing (UAT)",
-    "Cyber Security Testing",
-    "Performance Load Testing",
-    "Change Management (plan, material, execution)",
-    "RGC Approval — Permit to Rollout",
-  ];
-  const GOLIVE_STATUS_ORDER = ["Not started", "In progress", "Complete"];
-
-  // Who leads / contributes to each stage of the lifecycle — a static
-  // reference, not project data (slides 6, 11 and 12 of the same
-  // playbook). The playbook's own stage names ("Planning",
-  // "Architecture / Design", "Testing", "Security Validation",
-  // "Deployment", "Production Readiness") are kept as-is rather than
-  // force-mapped onto this dashboard's 9 PIPELINE_STAGES one-for-one —
-  // the two models are close but not identical (e.g. this dashboard
-  // splits "Development" out from "Build", the playbook doesn't have a
-  // separate "Proposal" stage), so relabeling them would imply a false
-  // precision this deck never claimed.
-  const RACI_STAGES = [
-    { stage: "Requirements", lead: "BA", with: "PM, Architecture, Development, QA, Cyber Security" },
-    { stage: "Planning", lead: "PM", with: "All tracks" },
-    { stage: "Architecture / Design", lead: "Architecture", with: "Development, Cyber Security, DevOps" },
-    { stage: "Development", lead: "Development", with: "QA, DevOps, BA" },
-    { stage: "Testing", lead: "QA", with: "BA, Development, DevOps" },
-    { stage: "Security Validation", lead: "Cyber Security", with: "Development, Architecture, DevOps" },
-    { stage: "Deployment", lead: "DevOps / Infra", with: "Development, QA, BA" },
-    { stage: "Production Readiness", lead: "PM", with: "All tracks" },
-  ];
+  // "Who leads each stage" (RACI reference) and the "Go-Live readiness"
+  // checklist were removed from the Stage-gate tab, all projects, on
+  // 2026-11-04 per explicit request ("remove these for all projects") —
+  // both were static/fixed-playbook content (RACI_STAGES,
+  // GOLIVE_CHECKLIST_ITEMS), not project-specific data, so nothing in
+  // data.json needed to change. `buildRaciReference()`/
+  // `buildGoLiveChecklist()` and their constants were deleted outright
+  // (not just unwired) since nothing else called them. `p.goLiveChecklist`
+  // stays in data.json/README unused, same precedent as `features`/
+  // `milestones` elsewhere in this file, in case it's revived later.
 
   // "Five logs every project maintains" (slide 15) banner — REMOVED
   // 2026-10-16. It used to sit above the Change & Decisions and Delay
@@ -1693,64 +1665,6 @@
         ])
       );
     });
-    return wrap;
-  }
-
-  // "Who leads each stage" — static reference, not project data (see
-  // RACI_STAGES above). Rendered once per project detail view, right
-  // alongside the Stage-gate legend, since both answer "how do I read
-  // this timeline" questions.
-  function buildRaciReference() {
-    const wrap = el("div", { class: "raci-ref" });
-    wrap.appendChild(el("h4", { class: "raci-ref-head" }, ["Who leads each stage"]));
-    const table = el("div", { class: "raci-ref-table" });
-    RACI_STAGES.forEach((row) => {
-      table.appendChild(
-        el("div", { class: "raci-ref-row" }, [
-          el("span", { class: "raci-ref-stage" }, [row.stage]),
-          el("span", { class: "raci-ref-lead" }, [row.lead]),
-          el("span", { class: "raci-ref-with" }, ["with: " + row.with]),
-        ])
-      );
-    });
-    wrap.appendChild(table);
-    return wrap;
-  }
-
-  // Go-Live Readiness checklist — the fixed "Go-Live - Approval Package"
-  // (slide 13) every project needs signed off before RGC grants a Permit
-  // to Rollout. `p.goLiveChecklist` only needs to carry entries that have
-  // moved off "Not started"; anything in GOLIVE_CHECKLIST_ITEMS not found
-  // there renders as "Not started" by default.
-  function buildGoLiveChecklist(p) {
-    const byItem = {};
-    (p.goLiveChecklist || []).forEach((entry) => {
-      byItem[entry.item] = entry;
-    });
-    const wrap = el("div", { class: "golive-checklist" });
-    const list = el("div", { class: "golive-checklist-list" });
-    let doneCount = 0;
-    GOLIVE_CHECKLIST_ITEMS.forEach((item) => {
-      const entry = byItem[item];
-      const status = entry && entry.status ? entry.status : "Not started";
-      if (status === "Complete") doneCount += 1;
-      const statusClass =
-        status === "Complete" ? "is-complete" : status === "In progress" ? "is-inprogress" : "is-notstarted";
-      list.appendChild(
-        el("div", { class: "golive-checklist-row " + statusClass }, [
-          el("span", { class: "golive-checklist-icon" }, [status === "Complete" ? "✓" : status === "In progress" ? "●" : "○"]),
-          el("span", { class: "golive-checklist-item" }, [item]),
-          el("span", { class: "golive-checklist-status" }, [status]),
-          entry && entry.notes ? el("span", { class: "golive-checklist-notes" }, [entry.notes]) : null,
-        ])
-      );
-    });
-    wrap.appendChild(
-      el("div", { class: "golive-checklist-progress" }, [
-        `${doneCount} of ${GOLIVE_CHECKLIST_ITEMS.length} signed off`,
-      ])
-    );
-    wrap.appendChild(list);
     return wrap;
   }
 
@@ -4592,15 +4506,6 @@
     // view") — see buildStageDatesTable() for what it shows and why.
     stagegatePanel.appendChild(el("h4", { class: "raci-ref-head" }, ["Stage dates"]));
     stagegatePanel.appendChild(buildStageDatesTable(p));
-    stagegatePanel.appendChild(buildRaciReference());
-
-    stagegatePanel.appendChild(el("h3", { class: "weekly-subhead", id: "golive-checklist-section" }, ["Go-Live readiness"]));
-    stagegatePanel.appendChild(
-      el("p", { class: "section-subhead" }, [
-        "The fixed Go-Live approval package — every item needs to sign off before RGC grants a Permit to Rollout.",
-      ])
-    );
-    stagegatePanel.appendChild(buildGoLiveChecklist(p));
 
     if (isLate) {
       stagegatePanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Delay recovery"]));
@@ -5146,7 +5051,6 @@
     "detail-escalations-section": "depsrisks",
     "raid-log-section": "depsrisks",
     "detail-followups-section": "followups",
-    "golive-checklist-section": "stagegate",
     "detailScheduleSection": "delay",
     "milestones-section": "schedule",
     "delay-log-section": "delay",

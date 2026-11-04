@@ -3979,15 +3979,10 @@ dd.is-missing {
   color: var(--green);
 }
 
-/* ---------- RACI reference (Stage-gate tab) ---------- */
-
-.raci-ref {
-  margin: 16px 0 8px;
-  padding: 14px 16px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--bg);
-}
+/* ---------- RACI reference + Go-Live readiness checklist (Stage-gate
+   tab) removed 2026-11-04, all projects, per explicit request ("also
+   remove these for all projects"). `.raci-ref-head` kept — still used by
+   the "Stage dates" heading just above where this section used to sit. */
 
 .raci-ref-head {
   font-family: var(--font-mono);
@@ -3998,109 +3993,10 @@ dd.is-missing {
   margin: 0 0 10px;
 }
 
-.raci-ref-table {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.raci-ref-row {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  font-size: 12.5px;
-  flex-wrap: wrap;
-}
-
-.raci-ref-stage {
-  flex: 0 0 170px;
-  font-weight: 700;
-  color: var(--ink);
-}
-
-.raci-ref-lead {
-  flex: 0 0 110px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--accent);
-  background: var(--accent-soft);
-  padding: 2px 8px;
-  border-radius: 999px;
-  text-align: center;
-}
-
-.raci-ref-with {
-  color: var(--ink-faint);
-  font-size: 11.5px;
-}
-
 /* "Five logs" banner CSS (.five-logs-*) removed 2026-10-16 — see the
    note by the old `buildFiveLogsBanner()` definition in app.js: every
    icon it had duplicated a tile already in the main horizontal
    icon-tile strip, so the whole banner was deleted rather than kept. */
-
-/* ---------- Go-Live readiness checklist (Stage-gate tab) ---------- */
-
-.golive-checklist-progress {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--ink-faint);
-  margin-bottom: 8px;
-}
-
-.golive-checklist-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-
-.golive-checklist-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 14px;
-  background: var(--bg-panel);
-  border-bottom: 1px solid var(--line);
-  font-size: 13px;
-}
-
-.golive-checklist-row:last-child { border-bottom: none; }
-
-.golive-checklist-icon {
-  flex: 0 0 16px;
-  font-weight: 700;
-  text-align: center;
-}
-
-.golive-checklist-row.is-complete .golive-checklist-icon { color: var(--green); }
-.golive-checklist-row.is-inprogress .golive-checklist-icon { color: var(--amber); }
-.golive-checklist-row.is-notstarted .golive-checklist-icon { color: var(--ink-faint); }
-
-.golive-checklist-item { flex: 1 1 auto; color: var(--ink); }
-
-.golive-checklist-status {
-  flex: 0 0 auto;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 2px 8px;
-  border-radius: 999px;
-}
-
-.golive-checklist-row.is-complete .golive-checklist-status { background: var(--green-bg); color: var(--green); }
-.golive-checklist-row.is-inprogress .golive-checklist-status { background: var(--amber-bg); color: var(--amber); }
-.golive-checklist-row.is-notstarted .golive-checklist-status { background: var(--bg); color: var(--ink-faint); }
-
-.golive-checklist-notes {
-  flex: 0 0 100%;
-  font-size: 11.5px;
-  color: var(--ink-faint);
-  padding-left: 26px;
-}
 
 /* ---------- Change Request Log / Decision Log (Change & Decisions tab) ----------
    Both rebuilt (2026-10-15) as wide <table>s (see .wide-log-* below) to
