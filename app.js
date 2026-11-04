@@ -4215,6 +4215,13 @@
   // comparison. `deltaDays` stays the week-on-week move, so the per-stage
   // delay analysis doesn't double-count the cumulative slip.
   function buildScheduleTimeline(weeks, p) {
+    // A hand-curated log (2026-11-03, GMS 1.4 — from the PM's stage table)
+    // replaces the snapshot-diff reconstruction entirely. Entries are
+    // { date, label, from, to, stage?, deltaDays? }; deltaDays, when given,
+    // is the PM's own delay count and wins over the calendar-day diff.
+    if (p && Array.isArray(p.scheduleLog)) {
+      return p.scheduleLog.map((e) => ({ ...e })).sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+    }
     const events = [];
     let prevGoLive = null;
     let prevMilestoneName = null;
@@ -4322,6 +4329,8 @@
       const vsPlan = e.vsPlanWorkingDays != null;
       const deltaDays = vsPlan
         ? e.vsPlanWorkingDays
+        : e.deltaDays != null
+        ? e.deltaDays
         : Math.round((new Date(e.to + "T00:00:00") - new Date(e.from + "T00:00:00")) / 86400000);
       const unit = vsPlan ? " working days vs plan" : " days";
       box.appendChild(

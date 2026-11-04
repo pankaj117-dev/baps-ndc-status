@@ -1699,7 +1699,7 @@
           "notes": "",
           "plannedDate": "2026-11-02",
           "actualDate": "2026-11-06",
-          "delayReason": "4 days"
+          "delayReason": "Resolving priority post-prod issues"
         },
         {
           "sprint": "Hotfix",
@@ -1709,7 +1709,7 @@
           "notes": "",
           "plannedDate": "2026-11-02",
           "actualDate": "2026-11-06",
-          "delayReason": "4 days"
+          "delayReason": "Resolving priority post-prod issues"
         },
         {
           "sprint": "Hypercare",
@@ -1727,7 +1727,56 @@
       "raidLog": [],
       "scheduleScope": "hotfix",
       "stageDatesFromPlan": true,
-      "changeRequestSeq": 104
+      "changeRequestSeq": 104,
+      "scheduleLog": [
+        {
+          "date": "2026-09-09",
+          "label": "Requirements completion",
+          "from": "2026-09-09",
+          "to": "2026-09-13",
+          "stage": "Requirements",
+          "deltaDays": 3
+        },
+        {
+          "date": "2026-09-14",
+          "label": "TDD completion",
+          "from": "2026-09-14",
+          "to": "2026-09-22",
+          "stage": "Tech. Design",
+          "deltaDays": 6
+        },
+        {
+          "date": "2026-09-24",
+          "label": "Development completion",
+          "from": "2026-09-24",
+          "to": "2026-10-05",
+          "stage": "Development",
+          "deltaDays": 7
+        },
+        {
+          "date": "2026-09-26",
+          "label": "QA completion",
+          "from": "2026-09-26",
+          "to": "2026-10-07",
+          "stage": null,
+          "deltaDays": 7
+        },
+        {
+          "date": "2026-10-06",
+          "label": "UAT completion",
+          "from": "2026-10-06",
+          "to": "2026-10-12",
+          "stage": "UAT",
+          "deltaDays": 4
+        },
+        {
+          "date": "2026-11-02",
+          "label": "Hotfix deployment",
+          "from": "2026-11-08",
+          "to": "2026-11-18",
+          "stage": "Hypercare"
+        }
+      ]
     },
     {
       "id": "baps-sso",
