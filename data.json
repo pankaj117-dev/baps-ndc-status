@@ -1,6 +1,6 @@
 {
-  "asOf": "2026-11-03",
-  "lastUpdated": "2026-11-03T07:34:44.121215Z",
+  "asOf": "2026-11-04",
+  "lastUpdated": "2026-11-04T06:28:31.229399Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -1092,7 +1092,7 @@
         "name": "UAT",
         "date": "2026-12-21"
       },
-      "goLive": "2026-11-06",
+      "goLive": null,
       "originalGoLive": "2026-11-06",
       "delayDays": 0,
       "delayNote": "Renamed to SSO V2 this week. Karyakar deployment was blocked on SID; session 1 scheduled 9/17 with Vishal Patel (Tampa) for ASM/GSS.",
@@ -1105,7 +1105,7 @@
           "dueBy": "2026-10-05",
           "priority": "Critical",
           "escalated": false,
-          "resolved": false,
+          "resolved": true,
           "track": "Implementation"
         },
         {
@@ -1127,8 +1127,17 @@
           "dueBy": "2026-09-25",
           "priority": "High",
           "escalated": false,
-          "resolved": false,
+          "resolved": true,
           "track": "Implementation"
+        },
+        {
+          "id": "DEP-104",
+          "text": "API collection required for load testing",
+          "team": "Dharmishta Gohil / Nirav",
+          "mitigation": "Load testing can't start until the API collection is shared by Dharmishta Gohil and Nirav",
+          "dueBy": "",
+          "escalated": false,
+          "resolved": false
         }
       ],
       "sprintStatus": {
@@ -1220,7 +1229,7 @@
       "timeSavedNote": [],
       "scopeReduced": false,
       "statusChangeReason": "",
-      "dependencySeq": 103,
+      "dependencySeq": 104,
       "stagePlan": {
         "Requirements": {
           "initialStart": "2026-02-09",
