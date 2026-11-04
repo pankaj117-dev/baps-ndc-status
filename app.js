@@ -1668,6 +1668,84 @@
     return wrap;
   }
 
+  // "Recovery note" (2026-11-04) — sits right under the Stage Dates table.
+  // Per explicit request: "below this allow the PMs to type a message on
+  // how they were able to catch up and finish ontime regardless of all the
+  // delays (so show the total delays = 0)". The table above can show
+  // individual stages slipping (Development +25, UAT +15, ...) while the
+  // project still landed on its original go-live date — this is the PM's
+  // own free-text explanation of how the team caught up, and a small
+  // "Total delay: 0" chip next to it (from the SAME `p.delayDays` number
+  // every other "on schedule" surface in the app already uses, so it can
+  // never disagree with the rest of the dashboard). Only shown when the
+  // project is genuinely on schedule (`delayDays === 0`) — a project
+  // that's still behind doesn't get a "how we caught up" prompt.
+  //
+  // The typed note is saved locally (localStorage, keyed by project id)
+  // AND mirrored onto `p.recoveryNote` in memory so it survives for the
+  // rest of this browser session. This dashboard has no write-back to
+  // data.json (that file is the ingested source of truth, updated only
+  // via the weekly-update pipeline) — see README for how a PM's note gets
+  // promoted into data.json permanently.
+  const RECOVERY_NOTE_STORAGE_PREFIX = "baps-ndc-recovery-note:";
+
+  function recoveryNoteFor(p) {
+    try {
+      const saved = localStorage.getItem(RECOVERY_NOTE_STORAGE_PREFIX + p.id);
+      if (saved !== null) return saved;
+    } catch (e) {
+      /* localStorage unavailable (private mode, etc.) — fall through */
+    }
+    return p.recoveryNote || "";
+  }
+
+  function saveRecoveryNote(p, text) {
+    p.recoveryNote = text;
+    try {
+      localStorage.setItem(RECOVERY_NOTE_STORAGE_PREFIX + p.id, text);
+    } catch (e) {
+      /* ignore — the in-memory copy above still holds it for this session */
+    }
+  }
+
+  function buildRecoveryNote(p) {
+    const delayDays = p.delayDays || 0;
+    if (delayDays !== 0) return null;
+
+    const wrap = el("div", { class: "recovery-note" });
+    wrap.appendChild(
+      el("div", { class: "recovery-note-head" }, [
+        el("span", { class: "recovery-note-chip" }, ["Total delay: 0"]),
+        el("span", { class: "recovery-note-label" }, ["How did the team catch up?"]),
+      ])
+    );
+
+    const saved = recoveryNoteFor(p);
+    const textarea = el("textarea", {
+      class: "recovery-note-input" + (saved ? "" : " is-empty"),
+      rows: "3",
+      placeholder: "Type how the team recovered the time lost above and still finished on schedule…",
+    });
+    textarea.value = saved;
+
+    const status = el("span", { class: "recovery-note-status" }, [saved ? "Saved" : ""]);
+
+    let saveTimer = null;
+    textarea.addEventListener("input", () => {
+      textarea.classList.toggle("is-empty", !textarea.value.trim());
+      status.textContent = "Saving…";
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        saveRecoveryNote(p, textarea.value);
+        status.textContent = "Saved";
+      }, 400);
+    });
+
+    wrap.appendChild(textarea);
+    wrap.appendChild(status);
+    return wrap;
+  }
+
   // Change Request Log — structured per-project log of every change
   // request (slide 8's CR process + slide 15's "five logs every project
   // maintains"). Previously CRs were only ever mentioned informally
@@ -4506,6 +4584,8 @@
     // view") — see buildStageDatesTable() for what it shows and why.
     stagegatePanel.appendChild(el("h4", { class: "raci-ref-head" }, ["Stage dates"]));
     stagegatePanel.appendChild(buildStageDatesTable(p));
+    const recoveryNote = buildRecoveryNote(p);
+    if (recoveryNote) stagegatePanel.appendChild(recoveryNote);
 
     if (isLate) {
       stagegatePanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Delay recovery"]));

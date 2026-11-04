@@ -3979,6 +3979,71 @@ dd.is-missing {
   color: var(--green);
 }
 
+/* "Recovery note" — sits right under the Stage Dates table (2026-11-04,
+   "below this allow the PMs to type a message on how they were able to
+   catch up and finish ontime regardless of all the delays"). Only shown
+   when the project is on schedule (delayDays === 0) — see
+   buildRecoveryNote() in app.js. */
+.recovery-note {
+  margin: 14px 0 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+.recovery-note-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.recovery-note-chip {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+.recovery-note-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.recovery-note-input {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg-panel);
+  color: var(--ink);
+}
+
+.recovery-note-input.is-empty {
+  font-style: italic;
+  color: var(--ink-faint);
+}
+
+.recovery-note-status {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  min-height: 14px;
+}
+
 /* ---------- RACI reference + Go-Live readiness checklist (Stage-gate
    tab) removed 2026-11-04, all projects, per explicit request ("also
    remove these for all projects"). `.raci-ref-head` kept — still used by

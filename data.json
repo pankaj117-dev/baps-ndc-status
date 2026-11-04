@@ -506,6 +506,7 @@
       },
       "goLive": "2026-10-01",
       "originalGoLive": "2026-09-21",
+      "recoveryNote": "",
       "delayDays": 0,
       "delayNote": "22-Sep review: UAT/VAPT/Load stages slipped (UAT +7d, VAPT +6d, Load +6d per deck); go-live planned 05-Oct-2026; blocked on mobile VAPT sign-off and DevOps/NAHQ production readiness.",
       "dependencies": [

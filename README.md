@@ -1086,6 +1086,27 @@ that `delayDays: 4` / its `delayNote` ("Hotfix deployment moved from
 Nov 8 to Nov 18...") is about a separate, later post-launch hotfix
 milestone — nothing to do with the go-live date at all. Left untouched.
 
+**"Recovery note" under the Stage Dates table (2026-11-04):** per explicit
+request ("below this allow the PMs to type a message on how they were able
+to catch up and finish ontime regardless of all the delays (so show the
+total delays = 0)"). `buildRecoveryNote(p)` renders right below the Stage
+Dates table — a green "Total delay: 0" chip (from the same `p.delayDays`
+every other "on schedule" surface in the app uses, so it can't disagree
+with the rest of the dashboard) plus a textarea for the PM's own
+explanation of how the team recovered the time the table above shows as
+per-stage slips. Only shown when `delayDays === 0`; a project that's still
+behind doesn't get a "how we caught up" prompt at all.
+
+The typed note is saved to `localStorage` (key `baps-ndc-recovery-note:<projectId>`,
+debounced ~400ms after typing stops, with a small "Saving…/Saved" status
+line) and mirrored onto `p.recoveryNote` in memory for the rest of the
+session. This dashboard has no write-back to `data.json` — that file is the
+ingested source of truth, updated only through the weekly-update pipeline —
+so a note lives in that browser until it's promoted into `data.json`'s
+`recoveryNote` field by hand (or a future pipeline change) to become
+permanent and visible to everyone else. `recoveryNote` added to
+`mybky-phase1` in `data.json` (empty) as the first project to use it.
+
 **"Who leads each stage" (RACI) and "Go-Live readiness" checklist removed,
 all projects (2026-11-04):** per explicit request ("also remove these for
 all projects"), after seeing both sections still showing their fully-
@@ -1994,6 +2015,12 @@ Everything lives in three files:
   "goLive": "2026-09-25",     // current planned go-live, or null if not yet set
   "originalGoLive": "2026-09-21", // baseline date, set once and preserved across
                                    // slips so the changelog can show the delta
+  "recoveryNote": "",          // OPTIONAL (2026-11-04) — PM's free-text note on how the team
+                                  // caught up despite per-stage slips, shown under the Stage
+                                  // Dates table only when delayDays === 0 (see
+                                  // buildRecoveryNote() in app.js). Also writable live from the
+                                  // UI into localStorage (baps-ndc-recovery-note:<projectId>);
+                                  // this field is the permanent, shared version of that note.
   "delayDays": 0,              // 0 if on schedule, positive integer if late
   "delayNote": "No delay reported",
   "delayImpact": "",           // required in the form whenever delayDays > 0
