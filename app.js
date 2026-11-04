@@ -158,11 +158,14 @@
       el("dt", null, ["Next milestone"]),
       el("dd", null, [(p.nextMilestone && p.nextMilestone.name || "—") + (p.nextMilestone && p.nextMilestone.date ? " · " + fmtDateShort(p.nextMilestone.date) : "")]),
       el("dt", null, ["Go-live"]),
-      el("dd", null, [
-        p.originalGoLive && p.originalGoLive !== p.goLive
-          ? `${fmtDate(p.originalGoLive)} → ${fmtDate(p.goLive)}`
-          : fmtDate(p.goLive),
-      ]),
+      // Single date only (2026-11-04, "Go Live should just be 1 date -
+      // check and update for all projects") — previously showed
+      // `originalGoLive → goLive` whenever the two differed. The history of
+      // how the date moved is already tracked separately (Date change log /
+      // Status History tab, from the weekly snapshots), so this fact row
+      // just needs the current committed date. `originalGoLive` is left in
+      // data.json untouched — nothing else reads it.
+      el("dd", null, [fmtDate(p.goLive)]),
       el("dt", null, ["Status"]),
       el("dd", { class: "delay-flag " + (isLate ? "is-late" : "is-ontime") }, [
         scheduleStatusText(p),

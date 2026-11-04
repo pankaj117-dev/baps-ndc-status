@@ -1086,6 +1086,18 @@ that `delayDays: 4` / its `delayNote` ("Hotfix deployment moved from
 Nov 8 to Nov 18...") is about a separate, later post-launch hotfix
 milestone — nothing to do with the go-live date at all. Left untouched.
 
+**Go-Live fact row shows a single date, all projects (2026-11-04):** per
+explicit request ("Go Live should just be 1 date - check and update for all
+projects"). `buildProgressFactsList()`'s "Go-live" row previously rendered
+`originalGoLive → goLive` whenever the two differed (8 projects: webnext-2,
+pledge-1a, emm, mybky-phase1, mybky-phase2, mymandir, gms, spm). Now it
+always renders just `goLive` — the current committed date. The history of
+how that date moved is unaffected: the Date change log and Status History
+tab both diff `goLive` week-over-week from `history.json` snapshots
+directly, not from `originalGoLive`, so nothing there changes.
+`originalGoLive` is left in `data.json` untouched (nothing else reads it —
+confirmed via a repo-wide search before making this change).
+
 **"Recovery note" under the Stage Dates table (2026-11-04):** per explicit
 request ("below this allow the PMs to type a message on how they were able
 to catch up and finish ontime regardless of all the delays (so show the
