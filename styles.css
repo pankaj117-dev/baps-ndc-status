@@ -1980,8 +1980,7 @@ table.deps-drill-table th {
 
 .hawkeye-row:last-child { border-bottom: none; }
 .hawkeye-row:hover, .hawkeye-row:focus-visible { background: var(--bg); outline: none; }
-.hawkeye-row:hover .hawkeye-row-label, .hawkeye-row:focus-visible .hawkeye-row-label,
-.hawkeye-row:hover .hawkeye-subrow-tag, .hawkeye-row:focus-visible .hawkeye-subrow-tag { background: var(--bg); }
+.hawkeye-row:hover .hawkeye-row-label, .hawkeye-row:focus-visible .hawkeye-row-label { background: var(--bg); }
 
 /* Sticks to the left edge of .hawkeye-scroll-inner as the timeline
    content scrolls horizontally underneath/beside it — an opaque
@@ -2018,51 +2017,20 @@ table.deps-drill-table th {
   color: var(--ink-faint);
 }
 
-/* Two stacked sub-rows per project (2026-11-03 calendar redesign — "two
-   lines one planned and one actual"): Planned on top (the baseline
-   schedule), Actual underneath (real recorded history, blank for
-   stages not yet reached). */
+/* Single merged row per project (2026-11-04, replacing the earlier
+   two-subrow "Planned"/"Actual" design): one track whose blocks are
+   positioned/sized by PLANNED dates, each with an actual-completion
+   caption stacked underneath — see .hawkeye-stage-caption below. */
 .hawkeye-row-tracks {
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
 }
 
-.hawkeye-subrow {
-  position: relative;
-  display: flex;
-  align-items: center;
-  min-height: 46px;
-}
-
-.hawkeye-subrow + .hawkeye-subrow {
-  border-top: 1px dashed var(--line);
-}
-
-/* Small sticky "Planned"/"Actual" tag, right after the project-name
-   column — same sticky-left reasoning as .hawkeye-row-label, just a
-   narrower second sticky column (HAWKEYE_SUBROW_TAG_WIDTH in app.js). */
-.hawkeye-subrow-tag {
-  position: sticky;
-  left: 220px;
-  z-index: 3;
-  flex: 0 0 60px;
-  width: 60px;
-  background: var(--bg-panel);
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  padding-left: 2px;
-  box-shadow: 4px 0 8px -6px rgba(20, 28, 45, 0.15);
-}
-
 .hawkeye-row-track {
   position: relative;
   flex: 0 0 auto;
-  height: 46px;
+  height: 64px;
 }
 
 .hawkeye-row-track-empty {
@@ -2073,14 +2041,15 @@ table.deps-drill-table th {
   font-style: italic;
 }
 
-/* Per-stage block on the calendar strip. Done stages get a solid fill,
-   the current stage is colored by its SLA flag, future/not-yet-reached
-   stages are outline-only (their width is just a planned placeholder,
-   not a real date range). */
+/* Per-stage block on the calendar strip, positioned/sized by its
+   PLANNED start/end. Done stages get a solid fill, the current stage is
+   colored by its SLA flag, future/not-yet-reached stages are
+   outline-only (shown only when a real stagePlan date is on record —
+   see buildHawkeyePlanActualBlocks()). Fixed (not vertically centered)
+   top offset leaves room below for .hawkeye-stage-caption. */
 .hawkeye-stage-block {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 10px;
   height: 26px;
   border-radius: 6px;
   display: flex;
@@ -2095,6 +2064,27 @@ table.deps-drill-table th {
   cursor: pointer;
   box-sizing: border-box;
 }
+
+/* "Second date underneath" (2026-11-04, explicit request: "this view
+   should show the planned dates in start and end and there is second
+   date underneath that is the actual date so you can see when things
+   finished"). Sits directly beneath its block at the same left offset,
+   colored by how the real finish date compares to that stage's own
+   plan — red/green mirror the Stage Dates table's delay-chip semantics,
+   just phrased as a finish date instead of a day count. */
+.hawkeye-stage-caption {
+  position: absolute;
+  top: 40px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.hawkeye-stage-caption.is-late { color: var(--red); }
+.hawkeye-stage-caption.is-early { color: var(--green); }
+.hawkeye-stage-caption.is-ontime { color: var(--ink-faint); }
+.hawkeye-stage-caption.is-inprogress { color: var(--accent); }
 
 .hawkeye-stage-block.is-done {
   background: var(--green-bg);
@@ -2123,30 +2113,24 @@ table.deps-drill-table th {
 }
 
 .hawkeye-stage-block.is-future {
-  /* Only ever reached by the Planned row now (2026-11-03 calendar
-     redesign) — a stage the project hasn't reached yet still gets a
-     real continuous block on the Planned row (there's no more separate
-     future-strip chip step; the Actual row just leaves it blank
-     entirely instead). Tinted fill + dashed border + darker text keeps
-     the "this is a plan, not a real date range" meaning legible. */
+  /* A not-yet-reached stage still gets a real continuous block (plotted
+     from its own stagePlan dates — see buildHawkeyePlanActualBlocks(),
+     which skips rendering it entirely when no real plan date exists at
+     all, rather than guessing). Tinted fill + dashed border + darker
+     text keeps the "this is a plan, not a real date range yet" meaning
+     legible, and it never gets a caption underneath (nothing to report
+     yet). */
   background: var(--bg);
   border: 1.5px dashed #7c8ba8;
   color: #4a5878;
   font-weight: 600;
 }
 
-/* Planned-row-only modifiers (2026-11-03): dashed border overlay on top
-   of whatever done/current/future status color the block already has,
-   so the Planned row is visually distinct from the solid-colored Actual
-   row at a glance, without losing the status color coding. The extra
-   "estimated" modifier (lower opacity) marks a stage chained from a
-   generic SLA guess because no real stagePlan date exists for it yet —
-   "is-future" blocks already look this way by default, so it mostly
-   matters for done/current blocks shown on the Planned row. */
-.hawkeye-stage-block.is-plan {
-  border-style: dashed;
-}
-.hawkeye-stage-block.is-plan.is-plan-estimated {
+/* Lower opacity marks a stage plotted from a generic SLA-guess chain
+   (no confirmed stagePlan date on record for it) rather than a real
+   committed date — "not a hard commitment," same meaning it had in the
+   old two-row design. */
+.hawkeye-stage-block.is-plan-estimated {
   opacity: 0.65;
 }
 

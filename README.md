@@ -1442,8 +1442,11 @@ chip from running past its own `stagePlan` end date.
 ## Tab 3 — 🦅 Hawk-eye (live)
 
 A cross-project **stage-gate calendar**: every project on one shared
-timeline, two rows each (**Planned** baseline schedule, **Actual**
-recorded history — see the 2026-11-03 entry below), sorted by go-live
+timeline, one row each — blocks positioned/sized by **PLANNED**
+start/end dates, with a small caption underneath each showing when the
+stage **actually** finished (see the 2026-11-04 entry below for the
+current design; the 2026-11-03 entries describe an earlier two-row
+Planned/Actual attempt that was superseded by it) — sorted by go-live
 date, built from the same stage-segment reconstruction used by the Grid
 tab / each project's Stage-gate timeline, so all three stage-gate views
 always agree.
@@ -1684,6 +1687,71 @@ blocks each now get a real, distinct pixel width (9–40px, not clamped
 slivers) with UAT/Rollout correctly positioned ahead of Requirements/
 Tech Design/Development on the date axis, matching their true
 August dates.
+
+**Merged back into a single row with stacked plan/actual dates
+(2026-11-04).** Per explicit request, with a screenshot of the
+disabled-Planned/Actual-row board next to the "NC27 Hub Phase 1"
+reference spreadsheet's Stage Dates table again: *"this view should
+show the planned dates in start and end and there is second date
+underneath that is the actual date so you can see when things finished
+— so you can assess the overall project delay as planned and delays
+just in the different stages."* Replaces the two-subrow Planned/Actual
+design from 2026-11-03 above (which had been disabled same-day because
+the Planned row's full-schedule sizing broke the board) with one merged
+row per project:
+
+- **`buildHawkeyePlanActualBlocks(p)`** (new, replaces
+  `buildHawkeyePlannedBlocks()`) positions/sizes each block by its
+  PLANNED start/end (`stagePlan`'s latest, falling back to initial),
+  same as the old Planned row — but bounded the same way the old Actual
+  row was: a **future** stage with no real `stagePlan` entry is skipped
+  entirely rather than chained from a generic SLA guess, which is almost
+  certainly what blew out the board width the first time around. A
+  done/current stage with no plan entry at all (rare) falls back to its
+  real recorded segment instead of being dropped.
+- Each block also carries its real **actual** completion info from
+  `computeStageSegments()` — `actualEnd`/`varianceDays` for a done
+  stage, `actualStart`/`overdue` for the current one.
+- **`hawkeyeBlockCaption(b)`** (new) turns that into the "second date
+  underneath": a done stage shows `"Finished <date> (+Xd / -Xd / on
+  plan)"`, weekday-only (`businessDaysBetweenIso`) and colored red/
+  green/neutral — the same **actual-vs-latest-plan** "Variance" the
+  stage detail modal's `dateVarianceCell()` already shows, just phrased
+  as a date instead of a day count, so Hawk-eye never disagrees with the
+  single-project detail view about a given stage. The current stage
+  shows `"In progress"` or, if it's run past its own planned end date,
+  `"Past planned end"` (red) — same test as `currentStageOverdue()`
+  already uses for the block's own warn/breach coloring. A future stage
+  has nothing to report yet, so no caption.
+- The two-subrow DOM (`.hawkeye-subrow`, `.hawkeye-subrow-tag`,
+  `HAWKEYE_SUBROW_TAG_WIDTH`) is gone — back to one `.hawkeye-row-track`
+  per project, now tall enough (64px) to fit the block plus its caption
+  stacked underneath. `.hawkeye-stage-block.is-plan`/`.is-plan-estimated`
+  collapsed to just `.is-plan-estimated` (no more separate Planned-row
+  dashed-overlay modifier needed now that there's only one row).
+- **Captions get their own "only show what fits" width budget** — the
+  real gap until the *next* block starts (not just the block's own
+  width, since a caption is free to spill into blank timeline space
+  after a narrow block) — so tightly-packed stages (e.g. overlapping
+  UAT/VAPT) never render two captions on top of each other. A caption
+  that doesn't fit is omitted; the block's hover tooltip always has the
+  full "Planned: ... | Actual: ..." text regardless. (First pass had no
+  width budget at all and produced badly overlapping caption text at
+  both zoom levels — fixed before shipping.)
+- The description paragraph above the board was rewritten to match (it
+  still described the original single-row-with-chip-strip design from
+  before 2026-11-03).
+
+Verified headlessly against real `data.json` (10 visible projects, 45
+stage blocks, 33 captions) and visually via a Chrome-headless/CDP
+screenshot at both zoom levels: `mybky-phase1` and `gms` — both running
+with `stageDatesFromPlan: true` — show every done stage captioned
+"(on plan)" (expected: their "actual" dates are themselves derived from
+the plan, so variance is always 0 for them); other projects show real
+variance where it exists (e.g. `webnext-2`, `pledge-1a`, and `spm`'s
+current stage captioned "Past planned end" in red, matching
+`currentStageOverdue()`). Row click-through to the project's Stage-gate
+timeline confirmed still working, unchanged.
 
 ## Tab 4 — Status History (live)
 
