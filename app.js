@@ -2669,8 +2669,16 @@
   function dependencyListItems(deps, project) {
     if (!deps.length) return [el("li", null, ["—"])];
     const projectName = project.name;
+    const today = todayISO();
     return deps.map((dep) => {
       const mitigation = dep.mitigation || "";
+      // Due date badge (2026-11-03, "I want to see the dependency ... due
+      // date on this view in the row") — same `dueWindow` badge/coloring
+      // already used in the cross-project Dependencies rollup (overdue/
+      // today/this week in red/amber, further out muted, "No date set"
+      // when `dueBy` isn't on record), just surfaced here too so it's
+      // visible without leaving the project detail view.
+      const dueWindow = dueWindowFor(dep.dueBy || "", today);
       const actions = dep.id
         ? [
             dependencyActionLink(dependencyUpdateUrl(projectName, dep.id, {}), "✎ Update"),
@@ -2701,6 +2709,9 @@
           // one this item came from instead of silently merging them.
           dep.track ? el("span", { class: "track-tag" }, [dep.track]) : null,
           el("span", { class: "team-tag" + (dep.team ? "" : " is-missing") }, [dep.team || "No team labeled"]),
+          el("span", { class: "deps-badge deps-badge-due is-" + dueWindow.key }, [
+            dep.dueBy ? `${dueWindow.label} · ${fmtDate(dep.dueBy)}` : "No date set",
+          ]),
         ].filter(Boolean)),
         el("div", { class: "paired-item-mitigation" + (mitigation ? "" : " is-missing") }, [
           el("span", { class: "mitigation-label" }, ["Mitigation / impact: "]),

@@ -3237,6 +3237,16 @@ body.no-scroll { overflow: hidden; }
   margin-bottom: 4px;
 }
 
+/* Due-date badge (2026-11-03) reused inline here from the cross-project
+   Dependencies rollup (`.deps-badge`/`.deps-badge-due`, normally inside
+   a flex row with its own `gap`) — needs its own left margin to match
+   `.team-tag`/`.track-tag`'s spacing since it's just flowing inline in
+   plain text here, not inside that flex container. */
+.paired-item-text .deps-badge {
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
 .paired-item-mitigation {
   font-size: 12px;
   color: var(--ink-soft);

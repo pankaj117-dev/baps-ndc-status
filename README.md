@@ -1586,6 +1586,23 @@ the free-text description instead), it's just the full description,
 mitigation plan, and resolved status. The modal reuses the same quick-action
 links as the inline row for dependencies with a stable id.
 
+**Due date surfaced inline on each dependency row (2026-11-03).** A user
+looking at the project detail view's Dependencies section asked to "see
+the dependency and risk due date on this view in the row" without having
+to open the item detail modal for it. For dependencies, this was already
+tracked (`dep.dueBy`) and already had a ready-made badge component — the
+exact same `dueWindow`/`.deps-badge-due` pill used in the cross-project
+Dependencies rollup (overdue/today/this-week in red or amber, further out
+muted, italic "No date set" when nothing's on record) — so it's reused
+as-is, right next to the team tag on each row. **Risks got asked about
+too, but intentionally weren't changed**: unlike dependencies, risks have
+no structured due-date field at all — any ETA/due date on a risk today
+is just free text buried in its description (see the note two paragraphs
+up). Adding a real one would mean a new field across `data.json`,
+`scripts/ingest.py`, and the `new-risk.yml`/`update-risk.yml` issue
+templates, not just a dashboard change — left as a separate follow-up
+rather than bundled in here.
+
 Week-over-week history for an individual project (progress-over-time chart,
 a **schedule timeline** tracking every time the go-live or next-milestone
 date moved — e.g. from a CR — with the date it happened, plain-English
