@@ -73,7 +73,7 @@
   let depsPivotCompact = false;
   let depsCycleFilter = "all"; // calendar year string from dueBy, e.g. "2026"
   let lastDepsPivotExport = null;
-  let hawkeyeZoom = "month"; // "quarter" | "month" | "week" — Hawk-eye's horizontal timeline density toggle
+  let hawkeyeZoom = "quarter"; // "quarter" | "month" — Hawk-eye's horizontal timeline density toggle (2026-11-03: dropped "week", default changed to "quarter" — "show month view no weeks, and then default to Quarters")
 
   // Projects flagged `hidden: true` in data.json are kept in the underlying
   // data (nothing's deleted) but excluded from every view/filter/dropdown —
@@ -1989,19 +1989,17 @@
   // readable as the timeline content scrolls horizontally underneath.
   const HAWKEYE_SUBROW_TAG_WIDTH = 60;
 
-  // Three timeline densities. Quarter = the most zoomed-out view
-  // (2026-10-05, added alongside Month/Week) — for a portfolio with
+  // Two timeline densities (2026-11-03: dropped "Week" — "show month
+  // view no weeks, and then default to Quarters"). Quarter = the
+  // most zoomed-out view, and now the default — for a portfolio with
   // projects spanning a year or more, Month's 5px/day still means a lot
   // of horizontal scrolling just to see the whole roadmap at once; this
   // trades per-day precision for being able to see far more of the
-  // calendar in one screen. Month = the original "quarter gridlines"
-  // zoom, just wide enough to read easily rather than being forced to
-  // fit a fixed board width. Week = a real zoom-in for anyone who wants
-  // week-level precision, at the cost of more horizontal scrolling.
+  // calendar in one screen. Month = wide enough to read easily without
+  // being forced to fit a fixed board width.
   const HAWKEYE_ZOOM = {
     quarter: { pxPerDay: 1.8, grid: "quarter" },
     month: { pxPerDay: 5, grid: "quarter" },
-    week: { pxPerDay: 16, grid: "week" },
   };
 
   function renderHawkeye() {
@@ -2044,12 +2042,11 @@
     // alone is enough to size the calendar range — no more separate
     // future-chip strip needed; everything is a real continuous block
     // on the date axis now.
+    // Only the Actual row's real dates size the calendar range — the
+    // Planned row is temporarily disabled/empty (2026-11-03), so its
+    // (much wider, full-schedule) dates shouldn't inflate the board.
     const allDates = [todayIso];
-    withBlocks.forEach(({ plannedBlocks, actualBlocks }) => {
-      plannedBlocks.forEach((b) => {
-        allDates.push(b.start);
-        allDates.push(b.end);
-      });
+    withBlocks.forEach(({ actualBlocks }) => {
       actualBlocks.forEach((b) => {
         allDates.push(b.start);
         allDates.push(b.end);
@@ -2081,14 +2078,6 @@
             el("span", { class: "hawkeye-legend-swatch is-breach" }),
             "Current — past planned end date",
           ]),
-          el("span", { class: "hawkeye-legend-item" }, [
-            el("span", { class: "hawkeye-legend-swatch is-plan" }),
-            "Planned row (baseline schedule)",
-          ]),
-          el("span", { class: "hawkeye-legend-item" }, [
-            el("span", { class: "hawkeye-legend-swatch is-plan is-plan-estimated" }),
-            "Planned row, estimated (no plan date on record yet)",
-          ]),
         ]),
         el("div", { class: "hawkeye-zoom-toggle", role: "tablist", title: "Timeline zoom" }, [
           el(
@@ -2113,17 +2102,6 @@
             },
             ["Month"]
           ),
-          el(
-            "button",
-            {
-              class: "hawkeye-zoom-btn" + (hawkeyeZoom === "week" ? " is-active" : ""),
-              type: "button",
-              "data-zoom": "week",
-              role: "tab",
-              "aria-selected": hawkeyeZoom === "week" ? "true" : "false",
-            },
-            ["Week"]
-          ),
         ]),
       ])
     );
@@ -2136,36 +2114,22 @@
       });
     });
 
-    // Gridline marks: quarters in Month view, individual weeks (Monday
-    // start) in Week view — the actual "break to a week view" zoom-in.
+    // Gridline marks: quarters, for both zoom densities (2026-11-03 —
+    // "Week" zoom level dropped entirely, so this no longer needs a
+    // per-zoom branch).
     const marks = [];
-    if (zoom.grid === "week") {
-      const cursor = new Date(minTime);
-      cursor.setHours(0, 0, 0, 0);
-      cursor.setDate(cursor.getDate() - ((cursor.getDay() + 6) % 7)); // snap to Monday on/before minTime
-      while (cursor.getTime() <= maxTime) {
-        if (cursor.getTime() >= minTime) {
-          marks.push({
-            px: ((cursor.getTime() - minTime) / DAY) * pxPerDay,
-            label: cursor.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-          });
-        }
-        cursor.setDate(cursor.getDate() + 7);
-      }
-    } else {
     const cursor = new Date(minTime);
     cursor.setDate(1);
     cursor.setHours(0, 0, 0, 0);
-      cursor.setMonth(Math.floor(cursor.getMonth() / 3) * 3); // snap to quarter start
+    cursor.setMonth(Math.floor(cursor.getMonth() / 3) * 3); // snap to quarter start
     while (cursor.getTime() <= maxTime) {
       if (cursor.getTime() >= minTime) {
-          marks.push({
-            px: ((cursor.getTime() - minTime) / DAY) * pxPerDay,
-            label: `Q${Math.floor(cursor.getMonth() / 3) + 1} ${cursor.getFullYear()}`,
-          });
-        }
-        cursor.setMonth(cursor.getMonth() + 3);
+        marks.push({
+          px: ((cursor.getTime() - minTime) / DAY) * pxPerDay,
+          label: `Q${Math.floor(cursor.getMonth() / 3) + 1} ${cursor.getFullYear()}`,
+        });
       }
+      cursor.setMonth(cursor.getMonth() + 3);
     }
 
     // Monospace font at 10.5px — ~6.5px/char is a safe (slightly
@@ -2189,15 +2153,34 @@
     // one's blocks never need to dodge the other's.
     let timelineWidthPx = ((maxTime - minTime) / DAY) * pxPerDay;
 
+    // Sort by real start date before running the collision-avoiding
+    // cursor (2026-11-03 — "the actual one shows a lot of things
+    // squished"): a few projects' recorded history has segments whose
+    // chronological dates don't match PIPELINE_STAGES order (e.g. a
+    // later-named stage with an earlier real start date than the one
+    // before it, from an upstream data/backfill quirk) — laying those
+    // out in STAGE order forced the out-of-order ones to get clamped
+    // far to the right of where they actually happened, squeezing them
+    // into near-invisible slivers. Sorting by start date first means
+    // the cursor always advances in true chronological order, so
+    // nothing gets forced out of its real position unless it's
+    // genuinely overlapping another block in time.
     function layoutBlocks(blocks) {
       let cursorPx = 0;
-      const placed = blocks.map((b) => {
+      const ordered = blocks.slice().sort((a, b) => (a.start < b.start ? -1 : a.start > b.start ? 1 : 0));
+      const placedByBlock = new Map();
+      ordered.forEach((b) => {
         const rawLeft = xPx(b.start);
         const left = Math.max(rawLeft, cursorPx);
         const width = Math.max(xPx(b.end) - left, MIN_BLOCK_PX);
         cursorPx = left + width;
-        return { b, left, width };
+        placedByBlock.set(b, { b, left, width });
       });
+      // Return in the ORIGINAL (pipeline-stage) order, not chronological
+      // order — rendering order doesn't matter for absolutely-positioned
+      // blocks, but keeping it stage-ordered keeps any future debugging/
+      // iteration simpler to reason about.
+      const placed = blocks.map((b) => placedByBlock.get(b));
       return { placed, endPx: cursorPx };
     }
 
@@ -2210,12 +2193,14 @@
       })
       .map(({ p, plannedBlocks, actualBlocks }) => {
         if (!plannedBlocks.length) return { p, empty: true };
-        const plannedLayout = layoutBlocks(plannedBlocks);
+        // Planned row temporarily disabled (2026-11-03 — "the planned
+        // is broken - remove the planned, just have an empty row for
+        // now"): skip laying it out entirely rather than rendering
+        // something known-broken.
         const actualLayout = layoutBlocks(actualBlocks);
-        timelineWidthPx = Math.max(timelineWidthPx, plannedLayout.endPx + 16, actualLayout.endPx + 16);
+        timelineWidthPx = Math.max(timelineWidthPx, actualLayout.endPx + 16);
         return {
           p,
-          plannedPlaced: plannedLayout.placed,
           actualPlaced: actualLayout.placed,
           hasActual: actualBlocks.length > 0,
         };
@@ -2278,27 +2263,21 @@
         return;
       }
 
-      // One stage block, built either for the Planned row (dashed
-      // "is-plan" overlay on top of its done/current/future status
-      // color, since the Planned row alone covers all 9 stages — an
-      // extra "is-plan-estimated" modifier marks stages chained from a
-      // generic SLA guess rather than a real stagePlan date) or the
-      // Actual row (plain solid status color — it's only ever done/
-      // current, "future" never reaches this row at all).
-      function buildTrack(placedList, isPlanned) {
+      // One Actual-row stage block — plain solid status color (it's
+      // only ever done/current, "future" never reaches this row at
+      // all, since a stage not yet reached is just absent).
+      function buildTrack(placedList) {
         const track = el("div", { class: "hawkeye-row-track", style: `width:${timelineWidthPx}px` });
         placedList.forEach(({ b, left, width }) => {
-          let kindClass =
-            b.kind === "done" ? "is-done" : b.kind === "current" ? "is-current" + (b.flag && b.flag !== "ok" ? " is-" + b.flag : "") : "is-future";
-          if (isPlanned) kindClass += " is-plan" + (b.estimated ? " is-plan-estimated" : "");
+          const kindClass =
+            b.kind === "done" ? "is-done" : "is-current" + (b.flag && b.flag !== "ok" ? " is-" + b.flag : "");
           const code = STAGE_SHORT_CODE[b.stage] || b.stage;
           // Only ever render text that's actually measured (in real px)
           // to fit, so it's never partial/illegible. Just the stage
           // code — no more per-stage SLA overage number (see
           // renderStageGridLegend).
           const label = width >= fitsPx(code) ? code : "";
-          const rowKindLabel = isPlanned ? (b.estimated ? "Planned, estimated" : "Planned") : "Actual";
-          const title = `${p.name} — ${b.stage} (${rowKindLabel}): ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)}`;
+          const title = `${p.name} — ${b.stage} (Actual): ${fmtDateShort(b.start)} → ${fmtDateShort(b.end)}`;
           track.appendChild(
             el("div", { class: "hawkeye-stage-block " + kindClass, style: `left:${left}px;width:${width}px`, title }, [label])
           );
@@ -2306,15 +2285,19 @@
         return track;
       }
 
+      // Planned row temporarily disabled (2026-11-03 — "the planned is
+      // broken - remove the planned, just have an empty row for now"):
+      // keep the row/tag structure so it's easy to re-enable later,
+      // just render it genuinely empty rather than any real content.
       const tracksWrap = el("div", { class: "hawkeye-row-tracks" }, [
         el("div", { class: "hawkeye-subrow" }, [
           el("div", { class: "hawkeye-subrow-tag" }, ["Planned"]),
-          buildTrack(plan.plannedPlaced, true),
+          el("div", { class: "hawkeye-row-track hawkeye-row-track-empty", style: `width:${timelineWidthPx}px` }, []),
         ]),
         el("div", { class: "hawkeye-subrow" }, [
           el("div", { class: "hawkeye-subrow-tag" }, ["Actual"]),
           plan.hasActual
-            ? buildTrack(plan.actualPlaced, false)
+            ? buildTrack(plan.actualPlaced)
             : el("div", { class: "hawkeye-row-track hawkeye-row-track-empty", style: `width:${timelineWidthPx}px` }, [
                 "No progress recorded yet",
               ]),
@@ -2345,7 +2328,7 @@
     // off-screen on first load. Everything before/after is still just a
     // scroll away, never clipped out of existence.
     requestAnimationFrame(() => {
-      const leadInDays = zoom.grid === "week" ? 21 : hawkeyeZoom === "quarter" ? 240 : 90;
+      const leadInDays = hawkeyeZoom === "quarter" ? 240 : 90;
       const target = xPx(todayIso) - leadInDays * pxPerDay;
       scrollInner.scrollLeft = Math.max(0, target);
     });

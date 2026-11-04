@@ -1326,6 +1326,46 @@ earlier than Development) — a pre-existing data/backfill quirk that now
 surfaces visually on its Actual row rather than being hidden by the old
 single-row collision-avoidance layout.
 
+**Planned row temporarily disabled; Actual-row squish fixed; Week zoom
+dropped (2026-11-03, same day).** Screenshot feedback on the above:
+*"the hawk-eye view planned is broken - remove the planned, just have
+an empty row for now the actual one shows a lot of things squeeshed
+things - show month view no weeks, and then default to Quarters."*
+- **Planned row** now renders genuinely empty (no blocks, no
+  placeholder text) for every project — intentionally, as a temporary
+  state. `buildHawkeyePlannedBlocks()` itself is untouched and still
+  called (its presence/absence still gates whether a project gets a
+  row at all), so re-enabling it later is just re-wiring the render
+  call, not rebuilding the data layer.
+- **Actual-row squish fixed at the root cause**, not just for GMS
+  1.4: `layoutBlocks()`'s collision-avoiding cursor now walks blocks in
+  **chronological start-date order** before computing pixel positions,
+  instead of fixed `PIPELINE_STAGES` order. A few projects' recorded
+  history has segments whose real dates don't match stage-name order
+  (e.g. GMS 1.4's UAT/Rollout actually started in August, before its
+  Development segment that runs through October) — laying those out in
+  STAGE order forced the out-of-order ones to get clamped far to the
+  right of where they really happened, squeezing them into
+  near-invisible slivers. Sorting by date first means every block lands
+  at (or genuinely near) its own real position; for the many projects
+  whose history already IS chronological in stage order, this sort is
+  a no-op — no visual change for them.
+- **"Week" zoom level removed entirely** (button + `HAWKEYE_ZOOM.week`
+  entry) — only **Quarter** and **Month** remain, and the default
+  changed from Month to **Quarter**. The now-dead `grid === "week"`
+  branch in the gridline-mark builder was simplified away too (both
+  remaining zoom levels use quarter gridlines, so there's no more
+  per-zoom branch needed there at all).
+
+Verified headlessly: default `hawkeyeZoom` is `"quarter"`; the zoom
+toggle renders exactly 2 buttons (`Quarter`, `Month` — no `Week`), with
+Quarter active by default; every active project's Planned sub-row
+renders zero `.hawkeye-stage-block` elements; GMS 1.4's Actual-row
+blocks each now get a real, distinct pixel width (9–40px, not clamped
+slivers) with UAT/Rollout correctly positioned ahead of Requirements/
+Tech Design/Development on the date axis, matching their true
+August dates.
+
 ## Tab 4 — Status History (live)
 
 A flat, chronological feed that merges **two kinds of events** across the
