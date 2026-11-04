@@ -175,6 +175,20 @@
       el("dd", { class: "delay-flag " + (isLate ? "is-late" : "is-ontime") }, [
         scheduleStatusText(p),
       ]),
+      // Open-item counts (2026-11-04, "this is what I want to see in the
+      // second image section") — the same three badges the project card
+      // shows (dependencies / risks / follow-ups), repeated here in the
+      // detail view's progress facts so they're visible without going back
+      // to the card. Same counts, same coloring: risks highlight only when
+      // there's at least one open, follow-ups only when there's at least one.
+      el("dt", null, ["Open items"]),
+      el("dd", null, [
+        el("span", { class: "facts-counts" }, [
+          el("span", { class: "badge" }, [countOpenDependencies(p) + " dependencies"]),
+          el("span", { class: "badge" + (countOpenRisks(p) ? " has-risk" : "") }, [countOpenRisks(p) + " risks"]),
+          el("span", { class: "badge" + (openNotesFor(p.id).length ? " has-followup" : "") }, [openNotesFor(p.id).length + " follow-ups"]),
+        ]),
+      ]),
       ...(isLate
         ? [
             el("dt", null, ["Impact of delay"]),

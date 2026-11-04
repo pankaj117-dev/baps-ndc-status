@@ -2418,6 +2418,14 @@ table.deps-drill-table th {
   margin-bottom: 6px;
 }
 
+/* Same dependency/risk/follow-up badges, repeated inside the detail view's
+   progress facts list (2026-11-04) — see buildProgressFactsList(). */
+.facts-counts {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .badge {
   font-family: var(--font-mono);
   font-size: 10.5px;

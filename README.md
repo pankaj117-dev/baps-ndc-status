@@ -1086,6 +1086,17 @@ that `delayDays: 4` / its `delayNote` ("Hotfix deployment moved from
 Nov 8 to Nov 18...") is about a separate, later post-launch hotfix
 milestone — nothing to do with the go-live date at all. Left untouched.
 
+**Open-item counts in the progress facts panel (2026-11-04):** per explicit
+request ("this is what I want to see in the second image section") — the
+three badges the project card shows (open dependencies / open risks /
+follow-ups) now also appear as an "Open items" row in the detail view's
+progress facts list (`buildProgressFactsList()`), right under Status. Same
+counts (`countOpenDependencies`, `countOpenRisks`, `openNotesFor`) and same
+coloring as the card: the risks badge highlights red only when there's at
+least one open risk, follow-ups highlight only when there's at least one.
+So for MyBKY Phase 1, whose 5 risks were all closed in the Nov 2 update,
+this row reads "0 dependencies · 0 risks · 0 follow-ups".
+
 **Progress-over-time chart shows one point per reporting week (2026-11-04):**
 per explicit request ("this should only show weekly views not daily or where
 an update was update. So if any of the PMs add a PR it should be for the
