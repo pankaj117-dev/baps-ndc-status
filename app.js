@@ -4931,6 +4931,22 @@
     );
     depsRisksPanel.appendChild(buildRaidLogTable(p));
 
+    // One-line TL;DR built from that week's "Weekly Status" notes
+    // (completed/inProgress/nextPlan — the same `sprintStatus` the block
+    // further down this same tab renders in full), used as a fallback
+    // for changelog rows that have no numeric/field delta to show (see
+    // the call site below). Picks the first item of whichever lists are
+    // non-empty, in Completed → In progress → Next priority order, so
+    // the line stays short — the full lists are always one click away in
+    // the snapshot preview beneath the changelog.
+    function weeklyChangelogTldr(snap) {
+      const s = snap && snap.sprintStatus;
+      if (!s) return null;
+      const pick = (label, list) => (list && list.length ? `${label}: ${list[0]}` : null);
+      const parts = [pick("Completed", s.completed), pick("In progress", s.inProgress), pick("Next", s.nextPlan)].filter(Boolean);
+      return parts.length ? parts.join("  ·  ") : null;
+    }
+
     // "Week-over-week" tab — click a week to load its Dependencies /
     // Weekly Status / Risks as they stood that week. Its own snapshot
     // preview is always read-only (even when the latest week is selected)
@@ -4969,6 +4985,20 @@
           );
         }
         if (changes.length) bodyChildren.push(el("div", null, [changes.join(" · ")]));
+
+        // TL;DR fallback (2026-11-03, "this empty space should have high
+        // level info from the notes below - like a tl;dr") — plenty of
+        // weeks have no progress/delay/phase/stage/status delta (nothing
+        // for the lines above to show) even though that week's "Weekly
+        // Status" notes below (completed/in progress/next plan) are very
+        // much not empty. Only fills in when the row would otherwise be
+        // genuinely blank — a week that already has a real change line
+        // isn't missing anything, so it's left as-is rather than
+        // cluttering it with a second, overlapping summary.
+        if (!bodyChildren.length) {
+          const tldr = weeklyChangelogTldr(cur);
+          if (tldr) bodyChildren.push(el("div", { class: "changelog-tldr" }, [tldr]));
+        }
 
         const rowEl = el(
           "div",

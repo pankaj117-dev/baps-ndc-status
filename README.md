@@ -1607,6 +1607,23 @@ a pill shows which week is being displayed ("Showing current data" or
 detail is captured going forward from each weekly update; older snapshots recorded
 before this existed will say so instead of showing stale/empty data.)
 
+**TL;DR fallback for weeks with no field delta (2026-11-03).** Plenty of
+weeks have nothing for the row above to show — progress/delay/phase/
+stage/status all held steady — even though that week's "Weekly Status"
+notes (completed/in progress/next plan, same data the snapshot preview
+below the changelog shows in full) are genuinely not empty. A user
+pointed at that blank space and asked for "high level info from the
+notes below - like a tl;dr" there instead. Added `weeklyChangelogTldr()`:
+picks the first item from whichever of that week's `completed`/
+`inProgress`/`nextPlan` lists are non-empty (Completed → In progress →
+Next priority order) and joins them into one italic, muted line — shown
+*only* on a row that would otherwise be genuinely blank (a row that
+already has a real progress/phase/etc. change isn't missing anything, so
+it's left alone rather than showing two overlapping summaries). Verified
+headlessly across all 10 visible projects: zero changelog rows render
+with an empty body afterward (was common before — e.g. `Pledge - 1.x`
+had 4 of its 8 rows blank).
+
 **Time saved** is tracked the same way as delay: it's a per-week value
 (`timeSavedDays`/`timeSavedNote`), not a diff, so it shows up everywhere the
 delay does — a "Time saved: -N days" row on the card and detail facts

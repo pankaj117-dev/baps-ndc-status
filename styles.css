@@ -3133,6 +3133,16 @@ body.no-scroll { overflow: hidden; }
   color: var(--accent);
 }
 
+/* TL;DR fallback line (2026-11-03) — only shows up on a changelog row
+   that has no real field/status delta to display (see
+   weeklyChangelogTldr() in app.js); italic + muted so it visually reads
+   as "here's what was going on" rather than "here's what changed",
+   distinct from the bold, non-italic delta line above it. */
+.changelog-tldr {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
 .notes-list {
   display: flex;
   flex-direction: column;
