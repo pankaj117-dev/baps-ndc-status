@@ -1630,9 +1630,9 @@
         {
           "title": "FE-7 (7829.003) Template editor: no way to replace an image",
           "description": "The only option was to delete the image block and add it again. Added a replace image option.",
-          "submittedDate": "",
-          "by": "",
-          "actionItem": "",
+          "submittedDate": "2026-10-20",
+          "by": "Pinkle Patel (Minneapolis Admin Sec.)",
+          "actionItem": "Approved",
           "approvalStatus": "Resolved",
           "impact": "",
           "id": "CR-101"
@@ -1640,9 +1640,9 @@
         {
           "title": "FE-8 (7996.013) Unsubscribe: footer text couldn't be edited",
           "description": "No one could change the unsubscribe footer text; super admins can now edit it.",
-          "submittedDate": "",
-          "by": "",
-          "actionItem": "",
+          "submittedDate": "2026-10-19",
+          "by": "Satyanishth Swami",
+          "actionItem": "Approved",
           "approvalStatus": "Resolved",
           "impact": "",
           "id": "CR-102"
@@ -1650,9 +1650,9 @@
         {
           "title": "FE-1 Access & permissions: granting access by position didn't show who was getting access (FE side)",
           "description": "Only the position and MIS ID were shown, so it was hard to tell which person the access went to. Added first and last name, and replaced the MIS ID with the BAPS ID. FE side of BE-1.",
-          "submittedDate": "",
-          "by": "",
-          "actionItem": "",
+          "submittedDate": "2026-10-01",
+          "by": "Vasu Champaneria",
+          "actionItem": "Approved",
           "approvalStatus": "Resolved",
           "impact": "",
           "id": "CR-103"
@@ -1660,9 +1660,9 @@
         {
           "title": "BE-15 Contact lists: campaign contact-list export for user variables lacked identifiers",
           "description": "Import/export of a campaign's contact list for user variables showed only the contact ID and other fields. Masked emails and person ID are now included.",
-          "submittedDate": "",
-          "by": "",
-          "actionItem": "",
+          "submittedDate": "2026-10-17",
+          "by": "Vasu Champaneria",
+          "actionItem": "Approved",
           "approvalStatus": "Resolved",
           "impact": "",
           "id": "CR-104"
