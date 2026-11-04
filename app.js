@@ -160,17 +160,13 @@
     const isLate = p.delayDays > 0;
     return el("dl", { class: "card-facts detail-facts" }, [
       ...currentStageFactNodes(p),
-      el("dt", null, ["Next milestone"]),
-      el("dd", null, [(p.nextMilestone && p.nextMilestone.name || "—") + (p.nextMilestone && p.nextMilestone.date ? " · " + fmtDateShort(p.nextMilestone.date) : "")]),
-      // "Go-live" moved out of this fact list (2026-11-04, "milestone
-      // should be below under the milestone") — it now renders as the
-      // first row of the Milestones section further down this same tab,
-      // see the milestones block in buildProjectDetail(). Single date
-      // only (same day's earlier request) — the history of how the date
-      // moved is already tracked separately (Date change log / Status
-      // History tab), so this just needs the current committed date.
-      // `originalGoLive` is left in data.json untouched — nothing else
-      // reads it.
+      // Go-Live lives in this top box (2026-11-04, "the go live should be
+      // in the top box"); the next milestone is listed under the
+      // Milestones heading below instead. Single date only — the history
+      // of how it moved is already in the Date change log / Status History
+      // tab. `originalGoLive` stays in data.json untouched.
+      el("dt", null, ["Go-live"]),
+      el("dd", null, [fmtDate(p.goLive)]),
       el("dt", null, ["Status"]),
       el("dd", { class: "delay-flag " + (isLate ? "is-late" : "is-ontime") }, [
         scheduleStatusText(p),
@@ -4950,19 +4946,17 @@
     // just upcoming) so this doubles as a complete milestone log, not
     // just a teaser.
     schedulePanel.appendChild(el("h3", { class: "weekly-subhead", id: "milestones-section" }, ["Milestones"]));
-    // Go-Live, shown as its own pinned row ahead of the rest of the
-    // milestone log (2026-11-04, "milestone should be below under the
-    // milestone") — moved here from the progress-facts list above. Always
-    // a single date (see the note in buildProgressFactsList()).
-    if (p.goLive) {
-      schedulePanel.appendChild(
-        el("div", { class: "milestones-golive" }, [
-          el("span", { class: "milestones-golive-label" }, ["Go-Live"]),
-          el("span", { class: "milestones-golive-date" }, [fmtDate(p.goLive)]),
-        ])
-      );
+    // The next milestone belongs under this heading (2026-11-04, "the
+    // milestone should be below under milestone"), not in the facts box
+    // above — Go-Live moved back up there. Fold it into the logged list
+    // when it isn't already one of the rows, so a project with only a
+    // next milestone doesn't read as "No milestones logged yet."
+    const allMilestones = (p.milestones || []).slice();
+    const nm = p.nextMilestone;
+    if (nm && nm.name && !allMilestones.some((m) => m.name === nm.name)) {
+      allMilestones.push({ name: nm.name, date: nm.date || null });
     }
-    const allMilestones = (p.milestones || []).slice().sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+    allMilestones.sort((a, b) => (a.date || "").localeCompare(b.date || ""));
     if (!allMilestones.length) {
       schedulePanel.appendChild(el("p", { class: "empty-note" }, ["No milestones logged yet."]));
     } else {
@@ -4973,7 +4967,9 @@
           { class: "milestones-list" },
           allMilestones.map((m) =>
             el("li", { class: "milestones-row" + ((m.date && m.date < todayStr) ? " is-past" : "") }, [
-              el("span", { class: "pill pill-" + (m.status || "green") }, [STATUS_LABEL[m.status] || m.status || ""]),
+              m.status
+                ? el("span", { class: "pill pill-" + m.status }, [STATUS_LABEL[m.status] || m.status])
+                : null,
               el("span", { class: "milestones-name" }, [m.name]),
               el("span", { class: "milestones-date" }, [m.date ? fmtDateShort(m.date) : "—"]),
             ])
