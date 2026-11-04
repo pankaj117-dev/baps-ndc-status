@@ -1892,7 +1892,7 @@
         {
           "title": "Default preview body could break a variable",
           "summary": "Auto preview could split a variable, failing variable replacement on send.",
-          "rca": "As per expectation",
+          "rca": "Under RCA review",
           "reportedBy": "My Mandir",
           "status": "Resolved"
         },
