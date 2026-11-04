@@ -201,8 +201,8 @@
         "name": "TDD",
         "date": "2026-09-25"
       },
-      "goLive": "2026-10-29",
-      "originalGoLive": "2026-11-06",
+      "goLive": "2026-11-06",
+      "originalGoLive": "2026-10-29",
       "delayDays": 0,
       "delayNote": "Scope confirmed with Manojbhai; project plan summary reviewed and confirmed with Manojbhai",
       "delayImpact": "",

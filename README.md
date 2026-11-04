@@ -1056,6 +1056,36 @@ SLAs per stage live in `data.json`'s top-level `stageSlaDays` (defaults:
 Proposal 7d, Requirements 10d, Tech. Design 10d, Estimate & Planning 5d,
 Development 30d, UAT 14d, VAPT 5d, Rollout 5d, Hypercare 21d).
 
+**`pledge-1a`'s Go-Live direction was backwards (2026-11-03).** A user
+pointed at the card's "Go-Live: Nov 6, 2026 → Oct 29, 2026" (reads as a
+7-day pull-in) and said it should read Oct → Nov instead. First check
+(the Date change log's weekly history) actually *disagreed* with the
+user — 7 straight weeks of ingested data consistently said baseline
+Nov 6 → pulled in to Oct 29 — so rather than guess, asked the user to
+confirm which was right given that conflict, and to decide whether GMS
+1.4 (which showed the same backwards pattern) was worth digging into
+too. Confirmed: the PM had entered it backwards in a weekly submission
+back on 2026-09-15, and it had simply never been caught since (amber/
+"at risk" status was the tell — a genuine 7-day pull-in doesn't usually
+look like that). Fixed `data.json`'s live `goLive`/`originalGoLive`
+*and* swapped the same two values across every `history.json` weekly
+snapshot for `pledge-1a` (not just the live record) — the per-project
+**Date change log** (`computeScheduleShifts`) diffs `goLive` week over
+week straight from history, so leaving old snapshots backwards would've
+kept showing the Sep 15 shift as a pull-in instead of the real 8-day
+slip it actually was. Verified headlessly: the card now reads
+"Oct 29, 2026 → Nov 6, 2026", and the Sep 15 shift event now reads
+"Oct 29, 2026 → Nov 6, 2026" (a delay), not the reverse.
+
+**GMS 1.4 — investigated the same backwards pattern, found no bug.** It
+also shows `originalGoLive` (Oct 19) later than `goLive` (Oct 12), which
+first looked doubly suspicious alongside `delayDays: 4`. Turned out to
+be a false alarm: GMS 1.4 is already in **Hypercare** (it already went
+live, 7 days early — a real, stable-for-8-weeks pull-in, not a bug), and
+that `delayDays: 4` / its `delayNote` ("Hotfix deployment moved from
+Nov 8 to Nov 18...") is about a separate, later post-launch hotfix
+milestone — nothing to do with the go-live date at all. Left untouched.
+
 **Data-accuracy pass (2026-09-30):** re-verified every `stagePlan` date
 against the source deck (22-Sep-2026 review PDF) after suspiciously round
 "+100d"-style overage numbers turned up on the Hawk-eye tab. Found and
