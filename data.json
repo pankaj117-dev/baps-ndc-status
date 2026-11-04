@@ -1673,7 +1673,7 @@
       "features": [
         {
           "sprint": "Hypercare",
-          "type": "SSO",
+          "type": "Development",
           "feature": "SSO (WSO2) implementation for GMS and AMS",
           "status": "Done",
           "notes": "",
@@ -1683,7 +1683,7 @@
         },
         {
           "sprint": "Hypercare",
-          "type": "SSO",
+          "type": "Development",
           "feature": "SSO (WSO2) QA testing",
           "status": "In Progress",
           "notes": "",
@@ -1693,7 +1693,7 @@
         },
         {
           "sprint": "Hotfix",
-          "type": "Hotfix",
+          "type": "Development",
           "feature": "Unsubscribe: TM user story development",
           "status": "In Progress",
           "notes": "",
@@ -1703,7 +1703,7 @@
         },
         {
           "sprint": "Hotfix",
-          "type": "Hotfix",
+          "type": "Development",
           "feature": "Unsubscribe: MIS opt-out user story development",
           "status": "In Progress",
           "notes": "",
@@ -1713,7 +1713,7 @@
         },
         {
           "sprint": "Hypercare",
-          "type": "Post-prod defect",
+          "type": "Development",
           "feature": "Post-production defects (3)",
           "status": "Done",
           "notes": "3 defects resolved",
@@ -1733,7 +1733,7 @@
         },
         {
           "sprint": "Hotfix",
-          "type": "Testing",
+          "type": "QA",
           "feature": "End-to-end regression and load testing",
           "status": "Upcoming",
           "notes": "",
