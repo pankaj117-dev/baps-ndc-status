@@ -1646,6 +1646,26 @@
           "approvalStatus": "Resolved",
           "impact": "",
           "id": "CR-102"
+        },
+        {
+          "title": "FE-1 Access & permissions: granting access by position didn't show who was getting access (FE side)",
+          "description": "Only the position and MIS ID were shown, so it was hard to tell which person the access went to. Added first and last name, and replaced the MIS ID with the BAPS ID. FE side of BE-1.",
+          "submittedDate": "",
+          "by": "",
+          "actionItem": "",
+          "approvalStatus": "Resolved",
+          "impact": "",
+          "id": "CR-103"
+        },
+        {
+          "title": "BE-15 Contact lists: campaign contact-list export for user variables lacked identifiers",
+          "description": "Import/export of a campaign's contact list for user variables showed only the contact ID and other fields. Masked emails and person ID are now included.",
+          "submittedDate": "",
+          "by": "",
+          "actionItem": "",
+          "approvalStatus": "Resolved",
+          "impact": "",
+          "id": "CR-104"
         }
       ],
       "decisions": [],
@@ -1656,7 +1676,7 @@
       "raidLog": [],
       "scheduleScope": "hotfix",
       "stageDatesFromPlan": true,
-      "changeRequestSeq": 102
+      "changeRequestSeq": 104
     },
     {
       "id": "baps-sso",
