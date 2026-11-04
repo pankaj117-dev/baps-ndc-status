@@ -4012,6 +4012,35 @@
       .sort((a, b) => (a.asOf < b.asOf ? -1 : a.asOf > b.asOf ? 1 : 0));
   }
 
+  // The weekly reporting cadence is Tuesday-to-Tuesday (2026-11-04, "this
+  // should only show weekly views not daily or where an update was
+  // update. So if any of the PMs add a PR it should be for the Tuesday to
+  // tuesday update"). history.json occasionally carries more than one
+  // snapshot inside a single Tue–Tue week — a mid-week correction, or a
+  // snapshot dated Monday because that week's Tuesday was a holiday — and
+  // plotting every one of them made the Progress-over-time chart read as
+  // a daily series (e.g. Oct 13 and Oct 14, or Oct 20 and Oct 23, both
+  // landing in the same week). This collapses a project's history down to
+  // one point per Tue–Tue week, keeping the latest snapshot in each week,
+  // so the chart always shows exactly one dot per reporting week no matter
+  // how many times the underlying data was touched. Used ONLY by the
+  // progress chart — the Date change log / Status History / stage
+  // segmentation keep the full snapshot list, since those exist precisely
+  // to show each individual change.
+  function weeklyHistoryForProject(projectId) {
+    const weeks = historyForProject(projectId);
+    const byWeek = new Map();
+    weeks.forEach((w) => {
+      const d = new Date(w.asOf + "T00:00:00");
+      const daysBack = (d.getDay() - 2 + 7) % 7; // 0 when already a Tuesday
+      d.setDate(d.getDate() - daysBack);
+      const key = d.toISOString().slice(0, 10);
+      const prev = byWeek.get(key);
+      if (!prev || w.asOf > prev.asOf) byWeek.set(key, w);
+    });
+    return Array.from(byWeek.values()).sort((a, b) => (a.asOf < b.asOf ? -1 : 1));
+  }
+
   /* ---------------- Stage-gate timeline ---------------- */
 
   // Generic per-stage duration estimates — used ONLY as a placeholder
@@ -5129,11 +5158,14 @@
     // milestone with a `progress` value in any weekly snapshot is overlaid
     // as its own line, built from history.json like the project line.
     schedulePanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Progress over time"]));
-    if (!weeks.length) {
+    // Weekly cadence only (2026-11-04) — one point per Tuesday-to-Tuesday
+    // reporting week, not one per snapshot. See weeklyHistoryForProject().
+    const chartWeeks = weeklyHistoryForProject(p.id);
+    if (!chartWeeks.length) {
       schedulePanel.appendChild(el("p", { class: "empty-note" }, ["No history yet — it'll build up week over week as updates get ingested."]));
     } else {
       const milestonePoints = {};
-      weeks.forEach((w) => {
+      chartWeeks.forEach((w) => {
         (w.milestones || []).forEach((m) => {
           if (m.progress == null || m.progress === "") return;
           (milestonePoints[m.name] || (milestonePoints[m.name] = [])).push({ asOf: w.asOf, progress: Number(m.progress) });
@@ -5148,7 +5180,7 @@
       // to the overall line only and show its milestones just in their own
       // charts below (e.g. myBKY 2A's parallel Requirements / Design / Dev stages).
       const overlaySeries = p.milestoneOverlay === false ? [] : milestoneSeries;
-      schedulePanel.appendChild(buildTrendGraph(weeks, "trendFill", overlaySeries));
+      schedulePanel.appendChild(buildTrendGraph(chartWeeks, "trendFill", overlaySeries));
 
       // Plus one standalone chart per milestone, in that milestone's line
       // color, so each one's trend can be read on its own.

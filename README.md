@@ -1086,6 +1086,23 @@ that `delayDays: 4` / its `delayNote` ("Hotfix deployment moved from
 Nov 8 to Nov 18...") is about a separate, later post-launch hotfix
 milestone — nothing to do with the go-live date at all. Left untouched.
 
+**Progress-over-time chart shows one point per reporting week (2026-11-04):**
+per explicit request ("this should only show weekly views not daily or where
+an update was update. So if any of the PMs add a PR it should be for the
+Tuesday to tuesday update"). `history.json` sometimes carries more than one
+snapshot inside a single Tuesday-to-Tuesday week (a mid-week correction, or
+a snapshot dated Monday when that week's Tuesday was a holiday), and the
+chart was plotting every one of them, so it read as a daily series — e.g.
+MyBKY Phase 1 showed both Oct 13 and Oct 14, and both Oct 20 and Oct 23.
+`weeklyHistoryForProject()` collapses a project's history to one point per
+Tue–Tue week (keeping the latest snapshot in each week) and the Progress
+over time chart — including its per-milestone overlay and standalone
+per-milestone charts — now uses that instead of the raw snapshot list. For
+MyBKY Phase 1 this takes the chart from 14 points to 11. The Date change
+log, Status History tab, and stage segmentation are deliberately left on the
+full snapshot list — those exist to show each individual change, not a
+weekly rollup.
+
 **Go-Live date moved into the Milestones section (2026-11-04):** per
 explicit request ("milestone should be below under the milestone"), right
 after the single-date change above. `buildProgressFactsList()` no longer
