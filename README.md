@@ -1086,6 +1086,34 @@ that `delayDays: 4` / its `delayNote` ("Hotfix deployment moved from
 Nov 8 to Nov 18...") is about a separate, later post-launch hotfix
 milestone — nothing to do with the go-live date at all. Left untouched.
 
+**MyBKY (Phase 1) stage dates corrected against source spreadsheet (2026-11-03):**
+the PM's "NC27 Hub Phase 1" Stage Dates tracker (the source of truth for this
+project) didn't match `mybky-phase1`'s `stagePlan` in a few spots. Fixed in
+both `data.json` (live) and every weekly `history.json` snapshot that carries
+a `stagePlan` for this project (so `stagePlanRevisions()`'s per-stage
+revision log stays consistent too, not just the live Stage Dates table):
+- `Requirements.initialStart`/`.latestStart`: was `2025-11-08`, corrected to
+  `2026-01-08` (over a year off — the `.initialEnd`/`.latestEnd` of
+  `2026-06-25` were already correct).
+- `UAT.latestEnd`: was `2026-09-21`, corrected to `2026-09-30` (the source
+  spreadsheet's revised UAT completion date).
+- `Hypercare.latestStart`: was `2026-10-02`, corrected to `2026-10-06`
+  (matches `.initialStart` — the source spreadsheet shows no revision for
+  Hypercare's start at all; the `2026-10-02` revision was spurious).
+
+Everything else already matched: `Tech. Design`, `Development`'s dates
+(including its `2026-09-21` revised end — left untouched, confirmed against
+the spreadsheet), `VAPT`, and `Rollout` (which lines up exactly with the
+spreadsheet's "Go-Live" row, `2026-09-16`→`2026-10-05` — that row is a stage
+*window*, not this app's separate single-day `goLive` milestone field, which
+was left alone). The spreadsheet's "Load" row has no equivalent in this
+app's 9-stage `PIPELINE_STAGES` model, so it wasn't applied anywhere. The
+spreadsheet's own "Delay (Days)" column doesn't always equal
+`End − revised End` for its own rows (e.g. its Development row says 25 for a
+17-Aug→21-Sep span, which is actually 35 days) — not copied in; this app's
+delay chip is always derived live from the Start/End dates it stores, so it
+stays internally consistent on its own.
+
 **Data-accuracy pass (2026-09-30):** re-verified every `stagePlan` date
 against the source deck (22-Sep-2026 review PDF) after suspiciously round
 "+100d"-style overage numbers turned up on the Hawk-eye tab. Found and
