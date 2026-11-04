@@ -1949,14 +1949,14 @@
           "title": "Template editor images with special/non-English filenames don't show",
           "summary": "Upload succeeds but the public link breaks (SFS doesn't encode the name).",
           "rca": "Under RCA review",
-          "reportedBy": "",
+          "reportedBy": "Vyom Suthar",
           "status": "Resolved"
         },
         {
           "title": "App Inbox attachments with special/non-English filenames don't load",
           "summary": "Same SFS link issue for inbox attachment copies.",
           "rca": "Missed",
-          "reportedBy": "",
+          "reportedBy": "Vyom Suthar",
           "status": "Resolved"
         }
       ]
