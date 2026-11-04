@@ -3948,6 +3948,10 @@ dd.is-missing {
 .hotfix-plan-title { margin: 0 0 8px; font-size: 15px; font-weight: 700; }
 .hotfix-plan-actual { color: var(--red); }
 
+.postprod-bugs { margin-bottom: 28px; }
+.postprod-bugs .hotfix-plan-title { margin-top: 16px; }
+.postprod-bugs-note { margin: 10px 0 0; color: var(--ink-soft); }
+
 /* ---------- Wide log tables (Delay, RAID, Change Request, Decision logs)
    — a real <table> + horizontal scroll wrapper, used for every log that
    was rebuilt (2026-10-15) to match the deck's own sample tables exactly,

@@ -1639,6 +1639,8 @@ Everything lives in three files:
                                 // version: [{date, label, from, to, stage?, deltaDays?}]
   "hotfixPlan": null,          // optional {title, rows:[{stage, plannedStart, actualStart, plannedEnd,
                                 // actualEnd, delayDays, note}]} — table under the Schedule timeline
+  "postProdBugs": null,        // optional {summary, groups:[{title, metrics:[{label, num, tone?}], note}]}
+                                // — "Post-prod bugs" section on the Dependencies & Risks tab
   "scheduleScope": "",         // optional qualifier shown after the Status line, e.g. "hotfix" →
                                 // "On schedule (hotfix)" / "+4 days (hotfix)"; set by hand in data.json
   "scopeReduced": false,       // true if scope is being cut/deferred this week to hold the go-live

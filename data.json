@@ -1834,6 +1834,59 @@
             "note": ""
           }
         ]
+      },
+      "postProdBugs": {
+        "summary": "Post-release issues: total reported 15 (10 bugs, 5 CRs)",
+        "groups": [
+          {
+            "title": "Post-release bugs",
+            "metrics": [
+              {
+                "label": "Reported",
+                "num": 12
+              },
+              {
+                "label": "Fixed",
+                "num": 10,
+                "tone": "tone-green"
+              },
+              {
+                "label": "Not reproducible in QA",
+                "num": 2
+              },
+              {
+                "label": "Open / WIP",
+                "num": 0,
+                "tone": "tone-green"
+              }
+            ]
+          },
+          {
+            "title": "Change requests",
+            "metrics": [
+              {
+                "label": "Total",
+                "num": 5
+              },
+              {
+                "label": "Fixed",
+                "num": 4,
+                "tone": "tone-green"
+              },
+              {
+                "label": "Open / WIP",
+                "num": 0,
+                "tone": "tone-green"
+              },
+              {
+                "label": "Deferred",
+                "num": 1,
+                "tone": "tone-amber"
+              }
+            ],
+            "note": "Deferred: \"Test your email\" \u2014 send the current user the email or inbox message instantly, without going through the full campaign process."
+          }
+        ]
       }
     },
     {

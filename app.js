@@ -2005,6 +2005,32 @@
     return "";
   }
 
+  // Post-prod bugs (2026-11-03, GMS 1.4) — the deck's post-release
+  // issue tally: an optional summary line, then one row of counts per
+  // group (bugs, CRs, …) with an optional note underneath. Shape:
+  // { summary, groups: [{ title, metrics: [{ label, num, tone? }], note }] }.
+  function buildPostProdBugs(data) {
+    const wrap = el("div", { class: "postprod-bugs" }, [
+      el("h3", { class: "weekly-subhead", id: "postprod-bugs-section" }, ["Post-prod bugs"]),
+      data.summary ? el("p", { class: "section-subhead" }, [data.summary]) : null,
+    ]);
+    (data.groups || []).forEach((g) => {
+      wrap.appendChild(el("h4", { class: "hotfix-plan-title" }, [g.title]));
+      const row = el("div", { class: "feature-kpi-row" });
+      g.metrics.forEach((m) => {
+        row.appendChild(
+          el("div", { class: ["metric-card", m.tone].filter(Boolean).join(" ") }, [
+            el("div", { class: "num" }, [String(m.num)]),
+            el("div", { class: "label" }, [m.label]),
+          ])
+        );
+      });
+      wrap.appendChild(row);
+      if (g.note) wrap.appendChild(el("p", { class: "postprod-bugs-note" }, [g.note]));
+    });
+    return wrap;
+  }
+
   function buildFeatureKpis(p) {
     const items = p.features || [];
     const row = el("div", { class: "feature-kpi-row" });
@@ -5092,6 +5118,8 @@
     const liveSnapshotSections = el("div", { class: "snapshot-sections" });
     renderSnapshotSections(liveSnapshotSections, p, null, true, { weeklyStatus: false });
     depsRisksPanel.appendChild(liveSnapshotSections);
+
+    if (p.postProdBugs) depsRisksPanel.appendChild(buildPostProdBugs(p.postProdBugs));
 
     // RAID Log — Risks, Assumptions, Issues, Dependencies consolidated
     // into one log (slide 18), appended below the existing
