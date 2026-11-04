@@ -1839,8 +1839,8 @@
             "actualStart": "2026-10-20",
             "plannedEnd": "2026-11-06",
             "actualEnd": "2026-11-20",
-            "delayDays": 5,
-            "note": "Additional 5 days of delay due to Diwali vacation"
+            "delayDays": null,
+            "note": "Diwali vacation"
           },
           {
             "stage": "UAT",
