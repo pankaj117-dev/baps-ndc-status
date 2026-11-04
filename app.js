@@ -1415,6 +1415,19 @@
   //  2. Every block's real date range and day-count is written out
   //     directly underneath it, not just on hover — "easy to see" was the
   //     whole point of rebuilding this.
+  // Percentage-based layout (2026-11-03, "the horizontal view should be
+  // visible in one view not scroll") — replaced the old fixed-px,
+  // caption-width-reserving layout entirely. That version deliberately
+  // widened the virtual timeline to make room for caption text, which is
+  // exactly what forced a horizontal scrollbar on anything but a short
+  // project; here every block's left/width is a PERCENT of the date span,
+  // so the whole chart always fits the actual container width, on any
+  // screen, with no scroll container at all. The tradeoff: captions can
+  // no longer reserve guaranteed non-overlapping horizontal room the way
+  // pixel math could — mitigated by letting caption text wrap (instead of
+  // `nowrap`) and a 2-row vertical stagger between neighboring captions,
+  // plus the full caption text is always available via the block's own
+  // `title` tooltip regardless of how cramped it looks on screen.
   function buildStageGateTimeline(p) {
     const DAY = 86400000;
     const blocks = buildHawkeyeBlocks(p);
@@ -1442,24 +1455,12 @@
     const minTime = Math.min(...times) - 4 * DAY;
     let maxTime = Math.max(...times) + 4 * DAY;
     if (maxTime - minTime < 20 * DAY) maxTime = minTime + 20 * DAY;
+    const totalSpanMs = maxTime - minTime;
+    const xPct = (iso) => ((new Date(iso + "T00:00:00").getTime() - minTime) / totalSpanMs) * 100;
+    const MIN_BLOCK_PCT = 1.4;
 
-    // Scale adapts to the project's real span instead of a fixed 6px/day —
-    // a project with one 229d stage used to render a ~1400px block (plus
-    // everything after it), forcing endless horizontal scrolling just to
-    // see "the rest of the chart exists." Target a total width that needs
-    // a little scrolling on a normal screen, not several screens' worth;
-    // short spans still get the old, more-zoomed-in 6px/day (clamped at
-    // MAX), long ones compress proportionally down to MIN so nothing
-    // collapses into an unreadable sliver.
-    const TARGET_TIMELINE_PX = 900;
-    const MAX_PX_PER_DAY = 6;
-    const MIN_PX_PER_DAY = 0.45;
-    const totalSpanDays = (maxTime - minTime) / DAY;
-    const PX_PER_DAY = Math.min(MAX_PX_PER_DAY, Math.max(MIN_PX_PER_DAY, TARGET_TIMELINE_PX / totalSpanDays));
-    const MIN_BLOCK_PX = 10;
-    const xPx = (iso) => ((new Date(iso + "T00:00:00").getTime() - minTime) / DAY) * PX_PER_DAY;
-
-    // Quarter gridlines — same snap logic as Hawk-eye's month view.
+    // Quarter gridlines — same snap logic as Hawk-eye's month view, now
+    // positioned in % instead of px.
     const marks = [];
     const cursor = new Date(minTime);
     cursor.setDate(1);
@@ -1468,22 +1469,13 @@
     while (cursor.getTime() <= maxTime) {
       if (cursor.getTime() >= minTime) {
         marks.push({
-          px: ((cursor.getTime() - minTime) / DAY) * PX_PER_DAY,
+          pct: ((cursor.getTime() - minTime) / totalSpanMs) * 100,
           label: `Q${Math.floor(cursor.getMonth() / 3) + 1} ${cursor.getFullYear()}`,
         });
       }
       cursor.setMonth(cursor.getMonth() + 3);
     }
 
-    // Build each block's caption text up front so its real pixel width
-    // can be reserved during layout — this is what keeps captions from
-    // ever overlapping, instead of guessing with a fixed tier stagger.
-    const CAPTION_GAP_PX = 14;
-    const STAGE_CHAR_PX = 7.1; // --font-display, 11.5px, 700 weight
-    const META_CHAR_PX = 6.3; // --font-mono, 10.5px
-    function textWidthPx(text, perCharPx) {
-      return text.length * perCharPx;
-    }
     const captioned = blocks.map((b) => {
       const seg = segByStage[b.stage];
       const dateLabel =
@@ -1508,82 +1500,63 @@
       } else if (b.kind !== "future" && seg) {
         metaText = (seg.approxStart ? "≥" : "") + seg.days + "d";
       }
-      // Caption cleanup (2026-10-16, "the timeline needs to be cleaner
-      // too") — date range and day-count used to be two separate lines;
-      // merged into one ("Sep 17 → now  ·  29d") so each block's caption
-      // is 2 lines instead of 3. Width is measured on the COMBINED
-      // string now, not the max of the two separately, so collision
-      // layout still reserves correctly for the (now wider) single line.
       const metaLine = dateLabel + "  \u00b7  " + metaText;
-      const capWidth = Math.max(textWidthPx(b.stage, STAGE_CHAR_PX), textWidthPx(metaLine, META_CHAR_PX));
-      return { b, metaLine, metaOverdue: b.kind === "future" && b.overdue, capWidth };
+      return { b, metaLine, metaOverdue: b.kind === "future" && b.overdue };
     });
 
-    // Sequential collision-avoiding layout — same idea as Hawk-eye's
-    // `cursorPx`, but every stage (including future ones) gets placed by
-    // its own real date here, and each slot reserves whichever is wider:
-    // the block itself, or the caption text that goes directly beneath
-    // it. That guarantees captions never overlap without needing a
-    // staggered tier (which breaks down once several short, back-to-back
-    // future stages are involved) — the tradeoff is that two
-    // calendar-adjacent stages with long captions get visually spread a
-    // little further apart than their raw dates alone would place them.
-    let cursorPx = 0;
-    const placed = captioned.map(({ b, metaLine, metaOverdue, capWidth }) => {
-      const rawLeft = xPx(b.start);
-      // Width comes from the stage's OWN real date span, measured before
-      // any rightward shift — not from `end - left`. Using the shifted
-      // `left` here was the bug: once a long caption pushed `left` far
-      // enough right, `end - left` could go negative and collapse to
-      // `MIN_BLOCK_PX`, turning every block into a same-size tiny dot and
-      // destroying the one thing a timeline is supposed to show
-      // (relative stage duration).
-      const width = Math.max(xPx(b.end) - rawLeft, MIN_BLOCK_PX);
-      const left = Math.max(rawLeft, cursorPx);
-      cursorPx = left + Math.max(width, capWidth + CAPTION_GAP_PX);
-      return { b, left, width, metaLine, metaOverdue };
+    // Sequential layout purely from each block's own real date span —
+    // the `cursorPct` push only ever fires when two stages genuinely
+    // overlap in calendar time (e.g. a backfilled earlier stage whose
+    // stagePlan dates overlap the next stage's real dates — see the note
+    // on `computeStageSegments`), never for caption-width reasons.
+    let cursorPct = 0;
+    const placedRaw = captioned.map(({ b, metaLine, metaOverdue }, i) => {
+      const rawLeft = xPct(b.start);
+      const width = Math.max(xPct(b.end) - rawLeft, MIN_BLOCK_PCT);
+      const left = Math.max(rawLeft, cursorPct);
+      cursorPct = left + width;
+      return { b, left, width, metaLine, metaOverdue, tier: i % 2 };
     });
+    // Hard guarantee of "fits in one view, no scroll": some projects have
+    // stages that genuinely overlap in real calendar time (a backfilled
+    // earlier stage's stagePlan dates overlapping the next stage's real
+    // dates — see the note on `computeStageSegments`), which can still
+    // push `cursorPct` past 100% even with the sequential, date-only
+    // layout above. If that happens, scale every block's left/width down
+    // proportionally so the whole chart always ends at/under 100% —
+    // relative order and proportions are preserved, just compressed.
+    const scale = cursorPct > 100 ? 100 / cursorPct : 1;
+    const placed = scale === 1 ? placedRaw : placedRaw.map((pl) => ({ ...pl, left: pl.left * scale, width: pl.width * scale }));
 
-    // "Today" line position (2026-10-16 bug fix — "the timeline does
-    // not look correct the today is after the 27th of Oct?"). The
-    // CURRENT stage's block always ends exactly on today by definition
-    // (`buildHawkeyeBlocks` sets its `end` to `today` for the current
-    // stage), so the Today line belongs at that block's RENDERED right
-    // edge — NOT at a raw `xPx(todayIso)` computed independently. Using
-    // the raw date position was the bug: once an earlier block's long
-    // caption pushed the collision-avoidance `cursorPx` rightward (very
-    // visible on a compressed, multi-month scale where a caption's real
-    // pixel width is much wider than the few actual days it's reserving
-    // room for), the current block's `left` could end up well to the
-    // right of its own true calendar position — but the Today line kept
-    // using the UNSHIFTED raw position, so it visually landed to the
-    // LEFT of the stage it's actually inside. Anchoring to the current
-    // block's own (possibly-shifted) edge keeps the two always in sync,
-    // whatever the shift ends up being.
+    // "Today" line position — anchored to the CURRENT stage's own
+    // (possibly date-overlap-shifted) rendered right edge, same reasoning
+    // as the pixel version this replaced: `buildHawkeyeBlocks` always
+    // sets the current stage's `end` to today, so the Today line belongs
+    // exactly there, not at an independently-computed raw position that
+    // could drift out of sync with where that block actually rendered.
     const currentPlaced = placed.find((pl) => pl.b.kind === "current");
-    const todayLineX = currentPlaced ? currentPlaced.left + currentPlaced.width : xPx(todayIso);
-    const timelineWidthPx = Math.max(cursorPx, todayLineX) + 24;
+    const todayLinePct = currentPlaced ? currentPlaced.left + currentPlaced.width : xPct(todayIso);
 
     const wrap = el("div", { class: "stagegantt-scroll" });
-    const inner = el("div", { class: "stagegantt-inner", style: `width:${timelineWidthPx}px` });
+    const inner = el("div", { class: "stagegantt-inner" });
 
     const header = el("div", { class: "stagegantt-months" });
     marks.forEach((m) => {
-      header.appendChild(el("div", { class: "stagegantt-month-mark", style: `left:${m.px}px` }, [m.label]));
+      header.appendChild(el("div", { class: "stagegantt-month-mark", style: `left:${m.pct}%` }, [m.label]));
     });
     inner.appendChild(header);
 
     const track = el("div", { class: "stagegantt-track" });
     marks.forEach((m) => {
-      track.appendChild(el("div", { class: "stagegantt-grid-line", style: `left:${m.px}px` }));
+      track.appendChild(el("div", { class: "stagegantt-grid-line", style: `left:${m.pct}%` }));
     });
     track.appendChild(
-      el("div", { class: "stagegantt-today-line", style: `left:${todayLineX}px` }, [
+      el("div", { class: "stagegantt-today-line", style: `left:${todayLinePct}%` }, [
         el("span", { class: "stagegantt-today-label" }, ["Today"]),
       ])
     );
 
-    placed.forEach(({ b, left, width, metaLine, metaOverdue }) => {
+    placed.forEach(({ b, left, width, metaLine, metaOverdue, tier }) => {
       const kindClass =
         b.kind === "done"
           ? "is-done"
@@ -1591,39 +1564,41 @@
           ? "is-current" + (b.flag && b.flag !== "ok" ? " is-" + b.flag : "")
           : "is-future" + (b.overdue ? " is-plan-overdue" : "");
       const code = STAGE_SHORT_CODE[b.stage] || b.stage;
+      const fullTitle = b.stage + " — " + metaLine;
 
       // Clickable again (2026-10-16, re-added same day it was removed —
       // "I want to click on this - and make it such a way people know
       // they can click on it"). role="button" + tabindex make it
       // keyboard-reachable; cursor:pointer + a hover highlight (CSS)
       // are the "you can click this" affordance; title/aria-label spell
-      // it out for anyone hovering or using a screen reader.
+      // it out for anyone hovering or using a screen reader — the title
+      // now always carries the FULL caption text, since the caption
+      // below the block can no longer reserve guaranteed room on a
+      // narrow/no-scroll layout.
       track.appendChild(
         el(
           "div",
           {
             class: "stagegantt-block " + kindClass,
-            style: `left:${left}px;width:${width}px`,
+            style: `left:${left}%;width:${width}%`,
             "data-project-id": p.id,
             "data-stage": b.stage,
             role: "button",
             tabindex: "0",
-            title: "Click for stage detail — " + b.stage,
+            title: fullTitle + " — click for stage detail",
             "aria-label": "View full stage detail for " + b.stage,
           },
-          [width >= 32 ? code : ""]
+          [code]
         )
       );
 
-      // Caption directly below the block, left-anchored to it — always
-      // real dates, no hover required. The layout pass above already
-      // reserved enough horizontal room for this exact text, so a single
-      // tier is guaranteed not to collide with its neighbors. Merged to
-      // 2 lines (2026-10-16, "the timeline needs to be cleaner too") —
-      // date range and day-count used to be two separate lines; now one
-      // combined "date range  ·  Nd" line under the stage name.
+      // Caption directly below the block, left-anchored to it, wrapping
+      // instead of a fixed `nowrap` width so it never pushes the chart
+      // wider than its container — plus a 2-row vertical stagger between
+      // neighboring stages so adjacent short captions don't sit directly
+      // on top of each other now that there's no pixel-reserved gap.
       track.appendChild(
-        el("div", { class: "stagegantt-caption", style: `left:${left}px` }, [
+        el("div", { class: "stagegantt-caption stagegantt-caption-tier" + tier, style: `left:${left}%` }, [
           el("span", { class: "stagegantt-caption-stage" }, [b.stage]),
           el("span", { class: "stagegantt-caption-meta" + (metaOverdue ? " is-plan-overdue" : "") }, [metaLine]),
         ])
@@ -1644,12 +1619,79 @@
       });
     });
 
-    // Default scroll position: land with "today" a little in from the
-    // left edge, same reasoning as Hawk-eye's own default scroll.
-    requestAnimationFrame(() => {
-      wrap.scrollLeft = Math.max(0, xPx(todayIso) - 60);
-    });
+    return wrap;
+  }
 
+  // "Stage Dates" table (2026-11-03) — per explicit request, modeled on a
+  // reference spreadsheet screenshot ("NDC Development Project Planned
+  // Schedule"-style table: Stage / Start / End / Delay (Days), with a
+  // revised date in red under the original whenever the plan slipped).
+  // Uses this project's own `stagePlan` baseline (`initialStart`/
+  // `initialEnd`) vs its current plan (`latestStart`/`latestEnd`) — the
+  // SAME two numbers every other plan-vs-latest view in this app already
+  // reads (e.g. `buildHawkeyeBlocks`'s `plan.latestStart || plan.initialStart`),
+  // just laid out as a table instead of a chart. "Delay (Days)" is the
+  // shift in the planned COMPLETION date specifically (latestEnd minus
+  // initialEnd) — not a start-date shift, and not the real/actual
+  // duration from `computeStageSegments` (that's what the Grid tab and
+  // the timeline above already show) — this table is purely "how has
+  // THIS stage's own plan moved since it was first committed." A stage
+  // with no `stagePlan` entry on record at all gets a dashed "—" row
+  // rather than being omitted, so the table always lists the full
+  // 9-stage pipeline.
+  function buildStageDatesTable(p) {
+    const wrap = el("div", { class: "stagedates-table" });
+    wrap.appendChild(
+      el("div", { class: "stagedates-row stagedates-head" }, [
+        el("span", { class: "stagedates-cell stagedates-stage" }, ["Stage"]),
+        el("span", { class: "stagedates-cell" }, ["Start"]),
+        el("span", { class: "stagedates-cell" }, ["End"]),
+        el("span", { class: "stagedates-cell stagedates-delay" }, ["Delay (Days)"]),
+      ])
+    );
+    PIPELINE_STAGES.forEach((stage) => {
+      const plan = p.stagePlan && p.stagePlan[stage];
+      const initialStart = plan && plan.initialStart;
+      const latestStart = plan && (plan.latestStart || plan.initialStart);
+      const initialEnd = plan && plan.initialEnd;
+      const latestEnd = plan && (plan.latestEnd || plan.initialEnd);
+      const startChanged = initialStart && latestStart && latestStart !== initialStart;
+      const endChanged = initialEnd && latestEnd && latestEnd !== initialEnd;
+      const delayDays = endChanged ? daysBetweenIso(initialEnd, latestEnd) : null;
+
+      wrap.appendChild(
+        el("div", { class: "stagedates-row" }, [
+          el("span", { class: "stagedates-cell stagedates-stage" }, [stage]),
+          el(
+            "span",
+            { class: "stagedates-cell stagedates-dates" },
+            initialStart
+              ? [
+                  el("span", { class: "stagedates-date" }, [fmtDateShort(initialStart)]),
+                  startChanged ? el("span", { class: "stagedates-date is-revised" }, [fmtDateShort(latestStart)]) : null,
+                ]
+              : ["—"]
+          ),
+          el(
+            "span",
+            { class: "stagedates-cell stagedates-dates" },
+            initialEnd
+              ? [
+                  el("span", { class: "stagedates-date" }, [fmtDateShort(initialEnd)]),
+                  endChanged ? el("span", { class: "stagedates-date is-revised" }, [fmtDateShort(latestEnd)]) : null,
+                ]
+              : ["—"]
+          ),
+          el(
+            "span",
+            { class: "stagedates-cell stagedates-delay" },
+            delayDays
+              ? [el("span", { class: "stagedates-delay-chip " + (delayDays > 0 ? "is-over" : "is-early") }, [(delayDays > 0 ? "+" : "") + delayDays])]
+              : ["—"]
+          ),
+        ])
+      );
+    });
     return wrap;
   }
 
@@ -4493,6 +4535,11 @@
     stagegatePanel.appendChild(
       el("div", { id: "stage-gate-timeline-section" }, [buildStageGateTimeline(p)])
     );
+    // "Stage Dates" table (2026-11-03, "I want this view in the
+    // stage-gate view - all the info below the timeline horizontal
+    // view") — see buildStageDatesTable() for what it shows and why.
+    stagegatePanel.appendChild(el("h4", { class: "raci-ref-head" }, ["Stage dates"]));
+    stagegatePanel.appendChild(buildStageDatesTable(p));
     stagegatePanel.appendChild(buildRaciReference());
 
     stagegatePanel.appendChild(el("h3", { class: "weekly-subhead", id: "golive-checklist-section" }, ["Go-Live readiness"]));

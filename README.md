@@ -237,6 +237,66 @@ widths now visibly vary per project (e.g. `MyBKY (Phase 1)`'s long-overrun
 stages render at 1374/762/1062px vs. a healthy project's 30px future
 stages).
 
+**"Stage dates" table added below the timeline + timeline rebuilt to fit
+without horizontal scrolling (2026-11-03).** Two explicit asks from a
+screenshot of a reference spreadsheet ("Stage Dates": Stage/Start/End/
+Delay (Days) columns, a revised date in red under the original wherever
+the plan slipped): "I want this view in the stage-gate view - all the
+info below the timeline horizontal view" and "the horizontal view should
+be visible in one view not scroll."
+
+1. **New `buildStageDatesTable()`**, rendered directly below the
+   timeline (and above "Who leads each stage"). Lists all 9 canonical
+   `PIPELINE_STAGES` as rows; Start/End show that stage's `stagePlan`
+   baseline (`initialStart`/`initialEnd`) with its current plan
+   (`latestStart`/`latestEnd`) underneath in red whenever the two
+   differ; "Delay (Days)" is the shift in the planned COMPLETION date
+   specifically (`latestEnd - initialEnd`), shown as a red `+Xd` chip
+   when the plan slipped or a green `-Xd` chip when it was pulled in. A
+   stage with no `stagePlan` entry on record gets a dashed "—" row
+   rather than being omitted. Deliberately a *plan-vs-plan* table (how
+   has this stage's own committed date moved since baseline) — distinct
+   from the Grid tab's per-stage delay chips (added 2026-11-04, see Tab
+   2) which compare real/actual duration against plan, and distinct
+   from the timeline above it (which shows real elapsed days).
+
+2. **`buildStageGateTimeline()` rewritten from fixed-pixel to
+   percentage layout.** The previous version (see the two fix entries
+   above) deliberately widened its virtual canvas to reserve guaranteed
+   non-overlapping horizontal room for each caption's text — which is
+   exactly what forced the `.stagegantt-scroll` wrapper's horizontal
+   scrollbar on any project whose captions didn't all fit a ~900px
+   target width. Every block's `left`/`width` is now a percent of the
+   chart's date span instead of a pixel value, so the chart fills
+   whatever width its container actually has, on any screen, with no
+   scroll container needed (`overflow-x: hidden`, `.stagegantt-inner`
+   at `width: 100%`). The sequential "push right to avoid collision"
+   pass still runs, but now only fires on a genuine calendar-date
+   overlap between two stages (the same backfilled-stagePlan-dates
+   quirk noted on `computeStageSegments` — several real projects have
+   it), never for caption-width reasons; if that overlap-avoidance ever
+   pushes the running total past 100%, every block's position/width is
+   rescaled down by the same factor so the whole chart still ends at
+   exactly 100% — verified this triggers for 7 of the 10 visible
+   projects (their stages do genuinely overlap in calendar time) and
+   all 10 render with `left% + width% <= 100%` on every block.
+   Captions lost their pixel-exact non-overlap guarantee as a result —
+   mitigated with `white-space: normal` (wrapping instead of a fixed
+   width) and the existing 2-row vertical stagger between neighboring
+   captions; the block's own `title` tooltip now always carries the
+   full caption text regardless of how cramped the on-screen caption
+   looks. The "Today" line and quarter gridlines moved from px to %
+   the same way. Removed the old default-scroll-to-today
+   `requestAnimationFrame` call — nothing to scroll to anymore.
+
+Verified headlessly against all 10 visible real projects: every block's
+rendered `left% + width%` stays at or under 100% (several needed the new
+rescale step — `MyBKY (Phase 1)` was pushing to 172% pre-rescale,
+`myBKY 2A` to 151%, `GMS 1.4` to 126% — all now exactly 100.00%), and the
+new Stage Dates table renders the expected baseline/revised dates and
+delay chips for `MyBKY (Phase 1)` (e.g. Development `+35d`, UAT `+12d`,
+VAPT `+8d`).
+
 **Removed the per-project calendar/Gantt from the Schedule tab
 (2026-09-30).** The Schedule tab used to show a small calendar/Gantt
 visualization (`buildSingleProjectGantt()` — month gridlines, a "Today"
