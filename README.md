@@ -1120,6 +1120,56 @@ internal admin-dashboard mockup, rebuilt here using our own stage-gate SLA
 data and the site's existing visual style instead of copying that mockup's
 own design system.
 
+**Fixed the "Total" column's day-math + added per-stage/project delay
+chips (2026-11-04).** User report, from a screenshot of MyBKY (Phase 1): a
+single stage cell said "229d" but the row's "Total" column said "629d" for
+the same project, which "does not make sense," plus a request for (1) how
+long the project has been running, (2) its total delay, and (3) where the
+delays happened individually, with delay shown in red per block.
+
+Root cause of the 229-vs-629 confusion: the Total column used to be
+`segments.reduce((sum, seg) => sum + seg.days, 0)` — literally summing
+every stage's own day-count (and the individual per-stage numbers really
+do add up to exactly 629: 229+127+177+35+13+19+29). The per-stage math was
+never wrong; the problem is that stages can *overlap* in real calendar
+time — MyBKY (Phase 1)'s Requirements (Nov 8 → Jun 25) and Tech. Design
+(Mar 9 → Jul 14) overlap by about 3.5 months, because earlier stages get
+backfilled from `stagePlan` dates (see the backfill note on
+`computeStageSegments`) without being cross-checked against the next
+stage's real dates. Summing both stages in full double-counts that
+overlap, so "Total" ends up bigger than the project has even existed —
+629d of summed stage-time against a project that's only been running
+~360 calendar days.
+
+Fixed by changing what "Total" measures: it's now real calendar days from
+the first stage's start to today (`daysBetweenIso(firstStart, today)`),
+never inflated by overlapping segments — verified MyBKY (Phase 1) now
+shows **"360d since Nov 8"** instead of "629d".
+
+Also added, per the three explicit asks:
+- **Per-stage delay chips**, red/green, inside each done or current stage
+  cell — a new `stagePlanDelayDays(p, stage, seg)` compares that stage's
+  real duration against *this project's own* `stagePlan` dates for that
+  same stage (never a flat per-stage-name SLA constant — see the SLA-removal
+  note above for why that approach was dropped). Positive shows red
+  (`+Xd`, ran longer than its own plan); negative shows green (`-Xd`,
+  "pulled up" — wrapped up ahead of its own plan). A still-open current
+  stage only gets a chip once it's actually run past its own planned end
+  date, not just for not being finished yet.
+- **Total delay**, shown as a second line in the Total column
+  (`+Xd delay` in red, or "on plan") — deliberately reuses the existing,
+  PM-reported `p.delayDays` field (same number already on the project
+  cards and Hawk-eye) instead of summing the new per-stage deltas into a
+  second, possibly-disagreeing delay number.
+- Legend updated with the two new red/green delay-chip swatches.
+
+Verified headlessly against real data: MyBKY (Phase 1) → Total
+"360d since Nov 8 / on plan" (its `delayDays` is 0), with a `+1d` chip on
+UAT and a `-24d` chip on VAPT (an example of "where things were pulled
+up"); myBKY 2A (`delayDays: 14`) → Total shows "144d since Jun 12 /
++14d delay", and its current stage (Requirements) cell shows a `+32d`
+chip from running past its own `stagePlan` end date.
+
 ## Tab 3 — 🦅 Hawk-eye (live)
 
 A cross-project **stage-gate calendar**: every project on one shared

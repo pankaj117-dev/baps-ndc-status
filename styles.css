@@ -896,6 +896,42 @@ body {
   font-weight: 700;
 }
 
+/* Per-stage / Total-column delay chips (2026-11-04) — a stage's (or the
+   whole project's) real duration vs its own stagePlan dates, see
+   stagePlanDelayDays(). Red = ran longer than its own plan. Green =
+   wrapped up ahead of its own plan ("pulled up"). Deliberately a small
+   pill, separate from the done/current/breach background color on the
+   cell itself, since a stage can be "Done" (green cell) and still have
+   run over its own plan (red chip) at the same time. */
+.stage-grid-delay {
+  display: inline-block;
+  margin-top: 1px;
+  padding: 0 4px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.5;
+  width: fit-content;
+}
+.stage-grid-delay.is-over {
+  background: var(--red-bg);
+  color: var(--red);
+}
+.stage-grid-delay.is-early {
+  background: var(--green-bg);
+  color: var(--green);
+}
+.stage-grid-delay-ok {
+  display: inline-block;
+  margin-top: 1px;
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--ink-faint);
+}
+.stage-grid-legend-chip {
+  margin-right: 2px;
+}
+
 .stage-grid-col-sla {
   display: block;
   font-size: 9px;

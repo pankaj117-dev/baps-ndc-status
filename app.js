@@ -501,6 +501,22 @@
         ])
       );
     });
+    // Per-stage delay chips (2026-11-04) — each cell's own real duration
+    // vs THIS project's own stagePlan dates for that stage, see
+    // stagePlanDelayDays(). Red = ran longer than its own plan. Green =
+    // wrapped up ahead of its own plan ("pulled up"). Shown inside the
+    // cell, separate from the done/current/breach coloring above.
+    [
+      { cls: "stage-grid-delay is-over", label: "Over its own plan for that stage" },
+      { cls: "stage-grid-delay is-early", label: "Ahead of its own plan (pulled up)" },
+    ].forEach((it) => {
+      box.appendChild(
+        el("span", { class: "stage-grid-legend-item" }, [
+          el("span", { class: it.cls + " stage-grid-legend-chip" }, ["+Nd"]),
+          it.label,
+        ])
+      );
+    });
   }
 
   // KPI strip above the grid — portfolio-wide stage-gate health at a glance,
@@ -752,12 +768,18 @@
         ])
       );
     });
-    // "Total" column — how long the WHOLE project lifecycle has been so
-    // far, horizontally, at a glance (sum of every stage it's passed
-    // through, including the current one), right alongside the per-stage
-    // breakdown instead of needing to add the row up by hand.
+    // "Total" column — how long the WHOLE project has been running
+    // (real calendar days since its first stage started, not a sum of
+    // per-stage day-counts — see the note by `lifecycleDays` below for
+    // why that distinction matters) plus the project's total delay,
+    // right alongside the per-stage breakdown instead of needing to
+    // scroll to a card to find either number.
     headerRow.appendChild(
-      el("div", { class: "stage-grid-cell stage-grid-col-head stage-grid-total-col", title: "Total days in the pipeline so far" }, ["Total"])
+      el(
+        "div",
+        { class: "stage-grid-cell stage-grid-col-head stage-grid-total-col", title: "Days running so far, and total delay against plan" },
+        ["Total"]
+      )
     );
     grid.appendChild(headerRow);
 
@@ -846,6 +868,8 @@
           // see the note on renderStageGridLegend. Whether the PROJECT as a
           // whole is delayed is tracked once, overall, via `delayDays`.)
           const seg = segByStage[stage];
+          const delta = stagePlanDelayDays(p, stage, seg);
+          const deltaLabel = delta != null && delta !== 0 ? (delta > 0 ? `+${delta}d` : `${delta}d`) : null;
           cell = el(
             "div",
             {
@@ -854,9 +878,16 @@
               "data-stage": stage,
               tabindex: "0",
               role: "button",
-              title: seg
-                ? `${stage}: ${seg.approxStart ? "≥" : ""}${seg.days}d (${fmtDateShort(seg.start)} \u2192 ${fmtDateShort(seg.end)}) — click for full detail`
-                : `${stage}: done — click for full detail`,
+              title:
+                (seg
+                  ? `${stage}: ${seg.approxStart ? "≥" : ""}${seg.days}d (${fmtDateShort(seg.start)} \u2192 ${fmtDateShort(seg.end)})`
+                  : `${stage}: done`) +
+                (deltaLabel
+                  ? delta > 0
+                    ? ` — ${deltaLabel} over its own plan`
+                    : ` — ${deltaLabel} ahead of its own plan (pulled up)`
+                  : "") +
+                " — click for full detail",
             },
             [
               el("span", { class: "stage-grid-days" }, [
@@ -864,6 +895,9 @@
               ]),
               seg
                 ? el("span", { class: "stage-grid-daterange" }, [`${fmtDateShort(seg.start)} → ${fmtDateShort(seg.end)}`])
+                : null,
+              deltaLabel
+                ? el("span", { class: "stage-grid-delay " + (delta > 0 ? "is-over" : "is-early") }, [deltaLabel])
                 : null,
             ]
           );
@@ -877,6 +911,8 @@
           const overdue = currentStageOverdue(p, stage);
           const flagClass = overdue ? " is-breach" : " is-warn";
           const days = seg ? seg.days : null;
+          const delta = stagePlanDelayDays(p, stage, seg);
+          const deltaLabel = delta != null && delta > 0 ? `+${delta}d` : null;
           cell = el(
             "div",
             {
@@ -889,7 +925,7 @@
                 (days != null
                   ? `${stage}: ${seg.approxStart ? "≥" : ""}${days}d so far (since ${fmtDateShort(seg.start)})`
                   : `${stage}: in progress`) +
-                (overdue ? " — past its planned end date" : "") +
+                (deltaLabel ? ` — ${deltaLabel} past its planned end date` : "") +
                 " — click for full detail",
             },
             [
@@ -897,31 +933,51 @@
                 days != null ? (seg.approxStart ? "≥" : "") + days + "d" : "In progress",
               ]),
               seg ? el("span", { class: "stage-grid-daterange" }, ["since " + fmtDateShort(seg.start)]) : null,
+              deltaLabel ? el("span", { class: "stage-grid-delay is-over" }, [deltaLabel]) : null,
             ]
           );
         }
         row.appendChild(cell);
       });
 
-      // Horizontal "whole lifecycle so far" total — sum of every stage
-      // segment this project has actually been through (including the
-      // one it's in right now), plus how far back that stretches. Not a
-      // delay judgment (that's `delayDays`, shown on the project cards) —
-      // just "how long has this project's pipeline run been, total."
-      const lifecycleDays = segments.reduce((sum, seg) => sum + seg.days, 0);
+      // Horizontal "whole lifecycle so far" total (2026-11-04: fixed —
+      // used to be `segments.reduce((sum, seg) => sum + seg.days, 0)`,
+      // which SUMS every stage's own day-count. That's wrong whenever
+      // stages overlap in real calendar time — which happens for any
+      // project whose earlier stages were backfilled from stagePlan dates
+      // (see the backfill note on computeStageSegments): those backfilled
+      // ranges aren't cross-checked against the next stage's real dates,
+      // so e.g. MyBKY (Phase 1)'s Requirements (Nov 8 → Jun 25) and Tech.
+      // Design (Mar 9 → Jul 14) overlap by ~3.5 months, and summing both
+      // in full double-counts that overlap — the per-stage days always
+      // added up correctly (229+127+...=629), the TOTAL just didn't mean
+      // "how long has this project been running" like it looked like it
+      // did. Fixed: calendar days from the first stage's start straight to
+      // today — the project's real elapsed run time, never inflated by
+      // overlapping segments.
       const firstStart = segments.length ? segments[0].start : null;
+      const lifecycleDays = firstStart ? daysBetweenIso(firstStart, todayISO()) : 0;
+      // Total delay (2026-11-04) — deliberately reuses the existing,
+      // PM-reported `delayDays` field (same number shown on the project
+      // cards and Hawk-eye), rather than summing the per-stage deltas
+      // above into a second, possibly-disagreeing delay figure.
+      const totalDelay = p.delayDays || 0;
       row.appendChild(
         el(
           "div",
           {
             class: "stage-grid-cell stage-grid-status-cell stage-grid-total-cell",
             title:
-              `${p.name}: ${lifecycleDays}d total in the pipeline so far` +
-              (firstStart ? ` (since ${fmtDateShort(firstStart)})` : ""),
+              `${p.name}: ${lifecycleDays}d running so far` +
+              (firstStart ? ` (since ${fmtDateShort(firstStart)})` : "") +
+              (totalDelay > 0 ? `; ${totalDelay}d total delay` : "; on plan"),
           },
           [
             el("span", { class: "stage-grid-days" }, [lifecycleDays + "d"]),
             firstStart ? el("span", { class: "stage-grid-daterange" }, ["since " + fmtDateShort(firstStart)]) : null,
+            totalDelay > 0
+              ? el("span", { class: "stage-grid-delay is-over" }, [`+${totalDelay}d delay`])
+              : el("span", { class: "stage-grid-delay-ok" }, ["on plan"]),
           ]
         )
       );
@@ -3701,6 +3757,34 @@
     const plannedEnd = plan && (plan.latestEnd || plan.initialEnd);
     if (!plannedEnd) return false;
     return todayISO() > plannedEnd;
+  }
+
+  // Per-stage delay vs THIS project's own stagePlan (2026-11-04, Grid tab
+  // redesign) — "where did the delays happen, individually" and "where
+  // were things pulled up." Deliberately compares a stage's real duration
+  // against THIS project's own committed stagePlan dates for that same
+  // stage, never a flat per-stage-name SLA constant (that's the approach
+  // removed on 2026-10-05 — see the note on renderStageGridLegend — which
+  // flagged big-but-on-plan projects as "over" just for being big).
+  // Positive = ran longer than its own plan (shown red). Negative = wrapped
+  // up ahead of its own plan (shown green, "pulled up"). Returns null when
+  // there's no stagePlan on record for that stage, or (for the still-open
+  // current stage) it simply hasn't reached its planned end date yet —
+  // that's "not done", not "ahead".
+  function stagePlanDelayDays(p, stage, seg) {
+    if (!seg) return null;
+    const plan = p.stagePlan && p.stagePlan[stage];
+    if (!plan) return null;
+    const plannedStart = plan.initialStart || plan.latestStart;
+    const plannedEnd = plan.latestEnd || plan.initialEnd;
+    if (!plannedStart || !plannedEnd) return null;
+    if (seg.ongoing) {
+      const today = todayISO();
+      if (today <= plannedEnd) return null;
+      return daysBetweenIso(plannedEnd, today);
+    }
+    const plannedDays = Math.max(0, daysBetweenIso(plannedStart, plannedEnd));
+    return seg.days - plannedDays;
   }
 
   // Reconstructs how long a project has spent in each pipeline stage, using
