@@ -1139,6 +1139,14 @@ section, ahead of the rest of the `p.milestones` log (or the "No
 milestones logged yet" empty state). Still a single date, still the
 current committed `goLive`.
 
+**Reversed the same day:** "the go live should be in the top box the
+milestone should be below under milestone." Go-Live is back in the
+facts box (`buildProgressFactsList`, single date). The next milestone
+(`p.nextMilestone`) is listed under the Milestones heading, merged into
+the logged list when it isn't already a row, so a project with only a
+next milestone no longer shows "No milestones logged yet." The pinned
+`.milestones-golive` row and its CSS are gone.
+
 **Go-Live fact row shows a single date, all projects (2026-11-04):** per
 explicit request ("Go Live should just be 1 date - check and update for all
 projects"). `buildProgressFactsList()`'s "Go-live" row previously rendered
@@ -1236,6 +1244,57 @@ own Delay (Days) column (25 / 15 / 6 for Development / UAT / VAPT) didn't
 match this app's calendar-day math at the time, but matches **exactly**
 once business days are used — the spreadsheet was counting weekdays all
 along.
+
+**Delay tab consolidated to pre-load from the Schedule timeline (2026-11-04):**
+per explicit request ("consolidate - just pre-load the logs and they
+should show according to the timeline the delays on the right should
+only show if they are going over planned dates"), after a portfolio-wide
+audit found `p.delayLog` is `[]` for **every** project (so "Delay
+attribution (all stages)" and "Delay log entries (all stages)" were
+always empty everywhere) and `p.delayItemLog` is only populated for GMS
+(2 entries) — so "Reported delay log (root cause & ownership)" showed
+its "No delay log entries recorded yet." placeholder for the other 14.
+Three changes, all in app.js:
+
+1. `renderScheduleTimeline()`'s Date change log: the right-hand
+   `.schedule-timeline-delta` chip ("+32 days", "-4 days", "No change in
+   days") now only renders when `deltaDays > 0` — a genuine overrun past
+   the date being compared against. A pull-forward or no-change entry
+   still shows its own row (it's still "every time the date moved"), just
+   with no chip, instead of a green/neutral badge implying it's worth
+   flagging the same way an overrun is.
+2. New `projectAutoDelayLogEntries(p)` maps `projectAutoScheduleShifts(p)`
+   — the function the stage detail modal's "Schedule shifts
+   (auto-detected)" section already uses, already filtered to
+   `deltaDays > 0` — into the `{id, date, stage, reason, team, member,
+   days}` shape `buildStageAnalysisPanel()`/`buildManualDelayLogSearchTable()`
+   expect (`team`/`member` left `null`, falling back to the existing
+   "Unlabeled" grouping — a date-move event has no owner to attribute).
+   "Delay attribution"/"Delay log entries" now use this whenever
+   `p.delayLog` is empty, instead of defaulting to an empty array. For
+   MyBKY (Phase 1) this surfaces its 4 real overruns (Project Closure
+   +32d, Go-Live +19d, UAT/VAPT/Load +7d, Go-Live +10d — the same 68
+   days total the Date change log's chips now show) instead of nothing.
+   `buildManualDelayLogSearchTable()`'s table now also defaults to the
+   same newest-first order the Schedule timeline uses (previously always
+   re-sorted by day-count on load) — clicking its "Days" header still
+   switches to sorting by magnitude, same as before — and its cell/search
+   text falls back to "—"/empty instead of the literal string
+   `"null"` for the auto-loaded rows' unset `member`/`team`/`reason`.
+3. "Reported delay log (root cause & ownership)" (`buildDelayLogTable`,
+   consumes `p.delayItemLog`) is now only rendered when
+   `(p.delayItemLog || []).length` — its Responsible/Status/Action
+   columns are real human-tracked fields that can't be honestly
+   synthesized from a date diff, so rather than fabricate them or show
+   the section perpetually empty, it's hidden outright for the 14
+   projects without real entries and still shows for GMS, unchanged.
+
+Verified headlessly (Node + CDP screenshots) for MyBKY (Phase 1): the
+Oct 5→Oct 1 Go-Live pull-in and the Sep 9→Sep 9 UAT completion "no
+change" row lost their chips; the other 4 rows kept theirs; "Reported
+delay log" disappeared; "Delay attribution"/"Delay log entries" filled
+in with those same 4 events. GMS, the one project with real
+`delayItemLog` entries, still shows "Reported delay log" unchanged.
 
 **MyBKY (Phase 1) stage dates corrected against source spreadsheet (2026-11-03):**
 the PM's "NC27 Hub Phase 1" Stage Dates tracker (the source of truth for this

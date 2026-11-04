@@ -4229,6 +4229,34 @@
       .filter((e) => e.deltaDays > 0);
   }
 
+  // Pre-loads the Delay tab's "Delay attribution" / "Delay log entries"
+  // sections from the Schedule timeline instead of leaving them empty
+  // (2026-11-04, "consolidate - just pre-load the logs and they should
+  // show according to the timeline"): `p.delayLog` is manually-curated
+  // and, across this whole portfolio, basically always empty — but
+  // `projectAutoScheduleShifts()` already has the real, already-detected
+  // delays (same data the Schedule timeline above shows, already filtered
+  // to genuine overruns only). Shaped to match `p.delayLog`'s
+  // date/stage/reason/team/member/days fields so `aggregateDelayLog()` and
+  // `buildManualDelayLogSearchTable()` can consume it unchanged — `team`/
+  // `member` are left unset (shows under "Unlabeled", same fallback
+  // `aggregateDelayLog()` already uses for a real entry missing either
+  // field) since a date-move event doesn't carry who owns it. Sorted
+  // newest-first, same order as the Schedule timeline it comes from — "by
+  // Reason" buckets by the event's own `label` when no explicit reason was
+  // logged, so e.g. every "Go-Live" slip still groups together.
+  function projectAutoDelayLogEntries(p) {
+    return projectAutoScheduleShifts(p).map((e, i) => ({
+      id: "AUTO-" + (i + 1),
+      date: e.date,
+      stage: e.stage || null,
+      reason: e.reason || e.label,
+      team: null,
+      member: null,
+      days: e.deltaDays,
+    }));
+  }
+
   // Groups delay-log entries by a key (team/member/reason) and sums days —
   // the data behind the stage detail modal's "Delay Analysis" tab. Sorted
   // by days descending so the biggest contributor leads.
@@ -4497,6 +4525,14 @@
         ? e.deltaDays
         : Math.round((new Date(e.to + "T00:00:00") - new Date(e.from + "T00:00:00")) / 86400000);
       const unit = vsPlan ? " working days vs plan" : " days";
+      // The right-hand chip only appears for a genuine overrun — the date
+      // actually moved LATER than the planned date it's being compared to
+      // (2026-11-04, "the delays on the right should only show if they are
+      // going over planned dates"). A pull-forward or no-change move still
+      // shows as its own row (this log is "every time the date moved," not
+      // "every delay"), just without a chip — same `deltaDays > 0` test
+      // `stageAutoScheduleShifts()`/`projectAutoScheduleShifts()` already
+      // use to decide what counts as a real delay.
       box.appendChild(
         el("div", { class: "schedule-timeline-row" }, [
           el("div", { class: "schedule-timeline-date" }, [fmtDate(e.date)]),
@@ -4505,9 +4541,9 @@
             el("span", { class: "golive-date-original" }, [fmtDateShort(e.from)]),
             el("span", { class: "golive-arrow" }, ["→"]),
             el("span", { class: "golive-date-current" }, [fmtDate(e.to)]),
-            el("span", { class: "schedule-timeline-delta " + (deltaDays > 0 ? "is-late" : deltaDays < 0 ? "is-early" : "") }, [
-              deltaDays === 0 ? (vsPlan ? "On plan" : "No change in days") : (deltaDays > 0 ? "+" : "") + deltaDays + unit,
-            ]),
+            deltaDays > 0
+              ? el("span", { class: "schedule-timeline-delta is-late" }, ["+" + deltaDays + unit])
+              : null,
             e.reason ? el("span", { class: "schedule-timeline-note is-reason" }, ["Reason: " + e.reason]) : null,
           ]),
         ])
@@ -5050,32 +5086,44 @@
     // Delay Log — narrative companion to the auto-detected shift log
     // above: root cause, ownership and status, manually maintained
     // rather than inferred from date diffs (slide 15 "five logs" + the
-    // sample Delay Log table).
-    delayPanel.appendChild(el("h3", { class: "weekly-subhead", id: "delay-log-section" }, ["Reported delay log (root cause & ownership)"]));
-    delayPanel.appendChild(
-      el("p", { class: "section-subhead" }, [
-        "Root cause, ownership and status for each delay — distinct from the auto-detected log above, and from the per-stage incident log below.",
-      ])
-    );
-    delayPanel.appendChild(buildDelayLogTable(p));
+    // sample Delay Log table). Consolidated away when there's nothing
+    // manually reported (2026-11-04, "consolidate - just pre-load the
+    // logs") — this 11-column table's Responsible/Status/Action fields
+    // can't be honestly auto-filled from a date-move event, unlike the
+    // attribution/entries sections below, so rather than show it
+    // perpetually empty for every project except GMS, it's only rendered
+    // once there's something real in it.
+    if ((p.delayItemLog || []).length) {
+      delayPanel.appendChild(el("h3", { class: "weekly-subhead", id: "delay-log-section" }, ["Reported delay log (root cause & ownership)"]));
+      delayPanel.appendChild(
+        el("p", { class: "section-subhead" }, [
+          "Root cause, ownership and status for each delay — distinct from the auto-detected log above, and from the per-stage incident log below.",
+        ])
+      );
+      delayPanel.appendChild(buildDelayLogTable(p));
+    }
 
     // Delay Analysis + Delay Log, aggregated across EVERY stage — the
     // same `buildStageAnalysisPanel()` / `buildManualDelayLogSearchTable()`
     // the stage detail modal uses one stage at a time (reached by
     // clicking a Grid cell), now also available project-wide without
-    // needing to click into each stage separately.
-    const allDelayEntries = p.delayLog || [];
+    // needing to click into each stage separately. Pre-loaded from the
+    // Schedule timeline above (`projectAutoDelayLogEntries()`) whenever
+    // there's no manually-reported `p.delayLog` — same real, already
+    // over-plan-only events, in the same (newest-first) order — rather
+    // than defaulting to empty (2026-11-04, see note above).
+    const allDelayEntries = (p.delayLog && p.delayLog.length) ? p.delayLog : projectAutoDelayLogEntries(p);
     delayPanel.appendChild(el("h3", { class: "weekly-subhead", id: "delay-attribution-section" }, ["Delay attribution (all stages)"]));
     delayPanel.appendChild(
       el("p", { class: "section-subhead" }, [
-        "By team, member and reason — the same breakdown shown per-stage in the stage detail modal (click a Grid cell), summed across every stage here.",
+        "By team, member and reason — the same breakdown shown per-stage in the stage detail modal (click a Grid cell), summed across every stage here. Pre-loaded from the Schedule timeline above when nothing's been manually reported yet.",
       ])
     );
-    delayPanel.appendChild(buildStageAnalysisPanel(allDelayEntries, "No delay log entries recorded yet."));
+    delayPanel.appendChild(buildStageAnalysisPanel(allDelayEntries, "No schedule-driven delays detected yet."));
 
     delayPanel.appendChild(el("h3", { class: "weekly-subhead", id: "delay-entries-section" }, ["Delay log entries (all stages)"]));
     if (!allDelayEntries.length) {
-      delayPanel.appendChild(el("p", { class: "empty-note" }, ["No manually reported delay log entries recorded yet."]));
+      delayPanel.appendChild(el("p", { class: "empty-note" }, ["No schedule-driven delays detected yet."]));
     } else {
       delayPanel.appendChild(buildManualDelayLogSearchTable(allDelayEntries));
     }
@@ -5965,6 +6013,14 @@
     const tableHolder = el("div");
     wrap.appendChild(tableHolder);
 
+    // Default sort matches the Schedule timeline's own (newest-first)
+    // order rather than re-sorting by day-count (2026-11-04, "they should
+    // show according to the timeline") — `entries` already arrives in that
+    // order whether it's the real manually-reported `p.delayLog` or the
+    // auto-loaded fallback (`projectAutoDelayLogEntries()`). Clicking the
+    // "Days" header switches to sorting by magnitude instead, toggling
+    // direction on repeat clicks, same as before.
+    let sortByDays = false;
     let sortDesc = true;
 
     function render() {
@@ -5974,10 +6030,10 @@
       let filtered = entries.filter((e) => {
         if (reasonFilter !== "all" && e.reason !== reasonFilter) return false;
         if (teamFilter !== "all" && e.team !== teamFilter) return false;
-        if (q && !(e.reason + " " + e.member + " " + e.team + " " + e.id).toLowerCase().includes(q)) return false;
+        if (q && !((e.reason || "") + " " + (e.member || "") + " " + (e.team || "") + " " + (e.id || "")).toLowerCase().includes(q)) return false;
         return true;
       });
-      filtered = filtered.slice().sort((a, b) => (sortDesc ? b.days - a.days : a.days - b.days));
+      filtered = sortByDays ? filtered.slice().sort((a, b) => (sortDesc ? b.days - a.days : a.days - b.days)) : filtered.slice();
 
       tableHolder.innerHTML = "";
       if (!filtered.length) {
@@ -5985,10 +6041,11 @@
         return;
       }
 
-      const sortArrow = el("span", { class: "stagedetail-sort-arrow" }, [sortDesc ? "▼" : "▲"]);
+      const sortArrow = sortByDays ? el("span", { class: "stagedetail-sort-arrow" }, [sortDesc ? "▼" : "▲"]) : null;
       const daysHeader = el("th", { class: "stagedetail-days-header" }, ["Days ", sortArrow]);
       daysHeader.addEventListener("click", () => {
-        sortDesc = !sortDesc;
+        sortDesc = sortByDays ? !sortDesc : true;
+        sortByDays = true;
         render();
       });
 
@@ -6013,9 +6070,9 @@
                 el("td", { class: "stagedetail-id-cell" }, [e.id || "—"]),
                 el("td", null, [fmtDateShort(e.date)]),
                 el("td", null, [e.stage || "—"]),
-                el("td", null, [e.reason]),
-                el("td", null, [e.member]),
-                el("td", null, [e.team]),
+                el("td", null, [e.reason || "—"]),
+                el("td", null, [e.member || "—"]),
+                el("td", null, [e.team || "—"]),
                 el("td", null, [el("span", { class: "stagedetail-days-pill" }, [e.days + "d"])]),
               ])
             )
