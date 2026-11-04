@@ -1772,9 +1772,17 @@
         {
           "date": "2026-11-02",
           "label": "Hotfix deployment",
-          "from": "2026-11-08",
-          "to": "2026-11-18",
+          "from": "2026-10-23",
+          "to": "2026-11-30",
           "stage": "Hypercare"
+        },
+        {
+          "date": "2026-10-12",
+          "label": "Go-Live (Rollout)",
+          "from": "2026-10-12",
+          "to": "2026-10-12",
+          "stage": "Rollout",
+          "vsPlanWorkingDays": 0
         }
       ]
     },
