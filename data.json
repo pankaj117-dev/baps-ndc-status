@@ -1926,7 +1926,7 @@
         },
         {
           "title": "Old contacts kept after changing campaign contact lists",
-          "summary": "With custom variables, swapped lists stayed attached (30 sent instead of 10).",
+          "summary": "In a campaign, the old contact list is retained even after changing the contact list.",
           "rca": "Under RCA review",
           "reportedBy": "Vyom",
           "status": "Resolved"
