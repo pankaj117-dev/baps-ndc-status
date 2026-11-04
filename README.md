@@ -1086,6 +1086,22 @@ that `delayDays: 4` / its `delayNote` ("Hotfix deployment moved from
 Nov 8 to Nov 18...") is about a separate, later post-launch hotfix
 milestone — nothing to do with the go-live date at all. Left untouched.
 
+**MyBKY (Phase 1) stage dates taken from the plan, all views (2026-11-04):**
+per explicit request ("the hypercare started on 6th of Oct — update all of
+these dates from the screenshot across the tabs and all the cards"). Set
+`stageDatesFromPlan: true` on `mybky-phase1`, the same flag GMS 1.4 already
+uses: `computeStageSegments()` then returns `stageSegmentsFromPlan()`, so the
+Grid tab, the Stage-gate timeline, and the stage detail modal's "Actual"
+dates all read straight from `stagePlan`'s latest dates instead of being
+reconstructed from the weekly snapshots. That reconstruction is what had
+Hypercare starting Oct 5 (the snapshot where the stage flipped) even though
+the plan — and the PM's stage table — says Oct 6, and it's the same reason
+the Grid's per-stage delay chips were reading negative (the snapshot-derived
+durations can't represent the overlapping UAT/VAPT windows). With the plan
+as the source, Hypercare's actual start is Oct 6 and each stage's actual
+range matches its own revised plan. A hard refresh picks it up — it's a data
+change, no code or cache-bust bump.
+
 **Open-item counts in the progress facts panel (2026-11-04):** per explicit
 request ("this is what I want to see in the second image section") — the
 three badges the project card shows (open dependencies / open risks /
