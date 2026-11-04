@@ -2833,6 +2833,37 @@ body.no-scroll { overflow: hidden; }
 
 /* ---------- Milestones list (Schedule tab) ---------- */
 
+/* Go-Live, pinned as its own row ahead of the rest of the milestone log
+   (2026-11-04, "milestone should be below under the milestone") — moved
+   here from the progress-facts list. */
+.milestones-golive {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+.milestones-golive-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+}
+
+.milestones-golive-date {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
 .milestones-list {
   margin: 0 0 16px;
   padding: 0;

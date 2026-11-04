@@ -1086,6 +1086,15 @@ that `delayDays: 4` / its `delayNote` ("Hotfix deployment moved from
 Nov 8 to Nov 18...") is about a separate, later post-launch hotfix
 milestone — nothing to do with the go-live date at all. Left untouched.
 
+**Go-Live date moved into the Milestones section (2026-11-04):** per
+explicit request ("milestone should be below under the milestone"), right
+after the single-date change above. `buildProgressFactsList()` no longer
+renders a "Go-live" row at all — it's now its own pinned row
+(`.milestones-golive`) at the top of the Schedule tab's Milestones
+section, ahead of the rest of the `p.milestones` log (or the "No
+milestones logged yet" empty state). Still a single date, still the
+current committed `goLive`.
+
 **Go-Live fact row shows a single date, all projects (2026-11-04):** per
 explicit request ("Go Live should just be 1 date - check and update for all
 projects"). `buildProgressFactsList()`'s "Go-live" row previously rendered
