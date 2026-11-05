@@ -64,16 +64,16 @@
       "owner": "Jeet Savani",
       "status": "green",
       "progress": 80,
-      "stage": "Tech. Design",
-      "phase": "Requirements complete 17-Sep; TDD 17-Sep to 29-Sep-2026",
+      "stage": "Development",
+      "phase": "Release 2A (P5 + P4): Dev & QA through 04-Nov, go-live 19-Nov. Release 2B go-live 07-Jan.",
       "nextMilestone": {
-        "name": "TDD",
-        "date": "2026-09-29"
+        "name": "UAT",
+        "date": "2026-11-05"
       },
-      "goLive": "2026-12-24",
-      "originalGoLive": "2026-12-31",
+      "goLive": "2026-11-19",
+      "originalGoLive": "2026-11-19",
       "delayDays": 0,
-      "delayNote": "Project plan to be ready by 2026-09-29 (per 22-Sep deck)",
+      "delayNote": "Release 2A TDD end moved 29-Sep → 21-Oct (16 weekdays). Go-live for 2A is 19-Nov with no slip. Release 2B TDD revised end is TBD; its go-live is 07-Jan.",
       "delayImpact": "",
       "delayMitigation": [
         "Connecting with Walle team to set pre-expectations, scope of work, and priority"
@@ -122,18 +122,92 @@
       "dependencySeq": 101,
       "stagePlan": {
         "Requirements": {
-          "initialEnd": "2026-09-17",
-          "latestEnd": "2026-09-17",
           "initialStart": "2026-06-12",
-          "latestStart": "2026-06-12"
+          "latestStart": "2026-06-12",
+          "initialEnd": "2026-09-17",
+          "latestEnd": "2026-09-17"
         },
         "Tech. Design": {
           "initialStart": "2026-09-17",
           "latestStart": "2026-09-17",
           "initialEnd": "2026-09-29",
+          "latestEnd": "2026-10-21"
+        },
+        "Development": {
+          "initialStart": "2026-10-01",
+          "latestStart": "2026-10-01",
+          "initialEnd": "2026-11-04",
+          "latestEnd": "2026-11-04"
+        },
+        "UAT": {
+          "initialStart": "2026-11-05",
+          "latestStart": "2026-11-05",
+          "initialEnd": "2026-11-18",
+          "latestEnd": "2026-11-18"
+        },
+        "VAPT": {
+          "initialStart": "2026-11-05",
+          "latestStart": "2026-11-05",
+          "initialEnd": "2026-11-12",
+          "latestEnd": "2026-11-12"
+        },
+        "Rollout": {
+          "initialStart": "2026-11-19",
+          "latestStart": "2026-11-19",
+          "initialEnd": "2026-11-19",
+          "latestEnd": "2026-11-19"
+        },
+        "TDD 2B": {
+          "initialStart": "2026-09-17",
+          "latestStart": "2026-09-17",
+          "initialEnd": "2026-09-29",
           "latestEnd": "2026-09-29"
+        },
+        "Dev 2B": {
+          "initialStart": "2026-11-20",
+          "latestStart": "2026-11-20",
+          "initialEnd": "2026-12-27",
+          "latestEnd": "2026-12-27"
+        },
+        "UAT 2B": {
+          "initialStart": "2026-12-28",
+          "latestStart": "2026-12-28",
+          "initialEnd": "2027-01-05",
+          "latestEnd": "2027-01-05"
+        },
+        "VAPT 2B": {
+          "initialStart": "2026-12-28",
+          "latestStart": "2026-12-28",
+          "initialEnd": "2027-01-05",
+          "latestEnd": "2027-01-05"
+        },
+        "Go-Live 2B": {
+          "initialStart": "2027-01-07",
+          "latestStart": "2027-01-07",
+          "initialEnd": "2027-01-07",
+          "latestEnd": "2027-01-07"
+        },
+        "Hypercare": {
+          "initialStart": "2027-01-08",
+          "latestStart": "2027-01-08",
+          "initialEnd": "2027-01-30",
+          "latestEnd": "2027-01-30"
         }
       },
+      "stageDateOrder": [
+        { "stage": "Requirements", "label": "Requirement (2A)" },
+        { "stage": "Tech. Design", "label": "TDD (2A)" },
+        { "stage": "Development", "label": "Development & QA (2A)" },
+        { "stage": "UAT", "label": "UAT (2A)" },
+        { "stage": "VAPT", "label": "VAPT & Load (2A)" },
+        { "stage": "Rollout", "label": "Go-Live (2A)" },
+        { "stage": "TDD 2B", "label": "TDD (2B)" },
+        { "stage": "Dev 2B", "label": "Development & QA (2B)" },
+        { "stage": "UAT 2B", "label": "UAT (2B)" },
+        { "stage": "VAPT 2B", "label": "VAPT & Load (2B)" },
+        { "stage": "Go-Live 2B", "label": "Go-Live (2B)" },
+        { "stage": "Hypercare", "label": "Hypercare (2B)" }
+      ],
       "riskSeq": 102,
       "changeRequests": [],
       "decisions": [],
@@ -201,10 +275,10 @@
         "name": "TDD",
         "date": "2026-09-25"
       },
-      "goLive": "2026-11-06",
+      "goLive": "2026-11-03",
       "originalGoLive": "2026-10-29",
-      "delayDays": 0,
-      "delayNote": "Scope confirmed with Manojbhai; project plan summary reviewed and confirmed with Manojbhai",
+      "delayDays": 3,
+      "delayNote": "Stage Dates sheet update: TDD slipped 11 weekdays (25-Sep → 11-Oct), Development & QA slipped 3 weekdays (21-Oct → 26-Oct); Go-Live moved 3 weekdays (29-Oct → 3-Nov).",
       "delayImpact": "",
       "delayMitigation": [],
       "delayTradeoffs": "",
@@ -290,39 +364,55 @@
           "initialStart": "2026-09-09",
           "latestStart": "2026-09-09",
           "initialEnd": "2026-09-25",
-          "latestEnd": "2026-09-25"
+          "latestEnd": "2026-10-11"
         },
         "Development": {
           "initialStart": "2026-09-28",
-          "latestStart": "2026-09-28",
+          "latestStart": "2026-10-01",
           "initialEnd": "2026-10-21",
-          "latestEnd": "2026-10-21"
+          "latestEnd": "2026-10-26"
         },
         "VAPT": {
           "initialStart": "2026-10-14",
-          "latestStart": "2026-10-14",
-          "initialEnd": "2026-10-28",
-          "latestEnd": "2026-10-28"
-        },
-        "UAT": {
-          "initialStart": "2026-10-22",
           "latestStart": "2026-10-22",
-          "initialEnd": "2026-10-28",
-          "latestEnd": "2026-10-28"
-        },
-        "Rollout": {
-          "initialStart": "2026-10-28",
-          "latestStart": "2026-10-28",
           "initialEnd": "2026-10-29",
           "latestEnd": "2026-10-29"
         },
+        "UAT": {
+          "initialStart": "2026-10-22",
+          "latestStart": "2026-10-23",
+          "initialEnd": "2026-10-28",
+          "latestEnd": "2026-10-28"
+        },
+        "Load": {
+          "initialStart": "2026-10-15",
+          "latestStart": "2026-10-27",
+          "initialEnd": "2026-10-28",
+          "latestEnd": "2026-11-17"
+        },
+        "Rollout": {
+          "initialStart": "2026-10-29",
+          "latestStart": "2026-10-29",
+          "initialEnd": "2026-10-29",
+          "latestEnd": "2026-11-03"
+        },
         "Hypercare": {
           "initialStart": "2026-10-30",
-          "latestStart": "2026-10-30",
+          "latestStart": "2026-11-04",
           "initialEnd": "2026-11-20",
-          "latestEnd": "2026-11-20"
+          "latestEnd": "2026-11-25"
         }
       },
+      "stageDateOrder": [
+        { "stage": "Requirements", "label": "Requirement" },
+        { "stage": "Tech. Design", "label": "TDD" },
+        { "stage": "Development", "label": "Development & QA" },
+        { "stage": "UAT", "label": "UAT" },
+        { "stage": "VAPT", "label": "VAPT" },
+        { "stage": "Load", "label": "Load (Not in scope)" },
+        { "stage": "Rollout", "label": "Go-Live" },
+        { "stage": "Hypercare", "label": "Hypercare" }
+      ],
       "changeRequests": [],
       "decisions": [],
       "goLiveChecklist": [],
@@ -344,8 +434,8 @@
       },
       "goLive": "2026-08-28",
       "originalGoLive": "2026-08-25",
-      "delayDays": 0,
-      "delayNote": "Pre-go-live UAT/Production stages both completed (with 5-day and 3-day slips already reflected in Go-Live date); now in post-go-live REQ phase",
+      "delayDays": 3,
+      "delayNote": "Overall: go-live landed 28-Aug against 25-Aug planned, +3 weekdays. Stage Dates sheet: UAT (Pre Go-Live) end moved 22-Aug → 27-Aug. Production (Pre Go-Live) end moved 25-Aug → 28-Aug, which is the go-live date. Post Go-Live REQ started 02-Sep; its end, and Dev, UAT, Go-Live, and Hypercare after that, are TBD.",
       "dependencies": [
         {
           "id": "DEP-101",
@@ -482,8 +572,25 @@
           "latestStart": "2026-08-22",
           "initialEnd": "2026-08-25",
           "latestEnd": "2026-08-28"
-        }
+        },
+        "REQ Post": {
+          "initialStart": "2026-09-02",
+          "latestStart": "2026-09-02"
+        },
+        "Dev Post": {},
+        "UAT Post": {},
+        "Go-Live Post": {},
+        "Hypercare Post": {}
       },
+      "stageDateOrder": [
+        { "stage": "UAT", "label": "UAT (Pre Go-Live)" },
+        { "stage": "Rollout", "label": "Production (Pre Go-Live)" },
+        { "stage": "REQ Post", "label": "REQ (Post Go-Live)" },
+        { "stage": "Dev Post", "label": "Dev (Post Go-Live)" },
+        { "stage": "UAT Post", "label": "UAT (Post Go-Live)" },
+        { "stage": "Go-Live Post", "label": "Go-Live" },
+        { "stage": "Hypercare Post", "label": "Hypercare" }
+      ],
       "riskSeq": 106,
       "changeRequests": [],
       "decisions": [],
@@ -505,11 +612,11 @@
         "date": "2026-11-06"
       },
       "goLive": "2026-10-01",
-      "originalGoLive": "2026-09-21",
+      "originalGoLive": "2026-10-05",
       "recoveryNote": "",
       "stageDatesFromPlan": true,
       "delayDays": 0,
-      "delayNote": "Go-live achieved 01-Oct-2026; no delay.",
+      "delayNote": "Go-live achieved 01-Oct-2026, ahead of the 05-Oct plan. No overall delay. Development, UAT and VAPT each ran past their own original end; later stages ran in parallel and the launch held.",
       "dependencies": [
         {
           "id": "DEP-101",
@@ -685,8 +792,24 @@
           "latestStart": "2026-08-18",
           "initialEnd": "2026-09-16",
           "latestEnd": "2026-09-24"
+        },
+        "Load": {
+          "initialStart": "2026-08-18",
+          "latestStart": "2026-08-18",
+          "initialEnd": "2026-09-16",
+          "latestEnd": "2026-09-21"
         }
       },
+      "stageDateOrder": [
+        { "stage": "Requirements", "label": "Requirement" },
+        { "stage": "Tech. Design", "label": "TDD" },
+        { "stage": "Development", "label": "Development & QA" },
+        { "stage": "UAT", "label": "UAT" },
+        { "stage": "VAPT", "label": "VAPT" },
+        { "stage": "Load", "label": "Load" },
+        { "stage": "Rollout", "label": "Go-Live" },
+        { "stage": "Hypercare", "label": "Hypercare" }
+      ],
       "riskSeq": 105,
       "delayLogSeq": 100,
       "changeRequests": [
@@ -1064,8 +1187,8 @@
       },
       "goLive": "2027-01-28",
       "originalGoLive": "2027-01-28",
-      "delayDays": 22,
-      "delayNote": "Team on Phase 1 bugs and 9 CR items from 29-Sep to 18-Oct (~16 working days); Event Management Figma approved 6 days late (19-Oct); GL & Chaperon requirements late (planned 21-Oct).",
+      "delayDays": 0,
+      "delayNote": "Stage Dates sheet: Requirement end moved 02-Oct → 05-Nov (24 weekdays). TDD end moved 23-Oct → 05-Nov (9 weekdays; the sheet's 5 only counts the 30-Oct revision). Go-Live is still 28-Jan, so there is no project-level delay.",
       "dependencies": [
         {
           "id": "DEP-101",
@@ -1296,6 +1419,12 @@
           "initialEnd": "2027-01-08",
           "latestEnd": "2027-01-08"
         },
+        "Load": {
+          "initialStart": "2026-12-21",
+          "latestStart": "2026-12-21",
+          "initialEnd": "2027-01-08",
+          "latestEnd": "2027-01-08"
+        },
         "Rollout": {
           "initialStart": "2027-01-11",
           "latestStart": "2027-01-11",
@@ -1309,6 +1438,16 @@
           "latestEnd": "2027-03-05"
         }
       },
+      "stageDateOrder": [
+        { "stage": "Requirements", "label": "Requirement" },
+        { "stage": "Tech. Design", "label": "TDD" },
+        { "stage": "Development", "label": "Development & QA" },
+        { "stage": "UAT", "label": "UAT" },
+        { "stage": "VAPT", "label": "VAPT" },
+        { "stage": "Load", "label": "Load" },
+        { "stage": "Rollout", "label": "Go-Live" },
+        { "stage": "Hypercare", "label": "Hypercare" }
+      ],
       "riskSeq": 120,
       "changeRequests": [],
       "decisions": [
@@ -1359,9 +1498,10 @@
       "milestoneOverlay": false,
       "scheduleBaseline": true,
       "parallelStages": {
-        "Requirements": "Requirements",
-        "Tech. Design": "Design",
-        "Development": "Development & QA"
+        "Requirements": "Requirement",
+        "Tech. Design": "TDD",
+        "Development": "Development & QA",
+        "Rollout": "Go-Live"
       },
       "decisionSeq": 102,
       "usePmStatus": true
@@ -1377,10 +1517,10 @@
         "name": "Milestone 2 \u2013 Nov 2026 release",
         "date": "2026-11-06"
       },
-      "goLive": "2026-11-30",
-      "originalGoLive": "2026-10-30",
+      "goLive": "2026-11-23",
+      "originalGoLive": "2026-11-23",
       "delayDays": 0,
-      "delayNote": "TDD end revised from 22-Sep to 25-Sep (+2 days) per 22-Sep deck; Amber status.",
+      "delayNote": "Milestone 1: TDD end moved 22-Sep → 07-Oct (11 weekdays). UAT end moved 26-Oct → 29-Oct (3 weekdays). Milestone 2: Development & QA end moved earlier, 15-Nov → 05-Nov (7 weekdays saved). Go-live is 23-Nov with no slip.",
       "dependencies": [
         {
           "id": "DEP-101",
@@ -1449,43 +1589,72 @@
       "statusChangeReason": "",
       "dependencySeq": 102,
       "stagePlan": {
-        "Tech. Design": {
-          "initialStart": "2026-09-17",
-          "latestStart": "2026-09-17",
-          "initialEnd": "2026-09-22",
-          "latestEnd": "2026-09-25"
-        },
         "Requirements": {
           "initialStart": "2026-07-22",
           "latestStart": "2026-07-22",
           "initialEnd": "2026-09-14",
           "latestEnd": "2026-09-14"
         },
+        "Tech. Design": {
+          "initialStart": "2026-09-17",
+          "latestStart": "2026-09-17",
+          "initialEnd": "2026-09-22",
+          "latestEnd": "2026-10-07"
+        },
         "Development": {
           "initialStart": "2026-09-22",
-          "latestStart": "2026-10-02",
+          "latestStart": "2026-09-30",
           "initialEnd": "2026-10-22",
-          "latestEnd": "2026-10-16"
+          "latestEnd": "2026-10-22"
         },
         "UAT": {
           "initialStart": "2026-10-23",
-          "latestStart": "2026-10-27",
+          "latestStart": "2026-10-23",
           "initialEnd": "2026-10-26",
-          "latestEnd": "2026-11-06"
+          "latestEnd": "2026-10-29"
         },
         "Rollout": {
-          "initialStart": "2026-10-28",
-          "latestStart": "2026-10-28",
-          "initialEnd": "2026-10-30",
-          "latestEnd": "2026-10-30"
+          "initialStart": "2026-11-23",
+          "latestStart": "2026-11-23",
+          "initialEnd": "2026-11-23",
+          "latestEnd": "2026-11-23"
         },
-        "VAPT": {
-          "initialStart": "2026-10-16",
-          "latestStart": "2026-11-16",
-          "initialEnd": "2026-10-28",
+        "Req M2": {
+          "initialStart": "2026-07-22",
+          "latestStart": "2026-07-22",
+          "initialEnd": "2026-09-14",
+          "latestEnd": "2026-09-14"
+        },
+        "TDD M2": {
+          "initialStart": "2026-10-12",
+          "latestStart": "2026-10-12",
+          "initialEnd": "2026-10-22",
+          "latestEnd": "2026-10-24"
+        },
+        "Dev M2": {
+          "initialStart": "2026-10-22",
+          "latestStart": "2026-10-22",
+          "initialEnd": "2026-11-15",
+          "latestEnd": "2026-11-05"
+        },
+        "UAT M2": {
+          "initialStart": "2026-11-16",
+          "latestStart": "2026-11-06",
+          "initialEnd": "2026-11-20",
           "latestEnd": "2026-11-20"
         }
       },
+      "stageDateOrder": [
+        { "stage": "Requirements", "label": "Requirement (Milestone 1)" },
+        { "stage": "Tech. Design", "label": "TDD (Milestone 1)" },
+        { "stage": "Development", "label": "Development & QA (Milestone 1)" },
+        { "stage": "UAT", "label": "UAT (Milestone 1)" },
+        { "stage": "Req M2", "label": "Requirement (Milestone 2)" },
+        { "stage": "TDD M2", "label": "TDD (Milestone 2)" },
+        { "stage": "Dev M2", "label": "Development & QA (Milestone 2)" },
+        { "stage": "UAT M2", "label": "UAT (Milestone 2)" },
+        { "stage": "Rollout", "label": "Go-Live" }
+      ],
       "riskSeq": 103,
       "changeRequests": [],
       "decisions": [],
@@ -1534,9 +1703,9 @@
         "date": "2026-11-30"
       },
       "goLive": "2026-10-12",
-      "originalGoLive": "2026-10-19",
-      "delayDays": 4,
-      "delayNote": "Hotfix deployment moved from Nov 8 to Nov 18 (time spent on post-prod bug fixes; 1 week of Diwali vacation).",
+      "originalGoLive": "2026-10-12",
+      "delayDays": 0,
+      "delayNote": "Overall: launch go-live held 12-Oct, so no project delay. The hotfix go-live moved 23-Nov → 30-Nov (+5 weekdays) and stays on that stage. Requirement +3, TDD +6, Development +7, QA +7, UAT +4 weekdays. Hotfix Development end moved 02-Nov → 06-Nov (4 weekdays). Hotfix QA end moved 06-Nov → 20-Nov. Hotfix go-live moved 23-Nov → 30-Nov.",
       "dependencies": [
         {
           "id": "DEP-101",
@@ -1634,10 +1803,66 @@
         "Hypercare": {
           "initialStart": "2026-10-12",
           "latestStart": "2026-10-12",
-          "initialEnd": "2026-11-12",
-          "latestEnd": "2026-11-12"
+          "initialEnd": "2026-12-31",
+          "latestEnd": "2026-12-31"
+        },
+        "QA": {
+          "initialStart": "2026-09-17",
+          "latestStart": "2026-09-17",
+          "initialEnd": "2026-09-26",
+          "latestEnd": "2026-10-07"
+        },
+        "Pilot": {
+          "initialStart": "2026-09-14",
+          "latestStart": "2026-09-14"
+        },
+        "Dev Hotfix": {
+          "initialStart": "2026-10-19",
+          "latestStart": "2026-10-19",
+          "initialEnd": "2026-11-02",
+          "latestEnd": "2026-11-06"
+        },
+        "QA Hotfix": {
+          "initialStart": "2026-10-30",
+          "latestStart": "2026-10-30",
+          "initialEnd": "2026-11-06",
+          "latestEnd": "2026-11-20"
+        },
+        "UAT Hotfix": {
+          "initialStart": "2026-11-07",
+          "latestStart": "2026-11-21",
+          "initialEnd": "2026-11-08",
+          "latestEnd": "2026-11-22"
+        },
+        "VAPT Hotfix": {
+          "initialStart": "2026-11-16",
+          "latestStart": "2026-11-21",
+          "initialEnd": "2026-11-22",
+          "latestEnd": "2026-11-27"
+        },
+        "Go-Live Hotfix": {
+          "initialStart": "2026-11-23",
+          "latestStart": "2026-11-30",
+          "initialEnd": "2026-11-23",
+          "latestEnd": "2026-11-30"
         }
       },
+      "stageDateOrder": [
+        { "stage": "Requirements", "label": "Requirement" },
+        { "stage": "Tech. Design", "label": "TDD" },
+        { "stage": "Development", "label": "Development" },
+        { "stage": "QA", "label": "QA" },
+        { "stage": "UAT", "label": "UAT" },
+        { "stage": "VAPT", "label": "VAPT" },
+        { "stage": "Rollout", "label": "Go-Live" },
+        { "stage": "Hypercare", "label": "Hypercare" },
+        { "stage": "Pilot", "label": "Pilot (Selected Centers)" },
+        { "stage": "Dev Hotfix", "label": "Development (Hotfix)" },
+        { "stage": "QA Hotfix", "label": "QA (Hotfix)" },
+        { "stage": "UAT Hotfix", "label": "UAT (Hotfix)" },
+        { "stage": "VAPT Hotfix", "label": "VAPT & Load Testing (Hotfix)" },
+        { "stage": "Go-Live Hotfix", "label": "Go-Live (Hotfix)" }
+      ],
       "riskSeq": 101,
       "changeRequests": [
         {
@@ -2025,7 +2250,7 @@
       "goLive": "2026-11-06",
       "originalGoLive": "2026-11-06",
       "delayDays": 0,
-      "delayNote": "Renamed to SSO V2 this week. Karyakar deployment was blocked on SID; session 1 scheduled 9/17 with Vishal Patel (Tampa) for ASM/GSS.",
+      "delayNote": "Stage Dates sheet: Development & QA end is 06-Nov (Satsangi; Karyakar 05-Nov; earlier revision 26-Oct). UAT end is 13-Nov (Satsangi; Karyakar 06-Nov; earlier revision 29-Oct). Hypercare start moved to 01-Dec. VAPT revised start is 29-Oct but the revised end is TBD, so that stage is still plotted on 15-Oct–21-Oct. Load revised end and Go-Live revised dates are TBD.",
       "dependencies": [
         {
           "id": "DEP-101",
@@ -2166,9 +2391,51 @@
         },
         "Development": {
           "initialStart": "2026-07-01",
-          "latestStart": "2026-07-01"
+          "latestStart": "2026-07-01",
+          "initialEnd": "2026-10-09",
+          "latestEnd": "2026-11-06"
+        },
+        "UAT": {
+          "initialStart": "2026-10-12",
+          "latestStart": "2026-11-12",
+          "initialEnd": "2026-10-14",
+          "latestEnd": "2026-11-13"
+        },
+        "VAPT": {
+          "initialStart": "2026-10-15",
+          "latestStart": "2026-10-15",
+          "initialEnd": "2026-10-21",
+          "latestEnd": "2026-10-21"
+        },
+        "Load": {
+          "initialStart": "2026-10-27",
+          "latestStart": "2026-10-27",
+          "initialEnd": "2026-10-28",
+          "latestEnd": "2026-10-28"
+        },
+        "Rollout": {
+          "initialStart": "2026-11-04",
+          "latestStart": "2026-11-04",
+          "initialEnd": "2026-11-06",
+          "latestEnd": "2026-11-06"
+        },
+        "Hypercare": {
+          "initialStart": "2026-11-06",
+          "latestStart": "2026-12-01",
+          "initialEnd": "2026-12-31",
+          "latestEnd": "2026-12-31"
         }
       },
+      "stageDateOrder": [
+        { "stage": "Requirements", "label": "Requirement" },
+        { "stage": "Tech. Design", "label": "TDD" },
+        { "stage": "Development", "label": "Development & QA" },
+        { "stage": "UAT", "label": "UAT" },
+        { "stage": "VAPT", "label": "VAPT" },
+        { "stage": "Load", "label": "Load" },
+        { "stage": "Rollout", "label": "Go-Live" },
+        { "stage": "Hypercare", "label": "Hypercare" }
+      ],
       "riskSeq": 108,
       "changeRequests": [],
       "decisions": [],
@@ -2225,15 +2492,15 @@
       "owner": "Sandeep Pistolwala",
       "status": "green",
       "progress": 100,
-      "phase": "Production go-live completed; Hypercare started 14-Sep (2 days early vs. revised plan)",
+      "phase": "SPM 1A. Hypercare 01-Nov–25-Nov. Go-live 30-Oct, was 22-Oct.",
       "nextMilestone": {
         "name": "Hypercare completion",
-        "date": "2026-10-31"
+        "date": "2026-11-25"
       },
-      "goLive": "2026-08-31",
-      "originalGoLive": "2026-08-29",
-      "delayDays": 12,
-      "delayNote": "UAT/VAPT/Load/Go-Live all slipped from original plan (UAT +3d, VAPT/Load +15d, Go-Live +12d) but production deployment is now complete and stable.",
+      "goLive": "2026-10-30",
+      "originalGoLive": "2026-10-22",
+      "delayDays": 6,
+      "delayNote": "Stage Dates sheet: TDD end moved 01-Oct → 29-Oct (20 weekdays). Load Testing, UAT, and VAPT ends moved 20-Oct → 28-Oct (6 weekdays). Go-Live end moved 22-Oct → 30-Oct (6 weekdays).",
       "dependencies": [
         {
           "id": "DEP-101",
@@ -2282,11 +2549,65 @@
       "dependencySeq": 101,
       "riskSeq": 101,
       "stagePlan": {
+        "Requirements": {
+          "initialStart": "2026-03-09",
+          "latestStart": "2026-03-09",
+          "initialEnd": "2026-03-20",
+          "latestEnd": "2026-03-20"
+        },
+        "Tech. Design": {
+          "initialStart": "2026-09-16",
+          "latestStart": "2026-09-16",
+          "initialEnd": "2026-10-01",
+          "latestEnd": "2026-10-29"
+        },
+        "Development": {
+          "initialStart": "2026-10-02",
+          "latestStart": "2026-10-02",
+          "initialEnd": "2026-10-15",
+          "latestEnd": "2026-10-15"
+        },
+        "Load": {
+          "initialStart": "2026-10-16",
+          "latestStart": "2026-10-16",
+          "initialEnd": "2026-10-20",
+          "latestEnd": "2026-10-28"
+        },
+        "UAT": {
+          "initialStart": "2026-10-16",
+          "latestStart": "2026-10-16",
+          "initialEnd": "2026-10-20",
+          "latestEnd": "2026-10-28"
+        },
+        "VAPT": {
+          "initialStart": "2026-10-16",
+          "latestStart": "2026-10-16",
+          "initialEnd": "2026-10-20",
+          "latestEnd": "2026-10-28"
+        },
+        "Rollout": {
+          "initialStart": "2026-10-21",
+          "latestStart": "2026-10-21",
+          "initialEnd": "2026-10-22",
+          "latestEnd": "2026-10-30"
+        },
         "Hypercare": {
-          "initialEnd": "2026-09-30",
-          "latestEnd": "2026-09-30"
+          "initialStart": "2026-11-01",
+          "latestStart": "2026-11-01",
+          "initialEnd": "2026-11-25",
+          "latestEnd": "2026-11-25"
         }
       },
+      "stageDateOrder": [
+        { "stage": "Requirements", "label": "Requirement" },
+        { "stage": "Tech. Design", "label": "TDD" },
+        { "stage": "Development", "label": "Development & QA" },
+        { "stage": "Load", "label": "Load Testing (QA)" },
+        { "stage": "UAT", "label": "UAT" },
+        { "stage": "VAPT", "label": "VAPT" },
+        { "stage": "Rollout", "label": "Go-Live" },
+        { "stage": "Hypercare", "label": "Hypercare" }
+      ],
       "changeRequests": [],
       "decisions": [],
       "goLiveChecklist": [],

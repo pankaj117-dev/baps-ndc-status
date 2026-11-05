@@ -3,25 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BAPS NDC · Program Status</title>
+<title>Program Status Dashboard - PM Track</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=112">
+<link rel="stylesheet" href="styles.css?v=143">
 </head>
 <body>
   <div class="wrap">
     <header class="masthead">
       <div class="masthead-title">
         <span class="kicker">BAPS North America · NDC</span>
-        <h1>Program Status</h1>
+        <h1>Program Status Dashboard - PM Track</h1>
       </div>
       <div class="masthead-meta">
         <strong id="asOf">As of —</strong>
         <span id="lastUpdated">Data last updated —</span>
-        <div class="masthead-actions">
-          <button id="openFeedbackBtn" class="btn-ghost">📝 Add feedback</button>
-        </div>
       </div>
     </header>
 
@@ -30,7 +27,6 @@
       <button class="tab-btn" data-tab="grid" role="tab" aria-selected="false">Grid</button>
       <button class="tab-btn" data-tab="hawkeye" role="tab" aria-selected="false">🦅 Hawk-eye</button>
       <button class="tab-btn" data-tab="deps" role="tab" aria-selected="false">Dependencies</button>
-      <button class="tab-btn" data-tab="statushistory" role="tab" aria-selected="false">Status History</button>
       <button class="tab-btn" data-tab="team" role="tab" aria-selected="false">Team Performance</button>
     </nav>
 
@@ -132,12 +128,6 @@
       <div id="escalationsBoard" class="deps-board"></div>
     </section>
 
-    <section id="panel-statushistory" class="tab-panel">
-      <h2 class="section-heading">Status history</h2>
-      <p class="section-subhead">Every status change (On Track ↔ At Risk / Delay ↔ Critical) and every go-live / milestone date shift, across every project, newest first — with dates, what changed, and the why. Click a project name to open its full detail view. Use the Project filter above to see just one project's story: how it got delayed, when its timeline shifted, and why.</p>
-      <div id="statusHistoryList" class="status-history-list"></div>
-    </section>
-
     <section id="panel-team" class="tab-panel">
       <div class="stub-panel">
         <div class="stub-icon">🛰️</div>
@@ -211,8 +201,7 @@
     <div class="modal">
       <h3>Log feedback / a follow-up</h3>
       <p class="modal-sub">
-        This opens a pre-filled GitHub issue for you to submit — no typing twice, and it'll show
-        up here as an open follow-up until the PM addresses it.
+        This stays on this project’s Feedback tab in this browser. Clean it up into a follow-up later.
       </p>
       <label for="fbProject">Project</label>
       <select id="fbProject"></select>
@@ -224,11 +213,52 @@
       <input id="fbRaisedBy" type="text" placeholder="Swami">
       <div class="modal-actions">
         <button id="fbCancel" class="btn-ghost">Cancel</button>
-        <button id="fbSubmit" class="btn-primary">Open in GitHub to submit →</button>
+        <button id="fbSubmit" class="btn-primary">Save note</button>
       </div>
     </div>
   </div>
 
-  <script src="app.js?v=138"></script>
+  <div id="depModal" class="modal-overlay" hidden>
+    <div class="modal">
+      <h3>Add a Dependency</h3>
+      <p class="modal-sub" id="depModalProject"></p>
+      <label for="depDescription">Dependency description</label>
+      <textarea id="depDescription" rows="3" placeholder="DEVOPS-1082 — SPM production environment setup"></textarea>
+      <label for="depTeam">Owning team(s)</label>
+      <input id="depTeam" type="text" placeholder="DevOps">
+      <label for="depPriority">Priority</label>
+      <select id="depPriority">
+        <option>Critical</option>
+        <option>High</option>
+        <option selected>Medium</option>
+        <option>Low</option>
+      </select>
+      <label for="depDueBy">Needed by date (optional)</label>
+      <input id="depDueBy" type="date">
+      <label for="depMitigation">Mitigation plan (optional)</label>
+      <textarea id="depMitigation" rows="2" placeholder="Escalated to DevOps lead — if missed, UAT start slips by same amount"></textarea>
+      <div class="modal-actions">
+        <button id="depCancel" class="btn-ghost">Cancel</button>
+        <button id="depSubmit" class="btn-primary">Open in GitHub to submit →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="riskModal" class="modal-overlay" hidden>
+    <div class="modal">
+      <h3>Report a Risk</h3>
+      <p class="modal-sub" id="riskModalProject"></p>
+      <label for="riskDescription">Risk description</label>
+      <textarea id="riskDescription" rows="3" placeholder="Security re-verification slot may not land before UAT exit — could push go-live"></textarea>
+      <label for="riskMitigation">Mitigation plan (optional)</label>
+      <textarea id="riskMitigation" rows="2" placeholder="Escalated to security lead for expedited slot — if missed, go-live slips ~1 week"></textarea>
+      <div class="modal-actions">
+        <button id="riskCancel" class="btn-ghost">Cancel</button>
+        <button id="riskSubmit" class="btn-primary">Open in GitHub to submit →</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=203"></script>
 </body>
 </html>

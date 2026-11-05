@@ -39,6 +39,194 @@ On every other tab (Program Status, Grid, Hawk-eye, Dependencies) all three
 filters genuinely apply, so the bar — and the "Applies to every tab" hint —
 look exactly as before.
 
+**Grid Total is the go-live slip, not the sum of stage slips (2026-11-05).**
+The Total cell and the Portfolio total add `delayDays` only. A stage can
+slip while the next one starts in parallel, and the launch can still hold:
+MyBKY Phase 1 shows its stage chips and "on plan" overall (launched 1 Oct,
+ahead of the 5 Oct plan). GMS 1.4's launch held 12 Oct, so its overall is
+also on plan; the hotfix slip stays on that stage. Pledge 1.x is +3,
+EMM is +3, SPM is +6.
+
+**Grid stage delay is against the original end (2026-11-05).** A done
+stage's red `+Nd` chip, and the completion variance in the stage popup,
+count weekdays from `initialEnd` to `latestEnd`. They used to compare
+against the revised end, so a stage that finished on its revised date
+showed no delay: MyBKY UAT (+15, original end 9 Sep, finished 30 Sep)
+and Development (+25, original end 17 Aug, finished 21 Sep).
+
+**Team dropdown is only on Dependencies (2026-11-05).** Project and PM
+still apply on every tab except Team Performance. The Team dropdown is
+hidden everywhere else, and a team picked on Dependencies no longer
+narrows Program Status, Grid, or Hawk-eye. Switching back to Dependencies
+applies it again.
+
+**Hawk-eye shows every stage block on one row per project (2026-11-04,
+superseded same day — see the two-row Planned/Actual note below).**
+Follow-up to the two-bar Planned/Actual collapse: "I want to see every
+stage and every block but in one row." Each project was one row, every
+stage its own block at its real (latest/actual) start and end. This
+collapsed Planned and Actual into a single block per stage with a red
+overrun tail, which turned out to read as "what even is this" — the user
+actually wanted Planned and Actual as two separate, comparable rows (next
+note). Superseded, but `hawkeyeStageBlocks()` (the Actual-side block
+builder: dates, short codes, done/current/future coloring, overrun
+flagging) is still the foundation the current design builds on.
+
+**Hawk-eye uses the full panel width, every zoom (2026-11-04).** Quarter
+view used to render at a fixed, narrow `pxPerDay` regardless of how wide
+the panel actually was, leaving a lot of dead white space and several
+projects' stage blocks squeezed down to nothing ("No stage plan dates to
+plot yet" even though the data was there — confirmed with a headless-DOM
+dump, this was a width bug, not a data bug). `pxPerDay` is now
+`Math.max(zoom.pxPerDay, availableWidth / spanDays)` — Quarter stretches
+to fill whatever space the panel has; Month keeps its denser fixed scale
+so it can still scroll. The Quarter/Month toggle moved to sit directly
+above the (now full-width) chart instead of floating in a
+`justify-content: space-between` toolbar far from it. Also fixed: Hawk-eye
+measured `board.clientWidth` as 0 while its tab was still `display:none`
+on first load — switched to re-rendering on tab activation
+(`requestAnimationFrame(() => renderHawkeye())` in the tab-click handler)
+so the width is measured once the tab is actually visible.
+
+**Hawk-eye is two rows per project — Planned, then Actual with any delay
+in red (2026-11-04).** Replaces the one-row design above after direct
+feedback ("what is thiss!!!! This is not what I want") plus a concrete
+worked example from the Stage Dates reference table: *"UAT planned would
+show a block start 18-Aug-2026 and end 09-Sep-2026 and actual row would
+show same start and end would be 30-Sep-2026 with the 15 days showing the
+block in red as delay."* Each project now gets:
+- A **Planned** row — every stage with a recorded baseline
+  (`stagePlan[stage].initialStart`/`initialEnd`) gets its own block at
+  those dates (`hawkeyeStagePlannedBlocks`). Plain dashed outline, no
+  color-coding or red — it's just the baseline. A project with no
+  baseline on record skips this row entirely (e.g. SPM) rather than
+  guessing one.
+- An **Actual** row — the same stage set (reuses `hawkeyeStageBlocks()`
+  unchanged) at the latest/actual dates, with the done/current/future
+  coloring and the red overrun segment from that stage's own planned end
+  to its actual end, exactly as before.
+
+Both rows share one horizontal scale/scroll per project. Each row is a
+single line: stages that overlap in calendar time sit next to each other
+inside that shared window (`layoutHawkeyeSideBySide`), instead of
+stepping down onto extra lines. The window is not stretched and later
+stages are not pushed past their own dates, so when Planned and Actual
+end on the same day the two rows end on the same pixel. The red delay is
+still the right-hand share of that stage's own block. Each red stretch has a label under it with the stage and the weekday count (`DEV +25d`). Quarter is drawn at 1.5× the fit-to-panel scale, with taller blocks, so
+it scrolls a little and the labels are readable. Half year (same toggle)
+shrinks that back so the span fits the panel. Row labels ("Planned"/
+"Actual") stay sticky on the left while scrolling sideways.
+
+**Hawk-eye gives every stage its own shared column, and shows time saved
+too (2026-11-04).** Follow-up: *"put columns for the same stages — Req
+shows up in one column for both planned and actual, just the two rows
+show one was planned for longer and one finished sooner — I do want to
+see how much time we saved along with delays too, and above show months
+in the view."* Three changes:
+- **Shared columns.** Each stage's column spans the UNION of its planned
+  and actual start/end (`computeHawkeyeStageColumns`) — wide enough for
+  whichever ran longer — computed once from both rows together, so the
+  same stage always lands at the same x position in the Planned row and
+  the Actual row. Stages that overlap each other in that unioned window
+  (UAT through VAPT) still pack side by side inside it, same as before;
+  that packing is also now shared, so a cluster's boundaries don't shift
+  between rows. A stage's own bar (`assignHawkeyeColumnPositions`) is
+  placed inside its column proportional to its real dates — the shorter
+  side visibly doesn't reach the column's far edge.
+- **Time saved, not just delay.** When Actual finishes before Planned,
+  the leftover share of the column — past Actual's own bar, up to where
+  Planned expected it to end — is a dashed green ghost (mirrors the red
+  overrun ghost, just the other direction), with a `CODE −Xd` label
+  (weekdays, same `businessDaysBetweenIso` the rest of the dashboard
+  uses). Legend got a matching "Time saved" entry. No project's data has
+  a saved stage at the moment, but the mechanic is symmetric with delay
+  and verified with a synthetic case.
+- **Months, every zoom.** The header above the chart now always marks
+  real months (`Jan '26`, `Feb '26`, …) regardless of which Half year /
+  Quarter / Month button is active — those only change how much calendar
+  fits the panel (`pxPerDay`), not what the axis itself marks.
+
+**Hawk-eye Roadmap view (2026-11-05).** Hawk-eye opens on **Roadmap**,
+the month grid from the PMO's "2026 New Development Project Planned
+Schedule" sheet (`buildHawkeyeRoadmap`): one column per month, each
+project with a **Planned** row and an **Actual** row, and the stages
+running that month as coloured chips (REQ, DSGN, DEV, UAT, VAPT, LOAD,
+ROLLOUT, HC). On Actual, a stage still running after its planned end is
+red, and the month it finished shows the weekday slip (`DEV +25d`) or the
+time saved. The project column shows go-live and the overall go-live
+delay only. **Timeline** puts each stage in one shared column (`layoutHawkeyeProjectRows`), so the planned block sits directly above the actual one, with Half year /
+Quarter / Month zoom back (Quarter is the default and opens with today
+in view). Every project starts collapsed; the Ladder and per-project
+zoom switches are gone.
+
+**Expand a project on Hawk-eye (2026-11-05).** The shared chart stays
+compact, but each project now has an **Expand** toggle next to its name
+(plus **Expand all** / **Collapse all** above the chart). An expanded
+project gets its own calendar, fitted to just that project's dates, in a
+panel pinned to the visible width (`buildHawkeyeFocusPanel`): taller
+blocks with the full stage name and dates, delay and time-saved pills
+with full stage names, and its own Fit / 2× / 4× zoom. Which projects are
+open is remembered in this browser (`localStorage`,
+`baps-ndc-hawkeye-expanded`). Delay and time-saved pills on every row now
+drop to a second line when they'd cover each other, instead of being
+pushed far to the right.
+
+**Hawk-eye Ladder layout, trialled on SPM (2026-11-05).** SPM's TDD ran
+20 weekdays late (to 29-Oct), but Development, Load Testing, UAT, VAPT and
+Go-Live each started on their planned day, so they overlap TDD in real
+time. Side by side forced them to wait behind it. An expanded project now
+has a **Side by side / Ladder** switch (`layoutHawkeyeLadder`): in Ladder
+the Actual row draws every stage on its real dates and a stage that
+overlaps one already placed steps down to the next lane, each lane
+carrying its own delay count. The Planned row stays one line, because
+that is the plan as it was drawn up. Gaps are kept; empty space means the dates leave that time
+empty, and a weekend between two stages in one lane is not a gap. Any
+project whose actual stages overlap in time opens in Ladder
+(`hawkeyeStagesOverlap`): WebNext 2.0, Pledge 1.x, EMM, MyBKY Phase 1,
+myBKY 2A, myMandir 1B, GMS 1.4, SSO V2 and SPM. myMandir 1C does not
+overlap, so it stays one line. The Side by side / Ladder switch still
+overrides that per project and the choice is remembered in this browser.
+The shared chart keeps Planned on one line. Actual uses the ladder, so a
+stage that overlaps another steps down instead of being pushed off its date.
+
+**Hawk-eye blocks run through the end of their last day (2026-11-05).**
+A stage ending on the 15th and the next starting on the 16th used to show
+a one-day gap, because a block stopped at the start of its end date. Blocks
+now run to the start of the next day, a weekend between two stages is
+closed, and stages that run in parallel sit flush against each other. Any
+gap that is still drawn is a gap in `stagePlan` itself: at least one
+working day between a stage's `initialEnd` and the next stage's
+`initialStart`. Those come from the stage sheets and are not filled in
+(SPM Rollout 22-Oct to Hypercare 01-Nov; SPM Requirements 20-Mar to
+Tech. Design 16-Sep; SSO V2 VAPT to Load to Rollout; and a few one- to
+three-day ones on WebNext 2.0, Pledge 1.x, myBKY 2A, myMandir 1B).
+
+**Each Hawk-eye row sits on its own dates (2026-11-04).** The shared
+column above opened a hole in the Planned row whenever a stage ran long:
+Development's column grew out to the delayed finish, and the next stage
+was drawn after that, so Planned showed an empty stretch the plan never
+had (MyBKY Phase 1: Development was planned to end 17 Aug and UAT to
+start 18 Aug). Planned and Actual are now placed separately
+(`computeHawkeyeStageColumns` once per row). The plan starts when it was
+planned — earlier — and the overrun stays on the Actual row, in red. A
+stage that finished early still extends its Actual column to the planned
+end so the green time-saved tail has room. Stages that really did overlap
+on that row still sit side by side.
+
+The now-unused flat-whole-project Planned/Actual functions from the
+2-bar design two iterations ago (`stagePlannedLaneBlocks`,
+`projectOverallTimeline`, `plannedActualExtentPx`,
+`buildPlannedActualRow`, and their `.hawkeye-pa-*` CSS) were removed as
+dead code along with this change, since the per-stage two-row design
+replaces what they were for.
+
+**Status History tab removed (2026-11-04).** The portfolio-wide Status
+History tab is gone. A project's own date-change log is still on its
+Timeline tab, and each project card still shows its most recent status or
+date change. The filter bar no longer has a Status History exception, so
+Project, PM, and Team apply on every tab except Team Performance, where
+the whole bar stays hidden.
+
 ## Why this exists
 
 The weekly 90-minute leadership review used a slide per project with wildly
@@ -1111,24 +1299,51 @@ counts (`countOpenDependencies`, `countOpenRisks`, `openNotesFor`) and same
 coloring as the card: the risks badge highlights red only when there's at
 least one open risk, follow-ups highlight only when there's at least one.
 So for MyBKY Phase 1, whose 5 risks were all closed in the Nov 2 update,
-this row reads "0 dependencies · 0 risks · 0 follow-ups".
+this row reads "0 dependencies · 0 risks · 0 follow-ups". Change requests
+were added to the same row later the same day ("CRs should be here too") —
+the logged `changeRequests` count, on the card badge and in this row.
+MyBKY Phase 1 reads "8 CRs". The badge highlights only when a CR is still
+unapproved; clicking it opens the Change Request Log.
 
-**Progress-over-time chart shows one point per reporting week (2026-11-04):**
-per explicit request ("this should only show weekly views not daily or where
-an update was update. So if any of the PMs add a PR it should be for the
-Tuesday to tuesday update"). `history.json` sometimes carries more than one
-snapshot inside a single Tuesday-to-Tuesday week (a mid-week correction, or
-a snapshot dated Monday when that week's Tuesday was a holiday), and the
-chart was plotting every one of them, so it read as a daily series — e.g.
-MyBKY Phase 1 showed both Oct 13 and Oct 14, and both Oct 20 and Oct 23.
-`weeklyHistoryForProject()` collapses a project's history to one point per
-Tue–Tue week (keeping the latest snapshot in each week) and the Progress
-over time chart — including its per-milestone overlay and standalone
-per-milestone charts — now uses that instead of the raw snapshot list. For
-MyBKY Phase 1 this takes the chart from 14 points to 11. The Date change
-log, Status History tab, and stage segmentation are deliberately left on the
-full snapshot list — those exist to show each individual change, not a
-weekly rollup.
+**Open-items badges show total counts, colored green/amber/red, and all
+jump to their section (2026-11-04).** Follow-up to the row above, per
+explicit report ("why are the risk and dependencies not showing up and all
+the button should link to the icon when clicked and show in red, yellow
+and green if things have resolved or in progress or red if nothing has
+been done"). The dependencies/risks/follow-ups/CR badges used to count
+OPEN items only, so MyBKY Phase 1 — whose 6 dependencies and 5 risks are
+all resolved — read "0 dependencies · 0 risks," as if nothing had ever
+been logged. Fixed by:
+- `dependencyCounts()`, `riskCounts()`, `followupCounts()`, `crCounts()` —
+  each returns `{ total, resolved }` for its project, counting every
+  logged item (not just open ones).
+- `openItemTone(total, resolved)` — green when `resolved === total` (and
+  `total > 0`), red when `resolved === 0`, amber in between, no color when
+  `total === 0` (nothing logged isn't "nothing done," there's nothing to
+  report). `changeRequestBadge()` now uses the same scale (an approved CR
+  counts as resolved via `crStatusClass`), replacing its old flat-amber
+  "any CR at all" styling.
+- `openItemBadge(counts, singular, plural, focusSectionId, opts)` — one
+  badge builder shared by the project card and the detail view's Open
+  items row. Always a clickable jump link now (previously the
+  dependencies/follow-ups badges in the Open items row weren't clickable
+  at all): `opts.jump: true` (card) sets `data-focus-section` and relies on
+  the existing `.badge.is-jump-link` wiring scoped to `.card`; without it
+  (already inside an open detail view) the badge wires its own click to
+  switch tabs and scroll to the section, the same split
+  `changeRequestBadge()` already used for the Change Request Log.
+- MyBKY Phase 1 now reads "6 dependencies" and "5 risks," both green,
+  alongside "0 follow-ups" (no color — none logged) and "8 CRs" (amber —
+  some still unapproved). `countOpenDependencies()`/`countOpenRisks()`
+  still exist unchanged for the portfolio-level "open" rollups (the global
+  metrics strip, the Dependencies tab's "has open work" filter) — only the
+  per-project badges switched to total counts.
+
+**Progress-over-time chart shows one point per calendar week (2026-11-04):**
+extra PM updates in the same Monday–Sunday week collapse to one point, the
+latest snapshot that week. The axis is labeled with that Monday, not the
+date of the PR. MyBKY Phase 1 no longer shows Oct 5 and Oct 6, or Nov 2 and
+Nov 3, as separate dots. The date-change log still keeps every snapshot.
 
 **Go-Live date moved into the Milestones section (2026-11-04):** per
 explicit request ("milestone should be below under the milestone"), right
@@ -1219,6 +1434,14 @@ date, mitigation, Update/Escalate/Resolve actions) are unaffected — those
 were already rendered inline in the row itself, not exclusive to the now-
 bypassed item-detail modal, so nothing is actually lost by this.
 
+**Resolved risks and dependencies stay visible (2026-11-04).** The
+Dependencies & Risks tile counted every logged item (`5 risks · 6
+dependencies`) while the lists underneath dropped anything with
+`resolved: true`, so a project whose items were all closed looked empty.
+Those rows now render, with a green Resolved badge, and the tile says
+"5 risks resolved · 6 dependencies resolved" when none are still open.
+The Open items row still counts only what is open.
+
 **Delay figures now count weekdays only (2026-11-04):** per explicit
 request, every DELAY/variance figure in the app (not plain elapsed-day
 counts) now excludes weekends. Added `businessDaysBetweenIso(aIso, bIso)`
@@ -1295,6 +1518,20 @@ change" row lost their chips; the other 4 rows kept theirs; "Reported
 delay log" disappeared; "Delay attribution"/"Delay log entries" filled
 in with those same 4 events. GMS, the one project with real
 `delayItemLog` entries, still shows "Reported delay log" unchanged.
+
+**Date movements are no longer labeled as delays (2026-11-04).** The
+Date change log keeps later target moves as neutral “days moved” chips.
+It does not color or total them as delays because a revised target can
+still be within the approved stage plan (for example, Hypercare ending
+Nov 6). Red delay figures come only from the source-of-truth Stage Dates
+planned-end versus actual-end calculation.
+
+**Planned vs actual follows the Stage Dates spreadsheet (2026-11-04).**
+MyBKY Phase 1's stage list is that sheet: Requirement, TDD, Development & QA,
+UAT, VAPT, Load, Go-Live, Hypercare. The Stage dates table and the Delay
+tab both show planned end, actual end, and weekday delay. The chart is that
+delay column (Development & QA 25, UAT 15, VAPT 6, Load 3). The headline
+stays "On time" because Go-Live and Hypercare did not slip.
 
 **MyBKY (Phase 1) stage dates corrected against source spreadsheet (2026-11-03):**
 the PM's "NC27 Hub Phase 1" Stage Dates tracker (the source of truth for this
@@ -1846,6 +2083,17 @@ Verified in headless Chrome: 10 project groups, 45 lanes; opening myBKY
 2A from its header shows the same 7 lanes and captions as before the
 refactor.
 
+**Stage-gate tab is a step ladder for every project (2026-11-04).** Per
+explicit request, with the cramped single-row chart (MyBKY Phase 1) next
+to myBKY 2A's lane chart: *"I want to see this in a step ladder UI
+downwards - so its easier to view like the second image."*
+`buildStageGateTimeline()` now always renders `buildParallelStageGateTimeline()`
+— one lane per stage, stacked downward on the shared date axis — instead
+of the single-row layout that shifted overlapping stages sideways and
+stacked their captions on top of each other. `.stagegantt-scroll` scrolls
+horizontally again so a long plan isn't compressed into the panel.
+myBKY 2A is unchanged; it was already on this layout.
+
 ## Tab 4 — Status History (live)
 
 A flat, chronological feed that merges **two kinds of events** across the
@@ -1987,18 +2235,21 @@ deferred — a card badge (✂️ scope cut / N fast-follow) flags this at a
 glance so nothing gets forgotten once the project launches.
 
 Each row in the **"Week-over-week changes"** log shows what changed that
-week (progress/phase/stage/status). Click a row to load the **Dependencies /
-Weekly Status / Risks** sections right below it as they stood that week —
-a pill shows which week is being displayed ("Showing current data" or
-"Showing snapshot as of ..."). Defaults to the latest week. (Weekly Status
-detail is captured going forward from each weekly update; older snapshots recorded
-before this existed will say so instead of showing stale/empty data.)
+week (progress/phase/stage/status). **Weekly Status** (Completed / In
+progress / Next plan) sits above that log (2026-11-04) — the current
+week's cards are the first thing in the tab, and clicking a row rewinds
+those same cards to that week. A pill shows which week is being displayed
+("Showing current data" or "Showing snapshot as of ..."). Defaults to the
+latest week. Dependencies and risks stay on the Dependencies & Risks tab;
+they are always current, not historical. (Weekly Status detail is captured
+going forward from each weekly update; older snapshots recorded before
+this existed will say so instead of showing stale/empty data.)
 
 **TL;DR fallback for weeks with no field delta (2026-11-03).** Plenty of
 weeks have nothing for the row above to show — progress/delay/phase/
 stage/status all held steady — even though that week's "Weekly Status"
-notes (completed/in progress/next plan, same data the snapshot preview
-below the changelog shows in full) are genuinely not empty. A user
+notes (completed/in progress/next plan, same data the Weekly Status
+cards above the changelog show in full) are genuinely not empty. A user
 pointed at that blank space and asked for "high level info from the
 notes below - like a tl;dr" there instead. Added `weeklyChangelogTldr()`:
 picks the first item from whichever of that week's `completed`/
@@ -2157,10 +2408,11 @@ that project's `risks` array with the next `RISK-*` id, and closes the
 issue. Edit or clear it later on the normal weekly update (list every
 **open** risk there, same one-line-per-field order as before).
 
-From a project's **full detail view** (opened from a project card), use
-**"+ Add a Dependency ↗"** or **"+ Report a Risk ↗"** in the Dependencies
-and Risks / blockers sections — each opens the matching GitHub issue form
-with the project pre-filled.
+From a project's **full detail view**, the Dependencies and Risks /
+blockers sections each have a **Notes from the call** box under the list
+(2026-11-04). Type during the call; it stays in this browser until someone
+cleans it into the real list. The GitHub issue forms above are still how a
+risk or dependency becomes a permanent row.
 
 ## How live meeting feedback works
 

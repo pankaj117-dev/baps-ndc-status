@@ -519,19 +519,17 @@ body {
 .stagegantt-legend-swatch.is-future { background: var(--bg); border-color: #7c8ba8; border-style: dashed; }
 .stagegantt-legend-swatch.is-future.is-plan-overdue { background: var(--red-bg); border-color: var(--red); border-style: dashed; }
 
-/* No horizontal scroll (2026-11-03, "the horizontal view should be
-   visible in one view not scroll") — the chart is laid out entirely in
-   percentages now (see buildStageGateTimeline in app.js), so it always
-   fits this container's actual width instead of needing a wider virtual
-   canvas + a scrollbar. */
+/* Horizontally scrollable (2026-11-04) — the step ladder plots every
+   stage on a real pixel date axis, wider than the panel once a project
+   spans more than a couple of quarters. Scroll starts near Today. */
 .stagegantt-scroll {
   background: var(--bg-panel);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 16px 20px;
-  margin-bottom: 24px;
-  overflow-x: hidden;
+  padding: 10px 16px 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
 }
 
 .stagegantt-inner {
@@ -557,14 +555,12 @@ body {
   white-space: nowrap;
 }
 
-/* Tall enough for the block itself (top ~34px) plus TWO staggered caption
-   tiers underneath it (2026-11-03 — captions now wrap and stagger
-   vertically between neighboring stages instead of each reserving
-   guaranteed non-overlapping pixel width, since that reservation is
-   exactly what used to force horizontal scrolling). */
+/* One lane per stage. The bar is 32px and the caption sits just under
+   it; 80px leaves room for a caption that wraps to two lines without
+   the empty band the old 104px single-row track reserved (2026-11-04). */
 .stagegantt-track {
   position: relative;
-  height: 104px;
+  height: 80px;
 }
 
 .stagegantt-grid-line {
@@ -678,10 +674,10 @@ body {
    compressed, percentage-wide timeline. */
 .stagegantt-caption {
   position: absolute;
-  top: 38px;
+  top: 34px;
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0;
   white-space: normal;
   max-width: min(220px, 32%);
 }
@@ -703,7 +699,7 @@ body {
   font-size: 10.5px;
   font-weight: 500;
   color: var(--ink-faint);
-  line-height: 1.35;
+  line-height: 1.25;
 }
 .stagegantt-caption-meta.is-plan-overdue { color: var(--red); font-weight: 700; }
 
@@ -1051,6 +1047,9 @@ body {
   color: var(--ink);
   font-weight: 600;
 }
+.golive-date-current.is-late {
+  color: var(--red);
+}
 
 /* ---------- Dependencies tab ---------- */
 
@@ -1196,9 +1195,12 @@ body {
 .deps-badge-escalated {
   background: var(--red-bg);
   color: var(--red);
-  border-color: #f0bcbc;
-  font-weight: 600;
 }
+.deps-badge-resolved {
+  background: var(--green-bg);
+  color: var(--green);
+}
+.paired-item.is-resolved { background: var(--bg); }
 
 .deps-pivot-escalated-flag {
   margin-left: 4px;
@@ -1803,6 +1805,55 @@ table.deps-drill-table th {
   color: var(--ink-soft);
 }
 
+.stagedates-list { margin: 4px 0 10px; gap: 4px; }
+.stagedates-list .stagedates-line {
+  display: grid;
+  grid-template-columns: 148px 196px minmax(180px, 1fr) 76px;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+.sd-start,
+.sd-stage,
+.sd-ends {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  white-space: nowrap;
+  font-size: 12.5px;
+}
+.sd-start { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--ink-soft); }
+.sd-delay { display: flex; justify-content: flex-end; }
+.sd-delay .schedule-timeline-delta { margin-left: 0; }
+.stagedates-start-label,
+.stagedates-end-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
+  font-weight: 600;
+}
+.stagedates-none { color: var(--ink-faint); font-size: 12.5px; }
+.schedule-timeline-row.is-current {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.stagedates-current-pill {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: var(--accent);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
 .schedule-timeline-main {
   display: flex;
   align-items: center;
@@ -1823,6 +1874,17 @@ table.deps-drill-table th {
   padding: 2px 9px;
 }
 
+.schedule-timeline-stage {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
 .schedule-timeline-delta {
   margin-left: auto;
   font-family: var(--font-mono);
@@ -1834,6 +1896,11 @@ table.deps-drill-table th {
 
 .schedule-timeline-delta.is-late { background: var(--red-bg); color: var(--red); }
 .schedule-timeline-delta.is-early { background: var(--green-bg); color: var(--green); }
+.schedule-timeline-delta.is-moved {
+  background: var(--bg);
+  color: var(--ink-soft);
+  border: 1px solid var(--line-strong);
+}
 
 .schedule-timeline-row.kind-timesaved { border-color: #b7e6cd; }
 
@@ -1873,19 +1940,26 @@ table.deps-drill-table th {
 .hawkeye-toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
   gap: 10px;
-  margin: 0 0 14px;
+  margin: 0 0 8px;
 }
 
+/* Quarter/Month sits on the chart window itself, right edge, not in the
+   empty space beside a short timeline (2026-11-04). */
+.hawkeye-window {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 100%;
+}
+.hawkeye-window .hawkeye-scroll-inner { align-self: stretch; width: 100%; }
 .hawkeye-zoom-toggle {
   display: inline-flex;
+  margin: 0 0 6px;
   border: 1.5px solid var(--line-strong);
   border-radius: 999px;
   padding: 2px;
   gap: 2px;
-  flex: 0 0 auto;
 }
 
 .hawkeye-zoom-btn {
@@ -1906,6 +1980,246 @@ table.deps-drill-table th {
 .hawkeye-zoom-btn.is-active {
   background: var(--accent);
   color: #fff;
+}
+
+/* Roadmap: the PMO planning sheet's month grid, with a Planned and an
+   Actual row per project. Project and row-kind columns stay pinned while
+   the months scroll. */
+.hawkeye-toolbar { flex-wrap: wrap; }
+.hawkeye-toolbar > .hawkeye-zoom-toggle { margin: 0; }
+.roadmap-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--bg-panel);
+}
+.roadmap-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+  min-width: 100%;
+}
+.roadmap-table th,
+.roadmap-table td {
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 4px;
+  vertical-align: top;
+}
+.roadmap-table thead th {
+  position: sticky;
+  top: 0;
+  background: #f3f6fb;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  text-align: center;
+  z-index: 2;
+}
+.roadmap-year-row th { color: var(--ink-faint); font-weight: 600; }
+.roadmap-month { min-width: 92px; }
+.roadmap-month.is-today { background: #e3ebff; color: var(--accent); }
+.roadmap-cell.is-today { background: #f5f8ff; }
+.roadmap-sticky {
+  position: sticky;
+  background: var(--bg-panel);
+  z-index: 1;
+}
+.roadmap-table thead .roadmap-sticky { z-index: 3; background: #f3f6fb; }
+.roadmap-name-col { left: 0; min-width: 180px; max-width: 220px; text-align: left; }
+.roadmap-kind-col { left: 180px; min-width: 64px; box-shadow: 1px 0 0 var(--line-strong); }
+.roadmap-name { border-bottom: 2px solid var(--line-strong) !important; vertical-align: middle !important; padding: 6px 8px !important; }
+.roadmap-project {
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+}
+.roadmap-project:hover { color: var(--accent); }
+.roadmap-project-meta { font-size: 11px; color: var(--ink-faint); margin-top: 2px; }
+.roadmap-project-meta.is-late { color: var(--red); font-weight: 600; }
+.roadmap-kind {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  vertical-align: middle !important;
+}
+.roadmap-row.is-actual-row td { border-bottom: 2px solid var(--line-strong); }
+.roadmap-cell { display: table-cell; }
+.roadmap-chip {
+  display: inline-block;
+  margin: 1px 2px 1px 0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: #3b3b3b;
+}
+.roadmap-chip[role="button"] { cursor: pointer; }
+.roadmap-chip.is-req, .roadmap-swatch.is-req { background: #eab8e4; }
+.roadmap-chip.is-dsgn, .roadmap-swatch.is-dsgn { background: #fbc35a; }
+.roadmap-chip.is-dev, .roadmap-swatch.is-dev { background: #f6c1a6; }
+.roadmap-chip.is-uat, .roadmap-swatch.is-uat { background: #8fd0f0; }
+.roadmap-chip.is-rollout, .roadmap-swatch.is-rollout { background: #8fd67a; }
+.roadmap-chip.is-hc, .roadmap-swatch.is-hc { background: #cfe7c8; }
+.roadmap-chip.is-other, .roadmap-swatch.is-other { background: #e2e6ee; }
+.roadmap-chip.is-planned {
+  background: transparent;
+  border: 1.5px dashed #9aa6bd;
+  color: var(--ink-soft);
+}
+.roadmap-chip.is-planned.is-req { border-color: #c98ac1; }
+.roadmap-chip.is-planned.is-dsgn { border-color: #e0a032; }
+.roadmap-chip.is-planned.is-dev { border-color: #e39a76; }
+.roadmap-chip.is-planned.is-uat { border-color: #5fb3dd; }
+.roadmap-chip.is-planned.is-rollout { border-color: #5fb84a; }
+.roadmap-chip.is-planned.is-hc { border-color: #9cc792; }
+.roadmap-chip.is-current { box-shadow: inset 0 0 0 1.5px var(--amber); }
+.roadmap-chip.is-future { opacity: 0.55; }
+.roadmap-chip.is-late,
+.roadmap-swatch.is-late {
+  background: var(--red-bg);
+  border: 1.5px solid var(--red);
+  color: var(--red);
+}
+.roadmap-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+/* Roadmap: the PMO planning sheet's month grid, with a Planned and an
+   Actual row per project. Project and row-kind columns stay pinned while
+   the months scroll. */
+.hawkeye-toolbar { flex-wrap: wrap; }
+.hawkeye-toolbar > .hawkeye-zoom-toggle { margin: 0; }
+.roadmap-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--bg-panel);
+}
+.roadmap-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+  min-width: 100%;
+}
+.roadmap-table th,
+.roadmap-table td {
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 4px;
+  vertical-align: top;
+}
+.roadmap-table thead th {
+  position: sticky;
+  top: 0;
+  background: #f3f6fb;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  text-align: center;
+  z-index: 2;
+}
+.roadmap-year-row th { color: var(--ink-faint); font-weight: 600; }
+.roadmap-month { min-width: 92px; }
+.roadmap-month.is-today { background: #e3ebff; color: var(--accent); }
+.roadmap-cell.is-today { background: #f5f8ff; }
+.roadmap-sticky {
+  position: sticky;
+  background: var(--bg-panel);
+  z-index: 1;
+}
+.roadmap-table thead .roadmap-sticky { z-index: 3; background: #f3f6fb; }
+.roadmap-name-col { left: 0; min-width: 180px; max-width: 220px; text-align: left; }
+.roadmap-kind-col { left: 180px; min-width: 64px; box-shadow: 1px 0 0 var(--line-strong); }
+.roadmap-name { border-bottom: 2px solid var(--line-strong) !important; vertical-align: middle !important; padding: 6px 8px !important; }
+.roadmap-project {
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+}
+.roadmap-project:hover { color: var(--accent); }
+.roadmap-project-meta { font-size: 11px; color: var(--ink-faint); margin-top: 2px; }
+.roadmap-project-meta.is-late { color: var(--red); font-weight: 600; }
+.roadmap-kind {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  vertical-align: middle !important;
+}
+.roadmap-row.is-actual-row td { border-bottom: 2px solid var(--line-strong); }
+.roadmap-cell { display: table-cell; }
+.roadmap-chip {
+  display: inline-block;
+  margin: 1px 2px 1px 0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: #3b3b3b;
+}
+.roadmap-chip[role="button"] { cursor: pointer; }
+.roadmap-chip.is-req, .roadmap-swatch.is-req { background: #eab8e4; }
+.roadmap-chip.is-dsgn, .roadmap-swatch.is-dsgn { background: #fbc35a; }
+.roadmap-chip.is-dev, .roadmap-swatch.is-dev { background: #f6c1a6; }
+.roadmap-chip.is-uat, .roadmap-swatch.is-uat { background: #8fd0f0; }
+.roadmap-chip.is-rollout, .roadmap-swatch.is-rollout { background: #8fd67a; }
+.roadmap-chip.is-hc, .roadmap-swatch.is-hc { background: #cfe7c8; }
+.roadmap-chip.is-other, .roadmap-swatch.is-other { background: #e2e6ee; }
+.roadmap-chip.is-planned {
+  background: transparent;
+  border: 1.5px dashed #9aa6bd;
+  color: var(--ink-soft);
+}
+.roadmap-chip.is-planned.is-req { border-color: #c98ac1; }
+.roadmap-chip.is-planned.is-dsgn { border-color: #e0a032; }
+.roadmap-chip.is-planned.is-dev { border-color: #e39a76; }
+.roadmap-chip.is-planned.is-uat { border-color: #5fb3dd; }
+.roadmap-chip.is-planned.is-rollout { border-color: #5fb84a; }
+.roadmap-chip.is-planned.is-hc { border-color: #9cc792; }
+.roadmap-chip.is-current { box-shadow: inset 0 0 0 1.5px var(--amber); }
+.roadmap-chip.is-future { opacity: 0.55; }
+.roadmap-chip.is-late,
+.roadmap-swatch.is-late {
+  background: var(--red-bg);
+  border: 1.5px solid var(--red);
+  color: var(--red);
+}
+.roadmap-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 12px;
+  border-radius: 3px;
 }
 
 /* The actual horizontally-scrollable area — everything that needs to be
@@ -1977,6 +2291,230 @@ table.deps-drill-table th {
   color: var(--ink-faint);
 }
 .hawkeye-project-empty { margin: 0 0 6px 6px; }
+
+/* Expand / collapse (2026-11-05). The bar holds the toggle and the
+   project name, sticky on the left like the name was. */
+.hawkeye-project-bar {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: max-content;
+}
+.hawkeye-project-bar .hawkeye-project-head { position: static; }
+.hawkeye-expand-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--bg-panel);
+  border: 1.5px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 3px 10px 3px 8px;
+  cursor: pointer;
+}
+.hawkeye-expand-btn:hover,
+.hawkeye-expand-btn:focus-visible { border-color: var(--accent); outline: none; }
+.hawkeye-expand-chevron { display: inline-block; transition: transform 0.15s ease; }
+.hawkeye-expand-btn.is-open .hawkeye-expand-chevron { transform: rotate(90deg); }
+
+.hawkeye-expand-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+.hawkeye-expand-hint {
+  font-size: 12px;
+  color: var(--ink-faint);
+  margin-right: auto;
+}
+.hawkeye-bulk-btn {
+  appearance: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--bg-panel);
+  border: 1.5px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+.hawkeye-bulk-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.hawkeye-bulk-btn:disabled { opacity: 0.45; cursor: default; }
+
+/* An expanded project: its own calendar, fitted to its dates, pinned to
+   the visible width of the shared chart so it never scrolls off. */
+.hawkeye-project.is-expanded { padding-bottom: 12px; }
+.hawkeye-focus {
+  position: sticky;
+  left: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--bg-panel);
+  padding: 8px 10px 4px;
+  box-shadow: 0 1px 3px rgba(20, 30, 60, 0.06);
+}
+.hawkeye-focus-scroll { overflow-x: auto; }
+.hawkeye-focus-top { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+/* Ladder rows: each lane carries its own block and delay count, so the
+   blocks are a touch shorter and the row sizes itself from the lane count. */
+.hawkeye-stage-row.is-ladder .hawkeye-stage-block { padding: 0 4px; }
+.hawkeye-stage-row.is-ladder .hawkeye-block-name { font-size: 11.5px; }
+.hawkeye-focus-zoom { margin: 0 0 4px; }
+.hawkeye-focus-lanes { position: relative; }
+.hawkeye-focus-header { margin-bottom: 4px; }
+
+.hawkeye-stage-row.is-large .hawkeye-stage-block {
+  height: 44px;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.1;
+  padding: 0 6px;
+  box-sizing: border-box;
+}
+.hawkeye-block-name {
+  font-size: 12px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.hawkeye-block-dates {
+  font-size: 10px;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Two rows per project — Planned, then Actual (2026-11-04). Each row is
+   one line: stage blocks sit next to each other. Stages that overlap in
+   time share that window instead of stepping down onto extra lines. The
+   part of an Actual block past that stage's own planned end is red. */
+.hawkeye-stage-row { position: relative; margin-bottom: 2px; }
+.hawkeye-stage-row-label {
+  position: sticky;
+  left: 2px;
+  z-index: 3;
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  background: var(--bg-panel);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.hawkeye-stage-block {
+  position: absolute;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  overflow: hidden;
+  white-space: nowrap;
+  z-index: 1;
+  cursor: pointer;
+}
+.hawkeye-stage-block.is-done {
+  background: var(--green-bg);
+  border: 1px solid var(--green);
+  color: var(--green);
+}
+.hawkeye-stage-block.is-current {
+  background: var(--amber-bg);
+  border: 1px solid var(--amber);
+  color: var(--amber);
+}
+.hawkeye-stage-block.is-future {
+  background: var(--bg);
+  border: 1.5px dashed #7c8ba8;
+  color: #4a5878;
+}
+.hawkeye-stage-block.is-delay {
+  background: var(--red-bg);
+  border: 1px solid var(--red);
+  color: var(--red);
+  z-index: 2;
+  pointer-events: none;
+}
+.hawkeye-delay-label {
+  position: absolute;
+  z-index: 4;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 16px;
+  letter-spacing: 0.01em;
+  color: var(--red);
+  background: var(--bg-panel);
+  border: 1px solid var(--red);
+  border-radius: 999px;
+  padding: 0 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 1px 2px rgba(180, 35, 24, 0.12);
+}
+
+/* The leftover share of a shared stage column when Actual finished
+   BEFORE Planned — a ghost/outline, not a solid fill, so it reads as
+   "time that was never used" rather than more progress (2026-11-04, "I
+   do want to see how much time we saved along with delays too"). */
+.hawkeye-stage-block.is-saved {
+  background: var(--green-bg);
+  border: 1.5px dashed var(--green);
+  color: var(--green);
+  z-index: 2;
+  pointer-events: none;
+}
+.hawkeye-saved-label {
+  position: absolute;
+  z-index: 4;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 16px;
+  letter-spacing: 0.01em;
+  color: var(--green);
+  background: var(--bg-panel);
+  border: 1px solid var(--green);
+  border-radius: 999px;
+  padding: 0 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 1px 2px rgba(23, 128, 80, 0.12);
+}
+
+/* Planned-row block (2026-11-04) — a plain dashed outline per stage, no
+   color-coding, since it's just the baseline (the Actual row below it
+   keeps the done/current/future coloring via the shared
+   `.hawkeye-stage-block` classes further down). */
+.hawkeye-stage-block.is-hawkeye-planned {
+  background: var(--bg);
+  border: 1.5px dashed #7c8ba8;
+  color: #4a5878;
+  cursor: default;
+}
+.stagegantt-legend-swatch.is-hawkeye-planned { background: var(--bg); border-color: #7c8ba8; border-style: dashed; }
+.stagegantt-legend-swatch.is-hawkeye-delay { background: var(--red-bg); border-color: var(--red); }
+.stagegantt-legend-swatch.is-hawkeye-saved { background: var(--green-bg); border-color: var(--green); border-style: dashed; }
 
 /* One caption line per lane on the cross-project board (the
    single-project view wraps into two tiers instead), so lanes can be
@@ -2262,6 +2800,18 @@ table.deps-drill-table th {
   color: var(--accent);
 }
 
+.badge.has-cr {
+  background: var(--amber-bg);
+  border-color: transparent;
+  color: var(--amber);
+  font-weight: 700;
+}
+.badge.has-cr .badge-count {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--amber);
+}
+
 .badge.has-fastfollow {
   background: var(--amber-bg);
   border-color: transparent;
@@ -2285,6 +2835,29 @@ table.deps-drill-table th {
   background: var(--green-bg);
   border-color: transparent;
   color: var(--green);
+  font-weight: 700;
+}
+
+/* Open-items tone (2026-11-04) — green when everything logged for that
+   badge is resolved, red when none of it is, amber in between. Shared by
+   the dependencies/risks/follow-ups/CR badges on both the project card
+   and the detail view's "Open items" row. */
+.badge.tone-green {
+  background: var(--green-bg);
+  border-color: transparent;
+  color: var(--green);
+  font-weight: 700;
+}
+.badge.tone-amber {
+  background: var(--amber-bg);
+  border-color: transparent;
+  color: var(--amber);
+  font-weight: 700;
+}
+.badge.tone-red {
+  background: var(--red-bg);
+  border-color: transparent;
+  color: var(--red);
   font-weight: 700;
 }
 
@@ -2673,7 +3246,24 @@ body.no-scroll { overflow: hidden; }
 
 .milestones-date {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.milestones-target {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.milestones-target-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--ink-faint);
 }
 
@@ -2760,16 +3350,18 @@ body.no-scroll { overflow: hidden; }
 }
 
 .detail-tab-tile-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
   background: var(--accent-soft);
   color: var(--accent);
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
+.detail-tab-tile-icon svg { display: block; }
+.detail-tab-tile:hover .detail-tab-tile-icon { transform: translateY(-1px); }
 .detail-tab-tile.is-open .detail-tab-tile-icon {
   background: var(--accent);
   color: #fff;
@@ -2909,7 +3501,7 @@ body.no-scroll { overflow: hidden; }
 
 .changelog-row {
   display: grid;
-  grid-template-columns: 110px 1fr;
+  grid-template-columns: 168px 1fr;
   gap: 14px;
   align-items: start;
   padding: 13px 18px;
@@ -3486,6 +4078,8 @@ dd.is-missing {
   margin-bottom: 18px;
 }
 .stagedetail-analysis-total .num { font-size: 26px; font-weight: 800; color: var(--ink); }
+.stagedetail-analysis-total .num.is-ontime { color: var(--green); font-size: 22px; }
+.stagedetail-analysis-total .num.is-late { color: var(--red); }
 .stagedetail-analysis-total .label {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -3757,6 +4351,12 @@ dd.is-missing {
 .stagedates-row:nth-child(even):not(.stagedates-head) {
   background: var(--green-bg);
 }
+.stagedates-row.is-current,
+.stagedates-row.is-current:nth-child(even) {
+  background: var(--accent-soft);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.stagedates-row.is-current .stagedates-stage { color: var(--accent); }
 .stagedates-cell {
   flex: 1 1 0;
   padding: 9px 12px;
@@ -3911,6 +4511,73 @@ dd.is-missing {
 .cr-log-status.is-approved { background: var(--green-bg); color: var(--green); }
 .cr-log-status.is-pending { background: var(--amber-bg); color: var(--amber); }
 
+.cr-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg-panel);
+}
+.cr-row {
+  appearance: none;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  font: inherit;
+  text-align: left;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto minmax(0, 190px) 14px;
+  gap: 14px;
+  align-items: center;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.cr-row:last-child { border-bottom: 0; }
+.cr-row:hover, .cr-row:focus-visible { background: var(--bg); outline: none; }
+.cr-row-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-faint);
+}
+.cr-row-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cr-row-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cr-row-desc {
+  font-size: 12px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cr-row-meta {
+  font-size: 12px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+.cr-row .cr-log-status {
+  justify-self: end;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cr-row-chevron { color: var(--ink-faint); font-size: 18px; line-height: 1; }
+.cr-detail-text { white-space: pre-line; line-height: 1.5; }
+
+@media (max-width: 720px) {
+  .cr-row { grid-template-columns: 36px minmax(0, 1fr) 14px; }
+  .cr-row-meta, .cr-row .cr-log-status { grid-column: 2; justify-self: start; }
+}
+
 .hotfix-plan { margin-top: 20px; }
 .hotfix-plan-title { margin: 0 0 8px; font-size: 15px; font-weight: 700; }
 .hotfix-plan-actual { color: var(--red); }
@@ -4008,6 +4675,34 @@ dd.is-missing {
    see "Wide log tables" above — with 7 distinct columns (SP, Type,
    Feature/Capability, Status, Notes, Planned/Actual, Delay Reason)
    instead of the original merged-cell card layout. */
+
+.feature-subtabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg);
+  margin-bottom: 16px;
+}
+.feature-subtab {
+  appearance: none;
+  border: 0;
+  background: none;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 7px 16px;
+  border-radius: 999px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.feature-subtab:hover { color: var(--ink); }
+.feature-subtab.is-active {
+  background: var(--accent);
+  color: #fff;
+}
 
 .feature-kpi-row {
   display: flex;
