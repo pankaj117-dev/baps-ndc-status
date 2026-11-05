@@ -2018,7 +2018,7 @@ table.deps-drill-table th {
   z-index: 2;
 }
 .roadmap-year-row th { color: var(--ink-faint); font-weight: 600; }
-.roadmap-month { min-width: 92px; }
+.roadmap-month { min-width: 132px; }
 .roadmap-month.is-today { background: #e3ebff; color: var(--accent); }
 .roadmap-cell.is-today { background: #f5f8ff; }
 .roadmap-sticky {
@@ -2057,137 +2057,28 @@ table.deps-drill-table th {
 .roadmap-row.is-actual-row td { border-bottom: 2px solid var(--line-strong); }
 .roadmap-cell { display: table-cell; }
 .roadmap-chip {
-  display: inline-block;
-  margin: 1px 2px 1px 0;
-  padding: 2px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  margin: 0 0 3px;
+  padding: 3px 6px;
   border-radius: 4px;
   border: 1px solid transparent;
   font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
+  line-height: 1.25;
   white-space: nowrap;
   color: #3b3b3b;
-}
-.roadmap-chip[role="button"] { cursor: pointer; }
-.roadmap-chip.is-req, .roadmap-swatch.is-req { background: #eab8e4; }
-.roadmap-chip.is-dsgn, .roadmap-swatch.is-dsgn { background: #fbc35a; }
-.roadmap-chip.is-dev, .roadmap-swatch.is-dev { background: #f6c1a6; }
-.roadmap-chip.is-uat, .roadmap-swatch.is-uat { background: #8fd0f0; }
-.roadmap-chip.is-rollout, .roadmap-swatch.is-rollout { background: #8fd67a; }
-.roadmap-chip.is-hc, .roadmap-swatch.is-hc { background: #cfe7c8; }
-.roadmap-chip.is-other, .roadmap-swatch.is-other { background: #e2e6ee; }
-.roadmap-chip.is-planned {
-  background: transparent;
-  border: 1.5px dashed #9aa6bd;
-  color: var(--ink-soft);
-}
-.roadmap-chip.is-planned.is-req { border-color: #c98ac1; }
-.roadmap-chip.is-planned.is-dsgn { border-color: #e0a032; }
-.roadmap-chip.is-planned.is-dev { border-color: #e39a76; }
-.roadmap-chip.is-planned.is-uat { border-color: #5fb3dd; }
-.roadmap-chip.is-planned.is-rollout { border-color: #5fb84a; }
-.roadmap-chip.is-planned.is-hc { border-color: #9cc792; }
-.roadmap-chip.is-current { box-shadow: inset 0 0 0 1.5px var(--amber); }
-.roadmap-chip.is-future { opacity: 0.55; }
-.roadmap-chip.is-late,
-.roadmap-swatch.is-late {
-  background: var(--red-bg);
-  border: 1.5px solid var(--red);
-  color: var(--red);
-}
-.roadmap-swatch {
-  display: inline-block;
-  width: 14px;
-  height: 12px;
-  border-radius: 3px;
-}
-
-/* Roadmap: the PMO planning sheet's month grid, with a Planned and an
-   Actual row per project. Project and row-kind columns stay pinned while
-   the months scroll. */
-.hawkeye-toolbar { flex-wrap: wrap; }
-.hawkeye-toolbar > .hawkeye-zoom-toggle { margin: 0; }
-.roadmap-scroll {
-  overflow-x: auto;
-  border: 1px solid var(--line-strong);
-  border-radius: 10px;
-  background: var(--bg-panel);
-}
-.roadmap-table {
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: 12px;
-  min-width: 100%;
-}
-.roadmap-table th,
-.roadmap-table td {
-  border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  padding: 4px;
   vertical-align: top;
 }
-.roadmap-table thead th {
-  position: sticky;
-  top: 0;
-  background: #f3f6fb;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--ink-soft);
-  text-align: center;
-  z-index: 2;
-}
-.roadmap-year-row th { color: var(--ink-faint); font-weight: 600; }
-.roadmap-month { min-width: 92px; }
-.roadmap-month.is-today { background: #e3ebff; color: var(--accent); }
-.roadmap-cell.is-today { background: #f5f8ff; }
-.roadmap-sticky {
-  position: sticky;
-  background: var(--bg-panel);
-  z-index: 1;
-}
-.roadmap-table thead .roadmap-sticky { z-index: 3; background: #f3f6fb; }
-.roadmap-name-col { left: 0; min-width: 180px; max-width: 220px; text-align: left; }
-.roadmap-kind-col { left: 180px; min-width: 64px; box-shadow: 1px 0 0 var(--line-strong); }
-.roadmap-name { border-bottom: 2px solid var(--line-strong) !important; vertical-align: middle !important; padding: 6px 8px !important; }
-.roadmap-project {
-  appearance: none;
-  border: none;
-  background: none;
-  padding: 0;
-  font: inherit;
-  font-weight: 700;
-  font-size: 13px;
-  color: var(--ink);
-  cursor: pointer;
-  text-align: left;
-}
-.roadmap-project:hover { color: var(--accent); }
-.roadmap-project-meta { font-size: 11px; color: var(--ink-faint); margin-top: 2px; }
-.roadmap-project-meta.is-late { color: var(--red); font-weight: 600; }
-.roadmap-kind {
-  font-family: var(--font-mono);
+.roadmap-chip-code { font-size: 11px; font-weight: 700; }
+.roadmap-chip-date {
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  vertical-align: middle !important;
+  font-weight: 500;
+  opacity: 0.85;
 }
-.roadmap-row.is-actual-row td { border-bottom: 2px solid var(--line-strong); }
-.roadmap-cell { display: table-cell; }
-.roadmap-chip {
-  display: inline-block;
-  margin: 1px 2px 1px 0;
-  padding: 2px 6px;
-  border-radius: 4px;
-  border: 1px solid transparent;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  white-space: nowrap;
-  color: #3b3b3b;
-}
+.roadmap-chip.is-late .roadmap-chip-date,
+.roadmap-chip.is-late .roadmap-chip-code { color: var(--red); }
 .roadmap-chip[role="button"] { cursor: pointer; }
 .roadmap-chip.is-req, .roadmap-swatch.is-req { background: #eab8e4; }
 .roadmap-chip.is-dsgn, .roadmap-swatch.is-dsgn { background: #fbc35a; }
@@ -2394,6 +2285,12 @@ table.deps-drill-table th {
   font-size: 10px;
   font-weight: 500;
   opacity: 0.8;
+}
+.hawkeye-block-dates.is-inline {
+  font-size: 8.5px;
+  font-weight: 500;
+  opacity: 0.78;
+  margin-left: 4px;
 }
 
 /* Two rows per project — Planned, then Actual (2026-11-04). Each row is

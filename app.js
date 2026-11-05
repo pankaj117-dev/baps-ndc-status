@@ -136,6 +136,15 @@
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   }
 
+  // Numeric "M/D" — tight enough to sit inside a small Roadmap/Timeline
+  // chip alongside the stage code (2026-11-05: "dates present for teams
+  // ... make it in small but show up").
+  function fmtDateTiny(iso) {
+    if (!iso) return "";
+    const d = new Date(iso + "T00:00:00");
+    return (d.getMonth() + 1) + "/" + d.getDate();
+  }
+
   function el(tag, attrs, children) {
     const node = document.createElement(tag);
     if (attrs) {
@@ -2437,20 +2446,23 @@
             let text = st.code;
             let late = false;
             let tip = b.label + (isActual ? " (actual): " : " (planned): ") + fmtDateShort(b.start) + " → " + fmtDateShort(b.end);
+            let delayNote = null;
             if (isActual && b.plannedEnd) {
               if (mo.start > b.plannedEnd && b.end > b.plannedEnd) late = true;
               if (monthKey(b.end) === mo.key && b.end !== b.plannedEnd) {
                 const d = businessDaysBetweenIso(b.plannedEnd, b.end);
                 if (d > 0) {
-                  text += " +" + d + "d";
+                  delayNote = "+" + d + "d";
                   late = true;
                   tip += " · +" + d + " weekdays past " + fmtDateShort(b.plannedEnd);
                 } else if (d < 0) {
-                  text += " −" + -d + "d";
+                  delayNote = "−" + -d + "d";
                   tip += " · " + -d + " weekdays early vs " + fmtDateShort(b.plannedEnd);
                 }
               }
             }
+            // The stage's own start and end, on every month it shows.
+            const dateLabel = fmtDateShort(b.start) + " – " + fmtDateShort(b.end);
             const cls =
               "roadmap-chip " +
               st.cls +
@@ -2458,7 +2470,10 @@
               (late ? " is-late" : "") +
               (isActual && b.kind === "current" ? " is-current" : "") +
               (isActual && b.kind === "future" ? " is-future" : "");
-            const chip = el("span", { class: cls, title: tip }, [text]);
+            const chip = el("span", { class: cls, title: tip }, [
+              el("span", { class: "roadmap-chip-code" }, [text, delayNote ? " " + delayNote : ""]),
+              el("span", { class: "roadmap-chip-date" }, [dateLabel]),
+            ]);
             if (isActual) {
               chip.setAttribute("role", "button");
               chip.setAttribute("tabindex", "0");
@@ -2734,9 +2749,21 @@
   // Block text. Compact rows show the stage code; an expanded project
   // shows the full stage name when it fits, plus its dates.
   function hawkeyeBlockContent(b, width, large) {
-    if (!large) return [width >= 28 ? b.code : ""];
+    if (!large) {
+      if (width < 24) return [""];
+      const tiny = width >= 58 ? fmtDateTiny(b.start) + "–" + fmtDateTiny(b.end) : null;
+      return [
+        el("span", { class: "hawkeye-block-name" }, [b.code]),
+        tiny ? el("span", { class: "hawkeye-block-dates is-inline" }, [tiny]) : null,
+      ];
+    }
     const name = width >= b.label.length * 7.2 + 16 ? b.label : width >= 24 ? b.code : "";
-    const dates = width >= 96 ? fmtDateShort(b.start) + " – " + fmtDateShort(b.end) : null;
+    const dates =
+      width >= 96
+        ? fmtDateShort(b.start) + " – " + fmtDateShort(b.end)
+        : width >= 46
+        ? fmtDateTiny(b.start) + "–" + fmtDateTiny(b.end)
+        : null;
     return [
       el("span", { class: "hawkeye-block-name" }, [name]),
       dates ? el("span", { class: "hawkeye-block-dates" }, [dates]) : null,
