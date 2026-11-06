@@ -2028,6 +2028,7 @@ table.deps-drill-table th {
 }
 .roadmap-table thead .roadmap-sticky { z-index: 3; background: #f3f6fb; }
 .roadmap-name-col { left: 0; min-width: 180px; max-width: 220px; text-align: left; }
+.roadmap-table.is-actual-only .roadmap-name-col { box-shadow: 1px 0 0 var(--line-strong); }
 .roadmap-kind-col { left: 180px; min-width: 64px; box-shadow: 1px 0 0 var(--line-strong); }
 .roadmap-name { border-bottom: 2px solid var(--line-strong) !important; vertical-align: middle !important; padding: 6px 8px !important; }
 .roadmap-project {
@@ -2054,7 +2055,32 @@ table.deps-drill-table th {
   color: var(--ink-faint);
   vertical-align: middle !important;
 }
-.roadmap-row.is-actual-row td { border-bottom: 2px solid var(--line-strong); }
+.roadmap-track-cell { padding: 0 !important; vertical-align: top; }
+.roadmap-track { position: relative; }
+.roadmap-track-line,
+.roadmap-track-today {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line);
+  pointer-events: none;
+}
+.roadmap-track-line.is-today { background: #c5d4f7; }
+.roadmap-track-today { width: 2px; background: var(--accent); z-index: 2; }
+.roadmap-bar.roadmap-chip {
+  position: absolute;
+  height: 34px;
+  margin: 0;
+  overflow: hidden;
+  justify-content: center;
+  z-index: 1;
+}
+.roadmap-bar.is-pair-plan,
+.roadmap-bar.is-pair-actual {
+  overflow: visible;
+  z-index: 3;
+}
 .roadmap-cell { display: table-cell; }
 .roadmap-chip {
   display: flex;

@@ -2300,9 +2300,13 @@
   // chart.
   const HAWKEYE_VIEWS = [
     { id: "roadmap", label: "Roadmap" },
+    { id: "v2", label: "2.0" },
     { id: "timeline", label: "Timeline" },
   ];
   let hawkeyeView = "roadmap";
+  // Roadmap row set: both month rows, or one timeline row of Actual, or one
+  // timeline row of Planned.
+  let hawkeyeRoadmapMode = "both";
 
   // Timeline densities. Half year fits the panel. Quarter (default) is
   // 1.5× that so blocks are readable; Month is the close view.
@@ -2408,8 +2412,13 @@
     }
     const todayKey = monthKey(todayIso);
 
-    const table = el("table", { class: "roadmap-table" });
-    const yearRow = el("tr", { class: "roadmap-year-row" }, [el("th", { class: "roadmap-sticky roadmap-name-col", colspan: "2" }, [""])]);
+    const mode = hawkeyeView === "v2" ? "both" : hawkeyeRoadmapMode;
+    const showBoth = mode === "both";
+    const showKind = showBoth && hawkeyeView !== "v2";
+    const table = el("table", { class: "roadmap-table" + (showKind ? "" : " is-actual-only") });
+    const yearRow = el("tr", { class: "roadmap-year-row" }, [
+      el("th", { class: "roadmap-sticky roadmap-name-col", colspan: showKind ? "2" : "1" }, [""]),
+    ]);
     let i = 0;
     while (i < months.length) {
       let j = i;
@@ -2419,7 +2428,7 @@
     }
     const headRow = el("tr", null, [
       el("th", { class: "roadmap-sticky roadmap-name-col" }, ["Project"]),
-      el("th", { class: "roadmap-sticky roadmap-kind-col" }, [""]),
+      showKind ? el("th", { class: "roadmap-sticky roadmap-kind-col" }, [""]) : null,
     ]);
     months.forEach((mo) => headRow.appendChild(el("th", { class: "roadmap-month" + (mo.key === todayKey ? " is-today" : "") }, [mo.label])));
     table.appendChild(el("thead", null, [yearRow, headRow]));
@@ -2428,7 +2437,7 @@
     rows.forEach(({ p, actual, planned }) => {
       if (!actual.length) return;
       const delay = Math.max(0, p.delayDays || 0);
-      const nameCell = el("td", { class: "roadmap-sticky roadmap-name-col roadmap-name", rowspan: "2" }, [
+      const nameCell = el("td", { class: "roadmap-sticky roadmap-name-col roadmap-name", rowspan: showBoth && hawkeyeView !== "v2" ? "2" : "1" }, [
         el("button", { class: "roadmap-project", type: "button", title: `Open ${p.name}'s Stage-gate timeline` }, [p.name]),
         el("div", { class: "roadmap-project-meta" }, [p.owner || ""]),
         el("div", { class: "roadmap-project-meta" + (delay > 0 ? " is-late" : "") }, [
@@ -2436,6 +2445,7 @@
         ]),
       ]);
       nameCell.querySelector(".roadmap-project").addEventListener("click", () => openProjectDetail(p.id, "stage-gate-timeline-section"));
+
 
       const cellsFor = (blocks, isActual) =>
         months.map((mo) => {
@@ -2461,7 +2471,6 @@
                 }
               }
             }
-            // The stage's own start and end, on every month it shows.
             const dateLabel = fmtDateShort(b.start) + " – " + fmtDateShort(b.end);
             const cls =
               "roadmap-chip " +
@@ -2484,18 +2493,250 @@
           return td;
         });
 
+      const timelineCell = (blocks, isActual) => {
+        const frac = (iso) => {
+          if (!iso || iso <= months[0].start) return 0;
+          const lastEnd = months[months.length - 1].end;
+          if (iso > lastEnd) return 1;
+          const idx = months.findIndex((mo) => mo.key === iso.slice(0, 7));
+          if (idx < 0) return 1;
+          const day = Number(iso.slice(8, 10));
+          const dim = Number(months[idx].end.slice(8, 10)) || 30;
+          return (idx + Math.min(Math.max(day - 1, 0), dim) / dim) / months.length;
+        };
+        const laneRight = [];
+        const placed = blocks
+          .slice()
+          .sort((a, b) => (a.start < b.start ? -1 : a.start > b.start ? 1 : hawkeyeStageIndex(a.stage) - hawkeyeStageIndex(b.stage)))
+          .map((b) => {
+            const left = frac(b.start);
+            const right = Math.max(frac(addDaysIso(b.end, 1)), left + 0.008);
+            const days = isActual && b.plannedEnd && b.end !== b.plannedEnd ? businessDaysBetweenIso(b.plannedEnd, b.end) : 0;
+            const note = days > 0 ? " +" + days + "d" : days < 0 ? " −" + -days + "d" : "";
+            const st = roadmapStage(b);
+            const label = st.code + note + "  " + fmtDateShort(b.start) + " – " + fmtDateShort(b.end);
+            // Keep the next bar off this label. A short stage still needs
+            // room for its name and dates.
+            const labelFrac = (label.length * 6.4 + 16) / Math.max(months.length * 132, 1);
+            const occupyRight = Math.max(right, left + labelFrac);
+            let lane = laneRight.findIndex((r) => left >= r - 0.001);
+            if (lane === -1) {
+              lane = laneRight.length;
+              laneRight.push(occupyRight);
+            } else laneRight[lane] = occupyRight;
+            return { b, left, right, lane, note, days, st };
+          });
+        const laneH = 40;
+        const track = el("div", { class: "roadmap-track", style: `height:${Math.max(laneRight.length, 1) * laneH + 8}px` });
+        months.forEach((mo, idx) => {
+          if (!idx) return;
+          track.appendChild(
+            el("div", {
+              class: "roadmap-track-line" + (mo.key === todayKey ? " is-today" : ""),
+              style: `left:${(idx / months.length) * 100}%`,
+            })
+          );
+        });
+        const todayFrac = frac(todayIso);
+        if (todayFrac > 0 && todayFrac < 1) {
+          track.appendChild(el("div", { class: "roadmap-track-today", style: `left:${todayFrac * 100}%` }));
+        }
+        placed.forEach(({ b, left, right, lane, note, days, st }) => {
+          const late = days > 0;
+          const tip =
+            b.label +
+            (isActual ? " (actual): " : " (planned): ") +
+            fmtDateShort(b.start) +
+            " → " +
+            fmtDateShort(b.end) +
+            (late ? " · +" + days + " weekdays past " + fmtDateShort(b.plannedEnd) : "");
+          const bar = el(
+            "div",
+            {
+              class:
+                "roadmap-bar roadmap-chip " +
+                st.cls +
+                (isActual ? "" : " is-planned") +
+                (late ? " is-late" : "") +
+                (isActual && b.kind === "current" ? " is-current" : "") +
+                (isActual && b.kind === "future" ? " is-future" : ""),
+              style: `left:${left * 100}%;width:${(right - left) * 100}%;top:${4 + lane * laneH}px`,
+              title: tip,
+              role: "button",
+              tabindex: "0",
+            },
+            [
+              el("span", { class: "roadmap-chip-code" }, [st.code + note]),
+              el("span", { class: "roadmap-chip-date" }, [fmtDateShort(b.start) + " – " + fmtDateShort(b.end)]),
+            ]
+          );
+          const open = () => openStageDetail(p.id, b.stage);
+          bar.addEventListener("click", open);
+          bar.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              open();
+            }
+          });
+          track.appendChild(bar);
+        });
+        return el("td", { class: "roadmap-track-cell", colspan: String(months.length) }, [track]);
+      };
+
+      // View 2.0: one track. Each stage is a pair — its planned bar
+      // directly above its actual bar. Overlapping stages step down.
+      const pairTimelineCell = () => {
+        const frac = (iso) => {
+          if (!iso || iso <= months[0].start) return 0;
+          const lastEnd = months[months.length - 1].end;
+          if (iso > lastEnd) return 1;
+          const idx = months.findIndex((mo) => mo.key === iso.slice(0, 7));
+          if (idx < 0) return 1;
+          const day = Number(iso.slice(8, 10));
+          const dim = Number(months[idx].end.slice(8, 10)) || 30;
+          return (idx + Math.min(Math.max(day - 1, 0), dim) / dim) / months.length;
+        };
+        const groups = new Map();
+        const order = [];
+        const add = (b, kind) => {
+          if (!groups.has(b.stage)) {
+            groups.set(b.stage, { stage: b.stage, planned: null, actual: null });
+            order.push(b.stage);
+          }
+          const g = groups.get(b.stage);
+          if (!g[kind]) g[kind] = b;
+        };
+        planned.forEach((b) => add(b, "planned"));
+        actual.forEach((b) => add(b, "actual"));
+        const spanOf = (b) => {
+          const left = frac(b.start);
+          return { left, right: Math.max(frac(addDaysIso(b.end, 1)), left + 0.008) };
+        };
+        const pairs = order
+          .map((stage) => {
+            const g = groups.get(stage);
+            const ps = g.planned ? spanOf(g.planned) : null;
+            const as = g.actual ? spanOf(g.actual) : null;
+            const left = Math.min(ps ? ps.left : 1, as ? as.left : 1);
+            const right = Math.max(ps ? ps.right : 0, as ? as.right : 0);
+            const src = g.actual || g.planned;
+            const st = roadmapStage(src);
+            const days = g.actual && g.actual.plannedEnd && g.actual.end !== g.actual.plannedEnd ? businessDaysBetweenIso(g.actual.plannedEnd, g.actual.end) : 0;
+            const note = days > 0 ? " +" + days + "d" : days < 0 ? " −" + -days + "d" : "";
+            const planLabel = g.planned ? st.code + "  " + fmtDateShort(g.planned.start) + " – " + fmtDateShort(g.planned.end) : "";
+            const actLabel = g.actual ? st.code + note + "  " + fmtDateShort(g.actual.start) + " – " + fmtDateShort(g.actual.end) : "";
+            const labelFrac = (Math.max(planLabel.length, actLabel.length) * 6.4 + 16) / Math.max(months.length * 132, 1);
+            return { ...g, st, ps, as, left, right, occupyRight: Math.max(right, left + labelFrac), days, note, start: src.start };
+          })
+          .sort((a, b) => (a.start < b.start ? -1 : a.start > b.start ? 1 : hawkeyeStageIndex(a.stage) - hawkeyeStageIndex(b.stage)));
+        const laneRight = [];
+        pairs.forEach((pair) => {
+          let lane = laneRight.findIndex((r) => pair.left >= r - 0.001);
+          if (lane === -1) {
+            lane = laneRight.length;
+            laneRight.push(pair.occupyRight);
+          } else laneRight[lane] = pair.occupyRight;
+          pair.lane = lane;
+        });
+        const barH = 30;
+        const pairGap = 2;
+        const laneH = barH * 2 + pairGap + 10;
+        const track = el("div", { class: "roadmap-track", style: `height:${Math.max(laneRight.length, 1) * laneH + 8}px` });
+        months.forEach((mo, idx) => {
+          if (!idx) return;
+          track.appendChild(
+            el("div", {
+              class: "roadmap-track-line" + (mo.key === todayKey ? " is-today" : ""),
+              style: `left:${(idx / months.length) * 100}%`,
+            })
+          );
+        });
+        const todayFrac = frac(todayIso);
+        if (todayFrac > 0 && todayFrac < 1) {
+          track.appendChild(el("div", { class: "roadmap-track-today", style: `left:${todayFrac * 100}%` }));
+        }
+        const makeBar = (b, isActual, box, top, note, days, st) => {
+          const late = isActual && days > 0;
+          const codeText = st.code + (isActual ? note : "");
+          const dateText = fmtDateShort(b.start) + " – " + fmtDateShort(b.end);
+          const minPx = Math.ceil((codeText + "  " + dateText).length * 6.4 + 16);
+          const tip =
+            b.label +
+            (isActual ? " (actual): " : " (planned): ") +
+            fmtDateShort(b.start) +
+            " → " +
+            fmtDateShort(b.end) +
+            (late ? " · +" + days + " weekdays past " + fmtDateShort(b.plannedEnd) : "");
+          const bar = el(
+            "div",
+            {
+              class:
+                "roadmap-bar roadmap-chip " +
+                st.cls +
+                (isActual ? " is-pair-actual" : " is-planned is-pair-plan") +
+                (late ? " is-late" : "") +
+                (isActual && b.kind === "current" ? " is-current" : "") +
+                (isActual && b.kind === "future" ? " is-future" : ""),
+              style: `left:${box.left * 100}%;width:${(box.right - box.left) * 100}%;min-width:${minPx}px;top:${top}px;height:${barH}px`,
+              title: tip,
+              role: "button",
+              tabindex: "0",
+            },
+            [
+              el("span", { class: "roadmap-chip-code" }, [codeText]),
+              el("span", { class: "roadmap-chip-date" }, [dateText]),
+            ]
+          );
+          const open = () => openStageDetail(p.id, b.stage);
+          bar.addEventListener("click", open);
+          bar.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              open();
+            }
+          });
+          return bar;
+        };
+        pairs.forEach((pair) => {
+          const top = 4 + pair.lane * laneH;
+          if (pair.planned && pair.actual) {
+            track.appendChild(makeBar(pair.planned, false, pair.ps, top, "", 0, pair.st));
+            track.appendChild(makeBar(pair.actual, true, pair.as, top + barH + pairGap, pair.note, pair.days, pair.st));
+          } else if (pair.planned) {
+            track.appendChild(makeBar(pair.planned, false, pair.ps, top, "", 0, pair.st));
+          } else if (pair.actual) {
+            track.appendChild(makeBar(pair.actual, true, pair.as, top, pair.note, pair.days, pair.st));
+          }
+        });
+        return el("td", { class: "roadmap-track-cell", colspan: String(months.length) }, [track]);
+      };
+
+      if (showBoth && hawkeyeView !== "v2") {
+        tbody.appendChild(
+          el("tr", { class: "roadmap-row is-planned-row" }, [
+            nameCell,
+            el("td", { class: "roadmap-sticky roadmap-kind-col roadmap-kind" }, ["Planned"]),
+            ...cellsFor(planned, false),
+          ])
+        );
+        tbody.appendChild(
+          el("tr", { class: "roadmap-row is-actual-row" }, [
+            el("td", { class: "roadmap-sticky roadmap-kind-col roadmap-kind" }, ["Actual"]),
+            ...cellsFor(actual, true),
+          ])
+        );
+        return;
+      }
+
+      if (showBoth) {
+        tbody.appendChild(
+          el("tr", { class: "roadmap-row is-merged-row" }, [nameCell, pairTimelineCell()])
+        );
+        return;
+      }
+
       tbody.appendChild(
-        el("tr", { class: "roadmap-row is-planned-row" }, [
-          nameCell,
-          el("td", { class: "roadmap-sticky roadmap-kind-col roadmap-kind" }, ["Planned"]),
-          ...cellsFor(planned, false),
-        ])
-      );
-      tbody.appendChild(
-        el("tr", { class: "roadmap-row is-actual-row" }, [
-          el("td", { class: "roadmap-sticky roadmap-kind-col roadmap-kind" }, ["Actual"]),
-          ...cellsFor(actual, true),
-        ])
+        el("tr", { class: "roadmap-row is-actual-row" }, [nameCell, timelineCell(mode === "actual" ? actual : planned, mode === "actual")])
       );
     });
     table.appendChild(tbody);
@@ -2504,7 +2745,8 @@
     requestAnimationFrame(() => {
       const todayTh = table.querySelector("th.roadmap-month.is-today");
       if (!todayTh) return;
-      const stickyW = table.querySelector(".roadmap-name-col").offsetWidth + table.querySelector(".roadmap-kind-col").offsetWidth;
+      const kindCol = table.querySelector(".roadmap-kind-col");
+      const stickyW = table.querySelector(".roadmap-name-col").offsetWidth + (kindCol ? kindCol.offsetWidth : 0);
       wrap.scrollLeft = Math.max(0, todayTh.offsetLeft - stickyW - (wrap.clientWidth - stickyW) * 0.6);
     });
     return wrap;
@@ -3190,8 +3432,23 @@
       },
       "Hawk-eye view"
     );
-    if (hawkeyeView === "roadmap") {
-      board.appendChild(el("div", { class: "hawkeye-toolbar" }, [viewToggle, hawkeyeRoadmapLegend()]));
+    if (hawkeyeView === "roadmap" || hawkeyeView === "v2") {
+      const planToggle =
+        hawkeyeView === "v2"
+          ? null
+          : hawkeyeToggle(
+              [
+                { id: "both", label: "Planned + Actual", active: hawkeyeRoadmapMode === "both" },
+                { id: "planned", label: "Planned", active: hawkeyeRoadmapMode === "planned" },
+                { id: "actual", label: "Actual", active: hawkeyeRoadmapMode === "actual" },
+              ],
+              (id) => {
+                hawkeyeRoadmapMode = id;
+                renderHawkeye();
+              },
+              "Month grid, or one timeline row of planned or actual"
+            );
+      board.appendChild(el("div", { class: "hawkeye-toolbar" }, [viewToggle, planToggle, hawkeyeRoadmapLegend()]));
       board.appendChild(buildHawkeyeRoadmap(rows, todayIso));
       return;
     }
