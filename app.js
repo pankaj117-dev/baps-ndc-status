@@ -2373,6 +2373,20 @@
     ]);
   }
 
+  // Totals mode colors by overall project status, not by stage, so it
+  // gets its own small legend instead of the stage one above.
+  function hawkeyeTotalsLegend() {
+    const swatch = (cls, text) =>
+      el("span", { class: "stagegantt-legend-item" }, [el("span", { class: "roadmap-swatch roadmap-total-swatch " + cls }), text]);
+    return el("div", { class: "stagegantt-legend hawkeye-legend" }, [
+      swatch("is-green", "On track"),
+      swatch("is-amber", "At risk"),
+      swatch("is-red", "Critical"),
+      swatch("is-late", "Delayed vs. its own plan"),
+      el("span", { class: "stagegantt-legend-item hawkeye-totals-hint" }, ["Click a bar to open that project"]),
+    ]);
+  }
+
   // Month grid: every month from the earliest to the latest stage date
   // across the visible projects. A stage shows in each month it runs in.
   // On the Actual row, a stage running in a month after its planned end is
@@ -2582,6 +2596,81 @@
         });
         return el("td", { class: "roadmap-track-cell", colspan: String(months.length) }, [track]);
       };
+
+      // Totals: no stages at all, one bar from the project's earliest
+      // start to its latest finish, labelled with just those two dates
+      // (2026-11-08: "if I collapse I can see just the timeline of the
+      // full projects, no details just the start and the finish ... so I
+      // can know what capacity planning I can do"). Reuses the Actual
+      // row's month-fraction math from `timelineCell` so it lines up with
+      // every other roadmap row on the same grid.
+      const totalsCell = (blocks) => {
+        const frac = (iso) => {
+          if (!iso || iso <= months[0].start) return 0;
+          const lastEnd = months[months.length - 1].end;
+          if (iso > lastEnd) return 1;
+          const idx = months.findIndex((mo) => mo.key === iso.slice(0, 7));
+          if (idx < 0) return 1;
+          const day = Number(iso.slice(8, 10));
+          const dim = Number(months[idx].end.slice(8, 10)) || 30;
+          return (idx + Math.min(Math.max(day - 1, 0), dim) / dim) / months.length;
+        };
+        const laneH = 34;
+        const track = el("div", { class: "roadmap-track roadmap-track-totals", style: `height:${laneH + 8}px` });
+        months.forEach((mo, idx) => {
+          if (!idx) return;
+          track.appendChild(
+            el("div", {
+              class: "roadmap-track-line" + (mo.key === todayKey ? " is-today" : ""),
+              style: `left:${(idx / months.length) * 100}%`,
+            })
+          );
+        });
+        const todayFrac = frac(todayIso);
+        if (todayFrac > 0 && todayFrac < 1) {
+          track.appendChild(el("div", { class: "roadmap-track-today", style: `left:${todayFrac * 100}%` }));
+        }
+        if (!blocks.length) return el("td", { class: "roadmap-track-cell", colspan: String(months.length) }, [track]);
+        let start = blocks[0].start;
+        let end = blocks[0].end;
+        blocks.forEach((b) => {
+          if (b.start < start) start = b.start;
+          if (b.end > end) end = b.end;
+        });
+        const left = frac(start);
+        const right = Math.max(frac(addDaysIso(end, 1)), left + 0.01);
+        const delay = Math.max(0, p.delayDays || 0);
+        const statusCls = p.status === "red" ? "is-red" : p.status === "amber" ? "is-amber" : "is-green";
+        const bar = el(
+          "div",
+          {
+            class: "roadmap-total-bar " + statusCls + (delay > 0 ? " is-late" : ""),
+            style: `left:${left * 100}%;width:${(right - left) * 100}%;top:4px;height:${laneH}px`,
+            title: p.name + ": " + fmtDateShort(start) + " → " + fmtDateShort(end) + (delay > 0 ? " · +" + delay + "d vs plan" : ""),
+            role: "button",
+            tabindex: "0",
+          },
+          [
+            el("span", { class: "roadmap-total-date is-start" }, [fmtDateShort(start)]),
+            el("span", { class: "roadmap-total-date is-end" }, [fmtDateShort(end)]),
+          ]
+        );
+        const open = () => openProjectDetail(p.id, "stage-gate-timeline-section");
+        bar.addEventListener("click", open);
+        bar.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            open();
+          }
+        });
+        track.appendChild(bar);
+        return el("td", { class: "roadmap-track-cell", colspan: String(months.length) }, [track]);
+      };
+
+      if (mode === "totals") {
+        tbody.appendChild(el("tr", { class: "roadmap-row is-actual-row is-totals-row" }, [nameCell, totalsCell(actual)]));
+        return;
+      }
 
       // View 2.0: one track. Each stage is a pair — its planned bar
       // directly above its actual bar. Overlapping stages step down.
@@ -3441,14 +3530,21 @@
                 { id: "both", label: "Planned + Actual", active: hawkeyeRoadmapMode === "both" },
                 { id: "planned", label: "Planned", active: hawkeyeRoadmapMode === "planned" },
                 { id: "actual", label: "Actual", active: hawkeyeRoadmapMode === "actual" },
+                { id: "totals", label: "Totals (collapse)", active: hawkeyeRoadmapMode === "totals" },
               ],
               (id) => {
                 hawkeyeRoadmapMode = id;
                 renderHawkeye();
               },
-              "Month grid, or one timeline row of planned or actual"
+              "Month grid, one timeline row of planned/actual, or one bar per project start-to-finish for capacity planning"
             );
-      board.appendChild(el("div", { class: "hawkeye-toolbar" }, [viewToggle, planToggle, hawkeyeRoadmapLegend()]));
+      board.appendChild(
+        el("div", { class: "hawkeye-toolbar" }, [
+          viewToggle,
+          planToggle,
+          hawkeyeRoadmapMode === "totals" ? hawkeyeTotalsLegend() : hawkeyeRoadmapLegend(),
+        ])
+      );
       board.appendChild(buildHawkeyeRoadmap(rows, todayIso));
       return;
     }
