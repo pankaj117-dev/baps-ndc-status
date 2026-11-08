@@ -2024,9 +2024,14 @@ table.deps-drill-table th {
 .roadmap-sticky {
   position: sticky;
   background: var(--bg-panel);
-  z-index: 1;
+  /* Above every timeline bar (roadmap-bar/roadmap-total-bar top out at
+     z-index 3, for the pair-view's overlapping-label case) so a bar
+     that scrolls under the pinned Project column is hidden behind it
+     instead of painting over the project's name/owner/go-live text
+     (2026-11-08). */
+  z-index: 4;
 }
-.roadmap-table thead .roadmap-sticky { z-index: 3; background: #f3f6fb; }
+.roadmap-table thead .roadmap-sticky { z-index: 5; background: #f3f6fb; }
 .roadmap-name-col { left: 0; min-width: 180px; max-width: 220px; text-align: left; }
 .roadmap-table.is-actual-only .roadmap-name-col { box-shadow: 1px 0 0 var(--line-strong); }
 .roadmap-kind-col { left: 180px; min-width: 64px; box-shadow: 1px 0 0 var(--line-strong); }
