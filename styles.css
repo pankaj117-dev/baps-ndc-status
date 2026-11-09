@@ -1999,6 +1999,11 @@ table.deps-drill-table th {
   opacity: 0.35;
   cursor: default;
 }
+.hawkeye-zoom-autohint {
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  font-style: italic;
+}
 .hawkeye-zoom-step-label {
   font-family: var(--font-mono);
   font-size: 11px;

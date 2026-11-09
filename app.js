@@ -2544,7 +2544,18 @@
     const months = buildRoadmapPeriods(first, last, hawkeyeRoadmapZoom);
 
     const mode = hawkeyeView === "v2" ? "both" : hawkeyeRoadmapMode;
-    const showBoth = mode === "both";
+    // Zooming all the way out to the 3-month view collapses every row to
+    // one start-to-finish bar — the same idea as the manual Totals toggle
+    // — instead of cramming a full stage breakdown into a column that's
+    // 3 months wide. Zooming in brings the stage chips back, then their
+    // dates, then delay badges: "zoom out -> one bar - then things show
+    // up and then delays show up" (2026-11-08).
+    const zoomTier = HAWKEYE_ROADMAP_ZOOM_ORDER.indexOf(hawkeyeRoadmapZoom);
+    const autoCollapsed = hawkeyeView !== "v2" && zoomTier === 0 && mode !== "totals";
+    const effectiveMode = autoCollapsed ? "totals" : mode;
+    const showDates = zoomTier >= 2; // month or week
+    const showDelayBadge = zoomTier >= 3; // week only
+    const showBoth = effectiveMode === "both";
     const showKind = showBoth && hawkeyeView !== "v2";
     const table = el("table", { class: "roadmap-table" + (showKind ? "" : " is-actual-only") });
     const yearRow = el("tr", { class: "roadmap-year-row" }, [
@@ -2611,8 +2622,8 @@
               (isActual && b.kind === "current" ? " is-current" : "") +
               (isActual && b.kind === "future" ? " is-future" : "");
             const chip = el("span", { class: cls, title: tip }, [
-              el("span", { class: "roadmap-chip-code" }, [text, delayNote ? " " + delayNote : ""]),
-              el("span", { class: "roadmap-chip-date" }, [dateLabel]),
+              el("span", { class: "roadmap-chip-code" }, [text, showDelayBadge && delayNote ? " " + delayNote : ""]),
+              showDates ? el("span", { class: "roadmap-chip-date" }, [dateLabel]) : null,
             ]);
             if (isActual) {
               chip.setAttribute("role", "button");
@@ -2688,8 +2699,8 @@
               tabindex: "0",
             },
             [
-              el("span", { class: "roadmap-chip-code" }, [st.code + note]),
-              el("span", { class: "roadmap-chip-date" }, [fmtDateShort(b.start) + " – " + fmtDateShort(b.end)]),
+              el("span", { class: "roadmap-chip-code" }, [st.code + (showDelayBadge ? note : "")]),
+              showDates ? el("span", { class: "roadmap-chip-date" }, [fmtDateShort(b.start) + " – " + fmtDateShort(b.end)]) : null,
             ]
           );
           const open = () => openStageDetail(p.id, b.stage);
@@ -2712,7 +2723,7 @@
       // can know what capacity planning I can do"). Reuses the Actual
       // row's month-fraction math from `timelineCell` so it lines up with
       // every other roadmap row on the same grid.
-      const totalsCell = (blocks) => {
+      const totalsCell = (blocks, showDates = true) => {
         const frac = (iso) => periodFrac(months, iso);
         const laneH = 34;
         const track = el("div", { class: "roadmap-track roadmap-track-totals", style: `height:${laneH + 8}px` });
@@ -2749,10 +2760,12 @@
             role: "button",
             tabindex: "0",
           },
-          [
-            el("span", { class: "roadmap-total-date is-start" }, [fmtDateShort(start)]),
-            el("span", { class: "roadmap-total-date is-end" }, [fmtDateShort(end)]),
-          ]
+          showDates
+            ? [
+                el("span", { class: "roadmap-total-date is-start" }, [fmtDateShort(start)]),
+                el("span", { class: "roadmap-total-date is-end" }, [fmtDateShort(end)]),
+              ]
+            : []
         );
         const open = () => openProjectDetail(p.id, "stage-gate-timeline-section");
         bar.addEventListener("click", open);
@@ -2766,8 +2779,10 @@
         return el("td", { class: "roadmap-track-cell", colspan: String(months.length) }, [track]);
       };
 
-      if (mode === "totals") {
-        tbody.appendChild(el("tr", { class: "roadmap-row is-actual-row is-totals-row" }, [nameCell, totalsCell(actual)]));
+      if (effectiveMode === "totals") {
+        tbody.appendChild(
+          el("tr", { class: "roadmap-row is-actual-row is-totals-row" }, [nameCell, totalsCell(actual, mode === "totals")])
+        );
         return;
       }
 
@@ -3638,11 +3653,20 @@
         },
         "Column width: 3 months → 2 months → 1 month → weeks. Narrower columns show stage dates and delays more clearly."
       );
+      // At the 3-month zoom every row auto-collapses to one bar (same look
+      // as picking Totals), so the mode toggle's own highlight would be
+      // misleading there — call it out instead of silently disagreeing
+      // with what's on screen.
+      const autoCollapseHint =
+        hawkeyeView === "roadmap" && hawkeyeRoadmapZoom === "quarter" && hawkeyeRoadmapMode !== "totals"
+          ? el("span", { class: "hawkeye-zoom-autohint" }, ["Zoomed out to one bar per project — zoom in for stages"])
+          : null;
       board.appendChild(
         el("div", { class: "hawkeye-toolbar" }, [
           viewToggle,
           planToggle,
           zoomStepper,
+          autoCollapseHint,
           hawkeyeRoadmapMode === "totals" ? hawkeyeTotalsLegend() : hawkeyeRoadmapLegend(),
         ])
       );
