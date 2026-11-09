@@ -2298,10 +2298,13 @@
   // planning sheet: one column per month, the stages running in it, with a
   // Planned and an Actual row per project. Timeline is the day-accurate bar
   // chart.
+  // "Timeline" (day-accurate bars) is hidden for now per PM request
+  // (2026-11-08) — Roadmap's zoom now covers week-level granularity, so
+  // Timeline felt redundant. Its rendering code is untouched below; add
+  // its entry back here to bring the tab back.
   const HAWKEYE_VIEWS = [
     { id: "roadmap", label: "Roadmap" },
     { id: "v2", label: "2.0" },
-    { id: "timeline", label: "Timeline" },
   ];
   let hawkeyeView = "roadmap";
   // Roadmap row set: both month rows, or one timeline row of Actual, or one
