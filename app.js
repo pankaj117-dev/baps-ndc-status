@@ -2551,18 +2551,18 @@
     const months = buildRoadmapPeriods(first, last, hawkeyeRoadmapZoom);
 
     const mode = hawkeyeView === "v2" ? "both" : hawkeyeRoadmapMode;
-    // Zooming all the way out to the 3-month view collapses every row to
-    // one start-to-finish bar — the same idea as the manual Totals toggle
-    // — instead of cramming a full stage breakdown into a column that's
-    // 3 months wide. Zooming in brings the stage chips back, then their
-    // dates, then delay badges: "zoom out -> one bar - then things show
-    // up and then delays show up" (2026-11-08).
+    // Zooming all the way out (6 or 3 months) collapses every row to one
+    // start-to-finish bar instead of cramming a full stage breakdown into
+    // a wide column — this replaced the old manual "Totals" toggle
+    // entirely. Zooming in brings the stage chips back, then their dates,
+    // then delay badges: "zoom out -> one bar - then things show up and
+    // then delays show up" (2026-11-08).
     const zoomTier = HAWKEYE_ROADMAP_ZOOM_ORDER.indexOf(hawkeyeRoadmapZoom);
     // Tiers (0..4): halfyear, quarter, bimonth, month, week. The two most
     // zoomed-out levels (6 and 3 months) collapse to one bar; bimonth
     // brings stage chips back (no dates yet); month adds dates; week adds
     // the delay badge.
-    const autoCollapsed = zoomTier <= 1 && mode !== "totals";
+    const autoCollapsed = zoomTier <= 1;
     const effectiveMode = autoCollapsed ? "totals" : mode;
     const showDates = zoomTier >= 3; // month or week
     const showDelayBadge = zoomTier >= 4; // week only
@@ -3646,14 +3646,18 @@
                 { id: "both", label: "Planned + Actual", active: hawkeyeRoadmapMode === "both" },
                 { id: "planned", label: "Planned", active: hawkeyeRoadmapMode === "planned" },
                 { id: "actual", label: "Actual", active: hawkeyeRoadmapMode === "actual" },
-                { id: "totals", label: "Totals (collapse)", active: hawkeyeRoadmapMode === "totals" },
               ],
               (id) => {
                 hawkeyeRoadmapMode = id;
                 renderHawkeye();
               },
-              "Month grid, one timeline row of planned/actual, or one bar per project start-to-finish for capacity planning"
+              "Month grid, or one timeline row of planned/actual. Zoom out to 3 or 6 months to collapse every row to one start-to-finish bar for capacity planning."
             );
+      // The old manual "Totals (collapse)" toggle is gone — zooming out to
+      // 6 or 3 months now collapses every row the same way, so there's
+      // only one place that does it (2026-11-08).
+      const roadmapZoomTier = HAWKEYE_ROADMAP_ZOOM_ORDER.indexOf(hawkeyeRoadmapZoom);
+      const isAutoCollapsed = roadmapZoomTier <= 1;
       const zoomStepper = hawkeyeZoomStepper(
         HAWKEYE_ROADMAP_ZOOM_ORDER,
         HAWKEYE_ROADMAP_ZOOM_LABEL,
@@ -3668,18 +3672,16 @@
       // as picking Totals), so the mode toggle's own highlight would be
       // misleading there — call it out instead of silently disagreeing
       // with what's on screen.
-      const autoCollapseHint =
-        (hawkeyeRoadmapZoom === "quarter" || hawkeyeRoadmapZoom === "halfyear") &&
-        (hawkeyeView === "v2" || hawkeyeRoadmapMode !== "totals")
-          ? el("span", { class: "hawkeye-zoom-autohint" }, ["Zoomed out to one bar per project — zoom in for stages"])
-          : null;
+      const autoCollapseHint = isAutoCollapsed
+        ? el("span", { class: "hawkeye-zoom-autohint" }, ["Zoomed out to one bar per project — zoom in for stages"])
+        : null;
       board.appendChild(
         el("div", { class: "hawkeye-toolbar" }, [
           viewToggle,
           planToggle,
           zoomStepper,
           autoCollapseHint,
-          hawkeyeRoadmapMode === "totals" ? hawkeyeTotalsLegend() : hawkeyeRoadmapLegend(),
+          isAutoCollapsed ? hawkeyeTotalsLegend() : hawkeyeRoadmapLegend(),
         ])
       );
       board.appendChild(buildHawkeyeRoadmap(rows, todayIso));
