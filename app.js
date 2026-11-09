@@ -2781,7 +2781,7 @@
 
       if (effectiveMode === "totals") {
         tbody.appendChild(
-          el("tr", { class: "roadmap-row is-actual-row is-totals-row" }, [nameCell, totalsCell(actual, mode === "totals")])
+          el("tr", { class: "roadmap-row is-actual-row is-totals-row" }, [nameCell, totalsCell(actual)])
         );
         return;
       }
