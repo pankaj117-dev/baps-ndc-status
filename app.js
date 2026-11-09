@@ -2562,7 +2562,7 @@
     // zoomed-out levels (6 and 3 months) collapse to one bar; bimonth
     // brings stage chips back (no dates yet); month adds dates; week adds
     // the delay badge.
-    const autoCollapsed = hawkeyeView !== "v2" && zoomTier <= 1 && mode !== "totals";
+    const autoCollapsed = zoomTier <= 1 && mode !== "totals";
     const effectiveMode = autoCollapsed ? "totals" : mode;
     const showDates = zoomTier >= 3; // month or week
     const showDelayBadge = zoomTier >= 4; // week only
@@ -2862,9 +2862,9 @@
         }
         const makeBar = (b, isActual, box, top, note, days, st) => {
           const late = isActual && days > 0;
-          const codeText = st.code + (isActual ? note : "");
-          const dateText = fmtDateShort(b.start) + " – " + fmtDateShort(b.end);
-          const minPx = Math.ceil((codeText + "  " + dateText).length * 6.4 + 16);
+          const codeText = st.code + (isActual && showDelayBadge ? note : "");
+          const dateText = showDates ? fmtDateShort(b.start) + " – " + fmtDateShort(b.end) : "";
+          const minPx = Math.ceil((codeText + (dateText ? "  " + dateText : "")).length * 6.4 + 16);
           const tip =
             b.label +
             (isActual ? " (actual): " : " (planned): ") +
@@ -2889,7 +2889,7 @@
             },
             [
               el("span", { class: "roadmap-chip-code" }, [codeText]),
-              el("span", { class: "roadmap-chip-date" }, [dateText]),
+              dateText ? el("span", { class: "roadmap-chip-date" }, [dateText]) : null,
             ]
           );
           const open = () => openStageDetail(p.id, b.stage);
@@ -3669,9 +3669,8 @@
       // misleading there — call it out instead of silently disagreeing
       // with what's on screen.
       const autoCollapseHint =
-        hawkeyeView === "roadmap" &&
         (hawkeyeRoadmapZoom === "quarter" || hawkeyeRoadmapZoom === "halfyear") &&
-        hawkeyeRoadmapMode !== "totals"
+        (hawkeyeView === "v2" || hawkeyeRoadmapMode !== "totals")
           ? el("span", { class: "hawkeye-zoom-autohint" }, ["Zoomed out to one bar per project — zoom in for stages"])
           : null;
       board.appendChild(
