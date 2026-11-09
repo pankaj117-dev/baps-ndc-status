@@ -1982,6 +1982,34 @@ table.deps-drill-table th {
   color: #fff;
 }
 
+/* Roadmap column-granularity stepper (−/+ through 3 months → weeks), a
+   distinct gesture from the flat Timeline zoom tabs above (2026-11-08). */
+.hawkeye-zoom-stepper {
+  align-items: center;
+  padding: 2px 4px;
+}
+.hawkeye-zoom-step {
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  font-size: 13px;
+  line-height: 1;
+}
+.hawkeye-zoom-step:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.hawkeye-zoom-step-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  padding: 0 6px;
+  min-width: 58px;
+  text-align: center;
+}
+
 /* Roadmap: the PMO planning sheet's month grid, with a Planned and an
    Actual row per project. Project and row-kind columns stay pinned while
    the months scroll. */

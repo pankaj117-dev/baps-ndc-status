@@ -2308,6 +2308,119 @@
   // timeline row of Planned.
   let hawkeyeRoadmapMode = "both";
 
+  // Roadmap column granularity — a separate zoom from the Timeline view's
+  // day-pixel density below. Columns shrink from a 3-month bucket down to
+  // a week so stage chips get more room and their dates/delays stop
+  // getting truncated (2026-11-08: "zoom in ... goes from 3months to
+  // 2 months to 1 month and then ... weeks but not days"). Order here IS
+  // the zoom-in direction: wider buckets first, narrower (more granular)
+  // last.
+  const HAWKEYE_ROADMAP_ZOOM_ORDER = ["quarter", "bimonth", "month", "week"];
+  const HAWKEYE_ROADMAP_ZOOM_LABEL = { quarter: "3 months", bimonth: "2 months", month: "1 month", week: "Weeks" };
+  const HAWKEYE_ROADMAP_ZOOM_KEY = "baps-ndc-hawkeye-roadmap-zoom";
+  let hawkeyeRoadmapZoom = (() => {
+    try {
+      const v = localStorage.getItem(HAWKEYE_ROADMAP_ZOOM_KEY);
+      return HAWKEYE_ROADMAP_ZOOM_ORDER.includes(v) ? v : "month";
+    } catch (e) {
+      return "month";
+    }
+  })();
+  function setHawkeyeRoadmapZoom(id) {
+    hawkeyeRoadmapZoom = id;
+    try {
+      localStorage.setItem(HAWKEYE_ROADMAP_ZOOM_KEY, id);
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  // Calendar months from `firstKey` ("YYYY-MM") through `lastKey`, then
+  // bucketed to the requested zoom: unchanged for "month", N consecutive
+  // months merged for "bimonth"/"quarter", or re-split into 7-day weeks.
+  // Every period — whatever its width — has the same {key, start, end,
+  // label, year} shape, so every renderer below treats them identically.
+  function buildRoadmapPeriods(firstKey, lastKey, zoom) {
+    const months = [];
+    let [y, m] = firstKey.split("-").map(Number);
+    for (;;) {
+      const key = y + "-" + String(m).padStart(2, "0");
+      const lastDay = new Date(y, m, 0).getDate();
+      months.push({
+        key,
+        start: key + "-01",
+        end: key + "-" + String(lastDay).padStart(2, "0"),
+        label: HAWKEYE_MONTH_SHORT[m - 1].toUpperCase(),
+        year: y,
+      });
+      if (key >= lastKey) break;
+      m += 1;
+      if (m > 12) {
+        m = 1;
+        y += 1;
+      }
+    }
+    if (zoom === "month" || !zoom) return months;
+    if (zoom === "bimonth" || zoom === "quarter") {
+      const size = zoom === "quarter" ? 3 : 2;
+      const periods = [];
+      for (let i = 0; i < months.length; i += size) {
+        const chunk = months.slice(i, i + size);
+        const startMo = chunk[0];
+        const endMo = chunk[chunk.length - 1];
+        periods.push({
+          key: startMo.key,
+          start: startMo.start,
+          end: endMo.end,
+          label: chunk.length > 1 ? startMo.label + "–" + endMo.label : startMo.label,
+          year: startMo.year,
+        });
+      }
+      return periods;
+    }
+    // Weeks: plain 7-day buckets across the same overall span, so the
+    // last week may run short rather than spilling past `months`' range.
+    const periods = [];
+    const lastEnd = months[months.length - 1].end;
+    let cur = months[0].start;
+    while (cur <= lastEnd) {
+      const end = addDaysIso(cur, 6);
+      periods.push({
+        key: cur,
+        start: cur,
+        end: end > lastEnd ? lastEnd : end,
+        label: fmtDateTiny(cur),
+        year: Number(cur.slice(0, 4)),
+      });
+      cur = addDaysIso(cur, 7);
+    }
+    return periods;
+  }
+
+  // Generic replacements for the old exact-month-key lookups, so every
+  // track-based row (Totals, single Planned/Actual, the 2.0 pair view)
+  // keeps working no matter how `months` is bucketed.
+  function periodIndexFor(periods, iso) {
+    if (!periods.length) return 0;
+    if (iso <= periods[0].start) return 0;
+    if (iso >= periods[periods.length - 1].end) return periods.length - 1;
+    const idx = periods.findIndex((mo) => iso >= mo.start && iso <= mo.end);
+    return idx === -1 ? periods.length - 1 : idx;
+  }
+  function periodFrac(periods, iso) {
+    if (!periods.length || !iso) return 0;
+    if (iso <= periods[0].start) return 0;
+    if (iso > periods[periods.length - 1].end) return 1;
+    const idx = periodIndexFor(periods, iso);
+    const mo = periods[idx];
+    const dim = hawkeyeDaySpan(mo.start, addDaysIso(mo.end, 1));
+    const dayOffset = hawkeyeRawDayDiff(mo.start, iso);
+    return (idx + Math.min(Math.max(dayOffset, 0), dim) / dim) / periods.length;
+  }
+  function periodIsToday(mo, todayIso) {
+    return todayIso >= mo.start && todayIso <= mo.end;
+  }
+
   // Timeline densities. Half year fits the panel. Quarter (default) is
   // 1.5× that so blocks are readable; Month is the close view.
   const HAWKEYE_ZOOM = {
@@ -2317,6 +2430,29 @@
   };
   const HAWKEYE_ZOOM_ORDER = ["half", "quarter", "month"];
   let hawkeyeZoom = "quarter";
+
+  // −/+ stepper through an ordered list of zoom levels (vs. hawkeyeToggle's
+  // flat set of tabs) — used for the Roadmap column granularity, where
+  // "next" and "previous" are the natural gesture, not picking a tab.
+  function hawkeyeZoomStepper(order, labels, current, onPick, title) {
+    const idx = order.indexOf(current);
+    const wrap = el("div", { class: "hawkeye-zoom-toggle hawkeye-zoom-stepper", title });
+    const minus = el("button", { class: "hawkeye-zoom-btn hawkeye-zoom-step", type: "button", "aria-label": "Zoom out" }, ["−"]);
+    const label = el("span", { class: "hawkeye-zoom-step-label" }, [labels[current] || current]);
+    const plus = el("button", { class: "hawkeye-zoom-btn hawkeye-zoom-step", type: "button", "aria-label": "Zoom in" }, ["+"]);
+    if (idx <= 0) minus.disabled = true;
+    if (idx === -1 || idx >= order.length - 1) plus.disabled = true;
+    minus.addEventListener("click", () => {
+      if (idx > 0) onPick(order[idx - 1]);
+    });
+    plus.addEventListener("click", () => {
+      if (idx !== -1 && idx < order.length - 1) onPick(order[idx + 1]);
+    });
+    wrap.appendChild(minus);
+    wrap.appendChild(label);
+    wrap.appendChild(plus);
+    return wrap;
+  }
 
   function hawkeyeToggle(options, onPick, title) {
     return el(
@@ -2405,26 +2541,7 @@
       });
     });
     if (!last || last < "2027-08") last = "2027-08";
-    const months = [];
-    let [y, m] = first.split("-").map(Number);
-    for (;;) {
-      const key = y + "-" + String(m).padStart(2, "0");
-      const lastDay = new Date(y, m, 0).getDate();
-      months.push({
-        key,
-        start: key + "-01",
-        end: key + "-" + String(lastDay).padStart(2, "0"),
-        label: HAWKEYE_MONTH_SHORT[m - 1].toUpperCase(),
-        year: y,
-      });
-      if (key >= last) break;
-      m += 1;
-      if (m > 12) {
-        m = 1;
-        y += 1;
-      }
-    }
-    const todayKey = monthKey(todayIso);
+    const months = buildRoadmapPeriods(first, last, hawkeyeRoadmapZoom);
 
     const mode = hawkeyeView === "v2" ? "both" : hawkeyeRoadmapMode;
     const showBoth = mode === "both";
@@ -2444,7 +2561,7 @@
       el("th", { class: "roadmap-sticky roadmap-name-col" }, ["Project"]),
       showKind ? el("th", { class: "roadmap-sticky roadmap-kind-col" }, [""]) : null,
     ]);
-    months.forEach((mo) => headRow.appendChild(el("th", { class: "roadmap-month" + (mo.key === todayKey ? " is-today" : "") }, [mo.label])));
+    months.forEach((mo) => headRow.appendChild(el("th", { class: "roadmap-month" + (periodIsToday(mo, todayIso) ? " is-today" : "") }, [mo.label])));
     table.appendChild(el("thead", null, [yearRow, headRow]));
 
     const tbody = el("tbody");
@@ -2464,7 +2581,7 @@
       const cellsFor = (blocks, isActual) =>
         months.map((mo) => {
           const inMonth = blocks.filter((b) => b.start <= mo.end && b.end >= mo.start);
-          const td = el("td", { class: "roadmap-cell" + (mo.key === todayKey ? " is-today" : "") });
+          const td = el("td", { class: "roadmap-cell" + (periodIsToday(mo, todayIso) ? " is-today" : "") });
           inMonth.forEach((b) => {
             const st = roadmapStage(b);
             let text = st.code;
@@ -2473,7 +2590,7 @@
             let delayNote = null;
             if (isActual && b.plannedEnd) {
               if (mo.start > b.plannedEnd && b.end > b.plannedEnd) late = true;
-              if (monthKey(b.end) === mo.key && b.end !== b.plannedEnd) {
+              if (b.end >= mo.start && b.end <= mo.end && b.end !== b.plannedEnd) {
                 const d = businessDaysBetweenIso(b.plannedEnd, b.end);
                 if (d > 0) {
                   delayNote = "+" + d + "d";
@@ -2508,16 +2625,7 @@
         });
 
       const timelineCell = (blocks, isActual) => {
-        const frac = (iso) => {
-          if (!iso || iso <= months[0].start) return 0;
-          const lastEnd = months[months.length - 1].end;
-          if (iso > lastEnd) return 1;
-          const idx = months.findIndex((mo) => mo.key === iso.slice(0, 7));
-          if (idx < 0) return 1;
-          const day = Number(iso.slice(8, 10));
-          const dim = Number(months[idx].end.slice(8, 10)) || 30;
-          return (idx + Math.min(Math.max(day - 1, 0), dim) / dim) / months.length;
-        };
+        const frac = (iso) => periodFrac(months, iso);
         const laneRight = [];
         const placed = blocks
           .slice()
@@ -2546,7 +2654,7 @@
           if (!idx) return;
           track.appendChild(
             el("div", {
-              class: "roadmap-track-line" + (mo.key === todayKey ? " is-today" : ""),
+              class: "roadmap-track-line" + (periodIsToday(mo, todayIso) ? " is-today" : ""),
               style: `left:${(idx / months.length) * 100}%`,
             })
           );
@@ -2605,23 +2713,14 @@
       // row's month-fraction math from `timelineCell` so it lines up with
       // every other roadmap row on the same grid.
       const totalsCell = (blocks) => {
-        const frac = (iso) => {
-          if (!iso || iso <= months[0].start) return 0;
-          const lastEnd = months[months.length - 1].end;
-          if (iso > lastEnd) return 1;
-          const idx = months.findIndex((mo) => mo.key === iso.slice(0, 7));
-          if (idx < 0) return 1;
-          const day = Number(iso.slice(8, 10));
-          const dim = Number(months[idx].end.slice(8, 10)) || 30;
-          return (idx + Math.min(Math.max(day - 1, 0), dim) / dim) / months.length;
-        };
+        const frac = (iso) => periodFrac(months, iso);
         const laneH = 34;
         const track = el("div", { class: "roadmap-track roadmap-track-totals", style: `height:${laneH + 8}px` });
         months.forEach((mo, idx) => {
           if (!idx) return;
           track.appendChild(
             el("div", {
-              class: "roadmap-track-line" + (mo.key === todayKey ? " is-today" : ""),
+              class: "roadmap-track-line" + (periodIsToday(mo, todayIso) ? " is-today" : ""),
               style: `left:${(idx / months.length) * 100}%`,
             })
           );
@@ -2675,16 +2774,7 @@
       // View 2.0: one track. Each stage is a pair — its planned bar
       // directly above its actual bar. Overlapping stages step down.
       const pairTimelineCell = () => {
-        const frac = (iso) => {
-          if (!iso || iso <= months[0].start) return 0;
-          const lastEnd = months[months.length - 1].end;
-          if (iso > lastEnd) return 1;
-          const idx = months.findIndex((mo) => mo.key === iso.slice(0, 7));
-          if (idx < 0) return 1;
-          const day = Number(iso.slice(8, 10));
-          const dim = Number(months[idx].end.slice(8, 10)) || 30;
-          return (idx + Math.min(Math.max(day - 1, 0), dim) / dim) / months.length;
-        };
+        const frac = (iso) => periodFrac(months, iso);
         const groups = new Map();
         const order = [];
         const add = (b, kind) => {
@@ -2735,7 +2825,7 @@
           if (!idx) return;
           track.appendChild(
             el("div", {
-              class: "roadmap-track-line" + (mo.key === todayKey ? " is-today" : ""),
+              class: "roadmap-track-line" + (periodIsToday(mo, todayIso) ? " is-today" : ""),
               style: `left:${(idx / months.length) * 100}%`,
             })
           );
@@ -3538,10 +3628,21 @@
               },
               "Month grid, one timeline row of planned/actual, or one bar per project start-to-finish for capacity planning"
             );
+      const zoomStepper = hawkeyeZoomStepper(
+        HAWKEYE_ROADMAP_ZOOM_ORDER,
+        HAWKEYE_ROADMAP_ZOOM_LABEL,
+        hawkeyeRoadmapZoom,
+        (id) => {
+          setHawkeyeRoadmapZoom(id);
+          renderHawkeye();
+        },
+        "Column width: 3 months → 2 months → 1 month → weeks. Narrower columns show stage dates and delays more clearly."
+      );
       board.appendChild(
         el("div", { class: "hawkeye-toolbar" }, [
           viewToggle,
           planToggle,
+          zoomStepper,
           hawkeyeRoadmapMode === "totals" ? hawkeyeTotalsLegend() : hawkeyeRoadmapLegend(),
         ])
       );
