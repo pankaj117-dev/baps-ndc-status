@@ -2315,8 +2315,14 @@
   // 2 months to 1 month and then ... weeks but not days"). Order here IS
   // the zoom-in direction: wider buckets first, narrower (more granular)
   // last.
-  const HAWKEYE_ROADMAP_ZOOM_ORDER = ["quarter", "bimonth", "month", "week"];
-  const HAWKEYE_ROADMAP_ZOOM_LABEL = { quarter: "3 months", bimonth: "2 months", month: "1 month", week: "Weeks" };
+  const HAWKEYE_ROADMAP_ZOOM_ORDER = ["halfyear", "quarter", "bimonth", "month", "week"];
+  const HAWKEYE_ROADMAP_ZOOM_LABEL = {
+    halfyear: "6 months",
+    quarter: "3 months",
+    bimonth: "2 months",
+    month: "1 month",
+    week: "Weeks",
+  };
   const HAWKEYE_ROADMAP_ZOOM_KEY = "baps-ndc-hawkeye-roadmap-zoom";
   let hawkeyeRoadmapZoom = (() => {
     try {
@@ -2361,8 +2367,9 @@
       }
     }
     if (zoom === "month" || !zoom) return months;
-    if (zoom === "bimonth" || zoom === "quarter") {
-      const size = zoom === "quarter" ? 3 : 2;
+    const BUCKET_SIZE = { halfyear: 6, quarter: 3, bimonth: 2 };
+    if (BUCKET_SIZE[zoom]) {
+      const size = BUCKET_SIZE[zoom];
       const periods = [];
       for (let i = 0; i < months.length; i += size) {
         const chunk = months.slice(i, i + size);
@@ -2551,10 +2558,14 @@
     // dates, then delay badges: "zoom out -> one bar - then things show
     // up and then delays show up" (2026-11-08).
     const zoomTier = HAWKEYE_ROADMAP_ZOOM_ORDER.indexOf(hawkeyeRoadmapZoom);
-    const autoCollapsed = hawkeyeView !== "v2" && zoomTier === 0 && mode !== "totals";
+    // Tiers (0..4): halfyear, quarter, bimonth, month, week. The two most
+    // zoomed-out levels (6 and 3 months) collapse to one bar; bimonth
+    // brings stage chips back (no dates yet); month adds dates; week adds
+    // the delay badge.
+    const autoCollapsed = hawkeyeView !== "v2" && zoomTier <= 1 && mode !== "totals";
     const effectiveMode = autoCollapsed ? "totals" : mode;
-    const showDates = zoomTier >= 2; // month or week
-    const showDelayBadge = zoomTier >= 3; // week only
+    const showDates = zoomTier >= 3; // month or week
+    const showDelayBadge = zoomTier >= 4; // week only
     const showBoth = effectiveMode === "both";
     const showKind = showBoth && hawkeyeView !== "v2";
     const table = el("table", { class: "roadmap-table" + (showKind ? "" : " is-actual-only") });
@@ -3651,14 +3662,16 @@
           setHawkeyeRoadmapZoom(id);
           renderHawkeye();
         },
-        "Column width: 3 months → 2 months → 1 month → weeks. Narrower columns show stage dates and delays more clearly."
+        "Column width: 6 months → 3 months → 2 months → 1 month → weeks. Narrower columns show stage dates and delays more clearly."
       );
       // At the 3-month zoom every row auto-collapses to one bar (same look
       // as picking Totals), so the mode toggle's own highlight would be
       // misleading there — call it out instead of silently disagreeing
       // with what's on screen.
       const autoCollapseHint =
-        hawkeyeView === "roadmap" && hawkeyeRoadmapZoom === "quarter" && hawkeyeRoadmapMode !== "totals"
+        hawkeyeView === "roadmap" &&
+        (hawkeyeRoadmapZoom === "quarter" || hawkeyeRoadmapZoom === "halfyear") &&
+        hawkeyeRoadmapMode !== "totals"
           ? el("span", { class: "hawkeye-zoom-autohint" }, ["Zoomed out to one bar per project — zoom in for stages"])
           : null;
       board.appendChild(
