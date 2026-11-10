@@ -2553,7 +2553,7 @@
     if (!last || last < "2027-08") last = "2027-08";
     const months = buildRoadmapPeriods(first, last, hawkeyeRoadmapZoom);
 
-    const mode = hawkeyeView === "v2" ? "both" : hawkeyeRoadmapMode;
+    const mode = hawkeyeRoadmapMode;
     // Zooming all the way out (6 or 3 months) collapses every row to one
     // start-to-finish bar instead of cramming a full stage breakdown into
     // a wide column — this replaced the old manual "Totals" toggle
@@ -3641,26 +3641,28 @@
       "Hawk-eye view"
     );
     if (hawkeyeView === "roadmap" || hawkeyeView === "v2") {
-      const planToggle =
-        hawkeyeView === "v2"
-          ? null
-          : hawkeyeToggle(
-              [
-                { id: "both", label: "Planned + Actual", active: hawkeyeRoadmapMode === "both" },
-                { id: "planned", label: "Planned", active: hawkeyeRoadmapMode === "planned" },
-                { id: "actual", label: "Actual", active: hawkeyeRoadmapMode === "actual" },
-              ],
-              (id) => {
-                hawkeyeRoadmapMode = id;
-                renderHawkeye();
-              },
-              "Month grid, or one timeline row of planned/actual. Zoom out to 3 or 6 months to collapse every row to one start-to-finish bar for capacity planning."
-            );
       // The old manual "Totals (collapse)" toggle is gone — zooming out to
       // 6 or 3 months now collapses every row the same way, so there's
       // only one place that does it (2026-11-08).
       const roadmapZoomTier = HAWKEYE_ROADMAP_ZOOM_ORDER.indexOf(hawkeyeRoadmapZoom);
       const isAutoCollapsed = roadmapZoomTier <= 1;
+      // Once stages are on screen, Planned + Actual / Planned / Actual
+      // filters which bars stay. Zoomed out, every row is one bar, so the
+      // filter would not change anything.
+      const planToggle = isAutoCollapsed
+        ? null
+        : hawkeyeToggle(
+            [
+              { id: "both", label: "Planned + Actual", active: hawkeyeRoadmapMode === "both" },
+              { id: "planned", label: "Planned", active: hawkeyeRoadmapMode === "planned" },
+              { id: "actual", label: "Actual", active: hawkeyeRoadmapMode === "actual" },
+            ],
+            (id) => {
+              hawkeyeRoadmapMode = id;
+              renderHawkeye();
+            },
+            "Show planned and actual together, or just one of them. On 2.0, Planned + Actual stacks the plan above the actual for each stage."
+          );
       const zoomStepper = hawkeyeZoomStepper(
         HAWKEYE_ROADMAP_ZOOM_ORDER,
         HAWKEYE_ROADMAP_ZOOM_LABEL,
