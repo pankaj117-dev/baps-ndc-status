@@ -56,5 +56,13 @@
     "raisedBy": "Aniket",
     "createdAt": "2026-11-02T00:00:00Z",
     "status": "open"
+  },
+  {
+    "id": "note-7",
+    "projectId": "mymandir",
+    "text": "Follow-up taken on 16 Nov 2026 for sign-off on Milestone 1.",
+    "raisedBy": "Aniket",
+    "createdAt": "2026-11-16T00:00:00Z",
+    "status": "open"
   }
 ]
