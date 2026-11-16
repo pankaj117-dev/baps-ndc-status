@@ -186,7 +186,10 @@
   // "On schedule" / "+N days", plus an optional per-project qualifier
   // (p.scheduleScope, e.g. "hotfix") so a project in Hypercare can say
   // what the schedule status is actually tracking.
+  // A finished project sets `closedOn` (ISO date, 2026-11-16, MyBKY Phase 1)
+  // and reads "Closed · <date>" here instead of a schedule status.
   function scheduleStatusText(p) {
+    if (p.closedOn) return "Closed · " + fmtDate(p.closedOn);
     const base = (p.delayDays || 0) > 0 ? "+" + p.delayDays + " days" : "On schedule";
     return p.scheduleScope ? base + " (" + p.scheduleScope + ")" : base;
   }
