@@ -1,6 +1,6 @@
 {
   "asOf": "2026-11-16",
-  "lastUpdated": "2026-11-16T16:05:03.567601Z",
+  "lastUpdated": "2026-11-16T16:39:13.479379Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -1203,16 +1203,16 @@
       "name": "myBKY 2A",
       "owner": "Satish Buddhadev",
       "status": "amber",
-      "progress": 51,
-      "phase": "Requirements 97% | Design 75% | Dev & QA 40%",
+      "progress": 60,
+      "phase": "Requirement 100% | TDD 100% | Dev & QA 56%",
       "nextMilestone": {
         "name": "Development & QA completion",
         "date": "2026-12-18"
       },
-      "goLive": "2027-01-28",
-      "originalGoLive": "2027-01-28",
-      "delayDays": 0,
-      "delayNote": "Stage Dates sheet: Requirement end moved 02-Oct → 05-Nov (24 weekdays). TDD end moved 23-Oct → 05-Nov (9 weekdays; the sheet's 5 only counts the 30-Oct revision). Go-Live is still 28-Jan, so there is no project-level delay.",
+      "goLive": "2027-01-31",
+      "originalGoLive": "2027-01-31",
+      "delayDays": 25,
+      "delayNote": "Requirements were planned to close 02-Oct and closed 06-Nov: 25 working days late (Mon-Fri). TDD was planned to close 23-Oct and closed 09-Nov (11 working days). Go-live is still 31-Jan. Week of Nov 17: Requirement and TDD 100% complete, Development & QA 56%, overall 60%.",
       "dependencies": [
         {
           "id": "DEP-101",
@@ -1228,7 +1228,7 @@
           "id": "DEP-102",
           "text": "RGC team to provide 1.5 additional QAs (for one month) to meet the functional / QA sign-off timeline (Dev & QA completion 18-Dec-2026)",
           "team": "RGC",
-          "mitigation": "Requested 1.5 additional QAs from RGC; test plan being reprioritized for the remaining ~7 person-day gap",
+          "mitigation": "Partially resolved: RGC has allocated 1 QA against the 1.5 requested; follow up for the remaining 0.5 QA",
           "dueBy": "2026-11-09",
           "priority": "Critical",
           "escalated": false,
@@ -1242,7 +1242,7 @@
           "dueBy": "2026-11-05",
           "priority": "High",
           "escalated": false,
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "DEP-104",
@@ -1252,27 +1252,24 @@
           "dueBy": "2026-11-06",
           "priority": "High",
           "escalated": false,
-          "resolved": false
+          "resolved": true
         }
       ],
       "sprintStatus": {
         "completed": [
-          "Requirements: all 6 modules (Transportation, Accommodation, GL and Chaperon, GMS, Event Management, Form)",
-          "UI/UX: Transportation, Accommodation, GMS, Event Management, Form",
-          "TDD: Transportation, GMS, Event Management, Form",
-          "Development: Transportation, GMS, Form"
+          "Requirement, UI/UX and TDD: all 7 modules (Transportation, Accommodation, GL and Chaperon, GMS, Event Management, Form, Ad hoc user stories)",
+          "Development: Transportation, Form",
+          "QA: Transportation, Form"
         ],
         "inProgress": [
-          "QA: Transportation, Form",
-          "TDD: Accommodation",
-          "UI/UX: GL and Chaperon"
+          "Development: GMS, Accommodation, GL and Chaperon, Event Management, Ad hoc user stories",
+          "QA test-case writing: Accommodation"
         ],
         "nextPlan": [
-          "Complete QA (QA sign-off) for Transportation and Form",
-          "Start QA for GMS",
-          "Start development for Event Management",
-          "Complete Accommodation TDD, then start development",
-          "Complete GL and Chaperon UI/UX, then TDD"
+          "Complete development for GMS, Accommodation, GL and Chaperon, Event Management, Ad hoc user stories",
+          "Complete Accommodation test cases and start QA",
+          "Start QA for GMS, GL and Chaperon, Event Management, Ad hoc user stories",
+          "Secure the 1.5 additional QAs from RGC (DEP-102) for the QA sign-off timeline"
         ]
       },
       "risks": [
@@ -1393,7 +1390,7 @@
         {
           "id": "RISK-120",
           "text": "If RGC does not provide the 1.5 additional QAs, functional / QA sign-off by 18-Dec-2026 is at risk: 77 QA person-days needed vs 40 available (70 with the extra 1.5 QAs)",
-          "mitigation": "Follow up with RGC on DEP-102; reprioritize the test plan for the remaining ~7 person-day gap; escalate if not confirmed",
+          "mitigation": "RGC has allocated 1 of the 1.5 requested QAs (DEP-102 partially resolved); follow up for the remaining 0.5 QA, reprioritize the test plan, escalate if not confirmed",
           "resolved": false
         }
       ],
@@ -1405,7 +1402,7 @@
         "Fixing Response form demo defects, GMS user story gaps and Accommodation requirement gaps"
       ],
       "delayTradeoffs": "19-Oct: Aksharbhai approved removing Bulk Update of Transport Details by Karyakars and Guest Registration from Phase 2A to compensate CR effort.",
-      "stage": "Requirements",
+      "stage": "Development",
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
@@ -1417,13 +1414,13 @@
           "initialStart": "2026-06-12",
           "latestStart": "2026-06-12",
           "initialEnd": "2026-10-02",
-          "latestEnd": "2026-11-05"
+          "latestEnd": "2026-11-06"
         },
         "Tech. Design": {
           "initialStart": "2026-08-10",
           "latestStart": "2026-08-10",
           "initialEnd": "2026-10-23",
-          "latestEnd": "2026-11-05"
+          "latestEnd": "2026-11-09"
         },
         "Development": {
           "initialStart": "2026-08-24",
@@ -1452,8 +1449,8 @@
         "Rollout": {
           "initialStart": "2027-01-11",
           "latestStart": "2027-01-11",
-          "initialEnd": "2027-01-28",
-          "latestEnd": "2027-01-28"
+          "initialEnd": "2027-01-31",
+          "latestEnd": "2027-01-31"
         },
         "Hypercare": {
           "initialStart": "2027-02-01",
@@ -1463,14 +1460,38 @@
         }
       },
       "stageDateOrder": [
-        { "stage": "Requirements", "label": "Requirement" },
-        { "stage": "Tech. Design", "label": "TDD" },
-        { "stage": "Development", "label": "Development & QA" },
-        { "stage": "UAT", "label": "UAT" },
-        { "stage": "VAPT", "label": "VAPT" },
-        { "stage": "Load", "label": "Load" },
-        { "stage": "Rollout", "label": "Go-Live" },
-        { "stage": "Hypercare", "label": "Hypercare" }
+        {
+          "stage": "Requirements",
+          "label": "Requirement"
+        },
+        {
+          "stage": "Tech. Design",
+          "label": "TDD"
+        },
+        {
+          "stage": "Development",
+          "label": "Development & QA"
+        },
+        {
+          "stage": "UAT",
+          "label": "UAT"
+        },
+        {
+          "stage": "VAPT",
+          "label": "VAPT"
+        },
+        {
+          "stage": "Load",
+          "label": "Load"
+        },
+        {
+          "stage": "Rollout",
+          "label": "Go-Live"
+        },
+        {
+          "stage": "Hypercare",
+          "label": "Hypercare"
+        }
       ],
       "riskSeq": 120,
       "changeRequests": [],
@@ -1495,22 +1516,22 @@
       "delayItemLog": [],
       "milestones": [
         {
-          "name": "Requirements",
-          "date": "2026-11-05",
+          "name": "Requirement",
+          "date": "2026-11-06",
           "status": "amber",
-          "progress": 97
+          "progress": 100
         },
         {
-          "name": "Design",
-          "date": "2026-11-05",
+          "name": "TDD",
+          "date": "2026-11-09",
           "status": "amber",
-          "progress": 75
+          "progress": 100
         },
         {
           "name": "Development & QA",
           "date": "2026-12-18",
           "status": "amber",
-          "progress": 40
+          "progress": 56
         }
       ],
       "raidLog": [],
