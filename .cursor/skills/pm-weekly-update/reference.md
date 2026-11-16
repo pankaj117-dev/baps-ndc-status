@@ -70,7 +70,7 @@ replace other keys); omit `"id"` to append a new one (the script mints
   "submittedDate": "2026-06-09",
   "by": "Aksharbhai",
   "actionItem": "Review requirements, assess effort, obtain CR approval",
-  "approvalStatus": "Approved for current phase",  // free text; "approved"/"pending"/"tbd" (substring, case-insensitive) drives badge color
+  "approvalStatus": "Approved for current phase",  // free text; "approved"/"resolved"/"closed" → green, "pending"/"tbd" (substring, case-insensitive) drives badge color
   "impact": "Go-Live date impacted by 10 days"
 }
 ```
