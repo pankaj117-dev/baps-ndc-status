@@ -16366,7 +16366,7 @@
     ]
   },
   "2026-11-16": {
-    "capturedAt": "2026-11-16T11:16:01.627660Z",
+    "capturedAt": "2026-11-16T11:24:17.423167Z",
     "projects": [
       {
         "id": "webnext",
@@ -17372,7 +17372,7 @@
         "id": "mymandir",
         "name": "myMandir 1B",
         "status": "green",
-        "progress": 75,
+        "progress": 100,
         "stage": "UAT",
         "delayDays": 0,
         "delayNote": "Milestone 1: TDD end moved 22-Sep \u2192 07-Oct (11 weekdays). UAT end moved 26-Oct \u2192 29-Oct (3 weekdays). Milestone 2: Development & QA end moved earlier, 15-Nov \u2192 05-Nov (7 weekdays saved). Go-live is 23-Nov with no slip.",
