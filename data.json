@@ -267,7 +267,7 @@
       "id": "pledge-1a",
       "name": "Pledge - 1.x",
       "owner": "Jeet Savani",
-      "status": "amber",
+      "status": "green",
       "progress": 35,
       "stage": "Development",
       "phase": "Requirement + TDD complete per 22-Sep deck's own plan (05-Aug\u201325-Sep); Development & QA in progress (28-Sep\u201321-Oct, no delay reported) \u2014 stage advanced to Development on 2026-09-30 based on the deck's own un-delayed schedule, not a newer confirmed report.",
