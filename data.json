@@ -1512,7 +1512,7 @@
       "owner": "Aniket Udgaonkar",
       "status": "green",
       "progress": 100,
-      "phase": "Milestone 1 delivered on UAT to stakeholders on 27 Oct 2026 \u00b7 Milestone 1: 100%, Milestone 2: 70%",
+      "phase": "Milestone 2 UAT completed on 06 Nov 2026 · VAPT (web) 16 Nov – 20 Nov 2026",
       "nextMilestone": {
         "name": "Milestone 2 \u2013 Nov 2026 release",
         "date": "2026-11-06"
@@ -1590,7 +1590,7 @@
         "Aniket connected with Sameep during BA's leave period to secure FRD sign-off"
       ],
       "delayTradeoffs": "",
-      "stage": "UAT",
+      "stage": "VAPT",
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
@@ -1650,7 +1650,7 @@
           "initialStart": "2026-11-16",
           "latestStart": "2026-11-06",
           "initialEnd": "2026-11-20",
-          "latestEnd": "2026-11-20"
+          "latestEnd": "2026-11-06"
         },
         "VAPT": {
           "initialStart": "2026-11-16",

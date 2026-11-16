@@ -16366,7 +16366,7 @@
     ]
   },
   "2026-11-16": {
-    "capturedAt": "2026-11-16T11:29:40.484962Z",
+    "capturedAt": "2026-11-16T11:31:19.483183Z",
     "projects": [
       {
         "id": "webnext",
@@ -17373,11 +17373,11 @@
         "name": "myMandir 1B",
         "status": "green",
         "progress": 100,
-        "stage": "UAT",
+        "stage": "VAPT",
         "delayDays": 0,
         "delayNote": "Milestone 1: TDD end moved 22-Sep \u2192 07-Oct (11 weekdays). UAT end moved 26-Oct \u2192 29-Oct (3 weekdays). Milestone 2: Development & QA end moved earlier, 15-Nov \u2192 05-Nov (7 weekdays saved). Go-live is 23-Nov with no slip.",
         "statusChangeReason": "",
-        "phase": "Milestone 1 delivered on UAT to stakeholders on 27 Oct 2026 \u00b7 Milestone 1: 100%, Milestone 2: 70%",
+        "phase": "Milestone 2 UAT completed on 06 Nov 2026 \u00b7 VAPT (web) 16 Nov \u2013 20 Nov 2026",
         "nextMilestone": {
           "name": "Milestone 2 \u2013 Nov 2026 release",
           "date": "2026-11-06"
@@ -17497,7 +17497,7 @@
             "initialStart": "2026-11-16",
             "latestStart": "2026-11-06",
             "initialEnd": "2026-11-20",
-            "latestEnd": "2026-11-20"
+            "latestEnd": "2026-11-06"
           },
           "VAPT": {
             "initialStart": "2026-11-16",
