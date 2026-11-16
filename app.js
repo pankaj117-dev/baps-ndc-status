@@ -7027,7 +7027,17 @@
     const segments = computeStageSegments(p);
     const seg = segments.find((s) => s.stage === stage) || null;
     const currentIndex = PIPELINE_STAGES.indexOf(p.stage || "Unstaged");
-    const kind = stageIndex < currentIndex ? "done" : stageIndex === currentIndex ? "current" : "future";
+    let kind = stageIndex < currentIndex ? "done" : stageIndex === currentIndex ? "current" : "future";
+    // Parallel-stage projects: done / in progress / not started and the %
+    // come from the stage's own progress, same as its Stage-gate lane.
+    let reportedPct = null;
+    if (p.parallelStages) {
+      const lane = stageLaneBlocks(p).find((b) => b.stage === stage);
+      if (lane) {
+        kind = lane.kind;
+        if (lane.pct != null) reportedPct = lane.pct;
+      }
+    }
     const days = seg ? seg.days : 0;
     const plan = (p.stagePlan && p.stagePlan[stage]) || {};
     const delayEntries = stageDelayLog(p, stage);
@@ -7061,7 +7071,7 @@
 
     const panels = el("div", { class: "stagedetail-panels" }, [
       el("div", { class: "stagedetail-panel is-active", "data-panel": "overview" }, [
-        buildStageOverviewPanel(p, stage, seg, days, kind, plan, delayEntries),
+        buildStageOverviewPanel(p, stage, seg, days, kind, plan, delayEntries, reportedPct),
       ]),
       el("div", { class: "stagedetail-panel", "data-panel": "history" }, [buildStageHistoryPanel(revisions)]),
       el("div", { class: "stagedetail-panel", "data-panel": "analysis" }, [buildStageAnalysisPanel(delayEntries)]),
@@ -7120,13 +7130,15 @@
     return el("span", { class: "stagedetail-variance" + (varianceClass ? " " + varianceClass : "") }, [varianceLabel]);
   }
 
-  function buildStageOverviewPanel(p, stage, seg, days, kind, plan, delayEntries) {
+  function buildStageOverviewPanel(p, stage, seg, days, kind, plan, delayEntries, reportedPct) {
     // `seg` can be null even for a "done" stage — computeStageSegments()
     // only reconstructs stages actually captured in history.json, so a
     // project whose tracking began mid-pipeline has no segment for stages
     // before that point, even though they're clearly in the past by index.
-    const actualStart = seg ? seg.start : null;
-    const actualEnd = kind === "done" && seg ? seg.end : null;
+    // A parallel-stage project's finished stage closes on its latest plan end.
+    const actualStart = seg ? seg.start : reportedPct != null ? plan.latestStart || null : null;
+    const actualEnd =
+      kind === "done" ? (seg ? seg.end : reportedPct != null ? plan.latestEnd || null : null) : null;
 
     // Progress is measured against THIS project's own planned duration for
     // the stage (stagePlan's latest approved dates), not a flat per-stage
@@ -7136,7 +7148,9 @@
     const plannedDays =
       plan.latestStart && plan.latestEnd ? daysBetweenIso(plan.latestStart, plan.latestEnd) : null;
     const pct =
-      kind === "done"
+      reportedPct != null
+        ? reportedPct
+        : kind === "done"
         ? 100
         : kind === "future"
         ? 0
