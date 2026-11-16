@@ -16,6 +16,7 @@ PROJECT_NAME_TO_ID = {
     "GMS 1.4": "gms",
     "SSO V2": "baps-sso",
     "SPM": "spm",
+    "SPM 1A": "spm-1a",
     "BKMS": "bkms",
     "MIS": "mis",
     "mySatsang – BAPS ID Integration": "mysatsang-bapsid",
