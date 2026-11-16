@@ -16366,7 +16366,7 @@
     ]
   },
   "2026-11-16": {
-    "capturedAt": "2026-11-16T11:36:42.218919Z",
+    "capturedAt": "2026-11-16T11:46:08.729200Z",
     "projects": [
       {
         "id": "webnext",
@@ -16583,7 +16583,7 @@
       {
         "id": "pledge-1a",
         "name": "Pledge - 1.x",
-        "status": "amber",
+        "status": "green",
         "progress": 35,
         "stage": "Development",
         "delayDays": 3,
@@ -17375,7 +17375,7 @@
         "progress": 100,
         "stage": "VAPT",
         "delayDays": 0,
-        "delayNote": "Milestone 1: TDD end moved 22-Sep \u2192 07-Oct (11 weekdays). UAT end moved 26-Oct \u2192 29-Oct (3 weekdays). Milestone 2: Development & QA end moved earlier, 15-Nov \u2192 05-Nov (7 weekdays saved). Go-live is 23-Nov with no slip.",
+        "delayNote": "Milestone 1: TDD end moved 22-Sep \u2192 07-Oct (11 weekdays). UAT end moved 26-Oct \u2192 29-Oct (3 weekdays). Milestone 2: Development & QA end moved earlier, 15-Nov \u2192 05-Nov (7 weekdays saved); UAT completed 06-Nov, earlier than its 20-Nov plan. VAPT (web) 16-Nov \u2192 20-Nov. Go-live is TBD.",
         "statusChangeReason": "",
         "phase": "Milestone 2 UAT completed on 06 Nov 2026 \u00b7 VAPT (web) 16 Nov \u2013 20 Nov 2026",
         "nextMilestone": {
