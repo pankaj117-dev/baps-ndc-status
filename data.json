@@ -1520,7 +1520,7 @@
       "goLive": null,
       "originalGoLive": "2026-11-23",
       "delayDays": 0,
-      "delayNote": "Milestone 1: TDD end moved 22-Sep → 07-Oct (11 weekdays). UAT end moved 26-Oct → 29-Oct (3 weekdays). Milestone 2: Development & QA end moved earlier, 15-Nov → 05-Nov (7 weekdays saved). Go-live is 23-Nov with no slip.",
+      "delayNote": "Milestone 1: TDD end moved 22-Sep → 07-Oct (11 weekdays). UAT end moved 26-Oct → 29-Oct (3 weekdays). Milestone 2: Development & QA end moved earlier, 15-Nov → 05-Nov (7 weekdays saved); UAT completed 06-Nov, earlier than its 20-Nov plan. VAPT (web) 16-Nov → 20-Nov. Go-live is TBD.",
       "dependencies": [
         {
           "id": "DEP-102",
