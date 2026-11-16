@@ -1,6 +1,6 @@
 {
   "asOf": "2026-11-16",
-  "lastUpdated": "2026-11-16T11:09:53.686987Z",
+  "lastUpdated": "2026-11-16T16:05:03.567601Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -605,8 +605,8 @@
       "name": "MyBKY (Phase 1)",
       "owner": "Satish Buddhadev",
       "status": "green",
-      "progress": 99,
-      "phase": "Hypercare (95% complete)",
+      "progress": 100,
+      "phase": "Project closed - Hypercare completed 06-Nov-2026",
       "nextMilestone": {
         "name": "Project Closure",
         "date": "2026-11-06"
@@ -687,15 +687,14 @@
       ],
       "sprintStatus": {
         "completed": [
-          "Hypercare triage of 27 reported issues: 8 fixed, 19 closed (not a bug / not reproducible / out of scope)"
+          "Hypercare completed (06-Nov-2026)",
+          "Phase 1 closed - 100% complete"
         ],
         "inProgress": [
-          "Hypercare (95% complete)"
+          "No Work"
         ],
         "nextPlan": [
-          "Phase 1 closure (06-Nov)",
-          "Handover to support",
-          "myBKY 2A work continues"
+          "No Work"
         ]
       },
       "risks": [
@@ -703,46 +702,46 @@
           "id": "RISK-101",
           "text": "Mobile VAPT sign-off pending (VAPT \u2014 Critical)",
           "mitigation": "",
-"resolved": true,
+          "resolved": true,
           "stage": "VAPT"
         },
         {
           "id": "RISK-102",
           "text": "UAT sign-off received but ~25% of items still need updates in tracking sheet (Stakeholders \u2014 Critical)",
           "mitigation": "UAT team updating tracking sheet",
-"resolved": true,
+          "resolved": true,
           "stage": "UAT"
         },
         {
           "id": "RISK-103",
           "text": "Production integration keys needed for SSO, SFS, MIS, MDS (DevOps \u2014 Critical)",
           "mitigation": "DevOps/NAHQ chasing keys and access",
-"resolved": true,
+          "resolved": true,
           "stage": "Rollout"
         },
         {
           "id": "RISK-104",
           "text": "Read-only MIS access, Google Maps API key, Apple Pay for Stripe, n8n pipelines (DevOps \u2014 Critical)",
           "mitigation": "",
-"resolved": true,
+          "resolved": true,
           "stage": "Rollout"
         },
         {
           "id": "RISK-105",
           "text": "SSO user accounts for Kishor/Kishori participants still need creation (NAHQ \u2014 Critical)",
           "mitigation": "NAHQ creating SSO accounts",
-"resolved": true,
+          "resolved": true,
           "stage": "Rollout"
         }
       ],
-      "delayImpact": "Go_live slips",
+      "delayImpact": "",
       "delayMitigation": [
         "Mobile app uploaded to app stores with exceptions to resolve before go-live",
         "Chasing Dharmaketu Swami / DevOps for integration keys and production readiness items",
         "Formal UAT approval received \u2014 UAT team asked to update testcase status in tracking sheet",
         "Web/mobile VAPT remediation completed \u2014 awaiting validation sign-offs"
       ],
-      "delayTradeoffs": "3 CRs already approved \u2014 CR1 added 10 working days, CR2 added 6 working days, CR3 no impact on Go-Live; no new CRs this week",
+      "delayTradeoffs": "",
       "stage": "Hypercare",
       "escalations": [],
       "timeSavedDays": 0,
@@ -801,14 +800,38 @@
         }
       },
       "stageDateOrder": [
-        { "stage": "Requirements", "label": "Requirement" },
-        { "stage": "Tech. Design", "label": "TDD" },
-        { "stage": "Development", "label": "Development & QA" },
-        { "stage": "UAT", "label": "UAT" },
-        { "stage": "VAPT", "label": "VAPT" },
-        { "stage": "Load", "label": "Load" },
-        { "stage": "Rollout", "label": "Go-Live" },
-        { "stage": "Hypercare", "label": "Hypercare" }
+        {
+          "stage": "Requirements",
+          "label": "Requirement"
+        },
+        {
+          "stage": "Tech. Design",
+          "label": "TDD"
+        },
+        {
+          "stage": "Development",
+          "label": "Development & QA"
+        },
+        {
+          "stage": "UAT",
+          "label": "UAT"
+        },
+        {
+          "stage": "VAPT",
+          "label": "VAPT"
+        },
+        {
+          "stage": "Load",
+          "label": "Load"
+        },
+        {
+          "stage": "Rollout",
+          "label": "Go-Live"
+        },
+        {
+          "stage": "Hypercare",
+          "label": "Hypercare"
+        }
       ],
       "riskSeq": 105,
       "delayLogSeq": 100,
@@ -1172,7 +1195,8 @@
       "delayLog": [],
       "milestones": [],
       "raidLog": [],
-      "changeRequestSeq": 108
+      "changeRequestSeq": 108,
+      "closedOn": "2026-11-06"
     },
     {
       "id": "mybky-phase2",
