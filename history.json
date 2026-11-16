@@ -16366,7 +16366,7 @@
     ]
   },
   "2026-11-16": {
-    "capturedAt": "2026-11-16T11:24:17.423167Z",
+    "capturedAt": "2026-11-16T11:29:40.484962Z",
     "projects": [
       {
         "id": "webnext",
@@ -17382,7 +17382,7 @@
           "name": "Milestone 2 \u2013 Nov 2026 release",
           "date": "2026-11-06"
         },
-        "goLive": "2026-11-23",
+        "goLive": null,
         "originalGoLive": "2026-11-23",
         "delayImpact": "TDD +2d slip may impact downstream development start (22-Sep deck)",
         "delayMitigation": [
@@ -17430,6 +17430,15 @@
             "text": "Restructure Teams as department/sub-department with coordinator + members (Nov 2026 user story) \u2014 the only user story still pending from Milestone 2; depends on Satyanishtha Swami and Shreyank bhai.",
             "team": "Satyanishtha Swami / Shreyank bhai",
             "mitigation": "Awaiting inputs from Satyanishtha Swami and Shreyank bhai to complete this user story; not resolved yet.",
+            "dueBy": "",
+            "escalated": false,
+            "resolved": false
+          },
+          {
+            "id": "DEP-103",
+            "text": "VAPT dates required for iOS and Android (web VAPT running 16 Nov \u2013 20 Nov 2026).",
+            "team": "",
+            "mitigation": "Mobile (iOS and Android) VAPT can't be scheduled until these dates are confirmed.",
             "dueBy": "",
             "escalated": false,
             "resolved": false
@@ -17487,6 +17496,12 @@
           "UAT M2": {
             "initialStart": "2026-11-16",
             "latestStart": "2026-11-06",
+            "initialEnd": "2026-11-20",
+            "latestEnd": "2026-11-20"
+          },
+          "VAPT": {
+            "initialStart": "2026-11-16",
+            "latestStart": "2026-11-16",
             "initialEnd": "2026-11-20",
             "latestEnd": "2026-11-20"
           }

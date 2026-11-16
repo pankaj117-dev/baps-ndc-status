@@ -130,6 +130,12 @@
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   }
 
+  // A project with no go-live date (`goLive: null`) hasn't lost one — the
+  // date is still to be decided, so say so instead of fmtDate's "—".
+  function fmtGoLive(iso) {
+    return iso ? fmtDate(iso) : "TBD";
+  }
+
   function fmtDateShort(iso) {
     if (!iso) return "—";
     const d = new Date(iso + "T00:00:00");
@@ -195,7 +201,7 @@
       // of how it moved is already in the Date change log / Status History
       // tab. `originalGoLive` stays in data.json untouched.
       el("dt", null, ["Go-live"]),
-      el("dd", null, [fmtDate(p.goLive)]),
+      el("dd", null, [fmtGoLive(p.goLive)]),
       el("dt", null, ["Status"]),
       el("dd", { class: "delay-flag " + (isLate ? "is-late" : "is-ontime") }, [
         scheduleStatusText(p),
@@ -1122,7 +1128,7 @@
           el("dt", null, ["Next milestone"]),
           el("dd", null, [(p.nextMilestone && p.nextMilestone.name || "—") + (p.nextMilestone && p.nextMilestone.date ? " · " + fmtDateShort(p.nextMilestone.date) : "")]),
           el("dt", null, ["Go-live"]),
-          el("dd", null, [fmtDate(p.goLive)]),
+          el("dd", null, [fmtGoLive(p.goLive)]),
           el("dt", null, ["Status"]),
           el("dd", { class: "delay-flag " + (isLate ? "is-late" : "is-ontime") }, [
             scheduleStatusText(p),

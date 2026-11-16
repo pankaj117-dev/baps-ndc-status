@@ -1517,7 +1517,7 @@
         "name": "Milestone 2 \u2013 Nov 2026 release",
         "date": "2026-11-06"
       },
-      "goLive": "2026-11-23",
+      "goLive": null,
       "originalGoLive": "2026-11-23",
       "delayDays": 0,
       "delayNote": "Milestone 1: TDD end moved 22-Sep → 07-Oct (11 weekdays). UAT end moved 26-Oct → 29-Oct (3 weekdays). Milestone 2: Development & QA end moved earlier, 15-Nov → 05-Nov (7 weekdays saved). Go-live is 23-Nov with no slip.",
@@ -1537,6 +1537,15 @@
           "text": "Restructure Teams as department/sub-department with coordinator + members (Nov 2026 user story) \u2014 the only user story still pending from Milestone 2; depends on Satyanishtha Swami and Shreyank bhai.",
           "team": "Satyanishtha Swami / Shreyank bhai",
           "mitigation": "Awaiting inputs from Satyanishtha Swami and Shreyank bhai to complete this user story; not resolved yet.",
+          "dueBy": "",
+          "escalated": false,
+          "resolved": false
+        },
+        {
+          "id": "DEP-103",
+          "text": "VAPT dates required for iOS and Android (web VAPT running 16 Nov – 20 Nov 2026).",
+          "team": "",
+          "mitigation": "Mobile (iOS and Android) VAPT can't be scheduled until these dates are confirmed.",
           "dueBy": "",
           "escalated": false,
           "resolved": false
@@ -1587,7 +1596,7 @@
       "timeSavedNote": [],
       "scopeReduced": false,
       "statusChangeReason": "",
-      "dependencySeq": 102,
+      "dependencySeq": 103,
       "stagePlan": {
         "Requirements": {
           "initialStart": "2026-07-22",
@@ -1642,6 +1651,12 @@
           "latestStart": "2026-11-06",
           "initialEnd": "2026-11-20",
           "latestEnd": "2026-11-20"
+        },
+        "VAPT": {
+          "initialStart": "2026-11-16",
+          "latestStart": "2026-11-16",
+          "initialEnd": "2026-11-20",
+          "latestEnd": "2026-11-20"
         }
       },
       "stageDateOrder": [
@@ -1653,6 +1668,7 @@
         { "stage": "TDD M2", "label": "TDD (Milestone 2)" },
         { "stage": "Dev M2", "label": "Development & QA (Milestone 2)" },
         { "stage": "UAT M2", "label": "UAT (Milestone 2)" },
+        { "stage": "VAPT", "label": "VAPT (Web)" },
         { "stage": "Rollout", "label": "Go-Live" }
       ],
       "riskSeq": 103,
