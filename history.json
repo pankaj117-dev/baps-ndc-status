@@ -855,7 +855,7 @@
           "name": "Go-Live",
           "date": "2026-09-07"
         },
-        "goLive": "2026-09-07",
+        "goLive": "2026-08-31",
         "originalGoLive": "2026-08-29",
         "delayImpact": "Go-live pushed from 29-Aug to 7-Sep-2026 pending VAPT, load testing, and production server readiness",
         "delayMitigation": [
@@ -1585,7 +1585,7 @@
           "name": "Go-Live",
           "date": "2026-09-07"
         },
-        "goLive": "2026-09-07",
+        "goLive": "2026-08-31",
         "originalGoLive": "2026-08-29",
         "delayImpact": "Go-live pushed from 29-Aug to 7-Sep-2026 pending VAPT, load testing, and production server readiness",
         "delayMitigation": [
@@ -6257,7 +6257,7 @@
           "name": "Hypercare completion",
           "date": "2026-10-31"
         },
-        "goLive": "2026-08-31",
+        "goLive": "2026-09-12",
         "originalGoLive": "2026-08-29",
         "delayImpact": "Go-live moved from 31-Aug to 12-Sep; no further downstream impact \u2014 Hypercare is already underway",
         "delayMitigation": [
@@ -7708,7 +7708,7 @@
           "name": "Hypercare completion",
           "date": "2026-10-31"
         },
-        "goLive": "2026-08-31",
+        "goLive": "2026-09-12",
         "originalGoLive": "2026-08-29",
         "delayImpact": "Go-live moved from 31-Aug to 12-Sep; no further downstream impact \u2014 Hypercare is already underway",
         "delayMitigation": [
@@ -9021,7 +9021,7 @@
           "name": "Hypercare completion",
           "date": "2026-10-31"
         },
-        "goLive": "2026-08-31",
+        "goLive": "2026-09-12",
         "originalGoLive": "2026-08-29",
         "delayImpact": "Go-live moved from 31-Aug to 12-Sep; no further downstream impact \u2014 Hypercare is already underway",
         "delayMitigation": [
@@ -10231,7 +10231,7 @@
           "name": "Hypercare completion",
           "date": "2026-10-31"
         },
-        "goLive": "2026-08-31",
+        "goLive": "2026-09-12",
         "originalGoLive": "2026-08-29",
         "delayImpact": "Go-live moved from 31-Aug to 12-Sep; no further downstream impact \u2014 Hypercare is already underway",
         "delayMitigation": [
@@ -11876,7 +11876,7 @@
           "name": "Hypercare completion",
           "date": "2026-10-31"
         },
-        "goLive": "2026-08-31",
+        "goLive": "2026-09-12",
         "originalGoLive": "2026-08-29",
         "delayImpact": "Go-live moved from 31-Aug to 12-Sep; no further downstream impact \u2014 Hypercare is already underway",
         "delayMitigation": [
@@ -16062,7 +16062,7 @@
           "name": "Hypercare completion",
           "date": "2026-10-31"
         },
-        "goLive": "2026-08-31",
+        "goLive": "2026-09-12",
         "originalGoLive": "2026-08-29",
         "delayImpact": "Go-live moved from 31-Aug to 12-Sep; no further downstream impact \u2014 Hypercare is already underway",
         "delayMitigation": [
