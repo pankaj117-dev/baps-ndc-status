@@ -1,6 +1,6 @@
 {
   "asOf": "2026-11-17",
-  "lastUpdated": "2026-11-17T17:45:41.041169Z",
+  "lastUpdated": "2026-11-17T19:52:40.299122Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -1285,10 +1285,10 @@
         "name": "Development & QA completion",
         "date": "2026-12-18"
       },
-      "goLive": "2027-01-31",
-      "originalGoLive": "2027-01-31",
+      "goLive": "2027-01-28",
+      "originalGoLive": "2027-01-28",
       "delayDays": 25,
-      "delayNote": "Requirements were planned to close 02-Oct and closed 06-Nov: 25 working days late (Mon-Fri). TDD was planned to close 23-Oct and closed 09-Nov (11 working days). Go-live is still 31-Jan. Week of Nov 17: Requirement and TDD 100% complete, Development & QA 56%, overall 60%.",
+      "delayNote": "Requirements were planned to close 02-Oct and closed 06-Nov: 25 working days late (Mon-Fri). TDD was planned to close 23-Oct and closed 09-Nov (11 working days). Go-live is still 28-Jan. Week of Nov 17: Requirement and TDD 100% complete, Development & QA 56%, overall 60%.",
       "dependencies": [
         {
           "id": "DEP-101",
@@ -1525,8 +1525,8 @@
         "Rollout": {
           "initialStart": "2027-01-11",
           "latestStart": "2027-01-11",
-          "initialEnd": "2027-01-31",
-          "latestEnd": "2027-01-31"
+          "initialEnd": "2027-01-28",
+          "latestEnd": "2027-01-28"
         },
         "Hypercare": {
           "initialStart": "2027-02-01",
