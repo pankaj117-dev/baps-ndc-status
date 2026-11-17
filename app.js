@@ -21,7 +21,16 @@
     const d = p.delayDays || 0;
     if (d > 10) return "red";
     if (d > 0) return "amber";
+    // A PM can flag `behindSchedule: true` (2026-11-17, SSO V2) when the
+    // project is late but has no day count yet (e.g. go-live is TBD).
+    if (owner && owner.behindSchedule) return "amber";
     return "green";
+  }
+
+  function isBehindSchedule(p) {
+    if ((p.delayDays || 0) > 0) return true;
+    const owner = p.behindSchedule != null ? p : DATA && (DATA.projects || []).find((x) => x.id === p.id);
+    return !!(owner && owner.behindSchedule);
   }
 
   let DATA = null;
@@ -190,7 +199,7 @@
   // and reads "Closed · <date>" here instead of a schedule status.
   function scheduleStatusText(p) {
     if (p.closedOn) return "Closed · " + fmtDate(p.closedOn);
-    const base = (p.delayDays || 0) > 0 ? "+" + p.delayDays + " days" : "On schedule";
+    const base = (p.delayDays || 0) > 0 ? "+" + p.delayDays + " days" : isBehindSchedule(p) ? "Behind schedule" : "On schedule";
     return p.scheduleScope ? base + " (" + p.scheduleScope + ")" : base;
   }
 
@@ -206,7 +215,7 @@
       el("dt", null, ["Go-live"]),
       el("dd", null, [fmtGoLive(p.goLive)]),
       el("dt", null, ["Status"]),
-      el("dd", { class: "delay-flag " + (isLate ? "is-late" : "is-ontime") }, [
+      el("dd", { class: "delay-flag " + (isBehindSchedule(p) ? "is-late" : "is-ontime") }, [
         scheduleStatusText(p),
       ]),
       // Open-item counts (2026-11-04, "this is what I want to see in the
@@ -258,8 +267,11 @@
   // The original free-text `phase` (when present) is kept as a secondary
   // detail line since it often carries useful specifics (e.g. "Regression
   // / Performance / Security / UAT") the canonical stage name alone loses.
+  // `stageLabel` (2026-11-17, SSO V2) renames the current stage on the card
+  // only (e.g. "QA" while the pipeline stage stays "Development"), so the
+  // Grid / Hawk-eye tabs keep using the canonical `stage`.
   function currentStageFactNodes(p) {
-    const stage = p.stage || "Unstaged";
+    const stage = p.stageLabel || p.stage || "Unstaged";
     const targetDate = currentStageTargetDate(p);
     return [
       el("dt", null, ["Current Stage"]),
@@ -1024,7 +1036,7 @@
             title:
               `${p.name}: ${lifecycleDays}d running so far` +
               (firstStart ? ` (since ${fmtDateShort(firstStart)})` : "") +
-              (totalDelay > 0 ? `; go-live +${totalDelay}d` : "; go-live on time"),
+              (totalDelay > 0 ? `; go-live +${totalDelay}d` : isBehindSchedule(p) ? "; behind schedule" : "; go-live on time"),
           },
           [
             el("span", { class: "stage-grid-days" }, [lifecycleDays + "d"]),
@@ -1133,7 +1145,7 @@
           el("dt", null, ["Go-live"]),
           el("dd", null, [fmtGoLive(p.goLive)]),
           el("dt", null, ["Status"]),
-          el("dd", { class: "delay-flag " + (isLate ? "is-late" : "is-ontime") }, [
+          el("dd", { class: "delay-flag " + (isBehindSchedule(p) ? "is-late" : "is-ontime") }, [
             scheduleStatusText(p),
           ]),
           ...((p.timeSavedDays || 0) > 0
@@ -1449,9 +1461,13 @@
       return {
         stage,
         label: row.label || stage,
-        start: plan.initialStart || null,
+        // `stageDatesLatestStart: true` (2026-11-17, SSO V2) shows each
+        // stage's revised start instead of its original one.
+        start: (plan.endTbd || p.stageDatesLatestStart ? plan.latestStart || plan.initialStart : plan.initialStart) || null,
         plannedEnd,
         actualEnd,
+        endTbd: !!(plan.endTbd || plan.datesTbd),
+        startTbd: !!plan.datesTbd,
         days: days > 0 ? days : 0,
       };
     });
@@ -1469,7 +1485,9 @@
     rows.forEach((row) => {
       const slipped = row.days > 0;
       const current = row.stage === p.stage;
-      const endParts = !row.actualEnd
+      const endParts = row.endTbd
+        ? [el("span", { class: "stagedates-end-label" }, ["Ends"]), el("span", { class: "golive-date-current" }, ["TBD"])]
+        : !row.actualEnd
         ? [el("span", { class: "stagedates-none" }, ["No dates planned yet"])]
         : slipped
         ? [
@@ -1482,7 +1500,7 @@
         el("div", { class: "schedule-timeline-row stagedates-line" + (current ? " is-current" : "") }, [
           el("div", { class: "sd-start" }, [
             el("span", { class: "stagedates-start-label" }, ["Start"]),
-            row.start ? fmtDate(row.start) : "—",
+            row.start ? fmtDate(row.start) : row.startTbd ? "TBD" : "—",
           ]),
           el("div", { class: "sd-stage" }, [
             el("span", { class: "schedule-timeline-label" }, [row.label]),
@@ -1508,7 +1526,49 @@
   // has passed when progress drives the coloring. A done/current stage
   // with no plan entry falls back to its recorded segment, and a done
   // stage carries its recorded finish date when that differs from the plan.
+  // `timelineFromStageDates: true` (2026-11-17, SSO V2) makes the lanes
+  // follow the project's own Stage dates list (`stageDateOrder`): its labels
+  // (e.g. "QA" for Development), its extra stages (e.g. per-flow
+  // Development rows), and its order. TBD stages have no dates and drop out.
   function stageLaneBlocks(p) {
+    const blocks = pipelineStageLaneBlocks(p);
+    const order = p.timelineFromStageDates && p.stageDateOrder;
+    if (!order || !order.length) return blocks;
+    const todayIso = todayISO();
+    const byStage = {};
+    blocks.forEach((b) => { byStage[b.stage] = b; });
+    const currentIdx = order.findIndex((row) => (row.stage || row) === p.stage);
+    const out = [];
+    order.forEach((row, i) => {
+      const stage = row.stage || row;
+      const label = row.label || stage;
+      if (byStage[stage]) {
+        out.push(Object.assign({}, byStage[stage], { label }));
+        return;
+      }
+      if (PIPELINE_STAGES.indexOf(stage) !== -1) return;
+      const plan = (p.stagePlan && p.stagePlan[stage]) || {};
+      const start = plan.latestStart || plan.initialStart;
+      const end = plan.latestEnd || plan.initialEnd;
+      if (!start || !end || end < start) return;
+      const kind = currentIdx === -1 ? (end < todayIso ? "done" : start <= todayIso ? "current" : "future") : i < currentIdx ? "done" : i === currentIdx ? "current" : "future";
+      out.push({
+        stage,
+        label,
+        start,
+        end,
+        plannedEnd: plan.initialEnd,
+        actualEnd: null,
+        pct: undefined,
+        kind,
+        late: kind === "current" && end < todayIso,
+        planPassed: kind === "future" && end < todayIso,
+      });
+    });
+    return out;
+  }
+
+  function pipelineStageLaneBlocks(p) {
     const todayIso = todayISO();
     const labels = p.parallelStages && typeof p.parallelStages === "object" ? p.parallelStages : {};
     const plan = p.stagePlan || {};
@@ -6016,7 +6076,7 @@
         return n ? plural(n, "weekly snapshot") + " logged" : "No history logged yet";
       }
       case "stagegate": {
-        const stage = p.stage || "Unstaged";
+        const stage = p.stageLabel || p.stage || "Unstaged";
         const target = currentStageTargetDate(p);
         return stage + (target ? " — target " + fmtDateShort(target) : "");
       }
@@ -6278,7 +6338,11 @@
     const stageIndex = PIPELINE_STAGES.indexOf(p.stage || "");
     const plan = p.stagePlan || {};
     const allMilestones = [];
-    PIPELINE_STAGES.forEach((stage, i) => {
+    // `milestonesOnly: true` (2026-11-17, SSO V2) lists just the project's
+    // own `milestones` here, so a PM can drop stages (e.g. UAT, Rollout) from
+    // this list without removing them from the Grid / Hawk-eye stage plan.
+    const fromStages = !p.milestonesOnly;
+    if (fromStages) PIPELINE_STAGES.forEach((stage, i) => {
       const sp = plan[stage];
       const target = sp && (sp.latestEnd || sp.initialEnd);
       if (!target) return;
@@ -6286,7 +6350,7 @@
       allMilestones.push({ name: stage, date: target, target: true });
     });
     const nm = p.nextMilestone;
-    if (nm && nm.name) {
+    if (fromStages && nm && nm.name) {
       const sameDay = nm.date && allMilestones.find((m) => m.date === nm.date);
       if (sameDay) sameDay.name = nm.name;
       else if (!allMilestones.some((m) => m.name === nm.name) && (!nm.date || nm.date >= todayStr)) {
@@ -7779,10 +7843,33 @@
 
   /* ---------------- Init ---------------- */
 
+  // A stagePlan entry can set `endTbd: true` (2026-11-17, SSO V2 VAPT) when
+  // its new start is known but its end isn't. Every view reads ends as
+  // `latestEnd || initialEnd`, so clear both in memory: the stage then has
+  // no end anywhere (timelines skip it, the Stage dates table says TBD)
+  // instead of falling back to a stale end before its new start.
+  // `datesTbd: true` does the same for both ends of the stage (start too).
+  function applyEndTbd(projects) {
+    (projects || []).forEach((p) => {
+      Object.values((p && p.stagePlan) || {}).forEach((plan) => {
+        if (plan && (plan.endTbd || plan.datesTbd)) {
+          plan.initialEnd = null;
+          plan.latestEnd = null;
+        }
+        if (plan && plan.datesTbd) {
+          plan.initialStart = null;
+          plan.latestStart = null;
+        }
+      });
+    });
+  }
+
   function init([data, history, notes]) {
     DATA = data;
     HISTORY = history;
     NOTES = notes;
+    applyEndTbd(DATA && DATA.projects);
+    Object.values(HISTORY || {}).forEach((snap) => applyEndTbd(snap && snap.projects));
 
     renderHeader();
     populateGlobalProjectFilter();
