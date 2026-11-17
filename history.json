@@ -22161,17 +22161,15 @@
           {
             "name": "Milestone 1 \u2013 Oct 2026 release",
             "status": "green",
-            "progress": 100
-          },
-          {
-            "name": "Milestone 2 \u2013 completed on 6 Nov 2026",
-            "status": "green"
+            "progress": 100,
+            "completedDate": "2026-10-27"
           },
           {
             "name": "Milestone 2 \u2013 Nov 2026 release",
             "date": "2026-11-06",
             "status": "green",
-            "progress": 100
+            "progress": 100,
+            "completedDate": "2026-11-06"
           },
           {
             "name": "Milestone 1 \u2013 UAT release to stakeholders",

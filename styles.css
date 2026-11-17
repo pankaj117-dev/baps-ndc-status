@@ -2600,6 +2600,7 @@ table.deps-drill-table th {
 .pill-amber { background: var(--amber-bg); color: var(--amber); }
 .pill-red { background: var(--red-bg); color: var(--red); }
 .pill-black { background: var(--black-bg); color: var(--black); }
+.pill-completed { background: var(--accent-soft); color: var(--accent); }
 
 .card-owner {
   font-size: 12px;
