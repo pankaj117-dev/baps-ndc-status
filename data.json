@@ -1,6 +1,6 @@
 {
   "asOf": "2026-11-17",
-  "lastUpdated": "2026-11-17T17:35:41.368763Z",
+  "lastUpdated": "2026-11-17T17:45:41.041169Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -266,7 +266,8 @@
         "Hypercare": "future"
       },
       "stageLabel": "UAT 2A",
-      "laneLabelsInBlock": true
+      "laneLabelsInBlock": true,
+      "rebaselinedOn": "2026-11-17"
     },
     {
       "id": "pledge",
@@ -319,19 +320,21 @@
       "name": "Pledge - 1.x",
       "owner": "Jeet Savani",
       "status": "green",
-      "progress": 35,
-      "stage": "Development",
-      "phase": "Requirement + TDD complete per 22-Sep deck's own plan (05-Aug\u201325-Sep); Development & QA in progress (28-Sep\u201321-Oct, no delay reported) \u2014 stage advanced to Development on 2026-09-30 based on the deck's own un-delayed schedule, not a newer confirmed report.",
+      "progress": 100,
+      "stage": "Hypercare",
+      "phase": "Go-live done 03-Nov (was 29-Oct, VAPT fixes). Hypercare 04-Nov\u201320-Nov; 8 of 10 stories delivered, 2 as fast-follow.",
       "nextMilestone": {
-        "name": "TDD",
-        "date": "2026-09-25"
+        "name": "Project Closure",
+        "date": "2026-11-20"
       },
       "goLive": "2026-11-03",
       "originalGoLive": "2026-10-29",
       "delayDays": 3,
-      "delayNote": "Stage Dates sheet update: TDD slipped 11 weekdays (25-Sep → 11-Oct), Development & QA slipped 3 weekdays (21-Oct → 26-Oct); Go-Live moved 3 weekdays (29-Oct → 3-Nov).",
-      "delayImpact": "",
-      "delayMitigation": [],
+      "delayNote": "VAPT fixes took longer than planned (VAPT end 29-Oct -> 02-Nov), moving go-live 29-Oct -> 03-Nov (3 working days).",
+      "delayImpact": "Go-live moved 3 working days (29-Oct -> 03-Nov)",
+      "delayMitigation": [
+        "VAPT fixes prioritized and retested"
+      ],
       "delayTradeoffs": "",
       "dependencies": [
         {
@@ -342,7 +345,7 @@
           "dueBy": "2026-09-24",
           "priority": "Critical",
           "escalated": false,
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "DEP-102",
@@ -352,7 +355,7 @@
           "dueBy": "2026-10-02",
           "priority": "High",
           "escalated": false,
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "DEP-103",
@@ -362,7 +365,7 @@
           "dueBy": "2026-09-30",
           "priority": "High",
           "escalated": false,
-          "resolved": false
+          "resolved": true
         },
         {
           "id": "DEP-104",
@@ -372,19 +375,20 @@
           "dueBy": "2026-09-30",
           "priority": "High",
           "escalated": false,
-          "resolved": false
+          "resolved": true
         }
       ],
       "sprintStatus": {
         "completed": [
-          "Requirement stage gate passed on time (05-Aug to 07-Sep)",
-          "Scope confirmed with Manojbhai"
+          "Go-live completed (03-Nov-2026)",
+          "VAPT, UAT and Load testing completed",
+          "8 of 10 finalized user stories delivered"
         ],
         "inProgress": [
-          "TDD (09-Sep to 25-Sep)"
+          "Hypercare (04-Nov to 20-Nov)"
         ],
         "nextPlan": [
-          "15 user stories total \u2014 4 achievable with 1 backend developer, 9 with 2 backend developers, by end of October"
+          "Project Closure (20-Nov-2026)"
         ]
       },
       "risks": [
@@ -392,16 +396,14 @@
           "id": "RISK-101",
           "text": "Backend-heavy user stories \u2014 not all 15 stories will fit before Diwali for Pledge 1.x",
           "mitigation": "",
-          "resolved": false
+          "resolved": true
         }
       ],
-      "escalations": [
-        "Need 1 additional backend development resource to complete more stories (7-8 stories)"
-      ],
+      "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
-      "statusChangeReason": "22-Sep deck Amber: new cross-track dependencies (INBOX vs GMS decision, DevOps UAT access, data import resourcing).",
+      "statusChangeReason": "",
       "dependencySeq": 104,
       "riskSeq": 101,
       "stagePlan": {
@@ -427,7 +429,7 @@
           "initialStart": "2026-10-14",
           "latestStart": "2026-10-22",
           "initialEnd": "2026-10-29",
-          "latestEnd": "2026-10-29"
+          "latestEnd": "2026-11-02"
         },
         "UAT": {
           "initialStart": "2026-10-22",
@@ -451,18 +453,42 @@
           "initialStart": "2026-10-30",
           "latestStart": "2026-11-04",
           "initialEnd": "2026-11-20",
-          "latestEnd": "2026-11-25"
+          "latestEnd": "2026-11-20"
         }
       },
       "stageDateOrder": [
-        { "stage": "Requirements", "label": "Requirement" },
-        { "stage": "Tech. Design", "label": "TDD" },
-        { "stage": "Development", "label": "Development & QA" },
-        { "stage": "UAT", "label": "UAT" },
-        { "stage": "VAPT", "label": "VAPT" },
-        { "stage": "Load", "label": "Load (Not in scope)" },
-        { "stage": "Rollout", "label": "Go-Live" },
-        { "stage": "Hypercare", "label": "Hypercare" }
+        {
+          "stage": "Requirements",
+          "label": "Requirement"
+        },
+        {
+          "stage": "Tech. Design",
+          "label": "TDD"
+        },
+        {
+          "stage": "Development",
+          "label": "Development & QA"
+        },
+        {
+          "stage": "UAT",
+          "label": "UAT"
+        },
+        {
+          "stage": "VAPT",
+          "label": "VAPT"
+        },
+        {
+          "stage": "Load",
+          "label": "Load (Not in scope)"
+        },
+        {
+          "stage": "Rollout",
+          "label": "Go-Live"
+        },
+        {
+          "stage": "Hypercare",
+          "label": "Hypercare"
+        }
       ],
       "changeRequests": [],
       "decisions": [],
@@ -470,7 +496,13 @@
       "features": [],
       "delayItemLog": [],
       "milestones": [],
-      "raidLog": []
+      "raidLog": [],
+      "fastFollowItems": [
+        "2 remaining user stories (of the 10 finalized)"
+      ],
+      "usePmStatus": true,
+      "stageDatesFromPlan": true,
+      "rebaselinedOn": "2026-11-17"
     },
     {
       "id": "emm",
