@@ -1703,6 +1703,10 @@
           "progress": 100
         },
         {
+          "name": "Milestone 2 \u2013 completed on 6 Nov 2026",
+          "status": "green"
+        },
+        {
           "name": "Milestone 2 \u2013 Nov 2026 release",
           "date": "2026-11-06",
           "status": "green",
