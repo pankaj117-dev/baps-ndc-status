@@ -1853,6 +1853,9 @@ table.deps-drill-table th {
   border-radius: 999px;
   padding: 2px 8px;
 }
+.stagedates-done-pill {
+  background: var(--green);
+}
 
 .schedule-timeline-main {
   display: flex;

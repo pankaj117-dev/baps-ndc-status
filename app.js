@@ -270,9 +270,11 @@
   // `stageLabel` (2026-11-17, SSO V2) renames the current stage on the card
   // only (e.g. "QA" while the pipeline stage stays "Development"), so the
   // Grid / Hawk-eye tabs keep using the canonical `stage`.
+  // `stageComplete` (2026-11-17, SPM) means every stage is finished, so the
+  // card shows the label alone with no "— target" date after it.
   function currentStageFactNodes(p) {
     const stage = p.stageLabel || p.stage || "Unstaged";
-    const targetDate = currentStageTargetDate(p);
+    const targetDate = p.stageComplete ? null : currentStageTargetDate(p);
     return [
       el("dt", null, ["Current Stage"]),
       el("dd", { class: "phase-fact" }, [
@@ -930,7 +932,7 @@
         let cell;
         if (currentIndex === -1 || i > currentIndex) {
           cell = el("div", { class: "stage-grid-cell stage-grid-status-cell is-none" }, ["—"]);
-        } else if (i < currentIndex) {
+        } else if (i < currentIndex || (p.stageComplete && i === currentIndex)) {
           // Already passed through this stage — show how long it took and
           // the actual date range. (No more per-stage SLA judgment here —
           // see the note on renderStageGridLegend. Whether the PROJECT as a
@@ -1128,7 +1130,7 @@
       const card = el("div", { class: "card status-" + eStatus, "data-project-id": p.id, tabindex: "0", role: "button" }, [
         el("div", { class: "card-head" }, [
           el("h3", null, [p.name]),
-          el("span", { class: "pill pill-" + eStatus }, [STATUS_LABEL[eStatus]]),
+          el("span", { class: "pill pill-" + eStatus }, [p.statusLabel || STATUS_LABEL[eStatus]]),
         ]),
         el("div", { class: "card-owner" }, [p.owner ? "PM: " + p.owner : "PM: unassigned"]),
         cardRecentChangeNode(recentChanges[p.id]),
@@ -1484,7 +1486,8 @@
     const box = el("div", { class: "schedule-timeline stagedates-list" });
     rows.forEach((row) => {
       const slipped = row.days > 0;
-      const current = row.stage === p.stage;
+      const current = row.stage === p.stage && !p.stageComplete;
+      const finished = row.stage === p.stage && p.stageComplete;
       const endParts = row.endTbd
         ? [el("span", { class: "stagedates-end-label" }, ["Ends"]), el("span", { class: "golive-date-current" }, ["TBD"])]
         : !row.actualEnd
@@ -1505,6 +1508,7 @@
           el("div", { class: "sd-stage" }, [
             el("span", { class: "schedule-timeline-label" }, [row.label]),
             current ? el("span", { class: "stagedates-current-pill" }, ["Current"]) : null,
+            finished ? el("span", { class: "stagedates-current-pill stagedates-done-pill" }, ["Done"]) : null,
           ]),
           el("div", { class: "sd-ends" }, endParts),
           el("div", { class: "sd-delay" }, [
@@ -1530,7 +1534,15 @@
   // follow the project's own Stage dates list (`stageDateOrder`): its labels
   // (e.g. "QA" for Development), its extra stages (e.g. per-flow
   // Development rows), and its order. TBD stages have no dates and drop out.
+  // `stageComplete` (2026-11-17, SPM): the last stage is finished too, so
+  // it draws as done rather than current.
   function stageLaneBlocks(p) {
+    const out = stageLaneBlocksRaw(p);
+    if (!p.stageComplete) return out;
+    return out.map((b) => (b.kind === "current" ? Object.assign({}, b, { kind: "done", late: false }) : b));
+  }
+
+  function stageLaneBlocksRaw(p) {
     const blocks = pipelineStageLaneBlocks(p);
     const order = p.timelineFromStageDates && p.stageDateOrder;
     if (!order || !order.length) return blocks;
@@ -3070,7 +3082,7 @@
       const start = plan.latestStart || plan.initialStart;
       const end = plan.latestEnd || plan.initialEnd;
       if (!start || !end || end < start) return;
-      const kind = currentIdx === -1 ? (end < today ? "done" : start <= today ? "current" : "future") : i < currentIdx ? "done" : i === currentIdx ? "current" : "future";
+      const kind = currentIdx === -1 ? (end < today ? "done" : start <= today ? "current" : "future") : i < currentIdx || (p.stageComplete && i === currentIdx) ? "done" : i === currentIdx ? "current" : "future";
       blocks.push({
         stage,
         label: row.label || stage,
@@ -6141,7 +6153,7 @@
     root.appendChild(
       el("div", { class: "detail-head" }, [
         el("div", null, [
-          el("span", { class: "pill pill-" + eStatus }, [STATUS_LABEL[eStatus]]),
+          el("span", { class: "pill pill-" + eStatus }, [p.statusLabel || STATUS_LABEL[eStatus]]),
           el("h1", null, [p.name]),
           el("div", { class: "card-owner" }, [p.owner ? "PM: " + p.owner : "PM: unassigned"]),
         ]),
