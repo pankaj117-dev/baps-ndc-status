@@ -4570,11 +4570,18 @@
   // data as the Status History tab, just collapsed to "what changed most
   // recently" per project so a card can show a one-line glimpse of it
   // without opening the full detail view. Returns { [projectId]: event }.
+  // A project can set `cardPrefersDateShift: true` (2026-11-17, SPM) so
+  // that when a status change and a date shift land in the same week, its
+  // card shows the date shift ("Go-Live moved Aug 31 → Sep 12") instead of
+  // the status change. Every other project keeps showing the status change.
   function mostRecentChangeByProject() {
     const byProject = {};
+    const prefersShift = new Set((DATA.projects || []).filter((p) => p.cardPrefersDateShift).map((p) => p.id));
     const consider = (event) => {
       const cur = byProject[event.projectId];
-      if (!cur || event.date > cur.date) byProject[event.projectId] = event;
+      const sameWeekShift =
+        cur && prefersShift.has(event.projectId) && event.date === cur.date && event.kind === "schedule" && cur.kind === "status";
+      if (!cur || event.date > cur.date || sameWeekShift) byProject[event.projectId] = event;
     };
     computeStatusTransitions().forEach((t) => consider(Object.assign({ kind: "status" }, t)));
     computeScheduleShifts().forEach((s) => consider(Object.assign({ kind: "schedule" }, s)));

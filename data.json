@@ -2492,6 +2492,7 @@
       "owner": "Sandeep Pistolwala",
       "status": "green",
       "usePmStatus": true,
+      "cardPrefersDateShift": true,
       "progress": 100,
       "phase": "Hypercare completed 13-Oct-2026; no open points",
       "nextMilestone": {
