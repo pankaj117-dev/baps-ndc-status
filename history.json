@@ -176,8 +176,8 @@
           "name": "TDD",
           "date": "2026-09-07"
         },
-        "goLive": "2027-01-31",
-        "originalGoLive": "2027-01-31",
+        "goLive": "2027-01-28",
+        "originalGoLive": "2027-01-28",
         "delayImpact": "",
         "risks": [
           "If Type 2 / stage-gate approach is required and RGC approves, timeline will further delay"
@@ -680,8 +680,8 @@
           "name": "Requirement completion + Sprint1 TDD submission & approval",
           "date": "2026-09-08"
         },
-        "goLive": "2027-01-31",
-        "originalGoLive": "2027-01-31",
+        "goLive": "2027-01-28",
+        "originalGoLive": "2027-01-28",
         "delayImpact": "Even with a sprint-by-sprint development approach, the go-live is optimistic \u2014 only 4 development sprints available for 6 modules (2 large)",
         "delayMitigation": [],
         "delayTradeoffs": "",
@@ -1329,8 +1329,8 @@
           "name": "Requirement completion + Sprint 1 TDD submission & approval",
           "date": "2026-09-08"
         },
-        "goLive": "2027-01-31",
-        "originalGoLive": "2027-01-31",
+        "goLive": "2027-01-28",
+        "originalGoLive": "2027-01-28",
         "delayImpact": "Even with a sprint-by-sprint development approach, the go-live is optimistic \u2014 only 4 development sprints available for 6 modules (2 large)",
         "delayMitigation": [
           "Highlighted to Aksharbhai that current Phase 2A Go-Live date is very challenging to achieve",
@@ -2125,8 +2125,8 @@
           "name": "Requirement + TDD",
           "date": "2026-09-28"
         },
-        "goLive": "2027-01-31",
-        "originalGoLive": "2027-01-31",
+        "goLive": "2027-01-28",
+        "originalGoLive": "2027-01-28",
         "delayImpact": "Current Phase 2A go-live date is very challenging to hold; a revised, realistic go-live date is being proposed",
         "delayMitigation": [
           "Highlighted to Aksharbhai that current go-live date is very challenging to achieve",
@@ -3197,8 +3197,8 @@
           "name": "Requirements completion",
           "date": "2026-10-02"
         },
-        "goLive": "2027-01-31",
-        "originalGoLive": "2027-01-31",
+        "goLive": "2027-01-28",
+        "originalGoLive": "2027-01-28",
         "delayImpact": "Current Phase 2A go-live date is very challenging to hold; a revised, realistic go-live date is being proposed",
         "delayMitigation": [
           "Highlighted to Aksharbhai that current go-live date is very challenging to achieve",
@@ -3265,8 +3265,8 @@
           "Rollout": {
             "initialStart": "2027-01-11",
             "latestStart": "2027-01-11",
-            "initialEnd": "2027-01-31",
-            "latestEnd": "2027-01-31"
+            "initialEnd": "2027-01-28",
+            "latestEnd": "2027-01-28"
           },
           "Hypercare": {
             "initialStart": "2027-02-01",
@@ -7228,8 +7228,8 @@
           "name": "Development & QA completion",
           "date": "2026-12-18"
         },
-        "goLive": "2027-01-31",
-        "originalGoLive": "2027-01-31",
+        "goLive": "2027-01-28",
+        "originalGoLive": "2027-01-28",
         "delayImpact": "Phase 1 CRs and bugs took ~17.5 working days (Change Request log): development can still complete by 18-Dec, but completion of testing (QA sign-off) is at risk.",
         "delayMitigation": [
           "Scope reduction approved 19-Oct: Bulk Update of Transport Details and Guest Registration removed from Phase 2A",
@@ -7409,8 +7409,8 @@
           "Rollout": {
             "initialStart": "2027-01-11",
             "latestStart": "2027-01-11",
-            "initialEnd": "2027-01-31",
-            "latestEnd": "2027-01-31"
+            "initialEnd": "2027-01-28",
+            "latestEnd": "2027-01-28"
           },
           "Hypercare": {
             "initialStart": "2027-02-01",
@@ -11240,8 +11240,8 @@
           "name": "Development & QA completion",
           "date": "2026-12-18"
         },
-        "goLive": "2027-01-31",
-        "originalGoLive": "2027-01-31",
+        "goLive": "2027-01-28",
+        "originalGoLive": "2027-01-28",
         "delayImpact": "Phase 1 CRs and bugs took ~17.5 working days (Change Request log): development can still complete by 18-Dec, but completion of testing (QA sign-off) is at risk.",
         "delayMitigation": [
           "Scope reduction approved 19-Oct: Bulk Update of Transport Details and Guest Registration removed from Phase 2A",
@@ -11457,8 +11457,8 @@
           "Rollout": {
             "initialStart": "2027-01-11",
             "latestStart": "2027-01-11",
-            "initialEnd": "2027-01-31",
-            "latestEnd": "2027-01-31"
+            "initialEnd": "2027-01-28",
+            "latestEnd": "2027-01-28"
           },
           "Hypercare": {
             "initialStart": "2027-02-01",
@@ -12876,8 +12876,8 @@
           "name": "Development & QA completion",
           "date": "2026-12-18"
         },
-        "goLive": "2027-01-31",
-        "originalGoLive": "2027-01-31",
+        "goLive": "2027-01-28",
+        "originalGoLive": "2027-01-28",
         "delayImpact": "Phase 1 CR batches (3-5 working days of effort each) put completion of testing (QA sign-off, planned 18-Dec) at risk.",
         "delayMitigation": [
           "Prioritized Phase 1 bugs and CRs; Phase 2A scope to be reduced to compensate",
@@ -13013,8 +13013,8 @@
           "Rollout": {
             "initialStart": "2027-01-11",
             "latestStart": "2027-01-11",
-            "initialEnd": "2027-01-31",
-            "latestEnd": "2027-01-31"
+            "initialEnd": "2027-01-28",
+            "latestEnd": "2027-01-28"
           },
           "Hypercare": {
             "initialStart": "2027-02-01",
@@ -14274,8 +14274,8 @@
           "name": "Development & QA completion",
           "date": "2026-12-18"
         },
-        "goLive": "2027-01-31",
-        "originalGoLive": "2027-01-31",
+        "goLive": "2027-01-28",
+        "originalGoLive": "2027-01-28",
         "delayImpact": "Phase 2A development largely on hold; Transportation, GMS and Accommodation development waiting on TDD reviews.",
         "delayMitigation": [
           "Phase 1 bugs and CRs prioritized for immediate release",
@@ -14410,8 +14410,8 @@
           "Rollout": {
             "initialStart": "2027-01-11",
             "latestStart": "2027-01-11",
-            "initialEnd": "2027-01-31",
-            "latestEnd": "2027-01-31"
+            "initialEnd": "2027-01-28",
+            "latestEnd": "2027-01-28"
           },
           "Hypercare": {
             "initialStart": "2027-02-01",
@@ -15667,8 +15667,8 @@
           "name": "Development & QA completion",
           "date": "2026-12-18"
         },
-        "goLive": "2027-01-31",
-        "originalGoLive": "2027-01-31",
+        "goLive": "2027-01-28",
+        "originalGoLive": "2027-01-28",
         "delayImpact": "Phase 1 CRs and bugs took ~17.5 working days (Change Request log): development can still complete by 18-Dec, but completion of testing (QA sign-off) is at risk.",
         "delayMitigation": [
           "Scope reduction approved 19-Oct: Bulk Update of Transport Details and Guest Registration removed from Phase 2A",
@@ -15817,8 +15817,8 @@
           "Rollout": {
             "initialStart": "2027-01-11",
             "latestStart": "2027-01-11",
-            "initialEnd": "2027-01-31",
-            "latestEnd": "2027-01-31"
+            "initialEnd": "2027-01-28",
+            "latestEnd": "2027-01-28"
           },
           "Hypercare": {
             "initialStart": "2027-02-01",
@@ -20003,15 +20003,15 @@
         "progress": 51,
         "stage": "Requirements",
         "delayDays": 25,
-        "delayNote": "Requirements were planned to close 02-Oct and closed 06-Nov: 25 working days late (Mon-Fri). Go-live is still 31-Jan. Week of Nov 10: Diwali holidays 9-13 Nov, no change from Nov 3.",
+        "delayNote": "Requirements were planned to close 02-Oct and closed 06-Nov: 25 working days late (Mon-Fri). Go-live is still 28-Jan. Week of Nov 10: Diwali holidays 9-13 Nov, no change from Nov 3.",
         "statusChangeReason": "Requirements and TDD (design) delayed.",
         "phase": "Requirements 97% | Design 75% | Dev & QA 40%",
         "nextMilestone": {
           "name": "Development & QA completion",
           "date": "2026-12-18"
         },
-        "goLive": "2027-01-31",
-        "originalGoLive": "2027-01-31",
+        "goLive": "2027-01-28",
+        "originalGoLive": "2027-01-28",
         "delayImpact": "Phase 1 CRs and bugs took ~17.5 working days (Change Request log): development can still complete by 18-Dec, but completion of testing (QA sign-off) is at risk.",
         "delayMitigation": [
           "Scope reduction approved 19-Oct: Bulk Update of Transport Details and Guest Registration removed from Phase 2A",
@@ -20233,8 +20233,8 @@
           "Rollout": {
             "initialStart": "2027-01-11",
             "latestStart": "2027-01-11",
-            "initialEnd": "2027-01-31",
-            "latestEnd": "2027-01-31"
+            "initialEnd": "2027-01-28",
+            "latestEnd": "2027-01-28"
           },
           "Hypercare": {
             "initialStart": "2027-02-01",
@@ -21727,15 +21727,15 @@
         "progress": 60,
         "stage": "Development",
         "delayDays": 25,
-        "delayNote": "Requirements were planned to close 02-Oct and closed 06-Nov: 25 working days late (Mon-Fri). TDD was planned to close 23-Oct and closed 09-Nov (11 working days). Go-live is still 31-Jan. Week of Nov 17: Requirement and TDD 100% complete, Development & QA 56%, overall 60%.",
+        "delayNote": "Requirements were planned to close 02-Oct and closed 06-Nov: 25 working days late (Mon-Fri). TDD was planned to close 23-Oct and closed 09-Nov (11 working days). Go-live is still 28-Jan. Week of Nov 17: Requirement and TDD 100% complete, Development & QA 56%, overall 60%.",
         "statusChangeReason": "PM review 17-Nov-2026: project not at risk; open RGC QA dependency (DEP-102) resolved.",
         "phase": "Requirement 100% | TDD 100% | Dev & QA 56%",
         "nextMilestone": {
           "name": "Development & QA completion",
           "date": "2026-12-18"
         },
-        "goLive": "2027-01-31",
-        "originalGoLive": "2027-01-31",
+        "goLive": "2027-01-28",
+        "originalGoLive": "2027-01-28",
         "delayImpact": "Phase 1 CRs and bugs took ~17.5 working days (Change Request log): development can still complete by 18-Dec, but completion of testing (QA sign-off) is at risk.",
         "delayMitigation": [
           "Scope reduction approved 19-Oct: Bulk Update of Transport Details and Guest Registration removed from Phase 2A",
@@ -21957,8 +21957,8 @@
           "Rollout": {
             "initialStart": "2027-01-11",
             "latestStart": "2027-01-11",
-            "initialEnd": "2027-01-31",
-            "latestEnd": "2027-01-31"
+            "initialEnd": "2027-01-28",
+            "latestEnd": "2027-01-28"
           },
           "Hypercare": {
             "initialStart": "2027-02-01",
