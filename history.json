@@ -22055,7 +22055,14 @@
         "timeSavedDays": 0,
         "timeSavedNote": [],
         "scopeReduced": false,
-        "risks": [],
+        "risks": [
+          {
+            "id": "RISK-101",
+            "text": "Very High: Restructure Teams as department/sub-department with coordinator + members (Nov 2026 user story) \u2014 the only user story still pending from Milestone 2",
+            "mitigation": "Tracked as dependency DEP-102; awaiting inputs from Satyanishtha Swami and Shreyank bhai to complete this user story.",
+            "resolved": false
+          }
+        ],
         "fastFollowItems": [],
         "escalations": [],
         "dependencies": [

@@ -1602,7 +1602,14 @@
           "VAPT on iOS and Android will start"
         ]
       },
-      "risks": [],
+      "risks": [
+        {
+          "id": "RISK-101",
+          "text": "Very High: Restructure Teams as department/sub-department with coordinator + members (Nov 2026 user story) — the only user story still pending from Milestone 2",
+          "mitigation": "Tracked as dependency DEP-102; awaiting inputs from Satyanishtha Swami and Shreyank bhai to complete this user story.",
+          "resolved": false
+        }
+      ],
       "delayImpact": "TDD +2d slip may impact downstream development start (22-Sep deck)",
       "delayMitigation": [
         "Aniket connected with Sameep during BA's leave period to secure FRD sign-off"
