@@ -22055,7 +22055,14 @@
         "timeSavedDays": 0,
         "timeSavedNote": [],
         "scopeReduced": false,
-        "risks": [],
+        "risks": [
+          {
+            "id": "RISK-101",
+            "text": "Very High: Restructure Teams as department/sub-department with coordinator + members (Nov 2026 user story) \u2014 the only user story still pending from Milestone 2",
+            "mitigation": "Tracked as dependency DEP-102; awaiting inputs from Satyanishtha Swami and Shreyank bhai to complete this user story.",
+            "resolved": false
+          }
+        ],
         "fastFollowItems": [],
         "escalations": [],
         "dependencies": [
@@ -22136,29 +22143,33 @@
         },
         "sprintStatus": {
           "completed": [
-            "Milestone 1 \u2013 UAT release to stakeholders on 27 Oct 2026",
-            "Milestone 2 \u2013 development completed on 29 Oct 2026",
-            "Milestone 1 \u2013 UAT bugs received from stakeholders on 3 Nov 2026"
+            "Milestone 2 delivered on UAT on 6 Nov 2026",
+            "Received approval on Milestone 1 on 17 Nov 2026",
+            "Most of the bugs resolved by the team on 17 Nov 2026"
           ],
           "inProgress": [
-            "Milestone 2 (Nov 2026 release) \u2013 70% complete; UAT release revised to 6 Nov 2026 (from 15 Nov 2026)"
+            "Received Milestone 2 feedback with bugs; the team is working on them",
+            "Milestone 2 feedback included some enhancements; we are working on those",
+            "VAPT of the web version is in progress"
           ],
           "nextPlan": [
-            "from next week,",
-            "we will continue development with testing in milestone1 as well as we will doing grooming sessions for milestone 2 whcih is for Nov 2026 release."
+            "Share the list of enhancements with effort estimates with Sameep",
+            "VAPT on iOS and Android will start"
           ]
         },
         "milestones": [
           {
             "name": "Milestone 1 \u2013 Oct 2026 release",
             "status": "green",
-            "progress": 100
+            "progress": 100,
+            "completedDate": "2026-10-27"
           },
           {
             "name": "Milestone 2 \u2013 Nov 2026 release",
             "date": "2026-11-06",
             "status": "green",
-            "progress": 100
+            "progress": 100,
+            "completedDate": "2026-11-06"
           },
           {
             "name": "Milestone 1 \u2013 UAT release to stakeholders",

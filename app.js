@@ -6369,8 +6369,15 @@
         allMilestones.push({ name: nm.name, date: nm.date || null, target: !!nm.date });
       }
     }
+    // A milestone with `completedDate` (2026-11-17, myMandir 1B) stays on
+    // the list after its date passes, with a "Completed" pill and that end
+    // date on the right, so finished releases still show where they landed.
     (p.milestones || []).forEach((m) => {
       if (!m.name || allMilestones.some((row) => row.name === m.name)) return;
+      if (m.completedDate) {
+        allMilestones.push({ name: m.name, date: m.completedDate, completed: true });
+        return;
+      }
       if (m.date && m.date < todayStr) return;
       allMilestones.push({ name: m.name, date: m.date || null, status: m.status, target: !!m.date });
     });
@@ -6383,12 +6390,19 @@
           "ul",
           { class: "milestones-list" },
           allMilestones.map((m) =>
-            el("li", { class: "milestones-row" + ((m.date && m.date < todayStr) ? " is-past" : "") }, [
-              m.status
+            el("li", { class: "milestones-row" + ((m.date && m.date < todayStr && !m.completed) ? " is-past" : "") }, [
+              m.completed
+                ? el("span", { class: "pill pill-completed" }, ["Completed"])
+                : m.status
                 ? el("span", { class: "pill pill-" + m.status }, [STATUS_LABEL[m.status] || m.status])
                 : null,
               el("span", { class: "milestones-name" }, [m.name]),
-              m.date && m.target
+              m.completed
+                ? el("span", { class: "milestones-target" }, [
+                    el("span", { class: "milestones-target-label" }, ["Completed"]),
+                    el("span", { class: "milestones-date" }, [fmtDateShort(m.date)]),
+                  ])
+                : m.date && m.target
                 ? el("span", { class: "milestones-target" }, [
                     el("span", { class: "milestones-target-label" }, ["Target date"]),
                     el("span", { class: "milestones-date" }, [fmtDateShort(m.date)]),
