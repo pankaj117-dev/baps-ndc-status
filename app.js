@@ -6338,6 +6338,9 @@
     // milestone with a `progress` value in any weekly snapshot is overlaid
     // as its own line, built from history.json like the project line.
     schedulePanel.appendChild(el("h3", { class: "weekly-subhead" }, ["Progress over time"]));
+    // A project can set `progressHistoryNote` (2026-11-17, SPM 1A) to say
+    // where its weekly figures came from when they weren't reported.
+    if (p.progressHistoryNote) schedulePanel.appendChild(el("p", { class: "empty-note" }, [p.progressHistoryNote]));
     // Weekly cadence only (2026-11-04) — one point per Tuesday-to-Tuesday
     // reporting week, not one per snapshot. See weeklyHistoryForProject().
     const chartWeeks = weeklyHistoryForProject(p.id);

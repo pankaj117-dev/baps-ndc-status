@@ -2649,13 +2649,17 @@
       "name": "SPM 1A",
       "owner": "Sandeep Pistolwala",
       "status": "green",
-      "progress": 0,
-      "phase": "Development",
-      "nextMilestone": null,
-      "goLive": null,
-      "originalGoLive": null,
+      "progress": 88,
+      "progressHistoryNote": "Worked out from stage end dates, not reported: each of the 8 stages counts as one-eighth, and a week's % is the share of stages finished by then.",
+      "phase": "Hypercare 01-Nov–25-Nov. Go-live 30-Oct, was 22-Oct.",
+      "nextMilestone": {
+        "name": "Hypercare completion",
+        "date": "2026-11-25"
+      },
+      "goLive": "2026-10-30",
+      "originalGoLive": "2026-10-22",
       "delayDays": 0,
-      "delayNote": "",
+      "delayNote": "TDD end moved 01-Oct → 29-Oct (20 days). Load Testing, UAT and VAPT ends moved 20-Oct → 28-Oct (6 days). Go-Live end moved 22-Oct → 30-Oct (6 days).",
       "dependencies": [],
       "sprintStatus": {
         "completed": [],
@@ -2666,7 +2670,67 @@
       "delayImpact": "",
       "delayMitigation": [],
       "delayTradeoffs": "",
-      "stage": "Development",
+      "stage": "Hypercare",
+      "stagePlan": {
+        "Requirements": {
+          "initialStart": "2026-03-09",
+          "latestStart": "2026-03-09",
+          "initialEnd": "2026-03-20",
+          "latestEnd": "2026-03-20"
+        },
+        "Tech. Design": {
+          "initialStart": "2026-09-16",
+          "latestStart": "2026-09-16",
+          "initialEnd": "2026-10-01",
+          "latestEnd": "2026-10-29"
+        },
+        "Development": {
+          "initialStart": "2026-10-02",
+          "latestStart": "2026-10-02",
+          "initialEnd": "2026-10-15",
+          "latestEnd": "2026-10-15"
+        },
+        "Load": {
+          "initialStart": "2026-10-16",
+          "latestStart": "2026-10-16",
+          "initialEnd": "2026-10-20",
+          "latestEnd": "2026-10-28"
+        },
+        "UAT": {
+          "initialStart": "2026-10-16",
+          "latestStart": "2026-10-16",
+          "initialEnd": "2026-10-20",
+          "latestEnd": "2026-10-28"
+        },
+        "VAPT": {
+          "initialStart": "2026-10-16",
+          "latestStart": "2026-10-16",
+          "initialEnd": "2026-10-20",
+          "latestEnd": "2026-10-28"
+        },
+        "Rollout": {
+          "initialStart": "2026-10-21",
+          "latestStart": "2026-10-21",
+          "initialEnd": "2026-10-22",
+          "latestEnd": "2026-10-30"
+        },
+        "Hypercare": {
+          "initialStart": "2026-11-01",
+          "latestStart": "2026-11-01",
+          "initialEnd": "2026-11-25",
+          "latestEnd": "2026-11-25"
+        }
+      },
+      "stageDateOrder": [
+        { "stage": "Requirements", "label": "Requirement" },
+        { "stage": "Tech. Design", "label": "TDD" },
+        { "stage": "Development", "label": "Development & QA" },
+        { "stage": "Load", "label": "Load Testing (QA)" },
+        { "stage": "UAT", "label": "UAT" },
+        { "stage": "VAPT", "label": "VAPT" },
+        { "stage": "Rollout", "label": "Go-Live" },
+        { "stage": "Hypercare", "label": "Hypercare" }
+      ],
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
