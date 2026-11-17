@@ -1599,7 +1599,13 @@
       let end = sp && (sp.latestEnd || sp.initialEnd);
       const label = labels[stage] || stage;
       const pct = pctByName[label];
-      const kind = byProgress
+      // `p.stageStatus` (2026-11-17, WebNext 2.0): the PM's own done / current
+      // / future per stage wins over pipeline order — e.g. VAPT finished
+      // while UAT, which comes before it in PIPELINE_STAGES, is still running.
+      const reported = p.stageStatus && p.stageStatus[stage];
+      const kind = ["done", "current", "future"].includes(reported)
+        ? reported
+        : byProgress
         ? pct >= 100 ? "done" : start && start <= todayIso ? "current" : "future"
         : i < currentIndex ? "done" : i === currentIndex ? "current" : "future";
       if ((!start || !end) && seg && kind !== "future") {
@@ -1613,7 +1619,7 @@
         start,
         end,
         plannedEnd: sp && sp.initialEnd,
-        actualEnd: kind === "done" && seg && seg.end !== end ? seg.end : null,
+        actualEnd: kind === "done" && !reported && seg && seg.end !== end ? seg.end : null,
         pct,
         kind,
         late: kind === "current" && end < todayIso,
@@ -1654,6 +1660,13 @@
     const left = xPx(b.start);
     const width = Math.max(xPx(b.end) - left, 10);
     const meta = stageLaneMeta(b);
+    // `p.laneLabelsInBlock` (2026-11-17, WebNext 2.0): the stage's own label
+    // ("TDD 2A") goes inside its block instead of a short code, and the bold
+    // caption line underneath is dropped. A block too narrow to hold its
+    // label (e.g. a one-day Go-Live) shows it on the same line, just right
+    // of the block, in regular weight.
+    const labelsInline = !!p.laneLabelsInBlock;
+    const labelInBlock = labelsInline && width >= b.label.length * 7 + 16;
     const track = el("div", { class: "stagegantt-track" + (o.className ? " " + o.className : "") });
     marks.forEach((m) => track.appendChild(el("div", { class: "stagegantt-grid-line", style: `left:${m.px}px` })));
     track.appendChild(
@@ -1676,7 +1689,7 @@
         title: `${p.name} — ${b.label}: ${meta}. Click for stage detail.`,
         "aria-label": "View full stage detail for " + b.label,
       },
-      [width >= 32 ? STAGE_SHORT_CODE[b.stage] || b.stage : ""]
+      [labelInBlock ? b.label : labelsInline ? "" : width >= 32 ? STAGE_SHORT_CODE[b.stage] || b.stage : ""]
     );
     const open = (e) => {
       e.stopPropagation();
@@ -1690,9 +1703,17 @@
       }
     });
     track.appendChild(block);
+    if (labelsInline && !labelInBlock) {
+      track.appendChild(
+        el("span", {
+          class: "stagegantt-caption-meta",
+          style: `position:absolute;top:0;left:${left + width + 6}px;line-height:32px;white-space:nowrap;`,
+        }, [b.label])
+      );
+    }
     track.appendChild(
       el("div", { class: "stagegantt-caption", style: `left:${left}px` }, [
-        el("span", { class: "stagegantt-caption-stage" }, [b.label]),
+        labelsInline ? null : el("span", { class: "stagegantt-caption-stage" }, [b.label]),
         el("span", { class: "stagegantt-caption-meta" + (b.late || b.planPassed ? " is-plan-overdue" : "") }, [meta]),
       ])
     );
@@ -7152,7 +7173,7 @@
     // Parallel-stage projects: done / in progress / not started and the %
     // come from the stage's own progress, same as its Stage-gate lane.
     let reportedPct = null;
-    if (p.parallelStages) {
+    if (p.parallelStages || p.stageStatus) {
       const lane = stageLaneBlocks(p).find((b) => b.stage === stage);
       if (lane) {
         kind = lane.kind;

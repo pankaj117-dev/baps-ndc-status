@@ -21076,22 +21076,20 @@
         "id": "webnext-2",
         "name": "WebNext 2.0",
         "status": "green",
-        "progress": 80,
-        "stage": "Development",
+        "progress": 69,
+        "stage": "UAT",
         "delayDays": 0,
-        "delayNote": "Release 2A TDD end moved 29-Sep \u2192 21-Oct (16 weekdays). Go-live for 2A is 19-Nov with no slip. Release 2B TDD revised end is TBD; its go-live is 07-Jan.",
+        "delayNote": "2A go-live 19-Nov, no slip (TDD had moved 29-Sep -> 21-Oct). 2B on plan for go-live 07-Jan.",
         "statusChangeReason": "",
-        "phase": "Release 2A (P5 + P4): Dev & QA through 04-Nov, go-live 19-Nov. Release 2B go-live 07-Jan.",
+        "phase": "2A: UAT (VAPT done), go-live 19-Nov | 2B: Req/UI-UX/TDD done, Development 20-Nov to 27-Dec, go-live 07-Jan | Progress 2A 98% / 2B 40%",
         "nextMilestone": {
-          "name": "UAT",
-          "date": "2026-11-05"
+          "name": "Go-Live 2A",
+          "date": "2026-11-19"
         },
         "goLive": "2026-11-19",
         "originalGoLive": "2026-11-19",
         "delayImpact": "",
-        "delayMitigation": [
-          "Connecting with Walle team to set pre-expectations, scope of work, and priority"
-        ],
+        "delayMitigation": [],
         "delayTradeoffs": "",
         "timeSavedDays": 0,
         "timeSavedNote": [],
@@ -21101,13 +21099,13 @@
             "id": "RISK-101",
             "text": "Two full-time QA resources required from this week onward (PMO/Bhavinbhai Patel & Rushabh Kothari, High)",
             "mitigation": "Requesting dedicated QA allocation",
-            "resolved": false
+            "resolved": true
           },
           {
             "id": "RISK-102",
             "text": "Project plan due 2026-09-29 (PM/Jeet Savani, High)",
             "mitigation": "Project plan in progress",
-            "resolved": false
+            "resolved": true
           }
         ],
         "fastFollowItems": [],
@@ -21121,7 +21119,7 @@
             "dueBy": "2026-10-03",
             "priority": "High",
             "escalated": false,
-            "resolved": false
+            "resolved": true
           }
         ],
         "stagePlan": {
@@ -21199,12 +21197,17 @@
           }
         },
         "sprintStatus": {
-          "completed": [],
+          "completed": [
+            "Requirement, UI/UX and TDD for all priorities (P1-P5)",
+            "Development, QA, Performance/Load and VAPT for Release 2A (P5, P4)",
+            "UAT for P4"
+          ],
           "inProgress": [
-            "Requirements finalization & approval"
+            "UAT for P5 (Release 2A)"
           ],
           "nextPlan": [
-            "New QA to be fully involved in project from the start \u2014 build test cases and test plan"
+            "Go-live Release 2A (19-Nov-2026)",
+            "Start Development for Release 2B (20-Nov)"
           ]
         },
         "milestones": []
@@ -21251,22 +21254,20 @@
         "id": "pledge-1a",
         "name": "Pledge - 1.x",
         "status": "green",
-        "progress": 100,
-        "stage": "Hypercare",
+        "progress": 35,
+        "stage": "Development",
         "delayDays": 3,
-        "delayNote": "VAPT fixes took longer than planned (VAPT end 29-Oct -> 02-Nov), moving go-live 29-Oct -> 03-Nov (3 working days).",
-        "statusChangeReason": "",
-        "phase": "Hypercare",
+        "delayNote": "Stage Dates sheet update: TDD slipped 11 weekdays (25-Sep \u2192 11-Oct), Development & QA slipped 3 weekdays (21-Oct \u2192 26-Oct); Go-Live moved 3 weekdays (29-Oct \u2192 3-Nov).",
+        "statusChangeReason": "22-Sep deck Amber: new cross-track dependencies (INBOX vs GMS decision, DevOps UAT access, data import resourcing).",
+        "phase": "Requirement + TDD complete per 22-Sep deck's own plan (05-Aug\u201325-Sep); Development & QA in progress (28-Sep\u201321-Oct, no delay reported) \u2014 stage advanced to Development on 2026-09-30 based on the deck's own un-delayed schedule, not a newer confirmed report.",
         "nextMilestone": {
-          "name": "Project Closure",
-          "date": "2026-11-20"
+          "name": "TDD",
+          "date": "2026-09-25"
         },
         "goLive": "2026-11-03",
         "originalGoLive": "2026-10-29",
-        "delayImpact": "Go-live moved 3 working days (29-Oct -> 03-Nov)",
-        "delayMitigation": [
-          "VAPT fixes prioritized and retested"
-        ],
+        "delayImpact": "",
+        "delayMitigation": [],
         "delayTradeoffs": "",
         "timeSavedDays": 0,
         "timeSavedNote": [],
@@ -21276,10 +21277,13 @@
             "id": "RISK-101",
             "text": "Backend-heavy user stories \u2014 not all 15 stories will fit before Diwali for Pledge 1.x",
             "mitigation": "",
-            "resolved": true
+            "resolved": false
           }
         ],
-        "escalations": [],
+        "fastFollowItems": [],
+        "escalations": [
+          "Need 1 additional backend development resource to complete more stories (7-8 stories)"
+        ],
         "dependencies": [
           {
             "id": "DEP-101",
@@ -21289,7 +21293,7 @@
             "dueBy": "2026-09-24",
             "priority": "Critical",
             "escalated": false,
-            "resolved": true
+            "resolved": false
           },
           {
             "id": "DEP-102",
@@ -21299,7 +21303,7 @@
             "dueBy": "2026-10-02",
             "priority": "High",
             "escalated": false,
-            "resolved": true
+            "resolved": false
           },
           {
             "id": "DEP-103",
@@ -21309,7 +21313,7 @@
             "dueBy": "2026-09-30",
             "priority": "High",
             "escalated": false,
-            "resolved": true
+            "resolved": false
           },
           {
             "id": "DEP-104",
@@ -21319,7 +21323,7 @@
             "dueBy": "2026-09-30",
             "priority": "High",
             "escalated": false,
-            "resolved": true
+            "resolved": false
           }
         ],
         "stagePlan": {
@@ -21345,7 +21349,7 @@
             "initialStart": "2026-10-14",
             "latestStart": "2026-10-22",
             "initialEnd": "2026-10-29",
-            "latestEnd": "2026-11-02"
+            "latestEnd": "2026-10-29"
           },
           "UAT": {
             "initialStart": "2026-10-22",
@@ -21369,26 +21373,22 @@
             "initialStart": "2026-10-30",
             "latestStart": "2026-11-04",
             "initialEnd": "2026-11-20",
-            "latestEnd": "2026-11-20"
+            "latestEnd": "2026-11-25"
           }
         },
         "sprintStatus": {
           "completed": [
-            "Go-live completed (03-Nov-2026)",
-            "VAPT, UAT and Load testing completed",
-            "8 of 10 finalized user stories delivered"
+            "Requirement stage gate passed on time (05-Aug to 07-Sep)",
+            "Scope confirmed with Manojbhai"
           ],
           "inProgress": [
-            "Hypercare (04-Nov to 20-Nov)"
+            "TDD (09-Sep to 25-Sep)"
           ],
           "nextPlan": [
-            "Project Closure (20-Nov-2026)"
+            "15 user stories total \u2014 4 achievable with 1 backend developer, 9 with 2 backend developers, by end of October"
           ]
         },
-        "milestones": [],
-        "fastFollowItems": [
-          "2 remaining user stories (of the 10 finalized)"
-        ]
+        "milestones": []
       },
       {
         "id": "emm",
