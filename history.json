@@ -17578,16 +17578,16 @@
         "status": "green",
         "progress": 100,
         "stage": "Hypercare",
-        "delayDays": 6,
-        "delayNote": "Stage Dates sheet: TDD end moved 01-Oct \u2192 29-Oct (20 weekdays). Load Testing, UAT, and VAPT ends moved 20-Oct \u2192 28-Oct (6 weekdays). Go-Live end moved 22-Oct \u2192 30-Oct (6 weekdays).",
+        "delayDays": 12,
+        "delayNote": "UAT/VAPT/Load/Go-Live all slipped from original plan (UAT +3d, VAPT/Load +15d, Go-Live +12d) but production deployment is now complete and stable.",
         "statusChangeReason": "",
-        "phase": "SPM 1A. Hypercare 01-Nov\u201325-Nov. Go-live 30-Oct, was 22-Oct.",
+        "phase": "Production go-live completed; Hypercare started 14-Sep (2 days early vs. revised plan)",
         "nextMilestone": {
           "name": "Hypercare completion",
-          "date": "2026-11-25"
+          "date": "2026-10-31"
         },
-        "goLive": "2026-10-30",
-        "originalGoLive": "2026-10-22",
+        "goLive": "2026-09-12",
+        "originalGoLive": "2026-08-29",
         "delayImpact": "Go-live moved from 31-Aug to 12-Sep; no further downstream impact \u2014 Hypercare is already underway",
         "delayMitigation": [
           "Dharmaketu Swamiji's accepted-risk confirmation obtained for VAPT points, enabling final sign-off and deployment"
@@ -17621,53 +17621,9 @@
           }
         ],
         "stagePlan": {
-          "Requirements": {
-            "initialStart": "2026-03-09",
-            "latestStart": "2026-03-09",
-            "initialEnd": "2026-03-20",
-            "latestEnd": "2026-03-20"
-          },
-          "Tech. Design": {
-            "initialStart": "2026-09-16",
-            "latestStart": "2026-09-16",
-            "initialEnd": "2026-10-01",
-            "latestEnd": "2026-10-29"
-          },
-          "Development": {
-            "initialStart": "2026-10-02",
-            "latestStart": "2026-10-02",
-            "initialEnd": "2026-10-15",
-            "latestEnd": "2026-10-15"
-          },
-          "Load": {
-            "initialStart": "2026-10-16",
-            "latestStart": "2026-10-16",
-            "initialEnd": "2026-10-20",
-            "latestEnd": "2026-10-28"
-          },
-          "UAT": {
-            "initialStart": "2026-10-16",
-            "latestStart": "2026-10-16",
-            "initialEnd": "2026-10-20",
-            "latestEnd": "2026-10-28"
-          },
-          "VAPT": {
-            "initialStart": "2026-10-16",
-            "latestStart": "2026-10-16",
-            "initialEnd": "2026-10-20",
-            "latestEnd": "2026-10-28"
-          },
-          "Rollout": {
-            "initialStart": "2026-10-21",
-            "latestStart": "2026-10-21",
-            "initialEnd": "2026-10-22",
-            "latestEnd": "2026-10-30"
-          },
           "Hypercare": {
-            "initialStart": "2026-11-01",
-            "latestStart": "2026-11-01",
-            "initialEnd": "2026-11-25",
-            "latestEnd": "2026-11-25"
+            "initialEnd": "2026-09-30",
+            "latestEnd": "2026-09-30"
           }
         },
         "sprintStatus": {
@@ -18992,7 +18948,7 @@
           "name": "Hypercare completion",
           "date": "2026-10-31"
         },
-        "goLive": "2026-08-31",
+        "goLive": "2026-09-12",
         "originalGoLive": "2026-08-29",
         "delayImpact": "Go-live moved from 31-Aug to 12-Sep; no further downstream impact \u2014 Hypercare is already underway",
         "delayMitigation": [
@@ -20642,7 +20598,7 @@
           "name": "Hypercare completion",
           "date": "2026-10-31"
         },
-        "goLive": "2026-08-31",
+        "goLive": "2026-09-12",
         "originalGoLive": "2026-08-29",
         "delayImpact": "Go-live moved from 31-Aug to 12-Sep; no further downstream impact \u2014 Hypercare is already underway",
         "delayMitigation": [
@@ -22448,16 +22404,16 @@
         "status": "green",
         "progress": 100,
         "stage": "Hypercare",
-        "delayDays": 6,
-        "delayNote": "Stage Dates sheet: TDD end moved 01-Oct \u2192 29-Oct (20 weekdays). Load Testing, UAT, and VAPT ends moved 20-Oct \u2192 28-Oct (6 weekdays). Go-Live end moved 22-Oct \u2192 30-Oct (6 weekdays).",
+        "delayDays": 12,
+        "delayNote": "UAT/VAPT/Load/Go-Live all slipped from original plan (UAT +3d, VAPT/Load +15d, Go-Live +12d) but production deployment is now complete and stable.",
         "statusChangeReason": "",
-        "phase": "SPM 1A. Hypercare 01-Nov\u201325-Nov. Go-live 30-Oct, was 22-Oct.",
+        "phase": "Production go-live completed; Hypercare started 14-Sep (2 days early vs. revised plan)",
         "nextMilestone": {
           "name": "Hypercare completion",
-          "date": "2026-11-25"
+          "date": "2026-10-31"
         },
-        "goLive": "2026-10-30",
-        "originalGoLive": "2026-10-22",
+        "goLive": "2026-09-12",
+        "originalGoLive": "2026-08-29",
         "delayImpact": "Go-live moved from 31-Aug to 12-Sep; no further downstream impact \u2014 Hypercare is already underway",
         "delayMitigation": [
           "Dharmaketu Swamiji's accepted-risk confirmation obtained for VAPT points, enabling final sign-off and deployment"
@@ -22491,53 +22447,9 @@
           }
         ],
         "stagePlan": {
-          "Requirements": {
-            "initialStart": "2026-03-09",
-            "latestStart": "2026-03-09",
-            "initialEnd": "2026-03-20",
-            "latestEnd": "2026-03-20"
-          },
-          "Tech. Design": {
-            "initialStart": "2026-09-16",
-            "latestStart": "2026-09-16",
-            "initialEnd": "2026-10-01",
-            "latestEnd": "2026-10-29"
-          },
-          "Development": {
-            "initialStart": "2026-10-02",
-            "latestStart": "2026-10-02",
-            "initialEnd": "2026-10-15",
-            "latestEnd": "2026-10-15"
-          },
-          "Load": {
-            "initialStart": "2026-10-16",
-            "latestStart": "2026-10-16",
-            "initialEnd": "2026-10-20",
-            "latestEnd": "2026-10-28"
-          },
-          "UAT": {
-            "initialStart": "2026-10-16",
-            "latestStart": "2026-10-16",
-            "initialEnd": "2026-10-20",
-            "latestEnd": "2026-10-28"
-          },
-          "VAPT": {
-            "initialStart": "2026-10-16",
-            "latestStart": "2026-10-16",
-            "initialEnd": "2026-10-20",
-            "latestEnd": "2026-10-28"
-          },
-          "Rollout": {
-            "initialStart": "2026-10-21",
-            "latestStart": "2026-10-21",
-            "initialEnd": "2026-10-22",
-            "latestEnd": "2026-10-30"
-          },
           "Hypercare": {
-            "initialStart": "2026-11-01",
-            "latestStart": "2026-11-01",
-            "initialEnd": "2026-11-25",
-            "latestEnd": "2026-11-25"
+            "initialEnd": "2026-09-30",
+            "latestEnd": "2026-09-30"
           }
         },
         "sprintStatus": {
