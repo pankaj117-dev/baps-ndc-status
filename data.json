@@ -2493,14 +2493,14 @@
       "status": "green",
       "usePmStatus": true,
       "progress": 100,
-      "phase": "SPM 1A. Hypercare 01-Nov–25-Nov. Go-live 30-Oct, was 22-Oct.",
+      "phase": "Hypercare completed 13-Oct-2026; no open points",
       "nextMilestone": {
-        "name": "Hypercare completion",
-        "date": "2026-11-25"
+        "name": "Hypercare completion (done)",
+        "date": "2026-10-13"
       },
-      "goLive": "2026-10-30",
+      "goLive": "2026-09-12",
       "originalGoLive": "2026-10-22",
-      "delayDays": 6,
+      "delayDays": 0,
       "delayNote": "Stage Dates sheet: TDD end moved 01-Oct → 29-Oct (20 weekdays). Load Testing, UAT, and VAPT ends moved 20-Oct → 28-Oct (6 weekdays). Go-Live end moved 22-Oct → 30-Oct (6 weekdays).",
       "dependencies": [
         {
@@ -2511,7 +2511,7 @@
           "dueBy": "",
           "priority": "Medium",
           "escalated": false,
-          "resolved": false
+          "resolved": true
         }
       ],
       "sprintStatus": {
@@ -2530,7 +2530,7 @@
           "id": "RISK-101",
           "text": "Production deployment pending due to VAPT sign-off / accepted-risk confirmation",
           "mitigation": "Continuous coordination with DevOps to monitor server load and resolve POD scaling/stability issues \u2014 issue resolved",
-          "resolved": false
+          "resolved": true
         }
       ],
       "delayImpact": "Go-live moved from 31-Aug to 12-Sep; no further downstream impact \u2014 Hypercare is already underway",
