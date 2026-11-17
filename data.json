@@ -2482,6 +2482,7 @@
       "name": "SPM",
       "owner": "Sandeep Pistolwala",
       "status": "green",
+      "statusLabel": "Completed",
       "usePmStatus": true,
       "cardPrefersDateShift": true,
       "progress": 100,
@@ -2531,73 +2532,31 @@
       ],
       "delayTradeoffs": "",
       "stage": "Hypercare",
+      "stageLabel": "No open points or pending stage",
+      "stageComplete": true,
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
-      "fastFollowItems": [
-        "SPM 1A Dashboard (one screen): TDD completion pending (Tirth Patel medical) \u2014 revised plan complete by 26-Sep-2026 with Pratikbhai Gohil review"
-      ],
+      "fastFollowItems": [],
       "statusChangeReason": "",
       "dependencySeq": 101,
       "riskSeq": 101,
       "stagePlan": {
-        "Requirements": {
-          "initialStart": "2026-03-09",
-          "latestStart": "2026-03-09",
-          "initialEnd": "2026-03-20",
-          "latestEnd": "2026-03-20"
-        },
-        "Tech. Design": {
-          "initialStart": "2026-09-16",
-          "latestStart": "2026-09-16",
-          "initialEnd": "2026-10-01",
-          "latestEnd": "2026-10-29"
-        },
-        "Development": {
-          "initialStart": "2026-10-02",
-          "latestStart": "2026-10-02",
-          "initialEnd": "2026-10-15",
-          "latestEnd": "2026-10-15"
-        },
-        "Load": {
-          "initialStart": "2026-10-16",
-          "latestStart": "2026-10-16",
-          "initialEnd": "2026-10-20",
-          "latestEnd": "2026-10-28"
-        },
-        "UAT": {
-          "initialStart": "2026-10-16",
-          "latestStart": "2026-10-16",
-          "initialEnd": "2026-10-20",
-          "latestEnd": "2026-10-28"
-        },
-        "VAPT": {
-          "initialStart": "2026-10-16",
-          "latestStart": "2026-10-16",
-          "initialEnd": "2026-10-20",
-          "latestEnd": "2026-10-28"
-        },
         "Rollout": {
-          "initialStart": "2026-10-21",
-          "latestStart": "2026-10-21",
-          "initialEnd": "2026-10-22",
-          "latestEnd": "2026-10-30"
+          "initialStart": "2026-09-12",
+          "latestStart": "2026-09-12",
+          "initialEnd": "2026-09-12",
+          "latestEnd": "2026-09-12"
         },
         "Hypercare": {
-          "initialStart": "2026-11-01",
-          "latestStart": "2026-11-01",
-          "initialEnd": "2026-11-25",
-          "latestEnd": "2026-11-25"
+          "initialStart": "2026-09-12",
+          "latestStart": "2026-09-12",
+          "initialEnd": "2026-10-13",
+          "latestEnd": "2026-10-13"
         }
       },
       "stageDateOrder": [
-        { "stage": "Requirements", "label": "Requirement" },
-        { "stage": "Tech. Design", "label": "TDD" },
-        { "stage": "Development", "label": "Development & QA" },
-        { "stage": "Load", "label": "Load Testing (QA)" },
-        { "stage": "UAT", "label": "UAT" },
-        { "stage": "VAPT", "label": "VAPT" },
         { "stage": "Rollout", "label": "Go-Live" },
         { "stage": "Hypercare", "label": "Hypercare" }
       ],
