@@ -21720,12 +21720,12 @@
       {
         "id": "mybky-phase2",
         "name": "myBKY 2A",
-        "status": "amber",
+        "status": "green",
         "progress": 60,
         "stage": "Development",
         "delayDays": 25,
         "delayNote": "Requirements were planned to close 02-Oct and closed 06-Nov: 25 working days late (Mon-Fri). TDD was planned to close 23-Oct and closed 09-Nov (11 working days). Go-live is still 31-Jan. Week of Nov 17: Requirement and TDD 100% complete, Development & QA 56%, overall 60%.",
-        "statusChangeReason": "Requirements and TDD (design) delayed.",
+        "statusChangeReason": "PM review 17-Nov-2026: project not at risk; open RGC QA dependency (DEP-102) resolved.",
         "phase": "Requirement 100% | TDD 100% | Dev & QA 56%",
         "nextMilestone": {
           "name": "Development & QA completion",
@@ -21862,8 +21862,8 @@
           {
             "id": "RISK-120",
             "text": "If RGC does not provide the 1.5 additional QAs, functional / QA sign-off by 18-Dec-2026 is at risk: 77 QA person-days needed vs 40 available (70 with the extra 1.5 QAs)",
-            "mitigation": "RGC has allocated 1 of the 1.5 requested QAs (DEP-102 partially resolved); follow up for the remaining 0.5 QA, reprioritize the test plan, escalate if not confirmed",
-            "resolved": false
+            "mitigation": "Closed (17-Nov-2026): DEP-102 resolved; RGC allocated 1 QA against the 1.5 requested; closed by PM",
+            "resolved": true
           }
         ],
         "fastFollowItems": [
@@ -21887,11 +21887,11 @@
             "id": "DEP-102",
             "text": "RGC team to provide 1.5 additional QAs (for one month) to meet the functional / QA sign-off timeline (Dev & QA completion 18-Dec-2026)",
             "team": "RGC",
-            "mitigation": "Partially resolved: RGC has allocated 1 QA against the 1.5 requested; follow up for the remaining 0.5 QA",
+            "mitigation": "Resolved (17-Nov-2026): RGC allocated 1 QA against the 1.5 requested; closed by PM",
             "dueBy": "2026-11-09",
             "priority": "Critical",
             "escalated": false,
-            "resolved": false
+            "resolved": true
           },
           {
             "id": "DEP-103",
