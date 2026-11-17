@@ -2293,7 +2293,7 @@
         {
           "title": "Duplicate emails in campaign user variables",
           "summary": "Same email repeated, so user variables had to be filled again and again.",
-          "rca": "Under RCA review",
+          "rca": "Missed",
           "reportedBy": "Vasu",
           "status": "Resolved"
         },
@@ -2314,7 +2314,7 @@
         {
           "title": "Old contacts kept after changing campaign contact lists",
           "summary": "In a campaign, the old contact list is retained even after changing the contact list.",
-          "rca": "Under RCA review",
+          "rca": "Missed",
           "reportedBy": "Vyom",
           "status": "Resolved"
         },
@@ -2335,7 +2335,7 @@
         {
           "title": "Template editor images with special/non-English filenames don't show",
           "summary": "Upload succeeds but the public link breaks (SFS doesn't encode the name).",
-          "rca": "Under RCA review",
+          "rca": "Missed",
           "reportedBy": "Vyom Suthar",
           "status": "Resolved"
         },
