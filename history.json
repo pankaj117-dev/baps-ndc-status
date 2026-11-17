@@ -20951,7 +20951,7 @@
     ]
   },
   "2026-11-17": {
-    "capturedAt": "2026-11-17T00:00:00Z",
+    "capturedAt": "2026-11-17T08:16:57.993284Z",
     "projects": [
       {
         "id": "webnext",
@@ -21307,7 +21307,7 @@
       },
       {
         "id": "emm",
-        "name": "EMM",
+        "name": "EMM 1.0",
         "status": "amber",
         "progress": 92,
         "stage": "Hypercare",
@@ -22255,17 +22255,17 @@
         "id": "baps-sso",
         "name": "SSO V2",
         "status": "amber",
-        "progress": 80,
+        "progress": 60,
         "stage": "Development",
         "delayDays": 0,
         "delayNote": "Stage Dates sheet: Development & QA end is 06-Nov (Satsangi; Karyakar 05-Nov; earlier revision 26-Oct). UAT end is 13-Nov (Satsangi; Karyakar 06-Nov; earlier revision 29-Oct). Hypercare start moved to 01-Dec. VAPT revised start is 29-Oct but the revised end is TBD, so that stage is still plotted on 15-Oct\u201321-Oct. Load revised end and Go-Live revised dates are TBD.",
         "statusChangeReason": "",
-        "phase": "Dev to QA for Karyakar and Satsangi flow",
+        "phase": "Karyakar testing done; Satsangi testing in progress",
         "nextMilestone": {
-          "name": "UAT",
-          "date": "2026-12-21"
+          "name": "QA",
+          "date": "2026-11-20"
         },
-        "goLive": "2026-11-06",
+        "goLive": null,
         "originalGoLive": "2026-11-06",
         "delayImpact": "",
         "delayMitigation": [
@@ -22275,102 +22275,29 @@
         "timeSavedDays": 0,
         "timeSavedNote": [],
         "scopeReduced": false,
-        "risks": [
-          {
-            "id": "RISK-101",
-            "text": "Not getting clarity on when QA resource can test Karyakar in dev (Dev, Critical)",
-            "mitigation": "",
-            "resolved": false,
-            "track": "Development"
-          },
-          {
-            "id": "RISK-102",
-            "text": "Need to create users (QA, High)",
-            "mitigation": "",
-            "resolved": false,
-            "track": "Development"
-          },
-          {
-            "id": "RISK-103",
-            "text": "Karyakar flow still not on UAT \u2014 pending long time (Dev, Critical)",
-            "mitigation": "",
-            "resolved": false,
-            "track": "Development"
-          },
-          {
-            "id": "RISK-104",
-            "text": "QA will test on Dev or UAT? Multiple dev env changes expected (FPO, Critical)",
-            "mitigation": "",
-            "resolved": false,
-            "track": "Development"
-          },
-          {
-            "id": "RISK-105",
-            "text": "Karyakar deployment blocked due to SID OTP issue (Hitesh Patel, Critical)",
-            "mitigation": "",
-            "resolved": false,
-            "track": "Implementation"
-          },
-          {
-            "id": "RISK-106",
-            "text": "Waiting on other apps' implementation plans / session 2 dates \u2014 Inbox/MSD (Vasu, High)",
-            "mitigation": "",
-            "resolved": false,
-            "track": "Implementation"
-          },
-          {
-            "id": "RISK-107",
-            "text": "Waiting on other apps' implementation plans / session 2 dates \u2014 MIS (Sandeep, High)",
-            "mitigation": "",
-            "resolved": false,
-            "track": "Implementation"
-          },
-          {
-            "id": "RISK-108",
-            "text": "Phase 2 app owner availability for session 1 (PM track, Medium)",
-            "mitigation": "",
-            "resolved": false,
-            "track": "Implementation"
-          }
-        ],
+        "risks": [],
         "fastFollowItems": [],
-        "escalations": [
-          "Need timely responses from application owners for meeting schedules and integration forms",
-          "Need to share communication to UAT end users impacted by SSO V2"
-        ],
+        "escalations": [],
         "dependencies": [
           {
-            "id": "DEP-101",
-            "text": "Karyakar deployment is blocked because of an SID issue. \u2014 Hitesh Patel",
-            "team": "DEV",
+            "id": "DEP-104",
+            "text": "Karyakar defects are resolved, but the PR is waiting for Swami's review (reported 06 Nov 2026)",
+            "team": "Swami",
             "mitigation": "",
-            "dueBy": "2026-10-05",
-            "priority": "Critical",
+            "dueBy": "",
             "escalated": false,
             "resolved": false,
-            "track": "Implementation"
+            "track": "Development"
           },
           {
-            "id": "DEP-102",
-            "text": "Waiting for the GMS, ASM implementation plan, including the Session 2 dates. \u2014 Vasu",
-            "team": "PM",
+            "id": "DEP-105",
+            "text": "QA is waiting for logs from Harikrishna (reported 27 Oct 2026)",
+            "team": "Harikrishna",
             "mitigation": "",
-            "dueBy": "2026-09-25",
-            "priority": "High",
-            "escalated": false,
-            "resolved": true,
-            "track": "Implementation"
-          },
-          {
-            "id": "DEP-103",
-            "text": "Waiting for the MIS implementation plan, including the Session 2 dates. \u2014 Sandeep Pistolwala",
-            "team": "PM",
-            "mitigation": "",
-            "dueBy": "2026-09-25",
-            "priority": "High",
+            "dueBy": "",
             "escalated": false,
             "resolved": false,
-            "track": "Implementation"
+            "track": "Development"
           }
         ],
         "stagePlan": {
@@ -22390,57 +22317,88 @@
             "initialStart": "2026-07-01",
             "latestStart": "2026-07-01",
             "initialEnd": "2026-10-09",
-            "latestEnd": "2026-11-06"
+            "latestEnd": "2026-11-20"
           },
           "UAT": {
             "initialStart": "2026-10-12",
             "latestStart": "2026-11-12",
             "initialEnd": "2026-10-14",
-            "latestEnd": "2026-11-13"
+            "latestEnd": "2026-11-13",
+            "datesTbd": true
           },
           "VAPT": {
             "initialStart": "2026-10-15",
-            "latestStart": "2026-10-15",
+            "latestStart": "2026-11-27",
             "initialEnd": "2026-10-21",
-            "latestEnd": "2026-10-21"
+            "latestEnd": "2026-12-04"
           },
           "Load": {
             "initialStart": "2026-10-27",
             "latestStart": "2026-10-27",
             "initialEnd": "2026-10-28",
-            "latestEnd": "2026-10-28"
+            "latestEnd": "2026-10-28",
+            "datesTbd": true
           },
           "Rollout": {
             "initialStart": "2026-11-04",
             "latestStart": "2026-11-04",
             "initialEnd": "2026-11-06",
-            "latestEnd": "2026-11-06"
+            "latestEnd": "2026-11-06",
+            "datesTbd": true
           },
           "Hypercare": {
             "initialStart": "2026-11-06",
             "latestStart": "2026-12-01",
             "initialEnd": "2026-12-31",
             "latestEnd": "2026-12-31"
+          },
+          "Dev Karyakar": {
+            "initialStart": "2026-07-13",
+            "latestStart": "2026-07-13",
+            "initialEnd": "2026-08-07",
+            "latestEnd": "2026-08-07"
+          },
+          "Dev Satsangi": {
+            "initialStart": "2026-07-15",
+            "latestStart": "2026-07-15",
+            "initialEnd": "2026-08-07",
+            "latestEnd": "2026-08-07"
           }
         },
         "sprintStatus": {
           "completed": [
-            "Demo application creation completed (Megh)",
-            "Satsangi flow development completed by Harikrishna \u2014 under review"
+            "QA completed Karyakar testing; defects resolved by dev and PR raised on 06 Nov 2026",
+            "Karyakar flow demo given in the NDC meeting on 05 Nov 2026"
           ],
           "inProgress": [
-            "Karyakar flow ready on local \u2014 PR raised, Swami reviewing",
-            "Swami reviewing Satsangi flow after Karyakar review",
-            "Developers conducting peer reviews of Satsangi flow",
-            "Codebase review underway"
+            "QA in progress for the Satsangi flow",
+            "mySatsang new flow prepared; under review with Swami",
+            "Harikrishna started working on Satsangi defects/blockers raised by QA"
           ],
           "nextPlan": [
-            "Clarity needed on when QA can join Karyakar testing in dev",
-            "Create QA users; confirm whether QA tests on Dev vs UAT",
-            "Share UAT end-user communication for SSO V2 impact"
+            "Swami to review the pull request from Meghbhai",
+            "Swami to provide dates in the announcement register",
+            "Swami to review the mySatsang flow doc",
+            "Satsangi demo with NDC leads on 24 Nov 2026"
           ]
         },
-        "milestones": []
+        "milestones": [
+          {
+            "name": "QA",
+            "date": "2026-11-20",
+            "progress": 50
+          },
+          {
+            "name": "VAPT start",
+            "date": "2026-11-27",
+            "progress": 0
+          },
+          {
+            "name": "Hypercare",
+            "date": "2026-12-31",
+            "progress": 0
+          }
+        ]
       },
       {
         "id": "spm",
@@ -22550,6 +22508,37 @@
           "nextPlan": [
             "No Work"
           ]
+        },
+        "milestones": []
+      },
+      {
+        "id": "spm-1a",
+        "name": "SPM 1A",
+        "status": "green",
+        "progress": 0,
+        "stage": "Development",
+        "delayDays": 0,
+        "delayNote": "",
+        "statusChangeReason": "",
+        "phase": "Development",
+        "nextMilestone": null,
+        "goLive": null,
+        "originalGoLive": null,
+        "delayImpact": "",
+        "delayMitigation": [],
+        "delayTradeoffs": "",
+        "timeSavedDays": 0,
+        "timeSavedNote": [],
+        "scopeReduced": false,
+        "risks": [],
+        "fastFollowItems": [],
+        "escalations": [],
+        "dependencies": [],
+        "stagePlan": {},
+        "sprintStatus": {
+          "completed": [],
+          "inProgress": [],
+          "nextPlan": []
         },
         "milestones": []
       },
