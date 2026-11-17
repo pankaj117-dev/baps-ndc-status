@@ -2491,6 +2491,7 @@
       "name": "SPM",
       "owner": "Sandeep Pistolwala",
       "status": "green",
+      "usePmStatus": true,
       "progress": 100,
       "phase": "SPM 1A. Hypercare 01-Nov–25-Nov. Go-live 30-Oct, was 22-Oct.",
       "nextMilestone": {
