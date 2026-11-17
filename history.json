@@ -21391,18 +21391,18 @@
         "id": "emm",
         "name": "EMM 1.0",
         "status": "amber",
-        "progress": 92,
-        "stage": "Hypercare",
-        "delayDays": 3,
-        "delayNote": "Overall: go-live landed 28-Aug against 25-Aug planned, +3 weekdays. Stage Dates sheet: UAT (Pre Go-Live) end moved 22-Aug \u2192 27-Aug. Production (Pre Go-Live) end moved 25-Aug \u2192 28-Aug, which is the go-live date. Post Go-Live REQ started 02-Sep; its end, and Dev, UAT, Go-Live, and Hypercare after that, are TBD.",
-        "statusChangeReason": "New solution failed under concurrent users in production; two performance risks open (check-printing / PDF generation via .NET, and WALL-E invocation+approval) \u2014 moving to Amber while fixes roll out, no impact to the already-completed go-live.",
-        "phase": "Live in production; Post Go-Live REQ phase started 02-Sep-2026",
+        "progress": 85,
+        "stage": "Development",
+        "delayDays": 0,
+        "delayNote": "",
+        "statusChangeReason": "Events REQ in discussion; Multi-operations policies testing and fixes in progress",
+        "phase": "Development for Post Go-Live (Canada REQ; Events REQ pending business decision)",
         "nextMilestone": {
-          "name": "Post Go-Live REQ",
-          "date": null
+          "name": "Development (incl. QA) complete",
+          "date": "2026-12-14"
         },
-        "goLive": "2026-08-28",
-        "originalGoLive": "2026-08-25",
+        "goLive": "2026-12-27",
+        "originalGoLive": "2026-12-27",
         "delayImpact": "",
         "delayMitigation": [],
         "delayTradeoffs": "",
@@ -21411,39 +21411,15 @@
         "scopeReduced": false,
         "risks": [
           {
-            "id": "RISK-101",
-            "text": "Check printing library failed under concurrent users \u2014 dev fix 2026-09-18, in QA (DEV/Bhavesh Patel, Medium) ETA 2026-09-25",
-            "mitigation": "Dev completed fix; currently in QA",
-            "resolved": false
-          },
-          {
-            "id": "RISK-102",
-            "text": "Workflow override emails \u2014 workaround or permanent fix needed (WALLE/Pratikbhai Gohil, High) ETA 2026-10-02",
-            "mitigation": "WALL-E team working workaround/permanent fix",
-            "resolved": false
-          },
-          {
-            "id": "RISK-103",
-            "text": "Invocation/Review/Status API v2 in progress (WALLE, High) ETA 2026-09-25",
-            "mitigation": "API v2 work in progress",
-            "resolved": false
-          },
-          {
-            "id": "RISK-104",
-            "text": "Separate default accounting entities for USA and Canada (MDS/Vasubhai, High) ETA 2026-09-30",
-            "mitigation": "",
-            "resolved": false
-          },
-          {
-            "id": "RISK-105",
-            "text": "Rate limiting in EMM \u2014 dev complete 2026-09-16, in QA (DEV/Vishalbhai, Low) ETA 2026-09-25",
-            "mitigation": "In QA",
-            "resolved": false
-          },
-          {
             "id": "RISK-106",
-            "text": "Events feature \u2014 business decision still TBD (RGC/Ashishbhai, Medium)",
-            "mitigation": "",
+            "text": "Events feature \u2014 business decision still TBD (RGC/Purvesh Patel, Medium); excluded from 27-Dec plan",
+            "mitigation": "Escalated to leadership; Events to get its own timeline once decided",
+            "resolved": false
+          },
+          {
+            "id": "RISK-107",
+            "text": "Multi-operations policies \u2014 testing and fixes in progress",
+            "mitigation": "Team is testing and preparing the gap analysis with stakeholders to create the TDD before finalizing code changes",
             "resolved": false
           }
         ],
@@ -21455,60 +21431,20 @@
         "escalations": [],
         "dependencies": [
           {
-            "id": "DEP-101",
-            "text": "The new check printing library failed when multiple users used it at the same time. Dev completed on 09/18/2026;\nCurrently in EMM QA for Load Testing. EMM QA ETA: 09/28/2026. \u2014 Bhavesh Patel",
-            "team": "DEV",
-            "mitigation": "",
-            "dueBy": "2026-10-01",
-            "priority": "Medium",
-            "escalated": false,
-            "resolved": false
-          },
-          {
-            "id": "DEP-102",
-            "text": "A workaround or permanent fix is needed for the workflow override emails issue. \nWALL-E ETA: 10/02/2026.\nEMM ETA: 10/06/2026 \u2014 Pratikbhai Gohil",
-            "team": "WALLE",
-            "mitigation": "",
-            "dueBy": "2026-10-06",
-            "priority": "High",
-            "escalated": false,
-            "resolved": false
-          },
-          {
-            "id": "DEP-103",
-            "text": "Version 2 of the Invocation API, Review API, and Status API is in progress. \nWALLE ETA: 09/23/2026.\nEMM ETA: \u2014 Pratikbhai Gohil",
-            "team": "WALLE",
-            "mitigation": "",
-            "dueBy": "2026-09-24",
-            "priority": "High",
-            "escalated": false,
-            "resolved": false
-          },
-          {
-            "id": "DEP-104",
-            "text": "Separate default accounting entities need to be set up for the USA and Canada. \nMDS ETA: 09/30/2026.\nEMM ETA: 10/07/2026 \u2014 Vasu",
-            "team": "MDS",
-            "mitigation": "",
-            "dueBy": "2026-10-07",
-            "priority": "High",
-            "escalated": false,
-            "resolved": false
-          },
-          {
-            "id": "DEP-105",
-            "text": "Rate limiting implementation in EMM. Dev completed on 09/16/2026; \nCurrently in EMM QA. EMM QA ETA: 09/25/2026. \u2014 Vishalbhai Patel",
-            "team": "DEV",
-            "mitigation": "",
-            "dueBy": "2026-09-25",
-            "priority": "Low",
-            "escalated": false,
-            "resolved": false
-          },
-          {
             "id": "DEP-106",
-            "text": "Business decision on the Events feature. REQ feasibility in progress - TBD \u2014 Ashishbhai Trivedi",
+            "text": "Business decision on the Events feature. REQ feasibility in progress \u2014 ETA TBD \u2014 Purvesh Patel",
             "team": "RGC",
-            "mitigation": "",
+            "mitigation": "Events excluded from the 27-Dec plan; will need its own timeline once decided. May impact the new overall Go-Live.",
+            "dueBy": "",
+            "priority": "Medium",
+            "escalated": true,
+            "resolved": false
+          },
+          {
+            "id": "DEP-107",
+            "text": "PDF generation \u2014 new approach; TDD in WIP",
+            "team": "DEV",
+            "mitigation": "TDD for the new PDF generation approach in progress",
             "dueBy": "",
             "priority": "Medium",
             "escalated": false,
@@ -21530,19 +21466,51 @@
           },
           "REQ Post": {
             "initialStart": "2026-09-02",
-            "latestStart": "2026-09-02"
+            "latestStart": "2026-09-02",
+            "initialEnd": "2026-10-28",
+            "latestEnd": "2026-10-28"
           },
-          "Dev Post": {},
-          "UAT Post": {},
-          "Go-Live Post": {},
-          "Hypercare Post": {}
+          "Dev Post": {
+            "initialStart": "2026-11-09",
+            "latestStart": "2026-11-09",
+            "initialEnd": "2026-12-14",
+            "latestEnd": "2026-12-14"
+          },
+          "UAT Post": {
+            "initialStart": "2026-12-16",
+            "latestStart": "2026-12-16",
+            "initialEnd": "2026-12-24",
+            "latestEnd": "2026-12-24"
+          },
+          "Go-Live Post": {
+            "initialStart": "2026-12-27",
+            "latestStart": "2026-12-27",
+            "initialEnd": "2026-12-27",
+            "latestEnd": "2026-12-27"
+          },
+          "Hypercare Post": {
+            "initialStart": "2026-12-27",
+            "latestStart": "2026-12-27",
+            "initialEnd": "2027-01-27",
+            "latestEnd": "2027-01-27"
+          },
+          "Development": {
+            "initialStart": "2026-11-09",
+            "latestStart": "2026-11-09",
+            "initialEnd": "2026-12-14",
+            "latestEnd": "2026-12-14"
+          }
         },
         "sprintStatus": {
-          "completed": [],
+          "completed": [
+            "EMM-8754 Vendor Creation and Management Enhancements \u2014 Dev done and deployed to QA",
+            "EMM-8919 UAT Feedback 1.33 \u2014 Vendor Review screen accordions expanded by default \u2014 Dev done (QA deployment Friday)",
+            "EMM-539.651 Country shown as changed when it remains the same \u2014 Dev done (QA deployment Friday)"
+          ],
           "inProgress": [
-            "QA on check-printing concurrent-user fix",
-            "WALL-E workflow override email workaround/permanent fix",
-            "Events functionality business decision \u2014 TBD"
+            "Canada Expenses submission/approval modifications",
+            "Canada Mandir Credit Cards Management",
+            "Canada Mandir Credit Card bulk upload and Expenses"
           ],
           "nextPlan": []
         },

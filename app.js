@@ -4600,10 +4600,23 @@
     const prevMilestoneDate = {};
     const prevMilestoneName = {};
     const shifts = [];
+    // A project can set `rebaselinedOn: "YYYY-MM-DD"` (2026-11-17, EMM) when
+    // it starts a fresh plan (e.g. a post-go-live release). Dates before
+    // that week are not compared with it, so the new go-live doesn't read
+    // as a slip against the old release's dates.
+    const rebaseOn = {};
+    DATA.projects.forEach((p) => { if (p.rebaselinedOn) rebaseOn[p.id] = p.rebaselinedOn; });
+    const rebased = {};
 
     dates.forEach((asOf) => {
       (HISTORY[asOf].projects || []).forEach((snap) => {
         nameById[snap.id] = nameById[snap.id] || snap.name;
+        if (rebaseOn[snap.id] && asOf >= rebaseOn[snap.id] && !rebased[snap.id]) {
+          rebased[snap.id] = true;
+          delete prevGoLive[snap.id];
+          delete prevMilestoneDate[snap.id];
+          delete prevMilestoneName[snap.id];
+        }
         const goLive = snap.goLive || null;
         const milestoneName = (snap.nextMilestone && snap.nextMilestone.name) || null;
         const milestoneDate = (snap.nextMilestone && snap.nextMilestone.date) || null;
@@ -5826,8 +5839,16 @@
     let prevMilestoneDate = null;
     let prevPlan = null;
     const baseline = !!(p && p.scheduleBaseline);
+    const rebaseOn = (p && p.rebaselinedOn) || null;
+    let rebased = false;
 
     weeks.forEach((w) => {
+      if (rebaseOn && !rebased && w.asOf >= rebaseOn) {
+        rebased = true;
+        prevGoLive = null;
+        prevMilestoneName = null;
+        prevMilestoneDate = null;
+      }
       const goLive = w.goLive || null;
       const milestoneName = (w.nextMilestone && w.nextMilestone.name) || null;
       const milestoneDate = (w.nextMilestone && w.nextMilestone.date) || null;
