@@ -1941,26 +1941,26 @@
         "QA Hotfix": {
           "initialStart": "2026-10-30",
           "latestStart": "2026-10-30",
-          "initialEnd": "2026-11-06",
-          "latestEnd": "2026-11-20"
-        },
-        "UAT Hotfix": {
-          "initialStart": "2026-11-07",
-          "latestStart": "2026-11-21",
-          "initialEnd": "2026-11-08",
-          "latestEnd": "2026-11-22"
-        },
-        "VAPT Hotfix": {
-          "initialStart": "2026-11-16",
-          "latestStart": "2026-11-21",
-          "initialEnd": "2026-11-22",
+          "initialEnd": "2026-11-23",
           "latestEnd": "2026-11-27"
         },
+        "UAT Hotfix": {
+          "initialStart": "2026-11-24",
+          "latestStart": "2026-11-28",
+          "initialEnd": "2026-11-25",
+          "latestEnd": "2026-11-29"
+        },
+        "VAPT Hotfix": {
+          "initialStart": "2026-11-24",
+          "latestStart": "2026-11-28",
+          "initialEnd": "2026-11-30",
+          "latestEnd": "2026-12-04"
+        },
         "Go-Live Hotfix": {
-          "initialStart": "2026-11-23",
-          "latestStart": "2026-11-30",
-          "initialEnd": "2026-11-23",
-          "latestEnd": "2026-11-30"
+          "initialStart": "2026-11-30",
+          "latestStart": "2026-12-06",
+          "initialEnd": "2026-11-30",
+          "latestEnd": "2026-12-06"
         }
       },
       "stageDateOrder": [
@@ -1977,7 +1977,7 @@
         { "stage": "QA Hotfix", "label": "QA (Hotfix)" },
         { "stage": "UAT Hotfix", "label": "UAT (Hotfix)" },
         { "stage": "VAPT Hotfix", "label": "VAPT & Load Testing (Hotfix)" },
-        { "stage": "Go-Live Hotfix", "label": "Go-Live (Hotfix)" }
+        { "stage": "Go-Live Hotfix", "label": "Hotfix release" }
       ],
       "riskSeq": 101,
       "changeRequests": [
@@ -2201,32 +2201,32 @@
             "stage": "QA",
             "plannedStart": "2026-10-20",
             "actualStart": "2026-10-20",
-            "plannedEnd": "2026-11-06",
+            "plannedEnd": "2026-11-23",
             "actualEnd": "2026-11-27",
             "delayDays": null,
             "note": "Diwali vacation + QA on leave till Nov 22"
           },
           {
             "stage": "UAT",
-            "plannedStart": "2026-11-07",
+            "plannedStart": "2026-11-24",
             "actualStart": "2026-11-28",
-            "plannedEnd": "2026-11-08",
+            "plannedEnd": "2026-11-25",
             "actualEnd": "2026-11-29",
             "delayDays": null,
             "note": ""
           },
           {
             "stage": "VAPT & Load Testing",
-            "plannedStart": "2026-11-16",
+            "plannedStart": "2026-11-24",
             "actualStart": "2026-11-28",
-            "plannedEnd": "2026-11-22",
+            "plannedEnd": "2026-11-30",
             "actualEnd": "2026-12-04",
             "delayDays": null,
             "note": ""
           },
           {
-            "stage": "Go-Live",
-            "plannedStart": "2026-11-23",
+            "stage": "Hotfix release",
+            "plannedStart": "2026-11-30",
             "actualStart": "2026-12-06",
             "plannedEnd": "",
             "actualEnd": "",
