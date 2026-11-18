@@ -2330,7 +2330,7 @@
           "summary": "Reserved variables show each other's values in async mode.",
           "rca": "Missed",
           "reportedBy": "Satyanishth Swami",
-          "status": "WIP"
+          "status": "Resolved"
         },
         {
           "title": "Template editor images with special/non-English filenames don't show",
