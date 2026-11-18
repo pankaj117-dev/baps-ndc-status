@@ -6,6 +6,30 @@ so any PM can update it by editing one JSON file and pushing.
 
 **Live site:** `https://pankaj117.github.io/baps-ndc-status/` (enabled via GitHub Pages on the `main` branch)
 
+## QA tab (2026-11-18)
+
+The **QA** tab (after Team Performance) shows the weekly *QA Status —
+Resource-wise* table: one row per resource and project, with User Stories,
+Test Cases (Designed / Modified / Executed), Defects (Logged / Closed /
+Reopen / Rejected) and Leave, plus a computed **Total (all resources)** row.
+
+Data lives in `qa.json`, one entry per week under `weeks`:
+
+```json
+{ "weekStart": "2026-10-26", "weekEnd": "2026-10-30",
+  "rows": [ { "resource": "Ankur Shah", "project": "MyBKY",
+              "userStories": 0, "tcDesigned": 0, "tcModified": 0, "tcExecuted": 94,
+              "defectsLogged": 9, "defectsClosed": 20, "defectsReopen": 6,
+              "defectsRejected": 0, "leave": 0 } ] }
+```
+
+To add a week, append a new entry from that week's QA spreadsheet. The tab
+opens on the latest week, and a **Week** dropdown shows earlier ones. Totals
+are never stored. The page adds them up. The rendering is in `qa.js` and the
+styles in `qa.css`, kept out of `app.js`. The global Project/PM bar hides on
+this tab, because QA project names (ASM, WFS, BMM…) don't match the
+dashboard's project list.
+
 ## Global filter bar
 
 A **"🔎 Project" dropdown** sits right under the tab bar, visible on every
