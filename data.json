@@ -2071,6 +2071,16 @@
           "plannedDate": "2026-11-02",
           "actualDate": "2026-11-02",
           "delayReason": ""
+        },
+        {
+          "sprint": "Hypercare",
+          "type": "Development",
+          "feature": "GMS UI enhancements backlog",
+          "status": "In Progress",
+          "notes": "",
+          "plannedDate": "2026-11-19",
+          "actualDate": "2026-11-19",
+          "delayReason": ""
         }
       ],
       "delayItemLog": [
