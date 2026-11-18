@@ -30,12 +30,31 @@ Rejected) and a grouped bar chart per project (TC Designed, TC Modified,
 TC Executed, Defects Logged), adding up each project's rows. Hover a project
 for its numbers, and use "Show as table" to see the chart's data as a table.
 
-To add a week, append a new entry from that week's QA spreadsheet. The tab
-opens on the latest week, and a **Week** dropdown shows earlier ones. Totals
-are never stored. The page adds them up. The rendering is in `qa.js` and the
-styles in `qa.css`, kept out of `app.js`. The global Project/PM bar hides on
-this tab, because QA project names (ASM, WFS, BMM…) don't match the
-dashboard's project list.
+**Source: `QA_Daily_Task.xlsx` (2026-11-18).** `qa.json` is generated from
+the **Task_Details** sheet of the QA team's daily task workbook, from
+1-Aug-2026 on:
+
+```bash
+pip install openpyxl
+python scripts/qa_import.py QA_Daily_Task.xlsx --from 2026-08-01 --to 2026-11-18
+```
+
+Rows are grouped into Monday-Sunday weeks, the same as the weekly QA deck,
+so Saturday work counts in its week. Each week is labelled Mon-Fri and
+clipped to the date range, so the first week reads 01-Aug to 02-Aug and a
+partial current week ends on the `--to` date. Columns used: Total Requirement.
+(User Stories), Total TC Designed, Total TC Modify, Total TC Executed, Total
+Defect logged, Closed, Reopen, Reject by Dev (Rejected), and the free-text
+Leave column (full day = 1, half day = 0.5, hour-level notes = 0). Spelling
+variants of names merge (MYBKY / My Bky -> MyBKY, Walle -> WFS, and so on).
+To update, re-run the script on the latest workbook with a new `--to`
+date. The full mapping is in the script's header.
+
+The tab opens on the latest week, and a **Week** dropdown shows earlier
+ones. Totals are never stored. The page adds them up. The rendering is in
+`qa.js` and the styles in `qa.css`, kept out of `app.js`. The global
+Project/PM bar hides on this tab, because QA project names (ASM, WFS, BMM…)
+don't match the dashboard's project list.
 
 ## Global filter bar
 
