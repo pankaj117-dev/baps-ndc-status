@@ -2202,32 +2202,32 @@
             "plannedStart": "2026-10-20",
             "actualStart": "2026-10-20",
             "plannedEnd": "2026-11-06",
-            "actualEnd": "2026-11-20",
+            "actualEnd": "2026-11-27",
             "delayDays": null,
-            "note": "Diwali vacation"
+            "note": "Diwali vacation + QA on leave till Nov 22"
           },
           {
             "stage": "UAT",
             "plannedStart": "2026-11-07",
-            "actualStart": "2026-11-21",
+            "actualStart": "2026-11-28",
             "plannedEnd": "2026-11-08",
-            "actualEnd": "2026-11-22",
+            "actualEnd": "2026-11-29",
             "delayDays": null,
             "note": ""
           },
           {
             "stage": "VAPT & Load Testing",
             "plannedStart": "2026-11-16",
-            "actualStart": "2026-11-21",
+            "actualStart": "2026-11-28",
             "plannedEnd": "2026-11-22",
-            "actualEnd": "2026-11-27",
+            "actualEnd": "2026-12-04",
             "delayDays": null,
             "note": ""
           },
           {
             "stage": "Go-Live",
             "plannedStart": "2026-11-23",
-            "actualStart": "2026-11-30",
+            "actualStart": "2026-12-06",
             "plannedEnd": "",
             "actualEnd": "",
             "delayDays": null,
