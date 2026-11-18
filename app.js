@@ -7855,7 +7855,9 @@
   // up at all yet) — none of the filters affect it, so the bar hides
   // there. Project and PM apply on every other tab. The Team dropdown
   // only applies on Dependencies (2026-11-05).
-  const NO_FILTER_TABS = new Set(["team"]);
+  // QA (2026-11-18) has its own week picker and its own project names,
+  // so the Project/PM filters don't apply there either.
+  const NO_FILTER_TABS = new Set(["team", "qa"]);
 
   function updateGlobalFilterBarForTab(tabKey) {
     const bar = document.getElementById("globalFilterBar");
