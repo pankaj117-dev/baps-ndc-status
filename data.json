@@ -2022,7 +2022,16 @@
           "id": "CR-104"
         }
       ],
-      "decisions": [],
+      "decisions": [
+        {
+          "id": "DEC-101",
+          "decision": "Hold rollout for Type C and D mandirs",
+          "description": "Rollout to Type C and D mandirs is on hold until further instructions. This release currently covers all Shikharbaddh, Type A and Type B mandirs.",
+          "dateTaken": "",
+          "by": ""
+        }
+      ],
+      "decisionSeq": 101,
       "goLiveChecklist": [],
       "features": [
         {
