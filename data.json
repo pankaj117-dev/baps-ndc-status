@@ -1844,13 +1844,16 @@
       "sprintStatus": {
         "completed": [
           "WSO2 (SSO) implementation done",
-          "Addressed 4 post-production issues"
-        ],
-        "inProgress": [
           "Hotfix: Unsubscribe user stories"
         ],
+        "inProgress": [
+          "QA for hotfix",
+          "QA for WSO2 (SSO)",
+          "UI enhancements backlog"
+        ],
         "nextPlan": [
-          "QA for hotfix"
+          "QA on UI enhancements backlog",
+          "VAPT and load testing for hotfix Unsubscribe user stories"
         ]
       },
       "risks": [
