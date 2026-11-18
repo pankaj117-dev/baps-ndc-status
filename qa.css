@@ -1,0 +1,103 @@
+/* QA tab (qa.js) — Weekly QA Status, resource-wise */
+
+/* `.global-filter-bar { display: flex }` beat the `hidden` attribute, so
+   the bar never actually hid on Team Performance (or QA). */
+.global-filter-bar[hidden] { display: none; }
+
+.qa-card {
+  background: var(--bg-panel);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.qa-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  background: #1d2b4f;
+  color: #fff;
+  padding: 18px 28px;
+}
+
+.qa-banner h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.qa-banner-week {
+  font-size: 18px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.qa-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 28px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.qa-toolbar select { min-width: 240px; }
+
+.qa-toolbar-note {
+  margin-left: auto;
+  font-weight: 500;
+  color: var(--ink-faint);
+}
+
+.qa-table-wrap {
+  overflow-x: auto;
+  padding: 16px 28px 28px;
+}
+
+.qa-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  min-width: 900px;
+}
+
+.qa-table th,
+.qa-table td {
+  border: 1px solid #d6dbe4;
+  padding: 7px 10px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.qa-table thead th {
+  background: #1d2b4f;
+  color: #fff;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.qa-table thead th.qa-grp-tc { background: #17665e; }
+.qa-table thead th.qa-grp-def { background: #8b1e22; }
+
+.qa-table .qa-th-left,
+.qa-table .qa-td-left { text-align: left; }
+
+.qa-table tbody tr:nth-child(even) td { background: #f4f6fa; }
+.qa-table tbody tr:hover td { background: var(--accent-soft); }
+
+.qa-table tfoot td {
+  background: #dcefe8;
+  font-weight: 800;
+  color: #1d2b4f;
+}
+
+.qa-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--ink-faint);
+}
