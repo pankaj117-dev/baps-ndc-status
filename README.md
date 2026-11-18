@@ -23,6 +23,13 @@ Data lives in `qa.json`, one entry per week under `weeks`:
               "defectsRejected": 0, "leave": 0 } ] }
 ```
 
+**Two views (2026-11-18)**, both following the Week dropdown:
+**Resource-wise** is the table above. **Project-wise** shows KPI tiles for the
+week (TC Modified / Designed / Executed, Defects Logged / Closed / Reopen /
+Rejected) and a grouped bar chart per project (TC Designed, TC Modified,
+TC Executed, Defects Logged), adding up each project's rows. Hover a project
+for its numbers, and use "Show as table" to see the chart's data as a table.
+
 To add a week, append a new entry from that week's QA spreadsheet. The tab
 opens on the latest week, and a **Week** dropdown shows earlier ones. Totals
 are never stored. The page adds them up. The rendering is in `qa.js` and the
