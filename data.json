@@ -2279,14 +2279,14 @@
         {
           "title": "Default preview body could break a variable",
           "summary": "Auto preview could split a variable, failing variable replacement on send.",
-          "rca": "Change Request",
+          "rca": "Requirement Gap",
           "reportedBy": "My Mandir",
           "status": "Resolved"
         },
         {
           "title": "Device tokens not fetched from SID",
           "summary": "Push notifications failed with \"SID API error: 200 OK OK\"; the error wasn't handled properly or given a clear description.",
-          "rca": "Change Request",
+          "rca": "Requirement Gap",
           "reportedBy": "Vasu",
           "status": "Resolved"
         },
@@ -2300,7 +2300,7 @@
         {
           "title": "Center-scoped \"Volunteer\" list pulled whole MIS database",
           "summary": "List limited to one center returned records for all US.",
-          "rca": "Change Request",
+          "rca": "Requirement Gap",
           "reportedBy": "Pratik Patel (IT support karyakar)",
           "status": "Resolved"
         },
