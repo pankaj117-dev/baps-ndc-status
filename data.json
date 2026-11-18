@@ -1874,9 +1874,7 @@
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
-      "fastFollowItems": [
-        "Contact Reorder: deferred indefinitely, not a current priority"
-      ],
+      "fastFollowItems": [],
       "statusChangeReason": "Time was used to address post-production bugs, which pushed the hotfix timeline.",
       "dependencySeq": 102,
       "stagePlan": {
