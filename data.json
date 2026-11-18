@@ -1818,7 +1818,7 @@
       "goLive": "2026-10-12",
       "originalGoLive": "2026-10-12",
       "delayDays": 0,
-      "delayNote": "Overall: launch go-live held 12-Oct, so no project delay. The hotfix go-live moved 23-Nov → 30-Nov (+5 weekdays) and stays on that stage. Requirement +3, TDD +6, Development +7, QA +7, UAT +4 weekdays. Hotfix Development end moved 02-Nov → 06-Nov (4 weekdays). Hotfix QA end moved 06-Nov → 20-Nov. Hotfix go-live moved 23-Nov → 30-Nov.",
+      "delayNote": "Overall: launch go-live held 12-Oct, so no project delay. Requirement +3, TDD +6, Development +7, QA +7, UAT +4 weekdays. Hotfix: Development end moved 02-Nov → 06-Nov; QA end moved 23-Nov → 27-Nov (Diwali vacation + QA on leave till 22-Nov); hotfix release moved 30-Nov → 06-Dec (+6 days).",
       "dependencies": [
         {
           "id": "DEP-101",
@@ -2103,10 +2103,10 @@
         },
         {
           "delayedItem": "Hotfix deployment",
-          "description": "Hotfix deployment moved from Nov 23 to Nov 30.",
+          "description": "Hotfix deployment moved from Nov 30 to Dec 6.",
           "reportedDate": "2026-11-02",
           "impactedPhase": "Hypercare (hotfix)",
-          "impact": "Hotfix go-live +7 days.",
+          "impact": "Hotfix go-live +6 days.",
           "rootCause": "Team time went to resolving post-prod issues.",
           "responsible": "",
           "actionItem": "",
