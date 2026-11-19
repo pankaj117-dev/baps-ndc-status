@@ -6,6 +6,34 @@ so any PM can update it by editing one JSON file and pushing.
 
 **Live site:** `https://pankaj117.github.io/baps-ndc-status/` (enabled via GitHub Pages on the `main` branch)
 
+## Summary tab (2026-11-19)
+
+**Summary** is the first tab and opens by default. It shows the *Project Status
+Summary* for the start of the NDC call: Red / Amber / Green counts and one
+row per active project, with columns # · Project · Last State · Current State ·
+State Change Notes · Go-Live / Hypercare · Stage. Nothing is stored for it.
+Everything comes from what PMs already enter through the Weekly Update form:
+
+- **Current State** uses the same effective status as the cards (delay days,
+  `usePmStatus`, `behindSchedule`, Non-Recoverable).
+- **Last State** applies that rule to the latest `history.json` snapshot from
+  the previous Monday-Sunday week.
+- **State Change Notes** is *Reason for status change*. It's shown when the
+  status changed or isn't Green; otherwise `-`.
+- **Go-Live / Hypercare** is the go-live date (`TBD` when not set, as on the
+  cards), plus the Hypercare stage's planned end while the project is in
+  Hypercare.
+- **Stage** is the stage label, or else the pipeline stage.
+
+A value a PM still has to enter shows a **⚠ chip** (e.g. *⚠ Reason
+missing*). Hovering over it names the Weekly Update form field to fill in, and
+the header counts the open items. Closed (`closedOn`) and finished
+(`stageComplete`) projects are left out. Rows run worst status first, then
+the ones that changed. The Project/PM filter bar applies, and clicking a
+project opens its details. The code is in `summary.js` / `summary.css`.
+`app.js` shares its data, filters and helpers as `window.NDC` and fires
+`ndc:render` when they change.
+
 ## QA tab (2026-11-18)
 
 The **QA** tab (after Team Performance) shows the weekly *QA Status —
