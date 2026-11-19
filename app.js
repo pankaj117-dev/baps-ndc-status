@@ -83,7 +83,7 @@
   let activeOwner = "all";
   let globalProjectFilter = "all";
   let globalTeamFilter = "all";
-  let activeTab = "status";
+  let activeTab = "summary"; // Summary opens first (2026-11-19)
   let depsPivotGroupBy = "project"; // "project" | "team" — which rollup the Dependencies tab shows first
   let depsPivotCompact = false;
   let depsCycleFilter = "all"; // calendar year string from dueBy, e.g. "2026"
@@ -3975,6 +3975,14 @@
     renderCards();
     renderDependenciesTab();
     renderEscalationsTab();
+    notifyExtraTabs();
+  }
+
+  // Tabs kept in their own files (summary.js, 2026-11-19) read the data
+  // and the current Project/PM filter through window.NDC, and redraw on
+  // "ndc:render", fired at load and whenever a filter changes.
+  function notifyExtraTabs() {
+    document.dispatchEvent(new CustomEvent("ndc:render"));
   }
 
   function updateGlobalFilterUI() {
@@ -7963,6 +7971,16 @@
     wireDependencyModal();
     wireRiskModal();
     wireTabs();
+
+    window.NDC = {
+      getData: () => DATA,
+      visibleProjects,
+      effectiveStatus,
+      historyForProject,
+      weekStartMonday,
+      openProjectDetail,
+    };
+    notifyExtraTabs();
   }
 
   function safeFetchJson(path, fallback) {
