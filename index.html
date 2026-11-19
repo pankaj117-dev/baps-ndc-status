@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=151">
 <link rel="stylesheet" href="qa.css?v=2">
+<link rel="stylesheet" href="summary.css?v=1">
 </head>
 <body>
   <div class="wrap">
@@ -24,7 +25,8 @@
     </header>
 
     <nav class="tabbar" role="tablist">
-      <button class="tab-btn is-active" data-tab="status" role="tab" aria-selected="true">Program Status</button>
+      <button class="tab-btn is-active" data-tab="summary" role="tab" aria-selected="true">Summary</button>
+      <button class="tab-btn" data-tab="status" role="tab" aria-selected="false">Program Status</button>
       <button class="tab-btn" data-tab="grid" role="tab" aria-selected="false">Grid</button>
       <button class="tab-btn" data-tab="hawkeye" role="tab" aria-selected="false">🦅 Hawk-eye</button>
       <button class="tab-btn" data-tab="deps" role="tab" aria-selected="false">Dependencies</button>
@@ -67,7 +69,11 @@
       <span class="global-filter-hint" id="globalFilterHint">Applies to every tab</span>
     </div>
 
-    <section id="panel-status" class="tab-panel is-active">
+    <section id="panel-summary" class="tab-panel is-active">
+      <div id="summaryPanel"></div>
+    </section>
+
+    <section id="panel-status" class="tab-panel">
       <div id="metricsRow" class="metrics-row"></div>
 
       <h2 class="section-heading">Projects</h2>
@@ -265,7 +271,8 @@
     </div>
   </div>
 
-  <script src="app.js?v=225"></script>
+  <script src="app.js?v=226"></script>
   <script src="qa.js?v=2"></script>
+  <script src="summary.js?v=1"></script>
 </body>
 </html>
