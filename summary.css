@@ -1,0 +1,137 @@
+/* Summary tab (summary.js) — Project Status Summary, 2026-11-19 */
+.sum-card {
+  background: var(--bg-panel);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 22px 28px 28px;
+  margin-bottom: 24px;
+}
+
+.sum-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px 24px;
+  margin-bottom: 18px;
+}
+
+.sum-head h2 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+  color: #1d2b4f;
+}
+
+.sum-sub {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.sum-gap-count { color: #9a4a00; font-weight: 700; }
+
+.sum-counts { display: flex; gap: 12px; }
+
+.sum-count {
+  min-width: 84px;
+  border-radius: 12px;
+  color: #fff;
+  text-align: center;
+  padding: 8px 14px 7px;
+}
+
+.sum-count b {
+  display: block;
+  font-size: 22px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.sum-count span { font-size: 12px; font-weight: 600; }
+
+/* Status fills. White text on each passes 4.5:1. */
+.sum-count-red, .sum-state-red { background: #c62828; }
+.sum-count-amber, .sum-state-amber { background: #b9560f; }
+.sum-count-green, .sum-state-green { background: #2e7d32; }
+.sum-state-black { background: #1f2430; }
+
+.sum-table-wrap { overflow-x: auto; }
+
+.sum-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  min-width: 860px;
+}
+
+.sum-table th,
+.sum-table td {
+  border: 1px solid #d6dbe4;
+  padding: 9px 10px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.sum-table thead th {
+  background: #1d2b4f;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.sum-table tbody tr:nth-child(even) td:not(.sum-state) { background: #f4f6fa; }
+
+.sum-table .sum-num { width: 36px; text-align: center; color: var(--ink-soft); }
+
+.sum-project-link {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  color: #1d2b4f;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sum-project-link:hover,
+.sum-project-link:focus-visible { color: var(--accent); text-decoration: underline; }
+
+.sum-table td.sum-state {
+  width: 110px;
+  text-align: center;
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.sum-table td.sum-state-none {
+  background: transparent;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.sum-table .sum-golive { width: 130px; white-space: nowrap; }
+.sum-table .sum-stage { width: 170px; font-weight: 700; }
+.sum-table .sum-notes { color: var(--ink); }
+
+.sum-missing {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #fff4e5;
+  border: 1px dashed #d98a2b;
+  color: #8a4300;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: help;
+}
+
+.sum-empty { text-align: center; color: var(--ink-faint); padding: 24px; }
+
+@media print {
+  .sum-card { box-shadow: none; padding: 0; }
+  .sum-state, .sum-count { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
