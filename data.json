@@ -1,6 +1,6 @@
 {
-  "asOf": "2026-11-17",
-  "lastUpdated": "2026-11-17T19:52:40.299122Z",
+  "asOf": "2026-11-23",
+  "lastUpdated": "2026-11-23T09:24:25.720067Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -1632,26 +1632,17 @@
       "name": "myMandir 1B",
       "owner": "Aniket Udgaonkar",
       "status": "green",
-      "progress": 100,
-      "phase": "Milestone 2 UAT completed on 06 Nov 2026 · VAPT (web) 16 Nov – 20 Nov 2026",
+      "progress": 90,
+      "phase": "1 user story (Restructure Teams) in development · VAPT in progress",
       "nextMilestone": {
-        "name": "UAT bugs resolution (16 Nov – 17 Nov 2026)",
-        "date": "2026-11-17"
+        "name": "Get UAT ready for the RAM meeting: deliver the Restructure Teams story to UAT and get sign-off from Sameep",
+        "date": null
       },
       "goLive": null,
       "originalGoLive": "2026-11-23",
       "delayDays": 0,
       "delayNote": "Milestone 1: TDD end moved 22-Sep → 07-Oct (11 weekdays). UAT end moved 26-Oct → 29-Oct (3 weekdays). Milestone 2: Development & QA end moved earlier, 15-Nov → 05-Nov (7 weekdays saved); UAT completed 06-Nov, earlier than its 20-Nov plan. VAPT (web) 16-Nov → 20-Nov. Go-live is TBD.",
       "dependencies": [
-        {
-          "id": "DEP-102",
-          "text": "Restructure Teams as department/sub-department with coordinator + members (Nov 2026 user story) \u2014 the only user story still pending from Milestone 2; depends on Satyanishtha Swami and Shreyank bhai.",
-          "team": "Satyanishtha Swami / Shreyank bhai",
-          "mitigation": "Awaiting inputs from Satyanishtha Swami and Shreyank bhai to complete this user story; not resolved yet.",
-          "dueBy": "",
-          "escalated": false,
-          "resolved": false
-        },
         {
           "id": "DEP-103",
           "text": "VAPT dates required for iOS and Android (web VAPT running 16 Nov – 20 Nov 2026).",
@@ -1678,20 +1669,14 @@
           "VAPT on iOS and Android will start"
         ]
       },
-      "risks": [
-        {
-          "id": "RISK-101",
-          "text": "Very High: Restructure Teams as department/sub-department with coordinator + members (Nov 2026 user story) — the only user story still pending from Milestone 2",
-          "mitigation": "Tracked as dependency DEP-102; awaiting inputs from Satyanishtha Swami and Shreyank bhai to complete this user story.",
-          "resolved": false
-        }
-      ],
+      "risks": [],
       "delayImpact": "TDD +2d slip may impact downstream development start (22-Sep deck)",
       "delayMitigation": [
         "Aniket connected with Sameep during BA's leave period to secure FRD sign-off"
       ],
       "delayTradeoffs": "",
       "stage": "VAPT",
+      "stageLabel": "Development & VAPT",
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
