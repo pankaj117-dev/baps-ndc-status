@@ -2913,6 +2913,156 @@
           "actionItem": "Implement post-publication family assignment management with the following capabilities: (1) Remove assigned families individually from a Karyakar pair or remove all assignments through single-pair and multi-pair bulk actions; removed families must remain in the project as unassigned/orphan families. (2) Assign orphan families to eligible Karyakar pairs through the Karyakar Tab and Families Tab, including pair selection, eligibility validation, and existing maximum-family-limit checks. (3) Reassign assigned families directly to another Karyakar pair through single-family and multi-family selection, supporting bulk transfer to a common target pair. Enforce the Done Sampark gate through UI and server-side validation to block removal and reassignment of completed families while allowing orphan-family assignment. Preserve 100% of historical Sampark notes, submitted GSS forms, and scheduled appointments across all operations. Retain existing business rules, including BR-001 self-family restrictions, pairing rules, and access permissions. Implement appropriate validations and user notifications for concurrent Done Sampark completion, zero-family pairs, target-pair eligibility conflicts, maximum-family-limit warnings, unavailable target pairs, and potentially unsaved GSS form data. Ensure Secondary Department Coordinators can perform the same operations as Primary owners without additional approval. Complete development, integration, and QA testing across all applicable entry points and bulk operations.",
           "approvalStatus": "Approved",
           "impact": "Functional Impact: Enables coordinators to manage family assignments dynamically after project publication through Remove, Assign, and Reassign operations. Supports individual and bulk actions across Karyakar and Families tabs, improves operational flexibility, and eliminates the existing add-only assignment limitation. Business Rule Impact: The Done Sampark gate prevents removal or reassignment of families with completed Sampark. Orphan-family assignment remains permitted. Existing business rules, including self-family restrictions, pairing rules, access permissions, and family-limit validations, remain applicable. Maximum-family-limit conditions generate non-blocking warnings. Data Impact: No family or project records are deleted or recreated. All historical Sampark information, including notes, submitted GSS forms, and scheduled appointments, must remain intact and accessible to the newly assigned Karyakar pair. Technical Impact: Requires backend API and business-logic enhancements, database relationship/assignment handling, frontend updates across Karyakar and Families tabs, pair-selection and bulk-action functionality, server-side validations, and appropriate confirmation dialogs, warnings, and notifications. Delivery and QA Impact: Requires development and regression testing for all three operations, individual and bulk workflows, Done Sampark validation, historical data preservation, conflicts, maximum-family-limit scenarios, concurrent updates, unsaved GSS form warnings, and Primary/Secondary coordinator access. Existing pre-publication assignment functionality and project publication behaviour must remain unaffected."
+        },
+        {
+          "id": "CR-03",
+          "title": "Change Request - MySeva App: Sampark Notes Character Limit Handling",
+          "description": "When users paste Sampark notes that exceed the allowed character limit, the MySeva app currently gives no error message or visual indication. Improve the notes field so users know when the limit is exceeded, either by automatically truncating the text to the maximum allowed length or by showing a clear warning that the limit has been exceeded.",
+          "submittedDate": "2026-11-19",
+          "by": "Bhavin Patel (Milwaukee)",
+          "actionItem": "Agree on the preferred behaviour (auto-truncate or warning message). Implement it in the Sampark notes field for both typed and pasted text, show the remaining or exceeded character count, and validate the limit on the server as well. QA to test paste, type and edit scenarios.",
+          "approvalStatus": "Pending Review - Under Queries discussion with Stakeholders",
+          "impact": "To be assessed"
+        },
+        {
+          "id": "CR-04",
+          "title": "Change Request - MySeva App: Actual Sampark Visit Date Selection",
+          "description": "Users can set appointment reminders, but there is no option to select or update the actual Sampark visit date. Add a date picker so users can enter the actual visit date, which is especially useful when documenting visits completed on an earlier date.",
+          "submittedDate": "2026-11-19",
+          "by": "Bhavin Patel (Milwaukee)",
+          "actionItem": "Add an actual visit date field with a date picker to the Sampark entry, defaulting to today and allowing past dates (no future dates). Store the date with the Sampark record and use it in dashboards and reports in place of the submission date where relevant.",
+          "approvalStatus": "Pending Review - Under Queries discussion with Stakeholders",
+          "impact": "To be assessed"
+        },
+        {
+          "id": "CR-05",
+          "title": "Change Request - MySeva App: Review of the \"Done Sampark\" Button",
+          "description": "The purpose of the \"Done Sampark\" button is unclear to many users and may not be necessary. Many Haribhaktos, including youths, complete and submit their reports without using it. Evaluate whether the button is still required or whether the workflow can be simplified.",
+          "submittedDate": "2026-11-19",
+          "by": "Bhavin Patel (Milwaukee)",
+          "actionItem": "Review the Done Sampark workflow with stakeholders and decide whether to keep, rename/clarify, or remove the button, or mark Sampark as done automatically on report submission. Note that the Done Sampark gate is used by CR-02 (blocks removal and reassignment of completed families), so any change must keep that rule working.",
+          "approvalStatus": "Pending Review - Under Queries discussion with Stakeholders",
+          "impact": "To be assessed"
+        },
+        {
+          "id": "CR-06",
+          "title": "Change Request - MySeva App: Stop Pending Reminders After All Reports Are Submitted (Nice to Have)",
+          "description": "Once all assigned reports have been submitted, users continue to receive pending reminders. Automatically stop reminders once all required reports have been completed.",
+          "submittedDate": "2026-11-19",
+          "by": "Bhavin Patel (Milwaukee)",
+          "actionItem": "Update the reminder logic to check each user's outstanding reports before sending, and stop pending reminders once every assigned report is submitted. Resume reminders if new families or reports are assigned later. Marked Nice to Have.",
+          "approvalStatus": "Pending Review - Under Queries discussion with Stakeholders",
+          "impact": "To be assessed"
+        },
+        {
+          "id": "CR-07",
+          "title": "Change Request - MySeva App: Visibility of Spouse / Secondary Family Contact Numbers",
+          "description": "Other family members' contact details are currently hidden. Allow visibility of the spouse or a secondary contact number to help when the primary contact is unreachable.",
+          "submittedDate": "2026-11-19",
+          "by": "Bhavin Patel (Milwaukee)",
+          "actionItem": "Confirm with stakeholders which contacts may be shown (spouse and/or one secondary number) and to which roles, in line with data privacy rules. Show those numbers on the family detail in MySeva for the assigned Karyakar pair only.",
+          "approvalStatus": "Pending Review - Under Queries discussion with Stakeholders",
+          "impact": "To be assessed"
+        },
+        {
+          "id": "CR-08",
+          "title": "Change Request - MySeva App: Display Full BAPS ID With Prefix",
+          "description": "BAPS IDs are currently displayed without their alphabetical prefix (for example, 102100 is shown instead of AP102100). Display the full BAPS ID including the prefix.",
+          "submittedDate": "2026-11-19",
+          "by": "Bhavin Patel (Milwaukee)",
+          "actionItem": "Update every screen that shows a BAPS ID in MySeva (and check the Web dashboard and exports) to show the full ID with its prefix. Confirm whether the prefix is stored or needs to be fetched from MIS.",
+          "approvalStatus": "Pending Review - Under Queries discussion with Stakeholders",
+          "impact": "To be assessed"
+        },
+        {
+          "id": "CR-09",
+          "title": "Change Request - MySeva App: Choice of Apple Maps or Google Maps on iOS",
+          "description": "On iOS devices, tapping an address always opens Google Maps, even when Apple Maps is installed. Give users the option to choose between Apple Maps and Google Maps.",
+          "submittedDate": "2026-11-19",
+          "by": "Bhavin Patel (Milwaukee)",
+          "actionItem": "On iOS, when an address is tapped, show a choice of the installed map apps (Apple Maps, Google Maps), with an option to remember the user's preference. Fall back to Apple Maps when Google Maps is not installed.",
+          "approvalStatus": "Pending Review - Under Queries discussion with Stakeholders",
+          "impact": "To be assessed"
+        },
+        {
+          "id": "CR-10",
+          "title": "Change Request - Dashboard: Search by Assigned Family Name",
+          "description": "The dashboard currently supports searching for Karyakars only. Extend the search so users can also find records by assigned family name.",
+          "submittedDate": "2026-11-19",
+          "by": "Bhavin Patel (Milwaukee)",
+          "actionItem": "Extend dashboard search on Web and MySeva to match assigned family names and return the related Karyakar pair and project. Results must respect the location-based visibility rules from CR-01.",
+          "approvalStatus": "Pending Review - Under Queries discussion with Stakeholders",
+          "impact": "To be assessed"
+        },
+        {
+          "id": "CR-11",
+          "title": "Change Request - Dashboard: SNC and Zone Coordinator Record Visibility, and View-Only Person Information",
+          "description": "Reported dashboard concerns: (1) SNC role dashboard record visibility issues in both the Web and MySeva applications; (2) Zone Coordinator dashboard record visibility issues in both the Web and MySeva applications; (3) person information should be view-only and not editable through the dashboard.",
+          "submittedDate": "2026-11-19",
+          "by": "Bhavin Patel (Milwaukee)",
+          "actionItem": "Reproduce and fix the SNC and Zone Coordinator record visibility issues on Web and MySeva, checking them against the CR-01 location hierarchy and role-access rules. Make person information read-only on the dashboard, with edits allowed only through the proper screens. Regression-test all dashboard roles.",
+          "approvalStatus": "Pending Review - Under Queries discussion with Stakeholders",
+          "impact": "To be assessed"
+        },
+        {
+          "id": "CR-12",
+          "title": "Change Request - SPM Portal: Use the User's Local Time Zone for Project Notifications",
+          "description": "The system currently uses UTC instead of the user's local time zone. For example, an alert configured for 8:00 AM is delivered at 2:00 AM UTC. Use the user's local time zone for project notifications and alerts.",
+          "submittedDate": "2026-11-19",
+          "by": "Bhavin Patel (Milwaukee)",
+          "actionItem": "Capture the time zone when alerts are configured (user's machine or a project/location time zone), store times with that zone, and schedule notifications at the intended local time. Confirm the rule for projects spanning several time zones. Test across time zones and daylight-saving changes.",
+          "approvalStatus": "Pending Review - Under Queries discussion with Stakeholders",
+          "impact": "To be assessed"
+        },
+        {
+          "id": "CR-13",
+          "title": "Change Request - SPM Portal: Duration Selection Bug (P0)",
+          "description": "Users are currently required to select the end date before they can select the duration. This is an existing P0 bug; restore the expected workflow.",
+          "submittedDate": "2026-11-19",
+          "by": "Bhavin Patel (Milwaukee)",
+          "actionItem": "Fix the date/duration fields so duration can be chosen without first selecting an end date, with the end date calculated from start date and duration (and vice versa). Treat as P0 and regression-test project creation and editing.",
+          "approvalStatus": "Pending Review - Under Queries discussion with Stakeholders",
+          "impact": "To be assessed"
+        },
+        {
+          "id": "CR-14",
+          "title": "Change Request - SPM Portal: Visibility and Sync of MIS Alternate Contact Numbers",
+          "description": "When a primary contact number is missing in MIS, alternate phone numbers entered by DBC are not immediately visible in the SPM Portal. Even after MIS is updated, the number sometimes stays hidden until the View (eye) icon is selected. Improve synchronization and visibility of alternate contact information.",
+          "submittedDate": "2026-11-19",
+          "by": "Bhavin Patel (Milwaukee)",
+          "actionItem": "Investigate the MIS-to-SPM sync for alternate contact numbers and make updates appear promptly. Show the alternate number when the primary is missing, and review the masking (eye icon) behaviour so an available number is not hidden unexpectedly, within agreed privacy rules.",
+          "approvalStatus": "Pending Review - Under Queries discussion with Stakeholders",
+          "impact": "To be assessed"
+        },
+        {
+          "id": "CR-15",
+          "title": "Change Request - SPM Portal: Unpublish Project Capability",
+          "description": "A project may be published by mistake even after all validation checks are completed. Provide an option to unpublish a project and return it to draft.",
+          "submittedDate": "2026-11-19",
+          "by": "Bhavin Patel (Milwaukee)",
+          "actionItem": "Add an Unpublish action for authorised roles that returns a published project to draft, with a confirmation step and an audit entry. Define what happens to assignments, notifications and any Sampark data already recorded (for example, allow unpublish only before any Sampark is submitted).",
+          "approvalStatus": "Pending Review - Under Queries discussion with Stakeholders",
+          "impact": "To be assessed"
+        },
+        {
+          "id": "CR-16",
+          "title": "Change Request - SPM Portal: ASM Configuration-Based Access Group",
+          "description": "Create a dedicated access group that can manage project configuration settings and create and publish projects, but cannot search, add or modify families and Karyakars. This gives stronger separation of duties and access control.",
+          "submittedDate": "2026-11-19",
+          "by": "Bhavin Patel (Milwaukee)",
+          "actionItem": "Define the new role and its permissions with stakeholders, add it to the role/permission model, and enforce it in the UI and APIs (configuration, project create and publish allowed; family and Karyakar search, add and edit blocked). Test against existing roles.",
+          "approvalStatus": "Pending Review - Under Queries discussion with Stakeholders",
+          "impact": "To be assessed"
+        },
+        {
+          "id": "CR-17",
+          "title": "Change Request - SPM Portal: Report Download for Manual Sampark and Manual Feedback Entry",
+          "description": "Requested functionality: (1) downloadable reports containing family addresses for manual Sampark; (2) the ability to enter completed Sampark feedback manually afterwards; (3) manually completed Sampark activities should be reflected in the system and marked as completed.",
+          "submittedDate": "2026-11-19",
+          "by": "Bhavin Patel (Milwaukee)",
+          "actionItem": "Add a downloadable family address report for authorised roles, limited to the locations they can access (CR-01). Add a screen to enter completed Sampark feedback for a family after the visit, and mark those Samparks as completed so dashboards, counts and progress include them.",
+          "approvalStatus": "Pending Review - Under Queries discussion with Stakeholders",
+          "impact": "To be assessed"
         }
       ],
       "decisions": [],
