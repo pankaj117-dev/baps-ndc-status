@@ -5758,8 +5758,10 @@
         `<text x="${padL - 8}" y="${y}" text-anchor="end" dominant-baseline="middle" class="graph-axis-label">${pct}</text>`;
     }).join("");
 
+    // Update date, not the week's Monday (2026-11-23), to match the
+    // Week-over-week list.
     const xLabels = points.map((p, i) =>
-      `<text x="${p.x}" y="${height - 8}" text-anchor="middle" class="graph-axis-label">${fmtDateShort(p.w.weekOf || p.w.asOf)}</text>`
+      `<text x="${p.x}" y="${height - 8}" text-anchor="middle" class="graph-axis-label">${fmtDateShort(p.w.asOf || p.w.weekOf)}</text>`
     ).join("");
 
     const latestColor = lineColor || STATUS_COLOR[weeks[weeks.length - 1].status] || "var(--accent)";
