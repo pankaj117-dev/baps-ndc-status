@@ -50,22 +50,6 @@
     "status": "open"
   },
   {
-    "id": "note-6",
-    "projectId": "mymandir",
-    "text": "Milestone 1 shared on UAT with stakeholders on 27 Oct 2026; first follow-up taken with stakeholders on 2 Nov 2026 for UAT feedback.",
-    "raisedBy": "Aniket",
-    "createdAt": "2026-11-02T00:00:00Z",
-    "status": "open"
-  },
-  {
-    "id": "note-7",
-    "projectId": "mymandir",
-    "text": "Follow-up taken on 16 Nov 2026 for sign-off on Milestone 1.",
-    "raisedBy": "Aniket",
-    "createdAt": "2026-11-16T00:00:00Z",
-    "status": "open"
-  },
-  {
     "id": "note-8",
     "projectId": "gms",
     "text": "NC27 email confirmations (e.g. pay-registration_confirmation_email) are going out of GMS as campaigns (one campaign, audience of 1 and its own contact list per email) instead of transactional messages. NC27 push notifications already use transactional messages correctly. Asked myBKY team to switch email confirmations to transactional messages before their next release. ETA: TBD.",

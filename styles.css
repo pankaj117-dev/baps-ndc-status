@@ -2601,6 +2601,7 @@ table.deps-drill-table th {
 .pill-red { background: var(--red-bg); color: var(--red); }
 .pill-black { background: var(--black-bg); color: var(--black); }
 .pill-completed { background: var(--accent-soft); color: var(--accent); }
+.pill-inprogress { background: var(--amber-bg); color: var(--amber); }
 
 .card-owner {
   font-size: 12px;
