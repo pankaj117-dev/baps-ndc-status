@@ -1656,17 +1656,15 @@
       ],
       "sprintStatus": {
         "completed": [
-          "Milestone 2 delivered on UAT on 6 Nov 2026",
-          "Received approval on Milestone 1 on 17 Nov 2026",
-          "Most of the bugs resolved by the team on 17 Nov 2026"
+          "Milestone 2 bugs resolved, deployed on UAT and Sameep informed on 20 Nov 2026",
+          "VAPT of the web version completed by the VAPT team"
         ],
         "inProgress": [
-          "Received Milestone 2 feedback with bugs; the team is working on them",
-          "Milestone 2 feedback included some enhancements; we are working on those",
-          "VAPT of the web version is in progress"
+          "Restructure Teams user story is in progress",
+          "Development team is checking the VAPT report for web"
         ],
         "nextPlan": [
-          "Share the list of enhancements with effort estimates with Sameep",
+          "Complete the Restructure Teams story and deploy it on UAT",
           "VAPT on iOS and Android will start"
         ]
       },
