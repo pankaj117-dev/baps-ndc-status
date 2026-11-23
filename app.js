@@ -6920,7 +6920,9 @@
             role: "button",
           },
           [
-            el("div", { class: "changelog-date" }, ["Week of " + fmtDate(cur.weekOf || cur.asOf)]),
+            // The date the update was logged (2026-11-23, myMandir 1B), not
+            // the Monday of its week; rows are still one per week.
+            el("div", { class: "changelog-date", title: "Week of " + fmtDate(cur.weekOf || cur.asOf) }, [fmtDate(cur.asOf)]),
             el("div", { class: "changelog-body" }, bodyChildren),
           ]
         );
