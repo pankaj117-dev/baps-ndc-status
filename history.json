@@ -23477,24 +23477,21 @@
         "id": "mybky-phase2",
         "name": "myBKY 2A",
         "status": "green",
-        "progress": 60,
+        "progress": 64,
         "stage": "Development",
-        "delayDays": 25,
-        "delayNote": "Requirements were planned to close 02-Oct and closed 06-Nov: 25 working days late (Mon-Fri). TDD was planned to close 23-Oct and closed 09-Nov (11 working days). Go-live is still 28-Jan. Week of Nov 17: Requirement and TDD 100% complete, Development & QA 56%, overall 60%.",
-        "statusChangeReason": "PM review 17-Nov-2026: project not at risk; open RGC QA dependency (DEP-102) resolved.",
-        "phase": "Requirement 100% | TDD 100% | Dev & QA 56%",
+        "delayDays": 11,
+        "delayNote": "TDD closed 09-Nov vs plan 23-Oct: 11 working days late (Mon\u2013Fri). Requirements closed 06-Nov vs plan 02-Oct (25 working days). Go-live unchanged: 28-Jan-2027.",
+        "statusChangeReason": "No change in status.",
+        "phase": "Requirement 100% | TDD 100% | Dev & QA 68%",
         "nextMilestone": {
           "name": "Development & QA completion",
           "date": "2026-12-18"
         },
         "goLive": "2027-01-28",
         "originalGoLive": "2027-01-28",
-        "delayImpact": "Phase 1 CRs and bugs took ~17.5 working days (Change Request log): development can still complete by 18-Dec, but completion of testing (QA sign-off) is at risk.",
+        "delayImpact": "Phase 1 CRs and bugs (~17.5 working days) and Accommodation user-story gaps: development can finish by 18-Dec, but QA sign-off is at risk.",
         "delayMitigation": [
-          "Scope reduction approved 19-Oct: Bulk Update of Transport Details and Guest Registration removed from Phase 2A",
-          "Phase 1 bugs and CRs implemented (18-Oct); production fixes deployed 25-Oct",
-          "Chaperon requirements added to FRD on priority",
-          "Fixing Response form demo defects, GMS user story gaps and Accommodation requirement gaps"
+          "Start UAT with the completed modules; release the remaining modules later"
         ],
         "delayTradeoffs": "19-Oct: Aksharbhai approved removing Bulk Update of Transport Details by Karyakars and Guest Registration from Phase 2A to compensate CR effort.",
         "timeSavedDays": 0,
@@ -23516,14 +23513,14 @@
           {
             "id": "RISK-103",
             "text": "Resource overlap with Phase 1: 2 QAs and 1 developer on Phase 1; Kishanbhai partly on Phase 1 support",
-            "mitigation": "Prioritize Phase 1 closure and optimize resource allocation for Phase 2A",
-            "resolved": false
+            "mitigation": "Closed (PM, 23-Nov): Phase 1 closed 06-Nov; resources back on Phase 2A.",
+            "resolved": true
           },
           {
             "id": "RISK-104",
             "text": "Kishanbhai unavailability impacting Phase 2A requirement and development work",
-            "mitigation": "Confirm availability, assess impact and plan alternate support",
-            "resolved": false
+            "mitigation": "Closed (PM, 23-Nov): Kishanbhai back on Phase 2A.",
+            "resolved": true
           },
           {
             "id": "RISK-105",
@@ -23534,14 +23531,14 @@
           {
             "id": "RISK-106",
             "text": "Delay in Group Lead and Chaperon UI/UX",
-            "mitigation": "Expedite UI/UX completion and align with development",
-            "resolved": false
+            "mitigation": "Closed (PM, 23-Nov): GL & Chaperon FRD / UI/UX approved 05-Nov.",
+            "resolved": true
           },
           {
             "id": "RISK-107",
             "text": "Kishanbhai occupied with NC27 activities; TDD reviews and requirement finalization for his modules pending",
-            "mitigation": "Confirm open issues, assign owners, track actions",
-            "resolved": false
+            "mitigation": "Closed (PM, 23-Nov): Kishanbhai back; TDD 100% complete.",
+            "resolved": true
           },
           {
             "id": "RISK-108",
@@ -23558,8 +23555,8 @@
           {
             "id": "RISK-110",
             "text": "Accommodation TDD review pending Kishanbhai",
-            "mitigation": "Start development on TDDs by senior developer; get review when available",
-            "resolved": false
+            "mitigation": "Closed (PM, 23-Nov): TDD 100% complete.",
+            "resolved": true
           },
           {
             "id": "RISK-111",
@@ -23570,49 +23567,49 @@
           {
             "id": "RISK-112",
             "text": "Transportation mobile and Response form development delay (requirement gaps, Kishanbhai on NC27, production bugs, 2 new CRs with 5 user stories)",
-            "mitigation": "Prioritize Phase 1 bugs and CRs; reduce scope (My Team removed; Guest Registration pending)",
-            "resolved": false
+            "mitigation": "Closed (PM, 23-Nov): Transportation and Response form development completed 26-Oct.",
+            "resolved": true
           },
           {
             "id": "RISK-113",
             "text": "Phase 1 defects and CRs may impact the Phase 2A timeline",
-            "mitigation": "Balance resources between Phase 1 defects/CRs and Phase 2A development",
-            "resolved": false
+            "mitigation": "Closed (RAID): team spent ~16 working days on Phase 1 after the 1-Oct release; Kishanbhai until 28-Oct.",
+            "resolved": true
           },
           {
             "id": "RISK-114",
             "text": "Incomplete Chaperon requirements may delay requirements and TDD closure",
-            "mitigation": "Validate Chaperon requirements against scope and expedite sign-off",
-            "resolved": false
+            "mitigation": "Closed (RAID): Chaperon requirement finalized 30-Oct.",
+            "resolved": true
           },
           {
             "id": "RISK-115",
             "text": "Event Management TDD completion delay (Kishanbhai on Phase 1; user stories pending)",
-            "mitigation": "Complete pending user stories and prioritize Kishanbhai for TDD",
-            "resolved": false
+            "mitigation": "Closed (RAID): TDDs prepared 09-Nov (plan 23-Oct).",
+            "resolved": true
           },
           {
             "id": "RISK-116",
             "text": "Transportation development delay: new edge cases need one extra screen and user story updates",
-            "mitigation": "Finalize edge cases, design the extra screen, update user stories",
-            "resolved": false
+            "mitigation": "Closed (RAID): development completed 26-Oct (plan 02-Oct).",
+            "resolved": true
           },
           {
             "id": "RISK-117",
             "text": "Response form development delay: defects found in development demo",
-            "mitigation": "Analyze and fix defects, validate in a follow-up demo",
-            "resolved": false
+            "mitigation": "Closed (RAID): development completed 26-Oct (plan 02-Oct).",
+            "resolved": true
           },
           {
             "id": "RISK-118",
             "text": "GMS development delay: user story gaps need development rework",
-            "mitigation": "Close gaps, finalize user stories, complete rework",
-            "resolved": false
+            "mitigation": "Closed (RAID): development completed 20-Nov (plan 16-Oct); 2 days against the revised date.",
+            "resolved": true
           },
           {
             "id": "RISK-119",
-            "text": "Accommodation development delay: requirement gaps from user story grooming",
-            "mitigation": "Close requirement gaps, update user stories, share with developers",
+            "text": "Development delay \u2013 Accommodation: requirement gaps found in the user stories led to rework in Accommodation and also delayed GL & Chaperon and Event Management development.",
+            "mitigation": "Close the Accommodation gaps and rework on priority, realign developers and re-plan GL & Chaperon and Event Management development, code review and QA dates \u2014 Abhishekbhai.",
             "resolved": false
           },
           {
@@ -23620,13 +23617,45 @@
             "text": "If RGC does not provide the 1.5 additional QAs, functional / QA sign-off by 18-Dec-2026 is at risk: 77 QA person-days needed vs 40 available (70 with the extra 1.5 QAs)",
             "mitigation": "Closed (17-Nov-2026): DEP-102 resolved; RGC allocated 1 QA against the 1.5 requested; closed by PM",
             "resolved": true
+          },
+          {
+            "id": "RISK-121",
+            "text": "UI/UX designer not onboarded for the mobile app (raised 14-Jul).",
+            "mitigation": "Closed (RAID): designer onboarded 06-Aug.",
+            "resolved": true
+          },
+          {
+            "id": "RISK-122",
+            "text": "BRD requirements were generic and needed NC27-specific clarification (raised 30-Jul).",
+            "mitigation": "Closed (RAID): requirement traceability matrix prepared.",
+            "resolved": true
+          },
+          {
+            "id": "RISK-123",
+            "text": "New scenarios raised during the wireframe / FRD walkthrough (raised 30-Jul).",
+            "mitigation": "Closed (RAID): go-live extension approved (DEC-101).",
+            "resolved": true
+          },
+          {
+            "id": "RISK-124",
+            "text": "New scenarios found during UI/UX design, not in the signed-off FRD (raised 30-Jul).",
+            "mitigation": "Closed (RAID): go-live extension approved (DEC-101).",
+            "resolved": true
+          },
+          {
+            "id": "RISK-125",
+            "text": "Business reviews delayed: business team away 13\u201316 Aug for the NC27 Karyakar Shibir (raised 04-Aug).",
+            "mitigation": "Closed (RAID): go-live extension approved (DEC-101).",
+            "resolved": true
+          },
+          {
+            "id": "RISK-126",
+            "text": "Requirement sign-off delayed by repeated iterations and business team unavailability 13\u201316 Aug (raised 10-Aug).",
+            "mitigation": "Closed (RAID): go-live extension approved (DEC-101).",
+            "resolved": true
           }
         ],
-        "fastFollowItems": [
-          "My Team",
-          "Guest Registration",
-          "Bulk Update of Transport Details"
-        ],
+        "fastFollowItems": [],
         "escalations": [],
         "dependencies": [
           {
@@ -23668,6 +23697,16 @@
             "priority": "High",
             "escalated": false,
             "resolved": true
+          },
+          {
+            "id": "DEP-105",
+            "text": "MIS team to replicate MIS production data on MIS UAT \u2014 Ketulbhai",
+            "team": "MIS",
+            "mitigation": "",
+            "dueBy": "",
+            "priority": "High",
+            "escalated": false,
+            "resolved": false
           }
         ],
         "stagePlan": {
@@ -23722,19 +23761,18 @@
         },
         "sprintStatus": {
           "completed": [
-            "Requirement, UI/UX and TDD: all 7 modules (Transportation, Accommodation, GL and Chaperon, GMS, Event Management, Form, Ad hoc user stories)",
-            "Development: Transportation, Form",
-            "QA: Transportation, Form"
+            "Development: GMS, Ad hoc user stories",
+            "QA test cases: GMS, Accommodation"
           ],
           "inProgress": [
-            "Development: GMS, Accommodation, GL and Chaperon, Event Management, Ad hoc user stories",
-            "QA test-case writing: Accommodation"
+            "Development: Accommodation, GL & Chaperon, Event Management",
+            "QA test cases: GL & Chaperon, Event Management",
+            "QA testing: GMS"
           ],
           "nextPlan": [
-            "Complete development for GMS, Accommodation, GL and Chaperon, Event Management, Ad hoc user stories",
-            "Complete Accommodation test cases and start QA",
-            "Start QA for GMS, GL and Chaperon, Event Management, Ad hoc user stories",
-            "Secure the 1.5 additional QAs from RGC (DEP-102) for the QA sign-off timeline"
+            "Finish development: Accommodation, GL & Chaperon, Event Management",
+            "Finish test cases: GL & Chaperon, Event Management",
+            "Start QA: Accommodation, Event Management, Ad hoc user stories"
           ]
         },
         "milestones": [
@@ -23754,7 +23792,7 @@
             "name": "Development & QA",
             "date": "2026-12-18",
             "status": "amber",
-            "progress": 56
+            "progress": 68
           }
         ]
       },
