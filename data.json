@@ -1,6 +1,6 @@
 {
   "asOf": "2026-11-23",
-  "lastUpdated": "2026-11-23T09:24:25.720067Z",
+  "lastUpdated": "2026-11-23T10:57:45.606337Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -522,49 +522,36 @@
       "dependencies": [
         {
           "id": "DEP-106",
-          "text": "Business decision on the Events feature. REQ feasibility in progress — ETA TBD — Purvesh Patel",
+          "text": "Business decision on the Events feature. REQ feasibility in progress \u2014 ETA TBD \u2014 Purvesh Patel",
           "team": "RGC",
           "mitigation": "Events excluded from the 27-Dec plan; will need its own timeline once decided. May impact the new overall Go-Live.",
           "dueBy": "",
           "priority": "Medium",
           "escalated": true,
           "resolved": false
-        },
-        {
-          "id": "DEP-107",
-          "text": "PDF generation — new approach; TDD in WIP",
-          "team": "DEV",
-          "mitigation": "TDD for the new PDF generation approach in progress",
-          "dueBy": "",
-          "priority": "Medium",
-          "escalated": false,
-          "resolved": false
         }
       ],
       "sprintStatus": {
         "completed": [
-          "EMM-8754 Vendor Creation and Management Enhancements — Dev done and deployed to QA",
-          "EMM-8919 UAT Feedback 1.33 — Vendor Review screen accordions expanded by default — Dev done (QA deployment Friday)",
-          "EMM-539.651 Country shown as changed when it remains the same — Dev done (QA deployment Friday)"
+          "EMM-8754 Vendor Creation and Management Enhancements \u2014 QA WIP",
+          "EMM-8523 Canada Expenses submission/approval modifications \u2014 Dev Done"
         ],
         "inProgress": [
           "Canada Expenses submission/approval modifications",
           "Canada Mandir Credit Cards Management",
           "Canada Mandir Credit Card bulk upload and Expenses"
         ],
-        "nextPlan": []
+        "nextPlan": [
+          "EMM-8523 Canada Expenses submission/approval modifications \u2014 QA WIP",
+          "EMM-8952 : Display Vendor Name in Expense Report View for Rejected Vendors \u2014 P0 issue and hotfix on production",
+          "EMM-8655 Mandir Credit Card Management \u2014 Dev WIP"
+        ]
       },
       "risks": [
         {
           "id": "RISK-106",
-          "text": "Events feature — business decision still TBD (RGC/Purvesh Patel, Medium); excluded from 27-Dec plan",
+          "text": "Events feature \u2014 business decision still TBD (RGC/Purvesh Patel, Medium); excluded from 27-Dec plan",
           "mitigation": "Escalated to leadership; Events to get its own timeline once decided",
-          "resolved": false
-        },
-        {
-          "id": "RISK-107",
-          "text": "Multi-operations policies — testing and fixes in progress",
-          "mitigation": "Team is testing and preparing the gap analysis with stakeholders to create the TDD before finalizing code changes",
           "resolved": false
         }
       ],
@@ -575,7 +562,7 @@
       "fastFollowItems": [
         "Canada taxation and expense reports requirements",
         "Vendor management enhancements approval from stakeholders",
-        "Events functionality — business decision ETA TBD"
+        "Events functionality \u2014 business decision ETA TBD"
       ],
       "escalations": [],
       "timeSavedDays": 0,
@@ -601,12 +588,6 @@
           "latestStart": "2026-09-02",
           "initialEnd": "2026-10-28",
           "latestEnd": "2026-10-28"
-        },
-        "Dev Post": {
-          "initialStart": "2026-11-09",
-          "latestStart": "2026-11-09",
-          "initialEnd": "2026-12-14",
-          "latestEnd": "2026-12-14"
         },
         "UAT Post": {
           "initialStart": "2026-12-16",
@@ -647,7 +628,7 @@
           "label": "REQ (Post Go-Live)"
         },
         {
-          "stage": "Dev Post",
+          "stage": "Development",
           "label": "Dev (Post Go-Live)"
         },
         {
@@ -667,14 +648,30 @@
       "changeRequests": [],
       "decisions": [],
       "goLiveChecklist": [],
-      "features": [],
+      "features": [
+        {
+          "sprint": "Production",
+          "type": "Production bug",
+          "feature": "EMM-8952 : Display Vendor Name in Expense Report View for Rejected Vendors",
+          "status": "In Progress",
+          "notes": "P0 issue and hotfix on production, shared on 11/22/2026. Current status: Dev Done",
+          "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        }
+      ],
       "delayItemLog": [],
       "milestones": [],
       "raidLog": [],
       "scheduleScope": "Post Go-Live, excl. Events",
       "stageLabel": "Dev (Post Go-Live)",
       "rebaselinedOn": "2026-11-17",
-      "usePmStatus": true
+      "usePmStatus": true,
+      "fastFollowDone": [
+        "Canada taxation and expense reports requirements",
+        "Vendor management enhancements approval from stakeholders",
+        "Events functionality \u2014 business decision ETA TBD"
+      ]
     },
     {
       "id": "mybky-phase1",
@@ -1633,7 +1630,7 @@
       "owner": "Aniket Udgaonkar",
       "status": "green",
       "progress": 90,
-      "phase": "1 user story (Restructure Teams) in development · VAPT in progress",
+      "phase": "1 user story (Restructure Teams) in development \u00b7 VAPT in progress",
       "nextMilestone": {
         "name": "Get UAT ready for the RAM meeting: deliver the Restructure Teams story to UAT and get sign-off from Sameep",
         "date": null,
@@ -1642,11 +1639,11 @@
       "goLive": null,
       "originalGoLive": "2026-11-23",
       "delayDays": 0,
-      "delayNote": "Milestone 1: TDD end moved 22-Sep → 07-Oct (11 weekdays). UAT end moved 26-Oct → 29-Oct (3 weekdays). Milestone 2: Development & QA end moved earlier, 15-Nov → 05-Nov (7 weekdays saved); UAT completed 06-Nov, earlier than its 20-Nov plan. VAPT (web) 16-Nov → 20-Nov. Go-live is TBD.",
+      "delayNote": "Milestone 1: TDD end moved 22-Sep \u2192 07-Oct (11 weekdays). UAT end moved 26-Oct \u2192 29-Oct (3 weekdays). Milestone 2: Development & QA end moved earlier, 15-Nov \u2192 05-Nov (7 weekdays saved); UAT completed 06-Nov, earlier than its 20-Nov plan. VAPT (web) 16-Nov \u2192 20-Nov. Go-live is TBD.",
       "dependencies": [
         {
           "id": "DEP-103",
-          "text": "VAPT dates required for iOS and Android (web VAPT running 16 Nov – 20 Nov 2026).",
+          "text": "VAPT dates required for iOS and Android (web VAPT running 16 Nov \u2013 20 Nov 2026).",
           "team": "",
           "mitigation": "Mobile (iOS and Android) VAPT can't be scheduled until these dates are confirmed.",
           "dueBy": "",
@@ -1739,16 +1736,46 @@
         }
       },
       "stageDateOrder": [
-        { "stage": "Requirements", "label": "Requirement (Milestone 1)" },
-        { "stage": "Tech. Design", "label": "TDD (Milestone 1)" },
-        { "stage": "Development", "label": "Development & QA (Milestone 1)" },
-        { "stage": "UAT", "label": "UAT (Milestone 1)" },
-        { "stage": "Req M2", "label": "Requirement (Milestone 2)" },
-        { "stage": "TDD M2", "label": "TDD (Milestone 2)" },
-        { "stage": "Dev M2", "label": "Development & QA (Milestone 2)" },
-        { "stage": "UAT M2", "label": "UAT (Milestone 2)" },
-        { "stage": "VAPT", "label": "VAPT (Web)" },
-        { "stage": "Rollout", "label": "Go-Live" }
+        {
+          "stage": "Requirements",
+          "label": "Requirement (Milestone 1)"
+        },
+        {
+          "stage": "Tech. Design",
+          "label": "TDD (Milestone 1)"
+        },
+        {
+          "stage": "Development",
+          "label": "Development & QA (Milestone 1)"
+        },
+        {
+          "stage": "UAT",
+          "label": "UAT (Milestone 1)"
+        },
+        {
+          "stage": "Req M2",
+          "label": "Requirement (Milestone 2)"
+        },
+        {
+          "stage": "TDD M2",
+          "label": "TDD (Milestone 2)"
+        },
+        {
+          "stage": "Dev M2",
+          "label": "Development & QA (Milestone 2)"
+        },
+        {
+          "stage": "UAT M2",
+          "label": "UAT (Milestone 2)"
+        },
+        {
+          "stage": "VAPT",
+          "label": "VAPT (Web)"
+        },
+        {
+          "stage": "Rollout",
+          "label": "Go-Live"
+        }
       ],
       "riskSeq": 103,
       "changeRequests": [
@@ -1813,7 +1840,7 @@
       "goLive": "2026-10-12",
       "originalGoLive": "2026-10-12",
       "delayDays": 0,
-      "delayNote": "Overall: launch go-live held 12-Oct, so no project delay. Requirement +3, TDD +6, Development +7, QA +7, UAT +4 weekdays. Hotfix: Development end moved 02-Nov → 06-Nov; QA end moved 23-Nov → 27-Nov (Diwali vacation + QA on leave till 22-Nov); hotfix release moved 30-Nov → 06-Dec (+6 days).",
+      "delayNote": "Overall: launch go-live held 12-Oct, so no project delay. Requirement +3, TDD +6, Development +7, QA +7, UAT +4 weekdays. Hotfix: Development end moved 02-Nov \u2192 06-Nov; QA end moved 23-Nov \u2192 27-Nov (Diwali vacation + QA on leave till 22-Nov); hotfix release moved 30-Nov \u2192 06-Dec (+6 days).",
       "dependencies": [
         {
           "id": "DEP-101",
@@ -1957,20 +1984,62 @@
         }
       },
       "stageDateOrder": [
-        { "stage": "Requirements", "label": "Requirement" },
-        { "stage": "Tech. Design", "label": "TDD" },
-        { "stage": "Development", "label": "Development" },
-        { "stage": "QA", "label": "QA" },
-        { "stage": "UAT", "label": "UAT" },
-        { "stage": "VAPT", "label": "VAPT" },
-        { "stage": "Rollout", "label": "Go-Live" },
-        { "stage": "Hypercare", "label": "Hypercare" },
-        { "stage": "Pilot", "label": "Pilot (Selected Centers)" },
-        { "stage": "Dev Hotfix", "label": "Development (Hotfix)" },
-        { "stage": "QA Hotfix", "label": "QA (Hotfix)" },
-        { "stage": "UAT Hotfix", "label": "UAT (Hotfix)" },
-        { "stage": "VAPT Hotfix", "label": "VAPT & Load Testing (Hotfix)" },
-        { "stage": "Go-Live Hotfix", "label": "Hotfix release" }
+        {
+          "stage": "Requirements",
+          "label": "Requirement"
+        },
+        {
+          "stage": "Tech. Design",
+          "label": "TDD"
+        },
+        {
+          "stage": "Development",
+          "label": "Development"
+        },
+        {
+          "stage": "QA",
+          "label": "QA"
+        },
+        {
+          "stage": "UAT",
+          "label": "UAT"
+        },
+        {
+          "stage": "VAPT",
+          "label": "VAPT"
+        },
+        {
+          "stage": "Rollout",
+          "label": "Go-Live"
+        },
+        {
+          "stage": "Hypercare",
+          "label": "Hypercare"
+        },
+        {
+          "stage": "Pilot",
+          "label": "Pilot (Selected Centers)"
+        },
+        {
+          "stage": "Dev Hotfix",
+          "label": "Development (Hotfix)"
+        },
+        {
+          "stage": "QA Hotfix",
+          "label": "QA (Hotfix)"
+        },
+        {
+          "stage": "UAT Hotfix",
+          "label": "UAT (Hotfix)"
+        },
+        {
+          "stage": "VAPT Hotfix",
+          "label": "VAPT & Load Testing (Hotfix)"
+        },
+        {
+          "stage": "Go-Live Hotfix",
+          "label": "Hotfix release"
+        }
       ],
       "riskSeq": 101,
       "changeRequests": [
@@ -2378,7 +2447,7 @@
       "goLive": null,
       "originalGoLive": "2026-11-06",
       "delayDays": 0,
-      "delayNote": "Stage Dates sheet: Development & QA end is 06-Nov (Satsangi; Karyakar 05-Nov; earlier revision 26-Oct). UAT end is 13-Nov (Satsangi; Karyakar 06-Nov; earlier revision 29-Oct). Hypercare start moved to 01-Dec. VAPT revised start is 29-Oct but the revised end is TBD, so that stage is still plotted on 15-Oct–21-Oct. Load revised end and Go-Live revised dates are TBD.",
+      "delayNote": "Stage Dates sheet: Development & QA end is 06-Nov (Satsangi; Karyakar 05-Nov; earlier revision 26-Oct). UAT end is 13-Nov (Satsangi; Karyakar 06-Nov; earlier revision 29-Oct). Hypercare start moved to 01-Dec. VAPT revised start is 29-Oct but the revised end is TBD, so that stage is still plotted on 15-Oct\u201321-Oct. Load revised end and Go-Live revised dates are TBD.",
       "dependencies": [
         {
           "id": "DEP-104",
@@ -2502,16 +2571,46 @@
         }
       },
       "stageDateOrder": [
-        { "stage": "Requirements", "label": "Requirement" },
-        { "stage": "Tech. Design", "label": "TDD" },
-        { "stage": "Dev Karyakar", "label": "Development (Karyakar)" },
-        { "stage": "Dev Satsangi", "label": "Development (Satsangi)" },
-        { "stage": "Development", "label": "QA" },
-        { "stage": "UAT", "label": "UAT" },
-        { "stage": "VAPT", "label": "VAPT" },
-        { "stage": "Load", "label": "Load" },
-        { "stage": "Rollout", "label": "Go-Live" },
-        { "stage": "Hypercare", "label": "Hypercare" }
+        {
+          "stage": "Requirements",
+          "label": "Requirement"
+        },
+        {
+          "stage": "Tech. Design",
+          "label": "TDD"
+        },
+        {
+          "stage": "Dev Karyakar",
+          "label": "Development (Karyakar)"
+        },
+        {
+          "stage": "Dev Satsangi",
+          "label": "Development (Satsangi)"
+        },
+        {
+          "stage": "Development",
+          "label": "QA"
+        },
+        {
+          "stage": "UAT",
+          "label": "UAT"
+        },
+        {
+          "stage": "VAPT",
+          "label": "VAPT"
+        },
+        {
+          "stage": "Load",
+          "label": "Load"
+        },
+        {
+          "stage": "Rollout",
+          "label": "Go-Live"
+        },
+        {
+          "stage": "Hypercare",
+          "label": "Hypercare"
+        }
       ],
       "riskSeq": 108,
       "changeRequests": [],
@@ -2533,7 +2632,7 @@
           "type": "QA",
           "feature": "Functional testing \u2013 Karyakar flow",
           "status": "Done",
-          "notes": "Planned 22 Oct – 28 Oct 2026; Karyakar testing completed",
+          "notes": "Planned 22 Oct \u2013 28 Oct 2026; Karyakar testing completed",
           "plannedDate": "2026-10-28",
           "actualDate": "",
           "delayReason": "Blockers and defects"
@@ -2596,7 +2695,7 @@
       "goLive": "2026-09-12",
       "originalGoLive": "2026-10-22",
       "delayDays": 0,
-      "delayNote": "Stage Dates sheet: TDD end moved 01-Oct → 29-Oct (20 weekdays). Load Testing, UAT, and VAPT ends moved 20-Oct → 28-Oct (6 weekdays). Go-Live end moved 22-Oct → 30-Oct (6 weekdays).",
+      "delayNote": "Stage Dates sheet: TDD end moved 01-Oct \u2192 29-Oct (20 weekdays). Load Testing, UAT, and VAPT ends moved 20-Oct \u2192 28-Oct (6 weekdays). Go-Live end moved 22-Oct \u2192 30-Oct (6 weekdays).",
       "dependencies": [
         {
           "id": "DEP-101",
@@ -2659,8 +2758,14 @@
         }
       },
       "stageDateOrder": [
-        { "stage": "Rollout", "label": "Go-Live" },
-        { "stage": "Hypercare", "label": "Hypercare" }
+        {
+          "stage": "Rollout",
+          "label": "Go-Live"
+        },
+        {
+          "stage": "Hypercare",
+          "label": "Hypercare"
+        }
       ],
       "changeRequests": [],
       "decisions": [],
@@ -2677,7 +2782,7 @@
       "status": "green",
       "progress": 88,
       "progressHistoryNote": "Worked out from stage end dates, not reported: each of the 8 stages counts as one-eighth, and a week's % is the share of stages finished by then.",
-      "phase": "Hypercare 01-Nov–25-Nov. Go-live 30-Oct, was 22-Oct.",
+      "phase": "Hypercare 01-Nov\u201325-Nov. Go-live 30-Oct, was 22-Oct.",
       "nextMilestone": {
         "name": "Hypercare completion",
         "date": "2026-11-25"
@@ -2685,7 +2790,7 @@
       "goLive": "2026-10-30",
       "originalGoLive": "2026-10-22",
       "delayDays": 0,
-      "delayNote": "TDD end moved 01-Oct → 29-Oct (20 days). Load Testing, UAT and VAPT ends moved 20-Oct → 28-Oct (6 days). Go-Live end moved 22-Oct → 30-Oct (6 days).",
+      "delayNote": "TDD end moved 01-Oct \u2192 29-Oct (20 days). Load Testing, UAT and VAPT ends moved 20-Oct \u2192 28-Oct (6 days). Go-Live end moved 22-Oct \u2192 30-Oct (6 days).",
       "dependencies": [],
       "sprintStatus": {
         "completed": [],
@@ -2748,14 +2853,38 @@
         }
       },
       "stageDateOrder": [
-        { "stage": "Requirements", "label": "Requirement" },
-        { "stage": "Tech. Design", "label": "TDD" },
-        { "stage": "Development", "label": "Development & QA" },
-        { "stage": "Load", "label": "Load Testing (QA)" },
-        { "stage": "UAT", "label": "UAT" },
-        { "stage": "VAPT", "label": "VAPT" },
-        { "stage": "Rollout", "label": "Go-Live" },
-        { "stage": "Hypercare", "label": "Hypercare" }
+        {
+          "stage": "Requirements",
+          "label": "Requirement"
+        },
+        {
+          "stage": "Tech. Design",
+          "label": "TDD"
+        },
+        {
+          "stage": "Development",
+          "label": "Development & QA"
+        },
+        {
+          "stage": "Load",
+          "label": "Load Testing (QA)"
+        },
+        {
+          "stage": "UAT",
+          "label": "UAT"
+        },
+        {
+          "stage": "VAPT",
+          "label": "VAPT"
+        },
+        {
+          "stage": "Rollout",
+          "label": "Go-Live"
+        },
+        {
+          "stage": "Hypercare",
+          "label": "Hypercare"
+        }
       ],
       "escalations": [],
       "timeSavedDays": 0,

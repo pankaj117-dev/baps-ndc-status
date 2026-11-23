@@ -2925,6 +2925,11 @@ table.deps-drill-table th {
   font-weight: 500;
 }
 
+.detail-block.fast-follow li.is-done {
+  color: var(--green);
+  font-weight: 600;
+}
+
 .detail-block.escalations {
   background: var(--red-bg);
   border: 1px solid #f0bcbc;

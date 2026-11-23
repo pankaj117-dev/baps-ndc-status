@@ -23187,12 +23187,6 @@
             "text": "Events feature \u2014 business decision still TBD (RGC/Purvesh Patel, Medium); excluded from 27-Dec plan",
             "mitigation": "Escalated to leadership; Events to get its own timeline once decided",
             "resolved": false
-          },
-          {
-            "id": "RISK-107",
-            "text": "Multi-operations policies \u2014 testing and fixes in progress",
-            "mitigation": "Team is testing and preparing the gap analysis with stakeholders to create the TDD before finalizing code changes",
-            "resolved": false
           }
         ],
         "fastFollowItems": [
@@ -23210,16 +23204,6 @@
             "dueBy": "",
             "priority": "Medium",
             "escalated": true,
-            "resolved": false
-          },
-          {
-            "id": "DEP-107",
-            "text": "PDF generation \u2014 new approach; TDD in WIP",
-            "team": "DEV",
-            "mitigation": "TDD for the new PDF generation approach in progress",
-            "dueBy": "",
-            "priority": "Medium",
-            "escalated": false,
             "resolved": false
           }
         ],
@@ -23275,16 +23259,19 @@
         },
         "sprintStatus": {
           "completed": [
-            "EMM-8754 Vendor Creation and Management Enhancements \u2014 Dev done and deployed to QA",
-            "EMM-8919 UAT Feedback 1.33 \u2014 Vendor Review screen accordions expanded by default \u2014 Dev done (QA deployment Friday)",
-            "EMM-539.651 Country shown as changed when it remains the same \u2014 Dev done (QA deployment Friday)"
+            "EMM-8754 Vendor Creation and Management Enhancements \u2014 QA WIP",
+            "EMM-8523 Canada Expenses submission/approval modifications \u2014 Dev Done"
           ],
           "inProgress": [
             "Canada Expenses submission/approval modifications",
             "Canada Mandir Credit Cards Management",
             "Canada Mandir Credit Card bulk upload and Expenses"
           ],
-          "nextPlan": []
+          "nextPlan": [
+            "EMM-8523 Canada Expenses submission/approval modifications \u2014 QA WIP",
+            "EMM-8952 : Display Vendor Name in Expense Report View for Rejected Vendors \u2014 P0 issue and hotfix on production",
+            "EMM-8655 Mandir Credit Card Management \u2014 Dev WIP"
+          ]
         },
         "milestones": []
       },

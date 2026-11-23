@@ -17,7 +17,9 @@
     "raisedBy": "S. Swami",
     "createdAt": "2026-09-09T02:41:29Z",
     "sourceIssue": "https://github.com/pankaj117-dev/baps-ndc-status/issues/1",
-    "status": "open"
+    "status": "resolved",
+    "resolvedBy": "Nitin Chaudhary",
+    "resolvedAt": "2026-11-23T00:00:00Z"
   },
   {
     "id": "note-3",
@@ -27,7 +29,9 @@
     "raisedBy": "Nitin",
     "createdAt": "2026-09-09T10:50:24Z",
     "sourceIssue": "https://github.com/pankaj117-dev/baps-ndc-status/issues/2",
-    "status": "open"
+    "status": "resolved",
+    "resolvedBy": "Nitin Chaudhary",
+    "resolvedAt": "2026-11-23T00:00:00Z"
   },
   {
     "id": "note-4",
@@ -37,7 +41,9 @@
     "raisedBy": "Nitin",
     "createdAt": "2026-10-27T09:03:39Z",
     "sourceIssue": "https://github.com/pankaj117-dev/baps-ndc-status/issues/11",
-    "status": "open"
+    "status": "resolved",
+    "resolvedBy": "Nitin Chaudhary",
+    "resolvedAt": "2026-11-23T00:00:00Z"
   },
   {
     "id": "note-5",
@@ -47,7 +53,9 @@
     "raisedBy": "Nitin",
     "createdAt": "2026-10-28T06:14:37Z",
     "sourceIssue": "https://github.com/pankaj117-dev/baps-ndc-status/issues/14",
-    "status": "open"
+    "status": "resolved",
+    "resolvedBy": "Nitin Chaudhary",
+    "resolvedAt": "2026-11-23T00:00:00Z"
   },
   {
     "id": "note-8",
