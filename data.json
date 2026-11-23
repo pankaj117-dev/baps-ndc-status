@@ -1636,7 +1636,8 @@
       "phase": "1 user story (Restructure Teams) in development · VAPT in progress",
       "nextMilestone": {
         "name": "Get UAT ready for the RAM meeting: deliver the Restructure Teams story to UAT and get sign-off from Sameep",
-        "date": null
+        "date": null,
+        "status": "in-progress"
       },
       "goLive": null,
       "originalGoLive": "2026-11-23",
@@ -1736,7 +1737,7 @@
           "initialStart": "2026-11-16",
           "latestStart": "2026-11-16",
           "initialEnd": "2026-11-20",
-          "latestEnd": "2026-11-20"
+          "latestEnd": "2026-11-27"
         }
       },
       "stageDateOrder": [
@@ -1752,7 +1753,18 @@
         { "stage": "Rollout", "label": "Go-Live" }
       ],
       "riskSeq": 103,
-      "changeRequests": [],
+      "changeRequests": [
+        {
+          "id": "CR-101",
+          "title": "Future scope items",
+          "description": "Received the future scope items from Sameep; he is adding more points to the future scope items sheet.",
+          "submittedDate": "2026-11-23",
+          "by": "Sameep",
+          "actionItem": "Wait for Sameep to finish adding points to the sheet, then review the items and estimate effort.",
+          "approvalStatus": "Pending",
+          "impact": "TBD"
+        }
+      ],
       "decisions": [],
       "goLiveChecklist": [],
       "features": [],
@@ -1768,7 +1780,7 @@
           "name": "Milestone 2 \u2013 Nov 2026 release",
           "date": "2026-11-06",
           "status": "green",
-          "progress": 100,
+          "progress": 90,
           "completedDate": "2026-11-06"
         },
         {
@@ -3024,15 +3036,17 @@
       "name": "myMandir 1C",
       "owner": "Aniket Udgaonkar",
       "status": "green",
-      "statusChangeReason": "",
+      "statusChangeReason": "NA",
       "progress": 15,
       "stage": "Tech. Design",
+      "stageLabel": "NA",
+      "hideStageTarget": true,
       "phase": "Split out from the myMandir umbrella this week, alongside myMandir 1B",
       "nextMilestone": {
         "name": "TDD",
         "date": "2026-09-22"
       },
-      "goLive": "2026-11-30",
+      "goLive": null,
       "originalGoLive": "2026-11-30",
       "delayDays": 0,
       "delayNote": "New this week \u2014 no prior snapshot as its own line item",

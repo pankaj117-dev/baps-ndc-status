@@ -274,7 +274,10 @@
   // card shows the label alone with no "— target" date after it.
   function currentStageFactNodes(p) {
     const stage = p.stageLabel || p.stage || "Unstaged";
-    const targetDate = p.stageComplete ? null : currentStageTargetDate(p);
+    // `hideStageTarget` (2026-11-23, myMandir 1C) drops the date for a stage
+    // shown as "NA" without marking the project finished (`stageComplete`
+    // also removes it from the Summary tab).
+    const targetDate = p.stageComplete || p.hideStageTarget ? null : currentStageTargetDate(p);
     return [
       el("dt", null, ["Current Stage"]),
       el("dd", { class: "phase-fact" }, [
@@ -6416,7 +6419,9 @@
       const sameDay = nm.date && allMilestones.find((m) => m.date === nm.date);
       if (sameDay) sameDay.name = nm.name;
       else if (!allMilestones.some((m) => m.name === nm.name) && (!nm.date || nm.date >= todayStr)) {
-        allMilestones.push({ name: nm.name, date: nm.date || null, target: !!nm.date });
+        // `nextMilestone.status: "in-progress"` (2026-11-23, myMandir 1B)
+        // puts an "In progress" pill on this row.
+        allMilestones.push({ name: nm.name, date: nm.date || null, target: !!nm.date, status: nm.status });
       }
     }
     // A milestone with `completedDate` (2026-11-17, myMandir 1B) stays on
@@ -6443,6 +6448,8 @@
             el("li", { class: "milestones-row" + ((m.date && m.date < todayStr && !m.completed) ? " is-past" : "") }, [
               m.completed
                 ? el("span", { class: "pill pill-completed" }, ["Completed"])
+                : m.status === "in-progress"
+                ? el("span", { class: "pill pill-inprogress" }, ["In progress"])
                 : m.status
                 ? el("span", { class: "pill pill-" + m.status }, [STATUS_LABEL[m.status] || m.status])
                 : null,
