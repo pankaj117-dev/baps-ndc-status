@@ -1089,6 +1089,27 @@
     });
   }
 
+  // Fast-follow items marked done (2026-11-23, EMM: "fast follow items are
+  // also completed so make it green"). `fastFollowDone` lists the item
+  // texts that shipped; anything not listed stays open, so a new item added
+  // by a later weekly update starts amber again.
+  function isFastFollowDone(p, text) {
+    return (p.fastFollowDone || []).indexOf(text) !== -1;
+  }
+  function fastFollowBadge(p) {
+    const items = p.fastFollowItems || [];
+    const done = items.filter((t) => isFastFollowDone(p, t)).length;
+    const all = items.length > 0 && done === items.length;
+    return el(
+      "span",
+      {
+        class: "badge has-fastfollow" + (all ? " tone-green" : ""),
+        title: done + " of " + items.length + " completed",
+      },
+      [items.length + " fast-follow" + (all ? " ✓" : "")]
+    );
+  }
+
   function listOrDash(items) {
     return items.length ? items.map((d) => el("li", null, [d])) : [el("li", null, ["—"])];
   }
@@ -1166,7 +1187,7 @@
           openItemBadge(followupCounts(p), "follow-up", "follow-ups", "detail-followups-section", { jump: true }),
           changeRequestBadge(p, { jump: true }),
           ...((p.fastFollowItems || []).length
-            ? [el("span", { class: "badge has-fastfollow" }, [(p.fastFollowItems || []).length + " fast-follow"])]
+            ? [fastFollowBadge(p)]
             : []),
           ...(p.scopeReduced
             ? [el("span", { class: "badge has-scopecut" }, ["✂️ scope cut"])]
@@ -6646,7 +6667,17 @@
               ? "Scope is being cut/deferred to hold the current date. Live / in production, but not fully closed out until these ship:"
               : "Live / in production, but not fully closed out until these ship:",
           ]),
-          el("ul", null, listOrDash(p.fastFollowItems || [])),
+          el(
+            "ul",
+            null,
+            (p.fastFollowItems || []).length
+              ? (p.fastFollowItems || []).map((t) =>
+                  isFastFollowDone(p, t)
+                    ? el("li", { class: "is-done", title: "Completed" }, ["✓ " + t])
+                    : el("li", null, [t])
+                )
+              : listOrDash([])
+          ),
         ])
       );
     }
