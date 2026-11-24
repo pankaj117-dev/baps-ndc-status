@@ -65,17 +65,19 @@
       "status": "green",
       "progress": 69,
       "stage": "UAT",
-      "phase": "2A: UAT (VAPT done), go-live 19-Nov | 2B: Req/UI-UX/TDD done, Development 20-Nov to 27-Dec, go-live 07-Jan | Progress 2A 98% / 2B 40%",
+      "phase": "2A: UAT (VAPT done), awaiting UAT approval; go-live by 27-Nov (was 19-Nov) | 2B: Req/UI-UX/TDD done, Development started 20-Nov (on track, to 27-Dec), go-live 07-Jan | Progress 2A 98% / 2B 40%",
       "nextMilestone": {
         "name": "Go-Live 2A",
-        "date": "2026-11-19"
+        "date": "2026-11-27"
       },
-      "goLive": "2026-11-19",
+      "goLive": "2026-11-27",
       "originalGoLive": "2026-11-19",
-      "delayDays": 0,
-      "delayNote": "2A go-live 19-Nov, no slip (TDD had moved 29-Sep -> 21-Oct). 2B on plan for go-live 07-Jan.",
-      "delayImpact": "",
-      "delayMitigation": [],
+      "delayDays": 6,
+      "delayNote": "2A go-live moved 19-Nov -> 27-Nov, waiting on UAT approval. 2B Development started 20-Nov as planned; on track for go-live 07-Jan.",
+      "delayImpact": "Go-live 2A moved 6 working days (19-Nov -> 27-Nov)",
+      "delayMitigation": [
+        "Following up for UAT approval ahead of 27-Nov go-live"
+      ],
       "delayTradeoffs": "",
       "dependencies": [
         {
@@ -96,11 +98,11 @@
           "UAT for P4"
         ],
         "inProgress": [
-          "UAT for P5 (Release 2A)"
+          "UAT for P5 (Release 2A) - awaiting UAT approval",
+          "Development for Release 2B (started 20-Nov, on track per timeline)"
         ],
         "nextPlan": [
-          "Go-live Release 2A (19-Nov-2026)",
-          "Start Development for Release 2B (20-Nov)"
+          "Go-live Release 2A (27-Nov-2026), once UAT approval is received"
         ]
       },
       "risks": [
@@ -121,7 +123,7 @@
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
-      "statusChangeReason": "",
+      "statusChangeReason": "Go-live 2A moved 19-Nov -> 27-Nov, waiting on UAT approval. Dev 2B started 20-Nov and is on track.",
       "dependencySeq": 101,
       "stagePlan": {
         "Requirements": {
@@ -146,7 +148,7 @@
           "initialStart": "2026-11-05",
           "latestStart": "2026-11-05",
           "initialEnd": "2026-11-18",
-          "latestEnd": "2026-11-18"
+          "latestEnd": "2026-11-26"
         },
         "VAPT": {
           "initialStart": "2026-11-05",
@@ -156,9 +158,9 @@
         },
         "Rollout": {
           "initialStart": "2026-11-19",
-          "latestStart": "2026-11-19",
+          "latestStart": "2026-11-27",
           "initialEnd": "2026-11-19",
-          "latestEnd": "2026-11-19"
+          "latestEnd": "2026-11-27"
         },
         "TDD 2B": {
           "initialStart": "2026-09-17",
@@ -263,9 +265,10 @@
         "VAPT": "done",
         "UAT": "current",
         "Rollout": "future",
-        "Hypercare": "future"
+        "Hypercare": "future",
+        "Dev 2B": "current"
       },
-      "stageLabel": "UAT 2A",
+      "stageLabel": "UAT 2A + Dev 2B",
       "laneLabelsInBlock": true,
       "rebaselinedOn": "2026-11-17"
     },
