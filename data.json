@@ -1,6 +1,6 @@
 {
   "asOf": "2026-11-23",
-  "lastUpdated": "2026-11-23T14:26:52.868085Z",
+  "lastUpdated": "2026-11-24T02:14:45.597779Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -1868,9 +1868,9 @@
       "id": "gms",
       "name": "GMS 1.4",
       "owner": "Vasu Champaneria",
-      "status": "amber",
+      "status": "green",
       "progress": 100,
-      "phase": "Hypercare",
+      "phase": "Hypercare completed 20-Nov-2026; hotfix release Dec 6",
       "nextMilestone": {
         "name": "Hotfix deployment",
         "date": "2026-12-06"
@@ -1903,16 +1903,14 @@
       ],
       "sprintStatus": {
         "completed": [
-          "WSO2 (SSO) implementation done",
-          "Hotfix: Unsubscribe user stories"
+          "Hotfix: Unsubscribe user stories development done",
+          "UI enhancements backlog"
         ],
         "inProgress": [
           "QA for hotfix",
-          "QA for WSO2 (SSO)",
-          "UI enhancements backlog"
+          "QA for WSO2 (SSO)"
         ],
         "nextPlan": [
-          "QA on UI enhancements backlog",
           "VAPT and load testing for hotfix Unsubscribe user stories"
         ]
       },
@@ -1930,12 +1928,14 @@
       ],
       "delayTradeoffs": "Reducing the scope; Management is aware.",
       "stage": "Hypercare",
+      "stageLabel": "Hypercare completed Nov 20",
+      "stageComplete": true,
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
       "fastFollowItems": [],
-      "statusChangeReason": "Time was used to address post-production bugs, which pushed the hotfix timeline.",
+      "statusChangeReason": "",
       "dependencySeq": 102,
       "stagePlan": {
         "Requirements": {
@@ -2168,7 +2168,7 @@
           "sprint": "Hotfix",
           "type": "Development",
           "feature": "Unsubscribe: MIS opt-out user story development",
-          "status": "In Progress",
+          "status": "Done",
           "notes": "",
           "plannedDate": "2026-11-02",
           "actualDate": "2026-11-06",
@@ -2188,7 +2188,7 @@
           "sprint": "Hypercare",
           "type": "Development",
           "feature": "GMS UI enhancements backlog",
-          "status": "In Progress",
+          "status": "Done",
           "notes": "",
           "plannedDate": "2026-11-19",
           "actualDate": "2026-11-19",
