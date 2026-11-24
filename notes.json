@@ -84,5 +84,15 @@
     "status": "resolved",
     "resolvedAt": "2026-11-18T00:00:00Z",
     "resolvedBy": "Aniket"
+  },
+  {
+    "id": "note-11",
+    "projectId": "webnext-2",
+    "text": "WebNext infra cost issue has been fixed by P. Dharmaketu Swami and is working as expected. Swami ji is monitoring the same.",
+    "mitigationImpact": "",
+    "raisedBy": "Jeet",
+    "createdAt": "2026-11-24T00:00:00Z",
+    "sourceIssue": null,
+    "status": "open"
   }
 ]
