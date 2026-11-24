@@ -1,6 +1,6 @@
 {
   "asOf": "2026-11-23",
-  "lastUpdated": "2026-11-23T14:26:52.868085Z",
+  "lastUpdated": "2026-11-23T15:35:56.253714Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -2476,11 +2476,11 @@
       "name": "SSO V2",
       "owner": "Aniket Udgaonkar",
       "status": "amber",
-      "progress": 60,
-      "phase": "Karyakar testing done; Satsangi testing in progress",
+      "progress": 70,
+      "phase": "Satsangi testing partially completed (logs required); senior QA assigned on 18 Nov 2026",
       "nextMilestone": {
         "name": "QA",
-        "date": "2026-11-20"
+        "date": "2026-11-24"
       },
       "goLive": null,
       "originalGoLive": "2026-11-06",
@@ -2488,19 +2488,9 @@
       "delayNote": "Stage Dates sheet: Development & QA end is 06-Nov (Satsangi; Karyakar 05-Nov; earlier revision 26-Oct). UAT end is 13-Nov (Satsangi; Karyakar 06-Nov; earlier revision 29-Oct). Hypercare start moved to 01-Dec. VAPT revised start is 29-Oct but the revised end is TBD, so that stage is still plotted on 15-Oct\u201321-Oct. Load revised end and Go-Live revised dates are TBD.",
       "dependencies": [
         {
-          "id": "DEP-104",
-          "text": "Karyakar defects are resolved, but the PR is waiting for Swami's review (reported 06 Nov 2026)",
-          "team": "Swami",
-          "mitigation": "",
-          "dueBy": "",
-          "escalated": false,
-          "resolved": false,
-          "track": "Development"
-        },
-        {
           "id": "DEP-105",
-          "text": "QA is waiting for logs from Harikrishna (reported 27 Oct 2026)",
-          "team": "Harikrishna",
+          "text": "QA is waiting for logs from DevOps (reported 27 Oct 2026)",
+          "team": "DevOps",
           "mitigation": "",
           "dueBy": "",
           "escalated": false,
@@ -2510,19 +2500,15 @@
       ],
       "sprintStatus": {
         "completed": [
-          "QA completed Karyakar testing; defects resolved by dev and PR raised on 06 Nov 2026",
-          "Karyakar flow demo given in the NDC meeting on 05 Nov 2026"
+          "QA completed Satsangi testing; only logs are required",
+          "Satsangi demo to NDC completed on 24 Nov 2026",
+          "Karyakar defects resolved from dev end"
         ],
         "inProgress": [
-          "QA in progress for the Satsangi flow",
-          "mySatsang new flow prepared; under review with Swami",
-          "Harikrishna started working on Satsangi defects/blockers raised by QA"
+          "mySatsang new flow implementation is in progress"
         ],
         "nextPlan": [
-          "Swami to review the pull request from Meghbhai",
-          "Swami to provide dates in the announcement register",
-          "Swami to review the mySatsang flow doc",
-          "Satsangi demo with NDC leads on 24 Nov 2026"
+          "QA will work on Karyakar defect resolution after the NDC demo on Satsangi"
         ]
       },
       "risks": [],
@@ -2560,7 +2546,7 @@
           "initialStart": "2026-07-01",
           "latestStart": "2026-07-01",
           "initialEnd": "2026-10-09",
-          "latestEnd": "2026-11-20"
+          "latestEnd": "2026-11-24"
         },
         "UAT": {
           "initialStart": "2026-10-12",
@@ -2570,9 +2556,9 @@
           "datesTbd": true
         },
         "VAPT": {
-          "initialStart": "2026-10-15",
+          "initialStart": "2026-11-27",
           "latestStart": "2026-11-27",
-          "initialEnd": "2026-10-21",
+          "initialEnd": "2026-12-04",
           "latestEnd": "2026-12-04"
         },
         "Load": {
@@ -2690,7 +2676,7 @@
           "type": "QA",
           "feature": "Functional testing \u2013 Satsangi flow",
           "status": "In Progress",
-          "notes": "Planned 29 Oct \u2013 04 Nov 2026; actual start 02 Nov 2026, still in QA",
+          "notes": "Planned 29 Oct \u2013 04 Nov 2026; started 02 Nov 2026. Partially completed \u2013 logs required; senior QA assigned 18 Nov 2026",
           "plannedDate": "2026-11-04",
           "actualDate": "",
           "delayReason": "Started 2 Nov instead of planned 29 Oct"
@@ -2700,8 +2686,12 @@
       "milestones": [
         {
           "name": "QA",
-          "date": "2026-11-20",
+          "date": "2026-11-24",
           "progress": 50
+        },
+        {
+          "name": "mySatsang flow implementation",
+          "date": "2026-11-27"
         },
         {
           "name": "VAPT start",
