@@ -4660,6 +4660,11 @@ dd.is-missing {
 
 .wide-log-status.is-closed { background: var(--green-bg); color: var(--green); }
 .wide-log-status.is-open { background: var(--red-bg); color: var(--red); }
+.wide-log-status.is-progress { background: var(--amber-bg); color: var(--amber); }
+.implementation-tracker { margin-bottom: 16px; }
+.implementation-tracker .wide-log-full-table { min-width: 980px; }
+.implementation-tracker td { white-space: nowrap; }
+.implementation-tracker td:last-child { white-space: normal; min-width: 240px; }
 
 /* ---------- RAID Log (Dependencies & Risks tab) — reuses the shared
    wide-log-table scaffolding above, plus its own Type pill since RAID

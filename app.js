@@ -1499,6 +1499,54 @@
     });
   }
 
+  // Per-application implementation table (2026-11-24, SSO V2). A cell can be
+  // a string or a list of strings (e.g. two plan dates), one per line.
+  function buildImplementationTrackerTable(rows) {
+    const cols = [
+      ["app", "App Name"],
+      ["owner", "Owner"],
+      ["onboarding", "Onboarding"],
+      ["implementationPlan", "Implementation Plan"],
+      ["review", "Review"],
+      ["devStart", "Dev Start"],
+      ["devEnd", "Dev End"],
+      ["prod", "Prod"],
+      ["status", "Status"],
+      ["comments", "Comments"],
+    ];
+    const cell = (v) => {
+      const vals = Array.isArray(v) ? v : [v];
+      const shown = vals.filter((x) => x != null && x !== "");
+      return shown.length ? shown.map((x) => el("div", null, [String(x)])) : ["—"];
+    };
+    const wrap = el("div", { class: "wide-log-table-scroll implementation-tracker" });
+    wrap.appendChild(
+      el("table", { class: "wide-log-full-table" }, [
+        el("thead", null, [el("tr", null, cols.map(([, label]) => el("th", null, [label])))]),
+        el(
+          "tbody",
+          null,
+          rows.map((r) =>
+            el(
+              "tr",
+              null,
+              cols.map(([key]) => {
+                if (key === "app") return el("td", { class: "wide-log-title-cell" }, cell(r.app));
+                if (key === "status") {
+                  const s = r.status || "";
+                  const cls = /complete|done|closed/i.test(s) ? "is-closed" : /progress/i.test(s) ? "is-progress" : "is-open";
+                  return el("td", null, s ? [el("span", { class: "wide-log-status " + cls }, [s])] : ["—"]);
+                }
+                return el("td", null, cell(r[key]));
+              })
+            )
+          )
+        ),
+      ])
+    );
+    return wrap;
+  }
+
   // One card row per stage, in the date-change-log style (2026-11-04):
   // start date on the left, then planned end → actual end, with the
   // weekday slip on the right. Latest stage first, in timeline order, so
@@ -6541,6 +6589,22 @@
         schedulePanel.appendChild(el("h3", { class: "weekly-subhead" }, [s.name + " — progress over time"]));
         schedulePanel.appendChild(buildTrendGraph(s.points, "trendFillMilestone" + i, [], s.color));
       });
+    }
+
+    // Implementation tracker (2026-11-24, SSO V2) — the per-application
+    // onboarding table from the PM's status deck, kept as data so it can be
+    // updated week to week. Shown under the progress charts.
+    const tracker = p.implementationTracker;
+    if (tracker && (tracker.rows || []).length) {
+      schedulePanel.appendChild(
+        el("h3", { class: "weekly-subhead", id: "implementation-tracker-section" }, [
+          tracker.title || "Implementation tracker",
+          tracker.status
+            ? el("span", { class: "pill pill-" + tracker.status, style: "margin-left:10px" }, [STATUS_LABEL[tracker.status] ? tracker.status.toUpperCase() : tracker.status])
+            : null,
+        ].filter(Boolean))
+      );
+      schedulePanel.appendChild(buildImplementationTrackerTable(tracker.rows));
     }
 
     // Delay tab (2026-10-15) — everything delay-related lives here now,
