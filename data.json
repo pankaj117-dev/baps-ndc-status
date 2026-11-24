@@ -2524,6 +2524,126 @@
       "milestonesOnly": true,
       "stageDatesLatestStart": true,
       "timelineFromStageDates": true,
+      "implementationTracker": {
+        "title": "SSO V2 (Implementation)",
+        "status": "amber",
+        "rows": [
+          {
+            "app": "ASM",
+            "owner": "Vishal Patel (Tampa)",
+            "onboarding": "17 Sep 2026",
+            "implementationPlan": "17 Nov 2026",
+            "review": "06 Nov 2026",
+            "devStart": "16 Nov 2026",
+            "devEnd": "-",
+            "prod": "-",
+            "status": "In-progress",
+            "comments": "Dev started"
+          },
+          {
+            "app": "GSS",
+            "owner": "Vishal Patel (Tampa)",
+            "onboarding": "17 Sep 2026",
+            "implementationPlan": "?",
+            "review": "-",
+            "devStart": "-",
+            "devEnd": "-",
+            "prod": "-",
+            "status": "In-progress",
+            "comments": "Waiting for implementation plan"
+          },
+          {
+            "app": "ALM",
+            "owner": "Bhavin Patel",
+            "onboarding": "24 Sep 2026",
+            "implementationPlan": "23 Oct 2026",
+            "review": "29 Oct 2026",
+            "devStart": "24 Oct 2026",
+            "devEnd": "28 Oct 2026",
+            "prod": "-",
+            "status": "In-progress",
+            "comments": "Changes are done on dev, waiting for UI to deploy on QA"
+          },
+          {
+            "app": "MDS",
+            "owner": "Vasu Champaneria",
+            "onboarding": "10 Sep 2026",
+            "implementationPlan": [
+              "02 Oct 2026",
+              "05 Oct 2026"
+            ],
+            "review": "05 Nov 2026",
+            "devStart": "20 Oct 2026",
+            "devEnd": "30 Oct 2026",
+            "prod": "-",
+            "status": "In-progress",
+            "comments": "QA sign-off is in progress"
+          },
+          {
+            "app": "SID",
+            "owner": "Hitesh Patel",
+            "onboarding": "08 Sep 2026",
+            "implementationPlan": "12 Sep 2026",
+            "review": "",
+            "devStart": "08 Sep 2026",
+            "devEnd": "12 Sep 2026",
+            "prod": "-",
+            "status": "Completed",
+            "comments": "For Dev and UAT, SSO V2 changes are already deployed"
+          },
+          {
+            "app": "GMS",
+            "owner": "Vasu Champaneria",
+            "onboarding": "29 Sep 2026",
+            "implementationPlan": "20 Oct 2026",
+            "review": "29 Oct 2026",
+            "devStart": "20 Oct 2026",
+            "devEnd": "28 Oct 2026",
+            "prod": "",
+            "status": "In-progress",
+            "comments": ""
+          },
+          {
+            "app": "AMS",
+            "owner": "Vasu Champaneria",
+            "onboarding": "29 Sep 2026",
+            "implementationPlan": "26 Oct 2026",
+            "review": [
+              "02 Nov 2026",
+              "29 Oct 2026"
+            ],
+            "devStart": "26 Oct 2026",
+            "devEnd": "30 Oct 2026",
+            "prod": "-",
+            "status": "In-progress",
+            "comments": ""
+          },
+          {
+            "app": "mySeva App",
+            "owner": "Yash Patel",
+            "onboarding": "25 Sep 2026",
+            "implementationPlan": "26 Oct 2026",
+            "review": "31 Oct 2026",
+            "devStart": "26 Oct 2026",
+            "devEnd": "31 Oct 2026",
+            "prod": "-",
+            "status": "In-progress",
+            "comments": "QA is pending; SSO team needs a change to onboard mySeva"
+          },
+          {
+            "app": "MIS/mySeva API",
+            "owner": "Sandeep Pistolwala",
+            "onboarding": "11 Sep 2026",
+            "implementationPlan": "12 Oct 2026",
+            "review": "04 Nov 2026",
+            "devStart": "12 Oct 2026",
+            "devEnd": "19 Nov 2026",
+            "prod": "-",
+            "status": "In-progress",
+            "comments": "Development done and deployed to QA on 20 Nov 2026; call scheduled for validation"
+          }
+        ]
+      },
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
