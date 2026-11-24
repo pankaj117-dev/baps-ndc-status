@@ -73,9 +73,17 @@ replace other keys); omit `"id"` to append a new one (the script mints
   "approvalStatus": "Approved for current phase",  // free text; "approved"/"resolved"/"closed" → green, anything else is pending approval and shows in red
   "approvedBy": "Aksharbhai",     // REQUIRED once approved: who approved it
   "approvedDate": "2026-06-12",   // REQUIRED once approved: YYYY-MM-DD
-  "impact": "Go-Live date impacted by 10 days"
+  "impact": "Go-Live date impacted by 10 days",
+  "attachments": [                // OPTIONAL: links only, added to the CR's existing ones
+    { "name": "CR approval email", "url": "https://drive.google.com/..." }
+  ]
 }
 ```
+Attachments are links, not uploaded files (the dashboard is a static public page,
+so nothing is copied into the repo). Ask the PM for the link (Drive, Jira,
+Confluence) and a name for it. Only `http(s)` links are accepted. To add one to an
+existing CR, send its `id` and just the new attachment; the ones already on the CR
+stay. The row shows a 📎 count and the CR popup lists the links.
 A CR nobody has approved stays `"approvalStatus": "Pending"` (a new CR with no
 status defaults to it) and appears in red as pending approval. The script exits
 with an error if an approved CR has no `approvedBy` or `approvedDate`. Ask the

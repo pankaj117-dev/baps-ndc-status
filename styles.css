@@ -4575,6 +4575,35 @@ dd.is-missing {
 .cr-row-approval.is-missing,
 .cr-detail-approval.is-missing { color: var(--amber); font-weight: 600; }
 
+.cr-row-clip {
+  margin-left: 8px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+}
+.followups-resolved-head {
+  margin: 18px 0 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.cr-detail-attachments { display: flex; flex-direction: column; gap: 6px; }
+.cr-attachment {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+  word-break: break-word;
+}
+.cr-attachment:hover { text-decoration: underline; }
+.cr-attachment-date { color: var(--ink-faint); font-weight: 500; font-size: 12px; }
+
 .cr-list {
   display: flex;
   flex-direction: column;

@@ -153,12 +153,32 @@
 .sum-table tbody tr:last-child td { border-bottom: none; }
 
 .sum-table thead th {
-  background: var(--bg);
+  background: #e7eef8;
   font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  color: var(--ink);
+  border-bottom: 2px solid var(--line-strong);
+  vertical-align: bottom;
+}
+
+.sum-th-sub {
+  display: block;
+  margin-top: 3px;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: none;
+  color: var(--ink-soft);
+}
+
+.sum-golive-date { display: block; }
+.sum-golive-end {
+  display: block;
+  margin-top: 3px;
   color: var(--ink-faint);
 }
 
@@ -167,6 +187,9 @@
   padding-top: 12px;
   padding-bottom: 46px;
 }
+
+/* No labels to show, so no room reserved for them. */
+.sum-table tbody tr.sum-row-plain td { padding-bottom: 14px; }
 
 .sum-table tbody tr.sum-row { cursor: pointer; }
 .sum-table tbody tr.sum-row:hover td { background: rgba(53, 98, 232, 0.05); }

@@ -173,6 +173,10 @@ roadmap/timeline — both read the same `stage` + `stagePlan` data.
       If someone has, ask who approved it AND the date (YYYY-MM-DD) and
       send them as `approvedBy` and `approvedDate`. The script refuses an
       approved CR without both, so don't guess either one.
+    - Ask "Any document to attach to this CR (approval email, spec)?" If so,
+      get a link (Drive, Jira, Confluence) and a short name, and send it in
+      `attachments: [{name, url}]`. Links only: files are not uploaded, because
+      the dashboard is published as a public page.
     - A plain, one-off `Milestones` entry (name/date/status/progress) is
       fine here through the script — it's only a second STAGE-GATE TRACK
       (Section B's bail-out case) that isn't.

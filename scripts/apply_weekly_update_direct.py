@@ -19,8 +19,9 @@ is a JSON array of objects, upserted (matched + merged, or appended with
 a freshly minted id/key) rather than wholesale-replaced like the
 risks/dependencies textareas above:
 
-    "ChangeRequests"  -> [{id?, title, description, submittedDate, by, actionItem, approvalStatus, approvedBy, approvedDate, impact}]
-                         (approved CRs must carry approvedBy + approvedDate; anything else stays "Pending")
+    "ChangeRequests"  -> [{id?, title, description, submittedDate, by, actionItem, approvalStatus, approvedBy, approvedDate, impact, attachments: [{name, url}]}]
+                         (approved CRs must carry approvedBy + approvedDate; anything else stays "Pending";
+                         attachments are http(s) links, merged onto the CR's existing ones, never uploaded files)
     "Decisions"       -> [{id?, decision, description, dateTaken, by}]
     "GoLiveChecklist" -> [{item, status, notes}]                 (upsert by "item")
     "RaidLog"         -> [{id?, type, item, description, reportedDate, actionItem, targetedCompletionDate, responsible, status, closureRemarks}]
@@ -68,6 +69,7 @@ EXTENDED_LOG_FIELDS = [
 
 APPROVED_RE = re.compile(r"approved|resolved|closed", re.I)
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+URL_RE = re.compile(r"^https?://\S+$", re.I)
 
 
 def check_cr_approvals(project, items):
@@ -95,6 +97,47 @@ def check_cr_approvals(project, items):
             problems.append(f"{label}: marked '{status}' but 'approvedDate' is blank. Ask what date they approved it (YYYY-MM-DD).")
         elif not DATE_RE.match(date):
             problems.append(f"{label}: 'approvedDate' must be YYYY-MM-DD, got '{date}'.")
+    return problems
+
+
+def merge_cr_attachments(project, items, as_of):
+    """Validate each CR's `attachments` and merge them onto what is stored.
+
+    An attachment is a link: `{name, url}` (optional `addedDate`). The dashboard
+    is a static page, so files are not uploaded. Put the file in Drive, Jira,
+    or Confluence and attach its link. Only http(s) links are accepted.
+
+    New attachments are added to the CR's existing ones (matched by url), so
+    adding one never drops the ones already there. Returns a list of problems.
+    """
+    existing = {e.get("id"): e for e in (project.get("changeRequests") or []) if isinstance(e, dict) and e.get("id")}
+    problems = []
+    for item in items:
+        if "attachments" not in item:
+            continue
+        label = item.get("id") or item.get("title") or "new change request"
+        base = existing.get(item.get("id"), {}).get("attachments") or []
+        merged = [dict(a) for a in base if isinstance(a, dict)]
+        seen = {str(a.get("url") or "").strip() for a in merged}
+        raw_list = item.get("attachments") or []
+        if not isinstance(raw_list, list):
+            problems.append(f"{label}: 'attachments' must be a list of {{name, url}}.")
+            continue
+        for raw in raw_list:
+            att = raw if isinstance(raw, dict) else {}
+            url = str(att.get("url") or "").strip()
+            name = str(att.get("name") or "").strip()
+            if not URL_RE.match(url):
+                problems.append(f"{label}: attachment needs an http(s) link, got '{url or raw}'. Files are not uploaded, so attach a Drive, Jira, or Confluence link.")
+                continue
+            if not name:
+                problems.append(f"{label}: attachment {url} needs a 'name' (what to call it).")
+                continue
+            if url in seen:
+                continue
+            seen.add(url)
+            merged.append({"name": name, "url": url, "addedDate": str(att.get("addedDate") or as_of).strip()})
+        item["attachments"] = merged
     return problems
 
 
@@ -230,10 +273,10 @@ def main():
         # A new CR with no status starts as Pending, shown in red on the dashboard.
         if not item.get("id") and not str(item.get("approvalStatus") or "").strip():
             item["approvalStatus"] = "Pending"
-    cr_problems = check_cr_approvals(project, cr_items)
+    cr_problems = check_cr_approvals(project, cr_items) + merge_cr_attachments(project, cr_items, as_of)
     if cr_problems:
         print(
-            "error: every approved change request needs who approved it and the date.\n  - "
+            "error: change request problems.\n  - "
             + "\n  - ".join(cr_problems)
             + "\nAsk the person for the missing details and retry. Leave the CR as 'Pending' if nobody has approved it yet.",
             file=sys.stderr,

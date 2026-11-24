@@ -2699,7 +2699,10 @@ Everything lives in three files:
       "approvedBy": "Aksharbhai",    // REQUIRED once approved (2026-11-23): shown on the CR row and popup
       "approvedDate": "2026-06-12",  // REQUIRED once approved: YYYY-MM-DD. The weekly-update script
                                       // refuses an approved CR that is missing either one.
-      "impact": "Go-Live date impacted by 10 days"
+      "impact": "Go-Live date impacted by 10 days",
+      "attachments": [               // OPTIONAL: links only (Drive, Jira, Confluence), never uploaded files.
+        { "name": "CR approval email", "url": "https://drive.google.com/...", "addedDate": "2026-06-12" }
+      ]
     }
   ],
   "decisions": [                 // OPTIONAL (2026-10-15) — structured Decision Log (Change &

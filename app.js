@@ -2138,6 +2138,14 @@
     return { cls: "is-pending", pill: "Pending approval", line: "Pending approval from someone", missing: false, pending: true, status };
   }
 
+  // Attachments are links (Drive, Jira, Confluence...) added through the
+  // weekly-update script. Only http(s) links are shown as links.
+  function crAttachments(cr) {
+    return ((cr && cr.attachments) || []).filter(
+      (a) => a && typeof a.url === "string" && /^https?:\/\//i.test(a.url.trim())
+    );
+  }
+
   function buildChangeRequestLog(p) {
     const items = p.changeRequests || [];
     if (!items.length) {
@@ -2163,6 +2171,11 @@
           el("span", { class: "cr-row-meta" }, [
             cr.submittedDate ? fmtDateShort(cr.submittedDate) : "—",
             cr.by ? " · " + cr.by : "",
+            crAttachments(cr).length
+              ? el("span", { class: "cr-row-clip", title: crAttachments(cr).length + " attachment(s)" }, [
+                  "📎 " + crAttachments(cr).length,
+                ])
+              : null,
           ]),
           el("span", { class: "cr-log-status " + approval.cls, title: cr.approvalStatus || "TBD" }, [approval.pill]),
           el("span", { class: "cr-row-chevron", "aria-hidden": "true" }, ["›"]),
@@ -4406,17 +4419,30 @@
   // counts always, and fast-follow, scope cut, and escalations only when
   // the project has them.
   function summaryBadges(p) {
-    const item = (counts, one, many, section) => ({
-      text: counts.total + " " + (counts.total === 1 ? one : many),
-      tone: openItemTone(counts.total, counts.resolved),
-      section,
-    });
+    // Dependencies, risks, and follow-ups count only what is still open,
+    // and a label is left out when nothing is open. CRs show the total.
+    const openItem = (counts, one, many, section) => {
+      const open = counts.total - counts.resolved;
+      if (open <= 0) return null;
+      return {
+        text: open + " open " + (open === 1 ? one : many),
+        tone: openItemTone(counts.total, counts.resolved),
+        section,
+      };
+    };
+    const crs = crCounts(p);
     const badges = [
-      item(dependencyCounts(p), "dependency", "dependencies", "detail-deps-section"),
-      item(riskCounts(p), "risk", "risks", "detail-risks-section"),
-      item(followupCounts(p), "follow-up", "follow-ups", "detail-followups-section"),
-      item(crCounts(p), "CR", "CRs", "cr-log-section"),
-    ];
+      openItem(dependencyCounts(p), "dependency", "dependencies", "detail-deps-section"),
+      openItem(riskCounts(p), "risk", "risks", "detail-risks-section"),
+      openItem(followupCounts(p), "follow-up", "follow-ups", "detail-followups-section"),
+      crs.total
+        ? {
+            text: crs.total + " " + (crs.total === 1 ? "CR" : "CRs"),
+            tone: openItemTone(crs.total, crs.resolved),
+            section: "cr-log-section",
+          }
+        : null,
+    ].filter(Boolean);
     const fastFollow = p.fastFollowItems || [];
     if (fastFollow.length) {
       const done = fastFollow.filter((t) => isFastFollowDone(p, t)).length;
@@ -6392,8 +6418,11 @@
         );
       }
       case "followups": {
-        const n = openNotesFor(p.id).length;
-        return n ? plural(n, "open follow-up") : "No open follow-ups";
+        const open = openNotesFor(p.id).length;
+        const all = NOTES.filter((note) => note.projectId === p.id).length;
+        if (!all) return "No follow-ups yet";
+        if (!open) return plural(all, "follow-up") + " · all resolved";
+        return open === all ? plural(open, "open follow-up") : open + " open · " + (all - open) + " resolved";
       }
       case "feedback": {
         const n = NOTES.filter((note) => note.projectId === p.id).length;
@@ -6402,6 +6431,32 @@
       default:
         return "";
     }
+  }
+
+  // One feedback / follow-up note, open or resolved. Used by the Feedback
+  // history and by the Follow-ups tab.
+  function buildNoteRow(n, p) {
+    const effective = noteStatus(n);
+    const locallyOnly = effective === "resolved" && n.status !== "resolved";
+    return el("div", { class: "note-row " + (effective === "open" ? "is-open" : "is-resolved") }, [
+      el("span", { class: "note-status" }, [effective === "open" ? "OPEN" : "RESOLVED"]),
+      el("span", { class: "note-text" }, [n.text]),
+      ...(n.mitigationImpact
+        ? [el("span", { class: "note-mitigation" }, ["Mitigation / impact: " + n.mitigationImpact])]
+        : []),
+      ...(n.status === "resolved" && n.resolutionNote
+        ? [el("span", { class: "note-mitigation" }, ["Resolution: " + n.resolutionNote])]
+        : []),
+      el("span", { class: "note-meta" }, [
+        (n.raisedBy ? n.raisedBy + " · " : "") + fmtDate((n.createdAt || "").slice(0, 10)),
+        n.status === "resolved" && n.resolvedBy
+          ? " · resolved by " + n.resolvedBy + (n.resolvedAt ? " " + fmtDate((n.resolvedAt || "").slice(0, 10)) : "")
+          : "",
+        locallyOnly ? " · resolved in your browser, not yet synced" : "",
+      ]),
+      ...(effective === "open" ? [resolveLink(n, p.name)] : []),
+      ...(locallyOnly ? [resolvedActions(n, p.name)] : []),
+    ]);
   }
 
   function buildProjectDetail(p) {
@@ -6527,7 +6582,13 @@
     // Follow-ups tab always exists (even with none open) so a stable set
     // of tabs is available no matter what — clicking the "0 follow-ups"
     // badge would otherwise have nowhere sensible to land.
-    followupsPanel.appendChild(el("h3", { class: "weekly-subhead", id: "detail-followups-section" }, ["Open follow-ups"]));
+    followupsPanel.appendChild(el("h3", { class: "weekly-subhead", id: "detail-followups-section" }, ["Follow-ups"]));
+    const resolvedFollowUps = allNotes
+      .filter((n) => noteStatus(n) === "resolved")
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    if (!openFollowUps.length && resolvedFollowUps.length) {
+      followupsPanel.appendChild(el("p", { class: "empty-note" }, ["No open follow-ups."]));
+    }
     if (openFollowUps.length) {
       followupsPanel.appendChild(
         el("div", { class: "detail-block followups" }, [
@@ -6543,8 +6604,16 @@
           ),
         ])
       );
-    } else {
-      followupsPanel.appendChild(el("p", { class: "empty-note" }, ["No open follow-ups."]));
+    } else if (!resolvedFollowUps.length) {
+      followupsPanel.appendChild(el("p", { class: "empty-note" }, ["No follow-ups yet."]));
+    }
+    if (resolvedFollowUps.length) {
+      followupsPanel.appendChild(
+        el("h4", { class: "followups-resolved-head" }, ["Resolved (" + resolvedFollowUps.length + ")"])
+      );
+      const resolvedList = el("div", { class: "notes-list" });
+      resolvedFollowUps.forEach((n) => resolvedList.appendChild(buildNoteRow(n, p)));
+      followupsPanel.appendChild(resolvedList);
     }
 
     // Change & Decisions tab — the two structured logs from the "five
@@ -7206,31 +7275,7 @@
       allNotes
         .slice()
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .forEach((n) => {
-          const effective = noteStatus(n);
-          const locallyOnly = effective === "resolved" && n.status !== "resolved";
-          notesList.appendChild(
-            el("div", { class: "note-row " + (effective === "open" ? "is-open" : "is-resolved") }, [
-              el("span", { class: "note-status" }, [effective === "open" ? "OPEN" : "RESOLVED"]),
-              el("span", { class: "note-text" }, [n.text]),
-              ...(n.mitigationImpact
-                ? [el("span", { class: "note-mitigation" }, ["Mitigation / impact: " + n.mitigationImpact])]
-                : []),
-              ...(n.status === "resolved" && n.resolutionNote
-                ? [el("span", { class: "note-mitigation" }, ["Resolution: " + n.resolutionNote])]
-                : []),
-              el("span", { class: "note-meta" }, [
-                (n.raisedBy ? n.raisedBy + " · " : "") + fmtDate((n.createdAt || "").slice(0, 10)),
-                n.status === "resolved" && n.resolvedBy
-                  ? " · resolved by " + n.resolvedBy + (n.resolvedAt ? " " + fmtDate((n.resolvedAt || "").slice(0, 10)) : "")
-                  : "",
-                locallyOnly ? " · resolved in your browser, not yet synced" : "",
-              ]),
-              ...(effective === "open" ? [resolveLink(n, p.name)] : []),
-              ...(locallyOnly ? [resolvedActions(n, p.name)] : []),
-            ])
-          );
-        });
+        .forEach((n) => notesList.appendChild(buildNoteRow(n, p)));
       feedbackPanel.appendChild(notesList);
     }
 
@@ -7344,6 +7389,19 @@
         el("dd", { class: "cr-detail-text" }, [cr.actionItem || "—"]),
         el("dt", null, ["Impact"]),
         el("dd", { class: "cr-detail-text" }, [cr.impact || "—"]),
+        el("dt", null, ["Attachments"]),
+        el(
+          "dd",
+          { class: "cr-detail-attachments" },
+          crAttachments(cr).length
+            ? crAttachments(cr).map((a) =>
+                el("a", { class: "cr-attachment", href: a.url.trim(), target: "_blank", rel: "noopener noreferrer" }, [
+                  "📎 " + (a.name || a.url),
+                  a.addedDate ? el("span", { class: "cr-attachment-date" }, [" · added " + fmtDateShort(a.addedDate)]) : null,
+                ])
+              )
+            : ["None. Ask Claude to attach a link in the weekly update."]
+        ),
       ])
     );
     return root;

@@ -95,8 +95,10 @@
     const inHypercare = /hypercare/i.test(p.stage || "");
     if (!inHypercare) return '<td class="sum-golive">' + go + "</td>";
     const end = hypercareEnd(p);
-    return '<td class="sum-golive">' + go + " /<br>" +
-      (end ? fmt(end) : missing("Not set", "Current stage — planned completion date")) + "</td>";
+    return '<td class="sum-golive"><span class="sum-golive-date">' + go + "</span>" +
+      '<span class="sum-golive-end">Ends ' +
+      (end ? fmt(end) : missing("Not set", "Current stage — planned completion date")) +
+      "</span></td>";
   }
 
   function stageCell(p) {
@@ -142,7 +144,7 @@
             ">" + esc(b.text) + "</span>"
           ).join("");
           return (
-            '<tr class="sum-row" tabindex="0" role="button" data-project="' + esc(r.p.id) +
+            '<tr class="sum-row' + (badges ? "" : " sum-row-plain") + '" tabindex="0" role="button" data-project="' + esc(r.p.id) +
               '" data-progress="' + pct + '" data-status="' + esc(r.current || "") +
               '" title="Open ' + esc(r.p.name) + '">' +
             '<td class="sum-num">' + (i + 1) + "</td>" +
@@ -179,8 +181,11 @@
       "</div></div>" +
       '<div class="sum-table-wrap"><table class="sum-table"><thead><tr>' +
       '<th class="sum-num">#</th><th class="sum-project">Project</th><th class="sum-pm">PM</th>' +
-      '<th class="sum-state">Last State</th><th class="sum-state">Current State</th>' +
-      '<th class="sum-notes">State Change Notes</th><th class="sum-golive">Go-Live /<br>Hypercare</th><th class="sum-stage">Stage</th>' +
+      '<th class="sum-state">Last week<span class="sum-th-sub">prior status</span></th>' +
+      '<th class="sum-state">This week<span class="sum-th-sub">current status</span></th>' +
+      '<th class="sum-notes">What changed</th>' +
+      '<th class="sum-golive">Go-live<span class="sum-th-sub">hypercare end</span></th>' +
+      '<th class="sum-stage">Stage</th>' +
       "</tr></thead><tbody>" + body + "</tbody></table></div>" +
       "</div>";
 
