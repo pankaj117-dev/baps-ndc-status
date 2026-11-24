@@ -3504,6 +3504,7 @@
       "stage": "Tech. Design",
       "stageLabel": "NA",
       "hideStageTarget": true,
+      "summaryInclude": false,
       "phase": "Split out from the myMandir umbrella this week, alongside myMandir 1B",
       "nextMilestone": {
         "name": "TDD",
