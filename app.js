@@ -6726,7 +6726,9 @@
       if (m.date && m.date < todayStr) return;
       allMilestones.push({ name: m.name, date: m.date || null, status: m.status, target: !!m.date });
     });
-    allMilestones.sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+    // A milestone with no date (2026-11-24, SSO V2 "VAPT start") reads "TBD"
+    // and sorts after the dated ones.
+    allMilestones.sort((a, b) => (a.date || "9999").localeCompare(b.date || "9999"));
     if (!allMilestones.length) {
       schedulePanel.appendChild(el("p", { class: "empty-note" }, ["No upcoming milestones from the stage dates yet."]));
     } else {
@@ -6754,7 +6756,7 @@
                     el("span", { class: "milestones-target-label" }, ["Target date"]),
                     el("span", { class: "milestones-date" }, [fmtDateShort(m.date)]),
                   ])
-                : el("span", { class: "milestones-date" }, [m.date ? fmtDateShort(m.date) : "—"]),
+                : el("span", { class: "milestones-date" }, [m.date ? fmtDateShort(m.date) : "TBD"]),
             ])
           )
         )
