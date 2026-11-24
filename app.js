@@ -1645,7 +1645,18 @@
       const start = plan.latestStart || plan.initialStart;
       const end = plan.latestEnd || plan.initialEnd;
       if (!start || !end || end < start) return;
-      const kind = currentIdx === -1 ? (end < todayIso ? "done" : start <= todayIso ? "current" : "future") : i < currentIdx ? "done" : i === currentIdx ? "current" : "future";
+      // `p.stageStatus` also covers the extra stages here (2026-11-24,
+      // WebNext 2.0: Dev 2B running alongside UAT 2A).
+      const reported = p.stageStatus && p.stageStatus[stage];
+      const kind = ["done", "current", "future"].includes(reported)
+        ? reported
+        : currentIdx === -1 ? (end < todayIso ? "done" : start <= todayIso ? "current" : "future") : i < currentIdx ? "done" : i === currentIdx ? "current" : "future";
+      // A stage the PM reports as running and on schedule shows its share of
+      // the planned window elapsed so far (2026-11-24, WebNext 2.0 Dev 2B).
+      const pct =
+        reported === "current" && start <= todayIso
+          ? Math.max(0, Math.min(100, Math.round((daysBetweenIso(start, todayIso) / Math.max(1, daysBetweenIso(start, end))) * 100)))
+          : undefined;
       out.push({
         stage,
         label,
@@ -1653,7 +1664,7 @@
         end,
         plannedEnd: plan.initialEnd,
         actualEnd: null,
-        pct: undefined,
+        pct,
         kind,
         late: kind === "current" && end < todayIso,
         planPassed: kind === "future" && end < todayIso,
