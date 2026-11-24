@@ -23821,7 +23821,14 @@
         "timeSavedDays": 0,
         "timeSavedNote": [],
         "scopeReduced": false,
-        "risks": [],
+        "risks": [
+          {
+            "id": "RISK-102",
+            "text": "UI designer screens were expected by EOD 22 Nov 2026 but are delayed due to additional changes and feedback from Shreyank and Jaydeep. This can delay development and the UAT delivery.",
+            "mitigation": "Tracked as dependency DEP-104; follow up with the UI designer, Shreyank and Jaydeep to close the changes and feedback and get the final screens.",
+            "resolved": false
+          }
+        ],
         "fastFollowItems": [],
         "escalations": [],
         "dependencies": [
@@ -23831,6 +23838,15 @@
             "team": "",
             "mitigation": "Mobile (iOS and Android) VAPT can't be scheduled until these dates are confirmed.",
             "dueBy": "",
+            "escalated": false,
+            "resolved": false
+          },
+          {
+            "id": "DEP-104",
+            "text": "UI designer screens were expected by EOD 22 Nov 2026 but are delayed due to additional changes and feedback from Shreyank and Jaydeep.",
+            "team": "UI designer / Shreyank / Jaydeep",
+            "mitigation": "Waiting for the UI designer to deliver the updated screens once the changes and feedback from Shreyank and Jaydeep are included.",
+            "dueBy": "2026-11-22",
             "escalated": false,
             "resolved": false
           }
@@ -23894,15 +23910,19 @@
         "sprintStatus": {
           "completed": [
             "Milestone 2 bugs resolved, deployed on UAT and Sameep informed on 20 Nov 2026",
-            "VAPT of the web version completed by the VAPT team"
+            "VAPT of the web version completed by the VAPT team",
+            "TDD created and approved for the 1 pending user story"
           ],
           "inProgress": [
             "Restructure Teams user story is in progress",
-            "Development team is checking the VAPT report for web"
+            "Development team is checking the VAPT report for web",
+            "UI screens for the Restructure Teams user story",
+            "Team is working on VAPT findings for web only"
           ],
           "nextPlan": [
             "Complete the Restructure Teams story and deploy it on UAT",
-            "VAPT on iOS and Android will start"
+            "VAPT on iOS and Android will start",
+            "Web VAPT will be completed"
           ]
         },
         "milestones": [
