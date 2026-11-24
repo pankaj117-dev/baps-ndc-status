@@ -1723,6 +1723,15 @@
           "dueBy": "",
           "escalated": false,
           "resolved": false
+        },
+        {
+          "id": "DEP-104",
+          "text": "UI designer screens were expected by EOD 22 Nov 2026 but are delayed due to additional changes and feedback from Shreyank and Jaydeep.",
+          "team": "UI designer / Shreyank / Jaydeep",
+          "mitigation": "Waiting for the UI designer to deliver the updated screens once the changes and feedback from Shreyank and Jaydeep are included.",
+          "dueBy": "2026-11-22",
+          "escalated": false,
+          "resolved": false
         }
       ],
       "sprintStatus": {
@@ -1739,7 +1748,14 @@
           "VAPT on iOS and Android will start"
         ]
       },
-      "risks": [],
+      "risks": [
+        {
+          "id": "RISK-102",
+          "text": "UI designer screens were expected by EOD 22 Nov 2026 but are delayed due to additional changes and feedback from Shreyank and Jaydeep. This can delay development and the UAT delivery.",
+          "mitigation": "Tracked as dependency DEP-104; follow up with the UI designer, Shreyank and Jaydeep to close the changes and feedback and get the final screens.",
+          "resolved": false
+        }
+      ],
       "delayImpact": "TDD +2d slip may impact downstream development start (22-Sep deck)",
       "delayMitigation": [
         "Aniket connected with Sameep during BA's leave period to secure FRD sign-off"
