@@ -1,6 +1,6 @@
 {
   "asOf": "2026-11-23",
-  "lastUpdated": "2026-11-24T02:38:06.000000Z",
+  "lastUpdated": "2026-11-24T10:30:00.000000Z",
   "stageSlaDays": {
     "Proposal": 7,
     "Requirements": 10,
@@ -522,10 +522,10 @@
       "dependencies": [
         {
           "id": "DEP-106",
-          "text": "Business decision on the Events feature. REQ feasibility in progress \u2014 ETA TBD \u2014 Purvesh Patel",
+          "text": "Business decision on the Events feature. REQ feasibility in progress \u2014 ETA 04-Dec-2026 \u2014 Purvesh Patel",
           "team": "RGC",
           "mitigation": "Events excluded from the 27-Dec plan; will need its own timeline once decided. May impact the new overall Go-Live.",
-          "dueBy": "",
+          "dueBy": "2026-12-04",
           "priority": "Medium",
           "escalated": true,
           "resolved": false
@@ -550,8 +550,14 @@
       "risks": [
         {
           "id": "RISK-106",
-          "text": "Events feature \u2014 business decision still TBD (RGC/Purvesh Patel, Medium); excluded from 27-Dec plan",
+          "text": "Phase 1 \"Go-Live\" date may delay due to DEP-106",
           "mitigation": "Escalated to leadership; Events to get its own timeline once decided",
+          "resolved": false
+        },
+        {
+          "id": "RISK-107",
+          "text": "NAHQ not able to see US and Canada entities. May add development overhead.",
+          "mitigation": "",
           "resolved": false
         }
       ],
@@ -568,7 +574,7 @@
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
-      "statusChangeReason": "Events REQ in discussion; Multi-operations policies testing and fixes in progress",
+      "statusChangeReason": "1. Events REQ review pending with Purvesh bhai \u2014 ETA 04-Dec-2026\n2. Multiple operations policy testing \u2014 WIP, ETA 04-Dec-2026\n3. 3 critical production tickets shared \u2014 WIP, ETA 25-Nov-2026",
       "dependencySeq": 107,
       "stagePlan": {
         "UAT": {
@@ -644,7 +650,7 @@
           "label": "Hypercare"
         }
       ],
-      "riskSeq": 107,
+      "riskSeq": 108,
       "changeRequests": [],
       "decisions": [],
       "goLiveChecklist": [],
@@ -653,9 +659,39 @@
           "sprint": "Production",
           "type": "Production bug",
           "feature": "EMM-8952 : Display Vendor Name in Expense Report View for Rejected Vendors",
-          "status": "In Progress",
-          "notes": "P0 issue and hotfix on production, shared on 11/22/2026. Current status: Dev Done",
+          "status": "QA Sign-off",
+          "notes": "P0 issue and hotfix on production, shared on 11/22/2026. Deployed on production; QA signed off.",
           "plannedDate": "",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Production",
+          "type": "Production bug",
+          "feature": "EMM-134 : Raleigh - Previous stage approved transaction is not appearing in the AP Lead queue or the MA queue for further processing.",
+          "status": "In Progress",
+          "notes": "Critical production ticket, shared on 11/24/2026. Current status: WIP",
+          "plannedDate": "2026-11-25",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Production",
+          "type": "Production bug",
+          "feature": "EMM-126 : Dallas - Can't print check",
+          "status": "In Progress",
+          "notes": "Critical production ticket, shared on 11/24/2026. Current status: WIP",
+          "plannedDate": "2026-11-25",
+          "actualDate": "",
+          "delayReason": ""
+        },
+        {
+          "sprint": "Production",
+          "type": "Production bug",
+          "feature": "EMM-132 : Raleigh - Transaction has been processed and approved in EMM but is not posted in Shelby, so the back office team can't reconcile.",
+          "status": "In Progress",
+          "notes": "Critical production ticket, shared on 11/24/2026. Current status: WIP",
+          "plannedDate": "2026-11-25",
           "actualDate": "",
           "delayReason": ""
         }
