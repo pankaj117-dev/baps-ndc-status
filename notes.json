@@ -64,5 +64,15 @@
     "raisedBy": "Vasu",
     "createdAt": "2026-11-17T00:00:00Z",
     "status": "open"
+  },
+  {
+    "id": "note-9",
+    "projectId": "mymandir",
+    "text": "Sameep Bhai mentioned that he will be joining the RAM meeting and has enough material prepared to present the myMandir UAT application to the audience.",
+    "raisedBy": "Sameep Bhai",
+    "createdAt": "2026-11-24T00:00:00Z",
+    "status": "resolved",
+    "resolvedAt": "2026-11-24T00:00:00Z",
+    "resolvedBy": "Aniket"
   }
 ]
