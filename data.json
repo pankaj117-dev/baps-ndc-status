@@ -322,10 +322,10 @@
       "status": "green",
       "progress": 100,
       "stage": "Hypercare",
-      "phase": "Go-live done 03-Nov (was 29-Oct, VAPT fixes). Hypercare 04-Nov\u201320-Nov; 8 of 10 stories delivered, 2 as fast-follow.",
+      "phase": "Go-live done 03-Nov (was 29-Oct, VAPT fixes). Hypercare 04-Nov\u201327-Nov (extended from 20-Nov); 8 of 10 stories delivered, 2 as fast-follow.",
       "nextMilestone": {
         "name": "Project Closure",
-        "date": "2026-11-20"
+        "date": "2026-11-27"
       },
       "goLive": "2026-11-03",
       "originalGoLive": "2026-10-29",
@@ -385,10 +385,11 @@
           "8 of 10 finalized user stories delivered"
         ],
         "inProgress": [
-          "Hypercare (04-Nov to 20-Nov)"
+          "Hypercare (04-Nov to 27-Nov, extended from 20-Nov)",
+          "Power BI reports work items"
         ],
         "nextPlan": [
-          "Project Closure (20-Nov-2026)"
+          "Project Closure (27-Nov-2026)"
         ]
       },
       "risks": [
@@ -453,7 +454,7 @@
           "initialStart": "2026-10-30",
           "latestStart": "2026-11-04",
           "initialEnd": "2026-11-20",
-          "latestEnd": "2026-11-20"
+          "latestEnd": "2026-11-27"
         }
       },
       "stageDateOrder": [
