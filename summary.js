@@ -86,7 +86,7 @@
   function notesCell(r) {
     const reason = String(r.p.statusChangeReason || "").trim();
     const needsReason = (r.current && r.current !== "green") || (r.last && r.current && r.last !== r.current);
-    if (reason) return '<td class="sum-notes">' + esc(reason) + "</td>";
+    if (reason) return '<td class="sum-notes">' + esc(reason).replace(/\n/g, "<br>") + "</td>";
     return '<td class="sum-notes">' + (needsReason ? missing("Reason missing", "Reason for status change") : "-") + "</td>";
   }
 
