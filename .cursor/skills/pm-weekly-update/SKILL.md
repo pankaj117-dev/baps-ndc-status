@@ -218,7 +218,13 @@ not just the ones the PM happened to think to mention. Only move to
    re-run it.
 5. Show the PM a short summary of what changed (the script already
    prints one).
-6. Commit: `git add data.json history.json && git commit -m "Weekly update: <project> (<as-of date>)"`.
+6. Seal the vault, then commit the encrypted files, not the plaintext JSON:
+   `node scripts/seal_dashboard.mjs`
+   `git add vault && git commit -m "Weekly update: <project> (<as-of date>)"`.
+   Do not `git add` `data.json`, `history.json`, `notes.json`, or `qa.json`.
+   If those files are missing (a fresh checkout), restore them first with
+   `node scripts/unseal_dashboard.mjs`. The password is
+   `BAPS_DASHBOARD_PASSWORD` or `.dashboard-password`.
 7. **Do not push to `main` without asking the PM first** — confirm
    explicitly, then push. If a push gets rejected (remote has new
    commits), `git fetch && git merge origin/main`, resolve any

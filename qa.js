@@ -334,8 +334,5 @@
     render(root);
   }
 
-  fetch("qa.json")
-    .then((r) => (r.ok ? r.json() : { weeks: [] }))
-    .catch(() => ({ weeks: [] }))
-    .then(init);
+  window.startQA = init;
 })();

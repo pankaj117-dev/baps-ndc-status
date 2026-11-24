@@ -44,9 +44,10 @@
     return '<span class="sum-missing" title="PM to update: ' + esc(FORM) + " → " + esc(field) + '">⚠ ' + esc(text) + "</span>";
   }
 
-  function stateCell(status, title) {
-    if (!status) return '<td class="sum-state sum-state-none">' + missing("Not updated", "Overall status") + "</td>";
-    return '<td class="sum-state" title="' + esc(title || "") + '"><span class="pill pill-' + status + '">' + WORD[status] + "</span></td>";
+  function stateCell(status, title, label) {
+    const attr = ' data-label="' + esc(label) + '"';
+    if (!status) return '<td class="sum-state sum-state-none"' + attr + '>' + missing("Not updated", "Overall status") + "</td>";
+    return '<td class="sum-state"' + attr + ' title="' + esc(title || "") + '"><span class="pill pill-' + status + '">' + WORD[status] + "</span></td>";
   }
 
   // Latest snapshot from the calendar week before the one data.json is
@@ -86,16 +87,16 @@
   function notesCell(r) {
     const reason = String(r.p.statusChangeReason || "").trim();
     const needsReason = (r.current && r.current !== "green") || (r.last && r.current && r.last !== r.current);
-    if (reason) return '<td class="sum-notes">' + esc(reason) + "</td>";
-    return '<td class="sum-notes">' + (needsReason ? missing("Reason missing", "Reason for status change") : "-") + "</td>";
+    if (reason) return '<td class="sum-notes" data-label="What changed">' + esc(reason) + "</td>";
+    return '<td class="sum-notes" data-label="What changed">' + (needsReason ? missing("Reason missing", "Reason for status change") : "-") + "</td>";
   }
 
   function goLiveCell(p) {
     const go = p.goLive ? fmt(p.goLive) : "TBD";
     const inHypercare = /hypercare/i.test(p.stage || "");
-    if (!inHypercare) return '<td class="sum-golive">' + go + "</td>";
+    if (!inHypercare) return '<td class="sum-golive" data-label="Go-live">' + go + "</td>";
     const end = hypercareEnd(p);
-    return '<td class="sum-golive"><span class="sum-golive-date">' + go + "</span>" +
+    return '<td class="sum-golive" data-label="Go-live"><span class="sum-golive-date">' + go + "</span>" +
       '<span class="sum-golive-end">Ends ' +
       (end ? fmt(end) : missing("Not set", "Current stage — planned completion date")) +
       "</span></td>";
@@ -103,7 +104,7 @@
 
   function stageCell(p) {
     const stage = p.stageLabel || p.stage;
-    return '<td class="sum-stage">' + (stage ? esc(stage) : missing("Not updated", "Pipeline stage")) + "</td>";
+    return '<td class="sum-stage" data-label="Stage">' + (stage ? esc(stage) : missing("Not updated", "Pipeline stage")) + "</td>";
   }
 
   function layoutBars(root) {
@@ -152,9 +153,9 @@
               '<span class="sum-pct">' + pct + "%</span></div>" +
               (badges ? '<div class="sum-badges">' + badges + "</div>" : "") +
               "</td>" +
-            '<td class="sum-pm">' + esc(r.p.owner || "—") + "</td>" +
-            (r.last ? stateCell(r.last, "Snapshot " + fmt(r.snapAsOf)) : '<td class="sum-state sum-state-none" title="No snapshot from last week">—</td>') +
-            stateCell(r.current, "Effective status, as on the cards") +
+            '<td class="sum-pm" data-label="PM">' + esc(r.p.owner || "—") + "</td>" +
+            (r.last ? stateCell(r.last, "Snapshot " + fmt(r.snapAsOf), "Last week") : '<td class="sum-state sum-state-none" data-label="Last week" title="No snapshot from last week">—</td>') +
+            stateCell(r.current, "Effective status, as on the cards", "This week") +
             notesCell(r) +
             goLiveCell(r.p) +
             stageCell(r.p) +

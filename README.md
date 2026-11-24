@@ -4,7 +4,14 @@ A single-page status dashboard for the BAPS NDC project portfolio, replacing the
 weekly slide-deck review. Built as a static site — no backend, no build step —
 so any PM can update it by editing one JSON file and pushing.
 
-**Live site:** `https://pankaj117.github.io/baps-ndc-status/` (enabled via GitHub Pages on the `main` branch)
+**Live site:** `https://pankaj117-dev.github.io/baps-ndc-status/` (GitHub Pages on `main`).
+
+The page asks for a shared password. The four JSON files are encrypted into
+`vault/*.bin` and are not served as plaintext. The password lives in
+`.dashboard-password` on your machine (gitignored), never in the repo. After
+editing the JSON, run `node scripts/seal_dashboard.mjs` and commit `vault/`.
+A fresh checkout restores the JSON with `node scripts/unseal_dashboard.mjs`.
+Git history from before the vault still contains the old plaintext.
 
 ## Summary tab (2026-11-19)
 

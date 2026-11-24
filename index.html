@@ -7,21 +7,33 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=156">
+<link rel="stylesheet" href="styles.css?v=157">
 <link rel="stylesheet" href="qa.css?v=3">
-<link rel="stylesheet" href="summary.css?v=10">
+<link rel="stylesheet" href="summary.css?v=11">
 </head>
-<body>
+<body class="is-locked">
+  <div id="gate" class="gate">
+    <form id="gateForm" class="gate-card">
+      <span class="kicker">BAPS North America · NDC</span>
+      <h1>This page is private</h1>
+      <p>Enter the shared password to open the dashboard.</p>
+      <label class="gate-label" for="gatePassword">Password</label>
+      <input id="gatePassword" type="password" autocomplete="current-password" required>
+      <button type="submit" class="gate-submit">Unlock</button>
+      <p id="gateError" class="gate-error" hidden></p>
+    </form>
+  </div>
   <div class="wrap">
     <header class="masthead">
       <div class="masthead-title">
         <span class="kicker">BAPS North America · NDC</span>
         <h1>Program Status Dashboard - PM Track</h1>
       </div>
-      <div class="masthead-meta">
-        <strong id="asOf">As of —</strong>
-        <span id="lastUpdated">Data last updated —</span>
-      </div>
+        <div class="masthead-meta">
+          <strong id="asOf">As of —</strong>
+          <span id="lastUpdated">Data last updated —</span>
+          <button type="button" id="lockDashboard" class="lock-btn">Lock</button>
+        </div>
     </header>
 
     <nav class="tabbar" role="tablist">
@@ -272,8 +284,9 @@
     </div>
   </div>
 
-  <script src="app.js?v=233"></script>
-  <script src="qa.js?v=3"></script>
-  <script src="summary.js?v=9"></script>
+  <script src="app.js?v=234"></script>
+  <script src="qa.js?v=4"></script>
+  <script src="summary.js?v=10"></script>
+  <script src="gate.js?v=1"></script>
 </body>
 </html>

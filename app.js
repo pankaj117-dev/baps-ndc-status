@@ -8297,19 +8297,12 @@
     notifyExtraTabs();
   }
 
-  function safeFetchJson(path, fallback) {
-    return fetch(path)
-      .then((r) => (r.ok ? r.json() : fallback))
-      .catch(() => fallback);
-  }
-
-  Promise.all([
-    safeFetchJson("data.json", { asOf: null, lastUpdated: null, projects: [] }),
-    safeFetchJson("history.json", {}),
-    safeFetchJson("notes.json", []),
-  ])
-    .then(init)
-    .catch((err) => {
-      document.getElementById("cards").textContent = "Could not load dashboard data: " + err.message;
-    });
+  window.startNDC = function (data, history, notes) {
+    try {
+      init([data, history, notes]);
+    } catch (err) {
+      const cards = document.getElementById("cards");
+      if (cards) cards.textContent = "Could not load dashboard data: " + err.message;
+    }
+  };
 })();

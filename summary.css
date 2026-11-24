@@ -267,3 +267,55 @@
   .sum-card { box-shadow: none; padding: 0; border: 0; }
   .sum-state .pill, .sum-count { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+
+@media (max-width: 760px) {
+  .sum-card { padding: 16px 12px; }
+  .sum-head { flex-direction: column; }
+  .sum-counts { width: 100%; }
+  .sum-count { flex: 1; min-width: 0; }
+  .sum-table-wrap { overflow: visible; border: 0; }
+  .sum-progress { display: none; }
+  .sum-table,
+  .sum-table tbody { display: block; width: 100%; }
+  .sum-table thead { display: none; }
+  .sum-table tr.sum-row {
+    display: block;
+    margin-bottom: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--bg-panel);
+  }
+  .sum-table tr.sum-row td {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    width: auto !important;
+    padding: 5px 0 !important;
+    border: 0;
+    text-align: right;
+  }
+  .sum-table td.sum-num { display: none; }
+  .sum-table td.sum-project {
+    display: block;
+    text-align: left;
+    padding-bottom: 8px !important;
+  }
+  .sum-table td[data-label]::before {
+    content: attr(data-label);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    text-align: left;
+  }
+  .sum-badges {
+    position: static;
+    flex-wrap: wrap;
+    width: auto;
+    margin-top: 10px;
+  }
+}
