@@ -15,15 +15,16 @@
  * A value a PM still has to enter shows a "⚠ ..." chip naming the form
  * field to fill in. Closed (`closedOn`) and finished (`stageComplete`)
  * projects are left out, unless `summaryInclude` keeps one listed (e.g. a
- * pending hotfix). `summaryPosition` (1-based) pins a row to a slot after
- * sorting. The Project/PM filter bar applies here too.
+ * pending hotfix). Rows are red, then amber, then green, and within a
+ * color the least complete project comes first. The Project/PM filter
+ * bar applies here too.
  *
  * app.js shares what this needs as window.NDC and fires "ndc:render"
  * whenever the data or the filters change. */
 (function () {
   "use strict";
 
-  const SEVERITY = { green: 0, amber: 1, red: 2, black: 3 };
+  const RANK = { black: 0, red: 1, amber: 2, green: 3 };
   const WORD = { green: "GREEN", amber: "AMBER", red: "RED", black: "NON-RECOVERABLE" };
   const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const FORM = "Weekly Update form";
@@ -45,7 +46,7 @@
 
   function stateCell(status, title) {
     if (!status) return '<td class="sum-state sum-state-none">' + missing("Not updated", "Overall status") + "</td>";
-    return '<td class="sum-state sum-state-' + status + '" title="' + esc(title || "") + '">' + WORD[status] + "</td>";
+    return '<td class="sum-state" title="' + esc(title || "") + '"><span class="pill pill-' + status + '">' + WORD[status] + "</span></td>";
   }
 
   // Latest snapshot from the calendar week before the one data.json is
@@ -72,18 +73,14 @@
         const last = snap && snap.status ? NDC.effectiveStatus(snap) : null;
         return { p, current, last, snapAsOf: snap ? snap.asOf : null };
       })
-      // Worst first, then the ones that changed, then by name: the order
-      // the deck reads in.
+      // Red at the top, then amber, then green. Inside a color, least
+      // complete first.
       .sort((a, b) =>
-        (SEVERITY[b.current] ?? 9) - (SEVERITY[a.current] ?? 9) ||
-        (SEVERITY[b.last] ?? -1) - (SEVERITY[a.last] ?? -1) ||
+        (RANK[a.current] ?? 9) - (RANK[b.current] ?? 9) ||
+        (Number(a.p.progress) || 0) - (Number(b.p.progress) || 0) ||
         a.p.name.localeCompare(b.p.name)
       );
-    // Pinned rows go to their slot (lowest slot first) once the rest are sorted.
-    const pinned = rows.filter((r) => r.p.summaryPosition > 0).sort((a, b) => a.p.summaryPosition - b.p.summaryPosition);
-    const out = rows.filter((r) => !(r.p.summaryPosition > 0));
-    pinned.forEach((r) => out.splice(Math.min(r.p.summaryPosition - 1, out.length), 0, r));
-    return out;
+    return rows;
   }
 
   function notesCell(r) {
@@ -107,6 +104,24 @@
     return '<td class="sum-stage">' + (stage ? esc(stage) : missing("Not updated", "Pipeline stage")) + "</td>";
   }
 
+  function layoutBars(root) {
+    const wrap = root.querySelector(".sum-table-wrap");
+    if (!wrap) return;
+    wrap.querySelectorAll(".sum-progress").forEach((bar) => bar.remove());
+    const wrapTop = wrap.getBoundingClientRect().top;
+    root.querySelectorAll("tr.sum-row").forEach((row) => {
+      const pct = Math.max(0, Math.min(100, Number(row.getAttribute("data-progress")) || 0));
+      if (!pct) return;
+      const rect = row.getBoundingClientRect();
+      const bar = document.createElement("div");
+      bar.className = "sum-progress status-" + (row.getAttribute("data-status") || "green");
+      bar.style.top = rect.top - wrapTop + wrap.scrollTop + "px";
+      bar.style.height = rect.height + "px";
+      bar.style.width = (wrap.scrollWidth * pct) / 100 + "px";
+      wrap.appendChild(bar);
+    });
+  }
+
   function render(NDC) {
     const root = document.getElementById("summaryPanel");
     if (!root) return;
@@ -117,20 +132,34 @@
       if (r.current === "red" || r.current === "black") counts.red++;
       else if (r.current in counts) counts[r.current]++;
     });
+    const cols = 8;
     const body = rows.length
-      ? rows.map((r, i) =>
-          "<tr>" +
-          '<td class="sum-num">' + (i + 1) + "</td>" +
-          '<td class="sum-project"><button type="button" class="sum-project-link" data-project="' + esc(r.p.id) +
-            '" title="Open ' + esc(r.p.name) + ' details">' + esc(r.p.name) + "</button></td>" +
-          (r.last ? stateCell(r.last, "Snapshot " + fmt(r.snapAsOf)) : '<td class="sum-state sum-state-none" title="No snapshot from last week">—</td>') +
-          stateCell(r.current, "Effective status, as on the cards") +
-          notesCell(r) +
-          goLiveCell(r.p) +
-          stageCell(r.p) +
-          "</tr>"
-        ).join("")
-      : '<tr><td colspan="7" class="sum-empty">No active projects match the current filter.</td></tr>';
+      ? rows.map((r, i) => {
+          const pct = Math.max(0, Math.min(100, Number(r.p.progress) || 0));
+          const badges = (NDC.summaryBadges ? NDC.summaryBadges(r.p) : []).map((b) =>
+            '<span class="badge' + (b.tone ? " " + b.tone : "") + '"' +
+            (b.section ? ' data-section="' + esc(b.section) + '"' : "") +
+            ">" + esc(b.text) + "</span>"
+          ).join("");
+          return (
+            '<tr class="sum-row" tabindex="0" role="button" data-project="' + esc(r.p.id) +
+              '" data-progress="' + pct + '" data-status="' + esc(r.current || "") +
+              '" title="Open ' + esc(r.p.name) + '">' +
+            '<td class="sum-num">' + (i + 1) + "</td>" +
+            '<td class="sum-project"><div class="sum-project-line">' + esc(r.p.name) +
+              '<span class="sum-pct">' + pct + "%</span></div>" +
+              (badges ? '<div class="sum-badges">' + badges + "</div>" : "") +
+              "</td>" +
+            '<td class="sum-pm">' + esc(r.p.owner || "—") + "</td>" +
+            (r.last ? stateCell(r.last, "Snapshot " + fmt(r.snapAsOf)) : '<td class="sum-state sum-state-none" title="No snapshot from last week">—</td>') +
+            stateCell(r.current, "Effective status, as on the cards") +
+            notesCell(r) +
+            goLiveCell(r.p) +
+            stageCell(r.p) +
+            "</tr>"
+          );
+        }).join("")
+      : '<tr><td colspan="' + cols + '" class="sum-empty">No active projects match the current filter.</td></tr>';
 
     const gaps = (body.match(/class="sum-missing"/g) || []).length;
     const lastWeek = rows.map((r) => r.snapAsOf).filter(Boolean).sort().pop();
@@ -149,14 +178,37 @@
       '<div class="sum-count sum-count-green"><b>' + counts.green + "</b><span>Green</span></div>" +
       "</div></div>" +
       '<div class="sum-table-wrap"><table class="sum-table"><thead><tr>' +
-      '<th class="sum-num">#</th><th>Project</th><th>Last State</th><th>Current State</th>' +
-      "<th>State Change Notes</th><th>Go-Live /<br>Hypercare</th><th>Stage</th>" +
+      '<th class="sum-num">#</th><th class="sum-project">Project</th><th class="sum-pm">PM</th>' +
+      '<th class="sum-state">Last State</th><th class="sum-state">Current State</th>' +
+      '<th class="sum-notes">State Change Notes</th><th class="sum-golive">Go-Live /<br>Hypercare</th><th class="sum-stage">Stage</th>' +
       "</tr></thead><tbody>" + body + "</tbody></table></div>" +
       "</div>";
 
-    root.querySelectorAll(".sum-project-link").forEach((b) =>
-      b.addEventListener("click", () => NDC.openProjectDetail(b.getAttribute("data-project")))
-    );
+    const openRow = (row) => NDC.openProjectDetail(row.getAttribute("data-project"));
+    root.querySelectorAll(".sum-row").forEach((row) => {
+      row.addEventListener("click", (e) => {
+        const badge = e.target.closest("[data-section]");
+        if (badge) {
+          NDC.openProjectDetail(row.getAttribute("data-project"), badge.getAttribute("data-section"));
+          return;
+        }
+        openRow(row);
+      });
+      row.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openRow(row);
+        }
+      });
+    });
+    layoutBars(root);
+    if (!render._wired) {
+      render._wired = true;
+      window.addEventListener("resize", () => {
+        const panel = document.getElementById("summaryPanel");
+        if (panel) layoutBars(panel);
+      });
+    }
   }
 
   function draw() {
@@ -164,5 +216,12 @@
   }
 
   document.addEventListener("ndc:render", draw);
+  document.querySelector('[data-tab="summary"]') &&
+    document.querySelector('[data-tab="summary"]').addEventListener("click", () => {
+      requestAnimationFrame(() => {
+        const panel = document.getElementById("summaryPanel");
+        if (panel) layoutBars(panel);
+      });
+    });
   draw();
 })();

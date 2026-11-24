@@ -1913,6 +1913,59 @@
     }
   }
 
+  // Call notes pinned onto the Hawk-eye board. This dashboard has no
+  // write-back to data.json, so a comment lives in this browser until it
+  // is removed.
+  const BOARD_COMMENT_PREFIX = "baps-ndc-board-comments:";
+
+  function boardCommentsFor(projectId) {
+    try {
+      const raw = localStorage.getItem(BOARD_COMMENT_PREFIX + projectId);
+      const list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list.filter((c) => c && c.text) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveBoardComments(projectId, list) {
+    try {
+      localStorage.setItem(BOARD_COMMENT_PREFIX + projectId, JSON.stringify(list));
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  function addBoardComment(projectId, text) {
+    const trimmed = String(text || "").trim();
+    if (!trimmed) return boardCommentsFor(projectId);
+    const list = boardCommentsFor(projectId);
+    if (!list.some((c) => c.text === trimmed)) {
+      list.push({ id: Date.now().toString(36), text: trimmed, at: new Date().toISOString() });
+      saveBoardComments(projectId, list);
+    }
+    return list;
+  }
+
+  function removeBoardComment(projectId, id) {
+    saveBoardComments(
+      projectId,
+      boardCommentsFor(projectId).filter((c) => c.id !== id)
+    );
+  }
+
+  function boardCommentNodes(projectId, onChange) {
+    return boardCommentsFor(projectId).map((c) => {
+      const remove = el("button", { class: "board-comment-remove", type: "button", title: "Remove from the board" }, ["×"]);
+      remove.addEventListener("click", (e) => {
+        e.stopPropagation();
+        removeBoardComment(projectId, c.id);
+        if (onChange) onChange();
+      });
+      return el("div", { class: "board-comment" }, [el("span", { class: "board-comment-text" }, [c.text]), remove]);
+    });
+  }
+
   function buildCallScratch(p, kind, label, placeholder) {
     const saved = scratchNoteFor(p, kind);
     const textarea = el("textarea", {
@@ -1932,12 +1985,39 @@
         status.textContent = "Saved on this browser";
       }, 400);
     });
+    const posted = el("div", { class: "board-comment-list" });
+    const refreshPosted = () => {
+      posted.innerHTML = "";
+      boardCommentNodes(p.id, () => {
+        refreshPosted();
+        const board = document.getElementById("hawkeyeGantt");
+        if (board) renderHawkeye();
+      }).forEach((node) => posted.appendChild(node));
+    };
+    const headChildren = [el("span", { class: "recovery-note-label" }, [label])];
+    if (kind === "feedback") {
+      const addBtn = el("button", { class: "recovery-note-add", type: "button" }, ["Add to board"]);
+      addBtn.addEventListener("click", () => {
+        const text = textarea.value.trim();
+        if (!text) {
+          status.textContent = "Type a note first";
+          return;
+        }
+        saveScratchNote(p, kind, textarea.value);
+        addBoardComment(p.id, text);
+        status.textContent = "Added to the Hawk-eye board";
+        refreshPosted();
+        const board = document.getElementById("hawkeyeGantt");
+        if (board) renderHawkeye();
+      });
+      headChildren.push(addBtn);
+      refreshPosted();
+    }
     return el("div", { class: "recovery-note", id: kind + "-scratch" }, [
-      el("div", { class: "recovery-note-head" }, [
-        el("span", { class: "recovery-note-label" }, [label]),
-      ]),
+      el("div", { class: "recovery-note-head" }, headChildren),
       textarea,
       status,
+      kind === "feedback" ? posted : null,
     ]);
   }
 
@@ -2035,6 +2115,29 @@
     return /approved|resolved|closed/i.test(status || "") ? "is-approved" : /pending|tbd/i.test(status || "") ? "is-pending" : "";
   }
 
+  // Every CR needs a named approver and the date they approved it. A CR
+  // that is not approved yet reads "Pending approval" in red. An approved
+  // CR shows who and when; if either was never entered it says so instead
+  // of guessing (`approvedBy` / `approvedDate` in data.json).
+  function crApproval(cr) {
+    const status = String((cr && cr.approvalStatus) || "TBD");
+    if (crStatusClass(status) === "is-approved") {
+      const by = String((cr && cr.approvedBy) || "").trim();
+      const date = cr && cr.approvedDate ? fmtDateShort(cr.approvedDate) : "";
+      const missing = !by || !date;
+      return {
+        cls: "is-approved",
+        pill: status,
+        line: missing
+          ? "Approved — " + (!by && !date ? "approver and date not recorded" : !by ? "approver not recorded" : "approval date not recorded")
+          : "Approved by " + by + " · " + date,
+        missing,
+        pending: false,
+      };
+    }
+    return { cls: "is-pending", pill: "Pending approval", line: "Pending approval from someone", missing: false, pending: true, status };
+  }
+
   function buildChangeRequestLog(p) {
     const items = p.changeRequests || [];
     if (!items.length) {
@@ -2042,6 +2145,7 @@
     }
     const list = el("div", { class: "cr-list" });
     items.forEach((cr, i) => {
+      const approval = crApproval(cr);
       const row = el(
         "button",
         { type: "button", class: "cr-row", title: "View full details" },
@@ -2050,12 +2154,17 @@
           el("span", { class: "cr-row-main" }, [
             el("span", { class: "cr-row-title" }, [cr.title || "Untitled change request"]),
             cr.description ? el("span", { class: "cr-row-desc" }, [cr.description]) : null,
+            el(
+              "span",
+              { class: "cr-row-approval" + (approval.pending ? " is-pending" : approval.missing ? " is-missing" : " is-approved") },
+              [approval.line]
+            ),
           ]),
           el("span", { class: "cr-row-meta" }, [
             cr.submittedDate ? fmtDateShort(cr.submittedDate) : "—",
             cr.by ? " · " + cr.by : "",
           ]),
-          el("span", { class: "cr-log-status " + crStatusClass(cr.approvalStatus) }, [cr.approvalStatus || "TBD"]),
+          el("span", { class: "cr-log-status " + approval.cls, title: cr.approvalStatus || "TBD" }, [approval.pill]),
           el("span", { class: "cr-row-chevron", "aria-hidden": "true" }, ["›"]),
         ]
       );
@@ -2773,6 +2882,7 @@
         el("div", { class: "roadmap-project-meta" + (delay > 0 ? " is-late" : "") }, [
           (p.goLive ? "Go-Live " + fmtDateShort(p.goLive) : "No go-live yet") + (delay > 0 ? " · +" + delay + "d" : " · on plan"),
         ]),
+        ...boardCommentNodes(p.id, () => renderHawkeye()),
       ]);
       nameCell.querySelector(".roadmap-project").addEventListener("click", () => openProjectDetail(p.id, "stage-gate-timeline-section"));
 
@@ -4290,6 +4400,36 @@
   // badge switches to that tab.
   function changeRequestBadge(p, opts) {
     return openItemBadge(crCounts(p), "CR", "CRs", "cr-log-section", opts);
+  }
+
+  // The Summary row's labels, matching the project card: the four open-item
+  // counts always, and fast-follow, scope cut, and escalations only when
+  // the project has them.
+  function summaryBadges(p) {
+    const item = (counts, one, many, section) => ({
+      text: counts.total + " " + (counts.total === 1 ? one : many),
+      tone: openItemTone(counts.total, counts.resolved),
+      section,
+    });
+    const badges = [
+      item(dependencyCounts(p), "dependency", "dependencies", "detail-deps-section"),
+      item(riskCounts(p), "risk", "risks", "detail-risks-section"),
+      item(followupCounts(p), "follow-up", "follow-ups", "detail-followups-section"),
+      item(crCounts(p), "CR", "CRs", "cr-log-section"),
+    ];
+    const fastFollow = p.fastFollowItems || [];
+    if (fastFollow.length) {
+      const done = fastFollow.filter((t) => isFastFollowDone(p, t)).length;
+      badges.push({
+        text: fastFollow.length + " fast-follow" + (done === fastFollow.length ? " ✓" : ""),
+        tone: done === fastFollow.length ? "tone-green" : "",
+        section: "",
+      });
+    }
+    if (p.scopeReduced) badges.push({ text: "scope cut", tone: "", section: "" });
+    const escalations = (p.escalations || []).length;
+    if (escalations) badges.push({ text: escalations + " escalated", tone: "tone-red", section: "detail-escalations-section" });
+    return badges;
   }
 
   function isPlaceholderRiskText(text) {
@@ -7176,12 +7316,13 @@
 
   function buildCrDetail(project, cr) {
     const root = el("div", { class: "itemdetail-root" });
+    const approval = crApproval(cr);
     root.appendChild(
       el("div", { class: "stagedetail-head" }, [
         el("div", null, [
           el("div", { class: "stagedetail-kicker" }, [project.name.toUpperCase() + " · CHANGE REQUEST " + cr.num]),
           el("h2", null, [cr.title || "Untitled change request"]),
-          el("span", { class: "cr-log-status " + crStatusClass(cr.approvalStatus) }, [cr.approvalStatus || "TBD"]),
+          el("span", { class: "cr-log-status " + approval.cls }, [approval.pending ? "Pending approval" : cr.approvalStatus || "Approved"]),
         ]),
       ])
     );
@@ -7191,6 +7332,14 @@
         el("dd", { class: "cr-detail-text" }, [cr.description || "—"]),
         el("dt", null, ["Submitted"]),
         el("dd", null, [(cr.submittedDate ? fmtDate(cr.submittedDate) : "—") + (cr.by ? " · by " + cr.by : "")]),
+        el("dt", null, ["Approval"]),
+        el("dd", { class: "cr-detail-approval" + (approval.pending ? " is-pending" : approval.missing ? " is-missing" : "") }, [
+          approval.pending
+            ? approval.line + (cr.approvalStatus ? " — status: " + cr.approvalStatus : "")
+            : approval.missing
+            ? approval.line
+            : "Approved by " + cr.approvedBy + " on " + fmtDate(cr.approvedDate),
+        ]),
         el("dt", null, ["Action item"]),
         el("dd", { class: "cr-detail-text" }, [cr.actionItem || "—"]),
         el("dt", null, ["Impact"]),
@@ -8085,6 +8234,7 @@
       historyForProject,
       weekStartMonday,
       openProjectDetail,
+      summaryBadges,
     };
     notifyExtraTabs();
   }

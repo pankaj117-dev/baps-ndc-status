@@ -19,7 +19,8 @@ is a JSON array of objects, upserted (matched + merged, or appended with
 a freshly minted id/key) rather than wholesale-replaced like the
 risks/dependencies textareas above:
 
-    "ChangeRequests"  -> [{id?, title, description, submittedDate, by, actionItem, approvalStatus, impact}]
+    "ChangeRequests"  -> [{id?, title, description, submittedDate, by, actionItem, approvalStatus, approvedBy, approvedDate, impact}]
+                         (approved CRs must carry approvedBy + approvedDate; anything else stays "Pending")
     "Decisions"       -> [{id?, decision, description, dateTaken, by}]
     "GoLiveChecklist" -> [{item, status, notes}]                 (upsert by "item")
     "RaidLog"         -> [{id?, type, item, description, reportedDate, actionItem, targetedCompletionDate, responsible, status, closureRemarks}]
@@ -37,6 +38,7 @@ import argparse
 import datetime
 import json
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -62,6 +64,38 @@ EXTENDED_LOG_FIELDS = [
     ("RaidLog", "raidLog", "raidLogSeq", "RAID"),
     ("DelayItemLog", "delayItemLog", "delayItemLogSeq", "DL-ITEM"),
 ]
+
+
+APPROVED_RE = re.compile(r"approved|resolved|closed", re.I)
+DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def check_cr_approvals(project, items):
+    """Every approved CR needs who approved it and when.
+
+    A CR that is not approved stays "Pending" (the dashboard shows it in red
+    as pending approval). Once a CR is marked approved, `approvedBy` and
+    `approvedDate` (YYYY-MM-DD) must be present, either in this update or
+    already on the CR. Returns a list of plain-language problems.
+    """
+    existing = {e.get("id"): e for e in (project.get("changeRequests") or []) if isinstance(e, dict) and e.get("id")}
+    problems = []
+    for raw in items:
+        merged = dict(existing.get(raw.get("id"), {}))
+        merged.update(raw)
+        label = merged.get("id") or merged.get("title") or "new change request"
+        status = str(merged.get("approvalStatus") or "").strip()
+        if not APPROVED_RE.search(status):
+            continue
+        by = str(merged.get("approvedBy") or "").strip()
+        date = str(merged.get("approvedDate") or "").strip()
+        if not by:
+            problems.append(f"{label}: marked '{status}' but 'approvedBy' is blank. Ask who approved it.")
+        if not date:
+            problems.append(f"{label}: marked '{status}' but 'approvedDate' is blank. Ask what date they approved it (YYYY-MM-DD).")
+        elif not DATE_RE.match(date):
+            problems.append(f"{label}: 'approvedDate' must be YYYY-MM-DD, got '{date}'.")
+    return problems
 
 
 def next_seq_id(project, seq_key, prefix):
@@ -187,6 +221,21 @@ def main():
             f"{STATUS_LABEL.get(prev_status, prev_status)} to {STATUS_LABEL.get(new_status, new_status)} "
             "but 'Reason for status change' is blank. Ask the PM for a reason and retry — "
             "same rule the GitHub issue pipeline enforces, not merged without one.",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+
+    cr_items = fields.get("ChangeRequests") or []
+    for item in cr_items:
+        # A new CR with no status starts as Pending, shown in red on the dashboard.
+        if not item.get("id") and not str(item.get("approvalStatus") or "").strip():
+            item["approvalStatus"] = "Pending"
+    cr_problems = check_cr_approvals(project, cr_items)
+    if cr_problems:
+        print(
+            "error: every approved change request needs who approved it and the date.\n  - "
+            + "\n  - ".join(cr_problems)
+            + "\nAsk the person for the missing details and retry. Leave the CR as 'Pending' if nobody has approved it yet.",
             file=sys.stderr,
         )
         sys.exit(2)

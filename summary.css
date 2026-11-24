@@ -1,9 +1,12 @@
-/* Summary tab (summary.js) — Project Status Summary, 2026-11-19 */
+/* Summary tab (summary.js) — Project Status Summary, 2026-11-19.
+   Uses the dashboard's own tokens (styles.css :root) so it reads like the
+   other tabs: white panel, mono uppercase labels, status pills. */
 .sum-card {
   background: var(--bg-panel);
-  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
-  padding: 22px 28px 28px;
+  padding: 24px 28px 26px;
   margin-bottom: 24px;
 }
 
@@ -18,71 +21,174 @@
 
 .sum-head h2 {
   margin: 0;
-  font-size: 26px;
+  font-family: var(--font-display);
+  font-size: 22px;
   font-weight: 800;
-  color: #1d2b4f;
+  letter-spacing: -0.02em;
+  color: var(--ink);
 }
 
 .sum-sub {
   margin: 6px 0 0;
-  font-size: 13px;
-  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-faint);
 }
 
-.sum-gap-count { color: #9a4a00; font-weight: 700; }
+.sum-gap-count { color: var(--amber); font-weight: 700; }
 
 .sum-counts { display: flex; gap: 12px; }
 
+/* Same look as the Program Status metric cards. */
 .sum-count {
-  min-width: 84px;
-  border-radius: 12px;
-  color: #fff;
-  text-align: center;
-  padding: 8px 14px 7px;
+  min-width: 96px;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 12px 14px 10px;
+  text-align: left;
 }
 
 .sum-count b {
   display: block;
-  font-size: 22px;
-  line-height: 1.1;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
   font-variant-numeric: tabular-nums;
 }
 
-.sum-count span { font-size: 12px; font-weight: 600; }
+.sum-count span {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+}
 
-/* Status fills. White text on each passes 4.5:1. */
-.sum-count-red, .sum-state-red { background: #c62828; }
-.sum-count-amber, .sum-state-amber { background: #b9560f; }
-.sum-count-green, .sum-state-green { background: #2e7d32; }
-.sum-state-black { background: #1f2430; }
+.sum-count-red { border-top-color: var(--red); }
+.sum-count-red b { color: var(--red); }
+.sum-count-amber { border-top-color: var(--amber); }
+.sum-count-amber b { color: var(--amber); }
+.sum-count-green { border-top-color: var(--green); }
+.sum-count-green b { color: var(--green); }
 
-.sum-table-wrap { overflow-x: auto; }
+.sum-table-wrap {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  position: relative;
+}
+
+.sum-progress {
+  position: absolute;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.16;
+}
+.sum-progress.status-green { background: var(--green); }
+.sum-progress.status-amber { background: var(--amber); }
+.sum-progress.status-red { background: var(--red); }
+.sum-progress.status-black { background: var(--black); }
+.sum-row:hover .sum-progress { opacity: 0.22; }
+
+.sum-table th,
+.sum-table td { position: relative; z-index: 1; }
+
+.sum-pct {
+  margin-left: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.sum-pm {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+
+.sum-project-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+}
+.sum-badges {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  width: max-content;
+  z-index: 2;
+}
+.sum-badges .badge {
+  font-size: 12px;
+  line-height: 1.35;
+  padding: 3px 9px;
+  cursor: pointer;
+  white-space: nowrap;
+}
 
 .sum-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
-  font-size: 13.5px;
-  min-width: 860px;
+  font-size: 13px;
 }
 
 .sum-table th,
 .sum-table td {
-  border: 1px solid #d6dbe4;
-  padding: 9px 10px;
+  border-bottom: 1px solid var(--line);
+  padding: 11px 12px;
   text-align: left;
   vertical-align: middle;
 }
 
+.sum-table tbody tr:last-child td { border-bottom: none; }
+
 .sum-table thead th {
-  background: #1d2b4f;
-  color: #fff;
-  font-weight: 700;
-  font-size: 13px;
+  background: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
 }
 
-.sum-table tbody tr:nth-child(even) td:not(.sum-state) { background: #f4f6fa; }
+.sum-table tbody tr.sum-row td {
+  vertical-align: top;
+  padding-top: 12px;
+  padding-bottom: 46px;
+}
 
-.sum-table .sum-num { width: 36px; text-align: center; color: var(--ink-soft); }
+.sum-table tbody tr.sum-row { cursor: pointer; }
+.sum-table tbody tr.sum-row:hover td { background: rgba(53, 98, 232, 0.05); }
+.sum-table tbody tr.sum-row:focus-visible td { background: rgba(53, 98, 232, 0.05); }
+
+.sum-table .sum-project {
+  width: 16%;
+  font-weight: 700;
+  color: var(--ink);
+  overflow: visible;
+  z-index: 2;
+}
+
+.sum-table .sum-num {
+  width: 36px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+.sum-table .sum-pm { width: 14%; }
 
 .sum-project-link {
   border: 0;
@@ -90,7 +196,7 @@
   padding: 0;
   font: inherit;
   font-weight: 700;
-  color: #1d2b4f;
+  color: var(--ink);
   text-align: left;
   cursor: pointer;
 }
@@ -98,32 +204,35 @@
 .sum-project-link:hover,
 .sum-project-link:focus-visible { color: var(--accent); text-decoration: underline; }
 
-.sum-table td.sum-state {
-  width: 110px;
-  text-align: center;
-  color: #fff;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-}
+.sum-table td.sum-state,
+.sum-table th.sum-state { width: 11%; }
+
+.sum-table td.sum-state .pill { font-weight: 700; }
 
 .sum-table td.sum-state-none {
-  background: transparent;
-  color: var(--ink-soft);
-  font-weight: 600;
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: 11px;
 }
 
-.sum-table .sum-golive { width: 130px; white-space: nowrap; }
-.sum-table .sum-stage { width: 170px; font-weight: 700; }
-.sum-table .sum-notes { color: var(--ink); }
+.sum-table .sum-golive {
+  width: 12%;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-soft);
+}
+
+.sum-table .sum-stage { width: 13%; font-weight: 600; color: var(--ink); }
+.sum-table .sum-notes { color: var(--ink-soft); }
 
 .sum-missing {
   display: inline-block;
-  padding: 2px 8px;
+  padding: 2px 9px;
   border-radius: 999px;
-  background: #fff4e5;
-  border: 1px dashed #d98a2b;
-  color: #8a4300;
-  font-size: 12px;
+  background: var(--amber-bg);
+  color: var(--amber);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
   font-weight: 700;
   white-space: nowrap;
   cursor: help;
@@ -132,6 +241,6 @@
 .sum-empty { text-align: center; color: var(--ink-faint); padding: 24px; }
 
 @media print {
-  .sum-card { box-shadow: none; padding: 0; }
-  .sum-state, .sum-count { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .sum-card { box-shadow: none; padding: 0; border: 0; }
+  .sum-state .pill, .sum-count { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }

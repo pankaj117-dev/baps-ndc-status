@@ -2693,8 +2693,12 @@ Everything lives in three files:
       "submittedDate": "2026-06-09",
       "by": "Aksharbhai",
       "actionItem": "Review requirements, assess effort, obtain CR approval",
-      "approvalStatus": "Approved for current phase",  // free text; "approved"/"pending"/"tbd" (case-
-                                                          // insensitive substring) drive the badge color
+      "approvalStatus": "Approved for current phase",  // free text; "approved"/"resolved"/"closed" is
+                                                          // approved, anything else shows in red as
+                                                          // "Pending approval from someone"
+      "approvedBy": "Aksharbhai",    // REQUIRED once approved (2026-11-23): shown on the CR row and popup
+      "approvedDate": "2026-06-12",  // REQUIRED once approved: YYYY-MM-DD. The weekly-update script
+                                      // refuses an approved CR that is missing either one.
       "impact": "Go-Live date impacted by 10 days"
     }
   ],

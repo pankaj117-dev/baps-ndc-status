@@ -167,6 +167,12 @@ roadmap/timeline — both read the same `stage` + `stagePlan` data.
       EXISTING entry they want to update (e.g. "mark CR-104 approved"),
       include its `"id"` in the object — the script merges by id instead
       of creating a duplicate. New entries just omit `"id"`.
+    - **Every Change Request needs an approver.** Ask: "Has anyone
+      approved this CR?" If nobody has, leave `approvalStatus` as
+      `"Pending"` (the dashboard shows it in red as pending approval).
+      If someone has, ask who approved it AND the date (YYYY-MM-DD) and
+      send them as `approvedBy` and `approvedDate`. The script refuses an
+      approved CR without both, so don't guess either one.
     - A plain, one-off `Milestones` entry (name/date/status/progress) is
       fine here through the script — it's only a second STAGE-GATE TRACK
       (Section B's bail-out case) that isn't.

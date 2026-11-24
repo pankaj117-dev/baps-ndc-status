@@ -70,10 +70,16 @@ replace other keys); omit `"id"` to append a new one (the script mints
   "submittedDate": "2026-06-09",
   "by": "Aksharbhai",
   "actionItem": "Review requirements, assess effort, obtain CR approval",
-  "approvalStatus": "Approved for current phase",  // free text; "approved"/"resolved"/"closed" → green, "pending"/"tbd" (substring, case-insensitive) drives badge color
+  "approvalStatus": "Approved for current phase",  // free text; "approved"/"resolved"/"closed" → green, anything else is pending approval and shows in red
+  "approvedBy": "Aksharbhai",     // REQUIRED once approved: who approved it
+  "approvedDate": "2026-06-12",   // REQUIRED once approved: YYYY-MM-DD
   "impact": "Go-Live date impacted by 10 days"
 }
 ```
+A CR nobody has approved stays `"approvalStatus": "Pending"` (a new CR with no
+status defaults to it) and appears in red as pending approval. The script exits
+with an error if an approved CR has no `approvedBy` or `approvedDate`. Ask the
+PM for both instead of guessing.
 
 ### `Decisions` → `decisions`
 ```json

@@ -4483,6 +4483,47 @@ dd.is-missing {
   color: var(--ink-faint);
   min-height: 14px;
 }
+.recovery-note-add {
+  margin-left: auto;
+  appearance: none;
+  border: 1px solid var(--accent);
+  background: #eef3ff;
+  color: var(--accent);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.recovery-note-add:hover { background: #e3ebff; }
+.board-comment-list { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+.board-comment {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  background: #f4f7ff;
+  border: 1px solid #d5def2;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--ink);
+  white-space: normal;
+}
+.roadmap-name .board-comment { max-width: 200px; }
+.board-comment-text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.board-comment-remove {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--ink-faint);
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+  cursor: pointer;
+}
+.board-comment-remove:hover { color: var(--red); }
 
 /* ---------- RACI reference + Go-Live readiness checklist (Stage-gate
    tab) removed 2026-11-04, all projects, per explicit request ("also
@@ -4520,7 +4561,19 @@ dd.is-missing {
 }
 
 .cr-log-status.is-approved { background: var(--green-bg); color: var(--green); }
-.cr-log-status.is-pending { background: var(--amber-bg); color: var(--amber); }
+.cr-log-status.is-pending { background: var(--red-bg); color: var(--red); }
+.cr-row-approval {
+  display: block;
+  margin-top: 3px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+.cr-row-approval.is-pending,
+.cr-detail-approval.is-pending { color: var(--red); font-weight: 700; }
+.cr-row-approval.is-approved { color: var(--green); }
+.cr-row-approval.is-missing,
+.cr-detail-approval.is-missing { color: var(--amber); font-weight: 600; }
 
 .cr-list {
   display: flex;

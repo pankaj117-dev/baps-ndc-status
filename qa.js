@@ -41,10 +41,10 @@
   // from the deck's #17665e so it passes the colorblind/contrast checks
   // next to the blue.
   const SERIES = [
-    { key: "tcDesigned", label: "TC Designed", color: "#2e6db4" },
-    { key: "tcModified", label: "TC Modified", color: "#139a84" },
+    { key: "tcDesigned", label: "TC Designed", color: "#3562e8" },
+    { key: "tcModified", label: "TC Modified", color: "#12b8a6" },
     { key: "tcExecuted", label: "TC Executed", color: "#6b4c9a" },
-    { key: "defectsLogged", label: "Defects Logged", color: "#c5600c" },
+    { key: "defectsLogged", label: "Defects Logged", color: "#e08a1e" },
   ];
 
   const VIEWS = [

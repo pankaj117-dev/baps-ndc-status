@@ -6,33 +6,38 @@
 
 .qa-card {
   background: var(--bg-panel);
-  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
-  overflow: hidden;
   margin-bottom: 24px;
 }
 
 .qa-banner {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 8px 24px;
-  background: #1d2b4f;
-  color: #fff;
-  padding: 18px 28px;
+  padding: 24px 28px 0;
 }
 
 .qa-banner h2 {
   margin: 0;
+  font-family: var(--font-display);
   font-size: 22px;
   font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
 }
 
 .qa-banner-week {
-  font-size: 18px;
-  font-weight: 800;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
   white-space: nowrap;
+  padding-top: 6px;
 }
 
 .qa-toolbar {
@@ -68,32 +73,36 @@
 
 .qa-table th,
 .qa-table td {
-  border: 1px solid #d6dbe4;
-  padding: 7px 10px;
+  border-bottom: 1px solid var(--line);
+  padding: 9px 10px;
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
 
 .qa-table thead th {
-  background: #1d2b4f;
-  color: #fff;
-  font-weight: 700;
+  background: var(--bg);
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   vertical-align: middle;
 }
 
-.qa-table thead th.qa-grp-tc { background: #17665e; }
-.qa-table thead th.qa-grp-def { background: #8b1e22; }
+.qa-table thead th.qa-grp-tc { color: var(--accent); background: var(--accent-soft); }
+.qa-table thead th.qa-grp-def { color: var(--red); background: var(--red-bg); }
 
 .qa-table .qa-th-left,
 .qa-table .qa-td-left { text-align: left; }
 
-.qa-table tbody tr:nth-child(even) td { background: #f4f6fa; }
-.qa-table tbody tr:hover td { background: var(--accent-soft); }
+.qa-table tbody tr:hover td { background: #fafcff; }
 
 .qa-table tfoot td {
-  background: #dcefe8;
-  font-weight: 800;
-  color: #1d2b4f;
+  background: var(--green-bg);
+  font-weight: 700;
+  color: var(--green);
+  border-bottom: none;
 }
 
 .qa-empty {
@@ -125,8 +134,9 @@
 .qa-view-btn:hover { color: var(--ink); }
 
 .qa-view-btn.is-active {
-  background: #1d2b4f;
   color: #fff;
+  background: linear-gradient(120deg, var(--accent) 0%, var(--accent-2) 100%);
+  box-shadow: 0 4px 12px rgba(53, 98, 232, 0.28);
 }
 
 /* ---------- Project-wise: KPI tiles ---------- */
@@ -138,32 +148,48 @@
 }
 
 .qa-tile {
-  border-radius: 10px;
-  color: #fff;
-  text-align: center;
-  padding: 16px 8px 14px;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--accent);
+  border-radius: var(--radius);
+  text-align: left;
+  padding: 14px 12px 12px;
 }
 
 .qa-tile-value {
+  font-family: var(--font-display);
   font-size: 26px;
   font-weight: 800;
-  line-height: 1.1;
+  line-height: 1;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
+  color: var(--accent);
 }
 
 .qa-tile-label {
   margin-top: 6px;
-  font-size: 12.5px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
 }
 
-.qa-tile-modified { background: #17665e; }
-.qa-tile-designed { background: #2e6db4; }
-.qa-tile-executed { background: #6b4c9a; }
-.qa-tile-logged { background: #b8560a; }
-.qa-tile-closed { background: #2e7d32; }
-.qa-tile-reopen { background: #8b1e22; }
-.qa-tile-rejected { background: #5f6673; }
+.qa-tile-modified { border-top-color: var(--accent-2); }
+.qa-tile-modified .qa-tile-value { color: var(--accent-2); }
+.qa-tile-designed { border-top-color: var(--accent); }
+.qa-tile-designed .qa-tile-value { color: var(--accent); }
+.qa-tile-executed { border-top-color: #6b4c9a; }
+.qa-tile-executed .qa-tile-value { color: #6b4c9a; }
+.qa-tile-logged { border-top-color: var(--amber); }
+.qa-tile-logged .qa-tile-value { color: var(--amber); }
+.qa-tile-closed { border-top-color: var(--green); }
+.qa-tile-closed .qa-tile-value { color: var(--green); }
+.qa-tile-reopen { border-top-color: var(--red); }
+.qa-tile-reopen .qa-tile-value { color: var(--red); }
+.qa-tile-rejected { border-top-color: var(--ink-soft); }
+.qa-tile-rejected .qa-tile-value { color: var(--ink-soft); }
 
 @media (max-width: 900px) {
   .qa-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
