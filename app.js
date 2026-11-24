@@ -2143,6 +2143,12 @@
   function crApproval(cr) {
     const status = String((cr && cr.approvalStatus) || "TBD");
     if (crStatusClass(status) === "is-approved") {
+      // `approvalDetailsNotRequired: true` (2026-11-24, SPM 1A CR-01/CR-02):
+      // the PM confirmed the CR as approved without an approver or date on
+      // record, so it reads plain "Approved" instead of the missing note.
+      if (cr && cr.approvalDetailsNotRequired) {
+        return { cls: "is-approved", pill: status, line: "Approved", missing: false, pending: false, plain: true };
+      }
       const by = String((cr && cr.approvedBy) || "").trim();
       const date = cr && cr.approvedDate ? fmtDateShort(cr.approvedDate) : "";
       const missing = !by || !date;
@@ -7404,7 +7410,7 @@
         el("dd", { class: "cr-detail-approval" + (approval.pending ? " is-pending" : approval.missing ? " is-missing" : "") }, [
           approval.pending
             ? approval.line + (cr.approvalStatus ? " — status: " + cr.approvalStatus : "")
-            : approval.missing
+            : approval.missing || approval.plain
             ? approval.line
             : "Approved by " + cr.approvedBy + " on " + fmtDate(cr.approvedDate),
         ]),
