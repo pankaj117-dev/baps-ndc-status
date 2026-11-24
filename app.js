@@ -232,7 +232,7 @@
         el("span", { class: "facts-counts" }, [
           openItemBadge(dependencyCounts(p), "dependency", "dependencies", "detail-deps-section"),
           openItemBadge(riskCounts(p), "risk", "risks", "detail-risks-section"),
-          openItemBadge(followupCounts(p), "follow-up", "follow-ups", "detail-followups-section"),
+          openFollowupBadge(p),
           changeRequestBadge(p),
         ]),
       ]),
@@ -1096,18 +1096,28 @@
   function isFastFollowDone(p, text) {
     return (p.fastFollowDone || []).indexOf(text) !== -1;
   }
+  // Badges show open items only (2026-11-24, "remove the follow up counts,
+  // only show open follow up"); the full list stays in the detail view.
+  function openFastFollowCount(p) {
+    return (p.fastFollowItems || []).filter((t) => !isFastFollowDone(p, t)).length;
+  }
   function fastFollowBadge(p) {
-    const items = p.fastFollowItems || [];
-    const done = items.filter((t) => isFastFollowDone(p, t)).length;
-    const all = items.length > 0 && done === items.length;
+    const open = openFastFollowCount(p);
     return el(
       "span",
-      {
-        class: "badge has-fastfollow" + (all ? " tone-green" : ""),
-        title: done + " of " + items.length + " completed",
-      },
-      [items.length + " fast-follow" + (all ? " ✓" : "")]
+      { class: "badge has-fastfollow", title: open + " fast-follow item" + (open === 1 ? "" : "s") + " still open" },
+      [open + " open fast-follow"]
     );
+  }
+  // Follow-up badge on cards and the detail header: open count only, left
+  // out when nothing is open. The Follow-ups tab still lists every item.
+  function openFollowupBadge(p, opts) {
+    const counts = followupCounts(p);
+    const open = counts.total - counts.resolved;
+    if (open <= 0) return null;
+    const badge = openItemBadge(counts, "follow-up", "follow-ups", "detail-followups-section", opts);
+    badge.textContent = open + " open " + (open === 1 ? "follow-up" : "follow-ups");
+    return badge;
   }
 
   function listOrDash(items) {
@@ -1184,9 +1194,9 @@
         el("div", { class: "card-badges" }, [
           openItemBadge(dependencyCounts(p), "dependency", "dependencies", "detail-deps-section", { jump: true }),
           openItemBadge(riskCounts(p), "risk", "risks", "detail-risks-section", { jump: true }),
-          openItemBadge(followupCounts(p), "follow-up", "follow-ups", "detail-followups-section", { jump: true }),
+          openFollowupBadge(p, { jump: true }),
           changeRequestBadge(p, { jump: true }),
-          ...((p.fastFollowItems || []).length
+          ...(openFastFollowCount(p)
             ? [fastFollowBadge(p)]
             : []),
           ...(p.scopeReduced
@@ -1635,7 +1645,18 @@
       const start = plan.latestStart || plan.initialStart;
       const end = plan.latestEnd || plan.initialEnd;
       if (!start || !end || end < start) return;
-      const kind = currentIdx === -1 ? (end < todayIso ? "done" : start <= todayIso ? "current" : "future") : i < currentIdx ? "done" : i === currentIdx ? "current" : "future";
+      // `p.stageStatus` also covers the extra stages here (2026-11-24,
+      // WebNext 2.0: Dev 2B running alongside UAT 2A).
+      const reported = p.stageStatus && p.stageStatus[stage];
+      const kind = ["done", "current", "future"].includes(reported)
+        ? reported
+        : currentIdx === -1 ? (end < todayIso ? "done" : start <= todayIso ? "current" : "future") : i < currentIdx ? "done" : i === currentIdx ? "current" : "future";
+      // A stage the PM reports as running and on schedule shows its share of
+      // the planned window elapsed so far (2026-11-24, WebNext 2.0 Dev 2B).
+      const pct =
+        reported === "current" && start <= todayIso
+          ? Math.max(0, Math.min(100, Math.round((daysBetweenIso(start, todayIso) / Math.max(1, daysBetweenIso(start, end))) * 100)))
+          : undefined;
       out.push({
         stage,
         label,
@@ -1643,7 +1664,7 @@
         end,
         plannedEnd: plan.initialEnd,
         actualEnd: null,
-        pct: undefined,
+        pct,
         kind,
         late: kind === "current" && end < todayIso,
         planPassed: kind === "future" && end < todayIso,
@@ -2171,6 +2192,8 @@
           el("span", { class: "cr-row-meta" }, [
             cr.submittedDate ? fmtDateShort(cr.submittedDate) : "—",
             cr.by ? " · " + cr.by : "",
+            // `uatDeploymentDate` (2026-11-24, SPM 1A): planned UAT deployment.
+            cr.uatDeploymentDate ? el("span", { class: "cr-row-uat" }, [" · UAT " + fmtDateShort(cr.uatDeploymentDate)]) : null,
             crAttachments(cr).length
               ? el("span", { class: "cr-row-clip", title: crAttachments(cr).length + " attachment(s)" }, [
                   "📎 " + crAttachments(cr).length,
@@ -2438,6 +2461,11 @@
   // a bug, not a feature (2026-11-04, "all the one listed are bugs") —
   // split the tracker into two sub-tabs instead of one mixed table, each
   // with its own KPI counts.
+  // "QA Sign-off" (2026-11-24, EMM: bug deployed on production and signed
+  // off by QA) counts as finished, alongside "Done".
+  function isFeatureDone(f) {
+    return f.status === "Done" || f.status === "QA Sign-off";
+  }
   function isBugFeatureItem(f) {
     return /bug/i.test(f.type || "");
   }
@@ -2447,7 +2475,7 @@
     const row = el("div", { class: "feature-kpi-row" });
     const totalLabel = opts.totalLabel || "Total";
     const doneLabel = opts.doneLabel || "Completed";
-    const doneItems = items.filter((f) => f.status === "Done");
+    const doneItems = items.filter(isFeatureDone);
     const inProgressItems = items.filter((f) => f.status === "In Progress" || f.status === "Partially Done");
     const upcomingItems = items.filter((f) => f.status === "Upcoming");
     const excludedItems = items.filter((f) => f.status === "Excluded");
@@ -2487,7 +2515,7 @@
           null,
           items.map((f) => {
             const statusClass =
-              f.status === "Done"
+              isFeatureDone(f)
                 ? "is-done"
                 : f.status === "In Progress" || f.status === "Partially Done"
                 ? "is-inprogress"
@@ -4443,15 +4471,8 @@
           }
         : null,
     ].filter(Boolean);
-    const fastFollow = p.fastFollowItems || [];
-    if (fastFollow.length) {
-      const done = fastFollow.filter((t) => isFastFollowDone(p, t)).length;
-      badges.push({
-        text: fastFollow.length + " fast-follow" + (done === fastFollow.length ? " ✓" : ""),
-        tone: done === fastFollow.length ? "tone-green" : "",
-        section: "",
-      });
-    }
+    const openFastFollow = openFastFollowCount(p);
+    if (openFastFollow) badges.push({ text: openFastFollow + " open fast-follow", tone: "", section: "" });
     if (p.scopeReduced) badges.push({ text: "scope cut", tone: "", section: "" });
     const escalations = (p.escalations || []).length;
     if (escalations) badges.push({ text: escalations + " escalated", tone: "tone-red", section: "detail-escalations-section" });
@@ -6393,8 +6414,8 @@
         const bugs = feats.filter(isBugFeatureItem);
         const feats2 = feats.filter((f) => !isBugFeatureItem(f));
         const parts = [];
-        if (feats2.length) parts.push(feats2.filter((f) => f.status === "Done").length + " of " + plural(feats2.length, "feature") + " done");
-        if (bugs.length) parts.push(bugs.filter((f) => f.status === "Done").length + " of " + plural(bugs.length, "bug") + " fixed");
+        if (feats2.length) parts.push(feats2.filter(isFeatureDone).length + " of " + plural(feats2.length, "feature") + " done");
+        if (bugs.length) parts.push(bugs.filter(isFeatureDone).length + " of " + plural(bugs.length, "bug") + " fixed");
         return parts.join(" · ") || "No features or bugs tracked yet";
       }
       case "depsrisks": {
@@ -6716,7 +6737,9 @@
       if (m.date && m.date < todayStr) return;
       allMilestones.push({ name: m.name, date: m.date || null, status: m.status, target: !!m.date });
     });
-    allMilestones.sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+    // A milestone with no date (2026-11-24, SSO V2 "VAPT start") reads "TBD"
+    // and sorts after the dated ones.
+    allMilestones.sort((a, b) => (a.date || "9999").localeCompare(b.date || "9999"));
     if (!allMilestones.length) {
       schedulePanel.appendChild(el("p", { class: "empty-note" }, ["No upcoming milestones from the stage dates yet."]));
     } else {
@@ -6744,7 +6767,7 @@
                     el("span", { class: "milestones-target-label" }, ["Target date"]),
                     el("span", { class: "milestones-date" }, [fmtDateShort(m.date)]),
                   ])
-                : el("span", { class: "milestones-date" }, [m.date ? fmtDateShort(m.date) : "—"]),
+                : el("span", { class: "milestones-date" }, [m.date ? fmtDateShort(m.date) : "TBD"]),
             ])
           )
         )
@@ -7385,6 +7408,9 @@
             ? approval.line
             : "Approved by " + cr.approvedBy + " on " + fmtDate(cr.approvedDate),
         ]),
+        ...(cr.uatDeploymentDate
+          ? [el("dt", null, ["UAT deployment"]), el("dd", null, [fmtDate(cr.uatDeploymentDate)])]
+          : []),
         el("dt", null, ["Action item"]),
         el("dd", { class: "cr-detail-text" }, [cr.actionItem || "—"]),
         el("dt", null, ["Impact"]),

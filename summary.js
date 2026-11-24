@@ -15,8 +15,9 @@
  * A value a PM still has to enter shows a "⚠ ..." chip naming the form
  * field to fill in. Closed (`closedOn`) and finished (`stageComplete`)
  * projects are left out, unless `summaryInclude` keeps one listed (e.g. a
- * pending hotfix). Rows are red, then amber, then green, and within a
- * color the least complete project comes first. The Project/PM filter
+ * pending hotfix), and `summaryInclude: false` leaves out any project.
+ * Rows are red, then amber, then green, and within a color the least
+ * complete project comes first. The Project/PM filter
  * bar applies here too.
  *
  * app.js shares what this needs as window.NDC and fires "ndc:render"
@@ -67,7 +68,7 @@
     const data = NDC.getData();
     const asOf = data.asOf;
     const rows = NDC.visibleProjects()
-      .filter((p) => !p.closedOn && (!p.stageComplete || p.summaryInclude))
+      .filter((p) => p.summaryInclude !== false && !p.closedOn && (!p.stageComplete || p.summaryInclude))
       .map((p) => {
         const current = p.status ? NDC.effectiveStatus(p) : null;
         const snap = asOf ? lastWeekSnapshot(NDC, p.id, asOf) : null;
@@ -87,7 +88,7 @@
   function notesCell(r) {
     const reason = String(r.p.statusChangeReason || "").trim();
     const needsReason = (r.current && r.current !== "green") || (r.last && r.current && r.last !== r.current);
-    if (reason) return '<td class="sum-notes" data-label="What changed">' + esc(reason) + "</td>";
+    if (reason) return '<td class="sum-notes" data-label="What changed">' + esc(reason).replace(/\n/g, "<br>") + "</td>";
     return '<td class="sum-notes" data-label="What changed">' + (needsReason ? missing("Reason missing", "Reason for status change") : "-") + "</td>";
   }
 

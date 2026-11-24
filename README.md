@@ -36,7 +36,8 @@ A value a PM still has to enter shows a **⚠ chip** (e.g. *⚠ Reason
 missing*). Hovering over it names the Weekly Update form field to fill in, and
 the header counts the open items. Closed (`closedOn`) and finished
 (`stageComplete`) projects are left out, unless `summaryInclude` keeps one
-listed. Rows run worst status first, then
+listed; `summaryInclude: false` leaves any project off the summary (it still
+shows on the other tabs). Rows run worst status first, then
 the ones that changed; `summaryPosition` (1-based) pins a row to a slot.
 The Project/PM filter bar applies, and clicking a
 project opens its details. The code is in `summary.js` / `summary.css`.
