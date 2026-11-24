@@ -1872,19 +1872,16 @@
         }
       ],
       "riskSeq": 103,
-      "changeRequests": [
+      "changeRequests": [],
+      "decisions": [
         {
-          "id": "CR-101",
-          "title": "Future scope items",
+          "id": "DEC-101",
+          "decision": "Future scope items",
           "description": "Received the future scope items from Sameep; he is adding more points to the future scope items sheet.",
-          "submittedDate": "2026-11-23",
-          "by": "Sameep",
-          "actionItem": "Wait for Sameep to finish adding points to the sheet, then review the items and estimate effort.",
-          "approvalStatus": "Pending",
-          "impact": "TBD"
+          "dateTaken": "2026-11-23",
+          "by": "Sameep"
         }
       ],
-      "decisions": [],
       "goLiveChecklist": [],
       "features": [],
       "delayItemLog": [],
