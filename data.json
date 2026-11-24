@@ -1930,6 +1930,8 @@
       "stage": "Hypercare",
       "stageLabel": "Hypercare completed Nov 20",
       "stageComplete": true,
+      "summaryInclude": true,
+      "summaryPosition": 8,
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
@@ -2816,6 +2818,7 @@
     {
       "id": "spm-1a",
       "name": "SPM 1A",
+      "summaryPosition": 3,
       "owner": "Sandeep Pistolwala",
       "status": "green",
       "progress": 88,

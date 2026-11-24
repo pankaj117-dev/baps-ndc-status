@@ -14,7 +14,9 @@
  *   Stage           stage label, or pipeline stage
  * A value a PM still has to enter shows a "⚠ ..." chip naming the form
  * field to fill in. Closed (`closedOn`) and finished (`stageComplete`)
- * projects are left out. The Project/PM filter bar applies here too.
+ * projects are left out, unless `summaryInclude` keeps one listed (e.g. a
+ * pending hotfix). `summaryPosition` (1-based) pins a row to a slot after
+ * sorting. The Project/PM filter bar applies here too.
  *
  * app.js shares what this needs as window.NDC and fires "ndc:render"
  * whenever the data or the filters change. */
@@ -62,8 +64,8 @@
   function buildRows(NDC) {
     const data = NDC.getData();
     const asOf = data.asOf;
-    return NDC.visibleProjects()
-      .filter((p) => !p.closedOn && !p.stageComplete)
+    const rows = NDC.visibleProjects()
+      .filter((p) => !p.closedOn && (!p.stageComplete || p.summaryInclude))
       .map((p) => {
         const current = p.status ? NDC.effectiveStatus(p) : null;
         const snap = asOf ? lastWeekSnapshot(NDC, p.id, asOf) : null;
@@ -77,6 +79,11 @@
         (SEVERITY[b.last] ?? -1) - (SEVERITY[a.last] ?? -1) ||
         a.p.name.localeCompare(b.p.name)
       );
+    // Pinned rows go to their slot (lowest slot first) once the rest are sorted.
+    const pinned = rows.filter((r) => r.p.summaryPosition > 0).sort((a, b) => a.p.summaryPosition - b.p.summaryPosition);
+    const out = rows.filter((r) => !(r.p.summaryPosition > 0));
+    pinned.forEach((r) => out.splice(Math.min(r.p.summaryPosition - 1, out.length), 0, r));
+    return out;
   }
 
   function notesCell(r) {
