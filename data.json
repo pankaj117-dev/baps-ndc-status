@@ -1766,7 +1766,7 @@
       ],
       "delayTradeoffs": "",
       "stage": "VAPT",
-      "stageLabel": "Development & VAPT",
+      "stageLabel": "Development and VAPT (Web)",
       "escalations": [],
       "timeSavedDays": 0,
       "timeSavedNote": [],
