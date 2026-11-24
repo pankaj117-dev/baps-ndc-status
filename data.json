@@ -3514,6 +3514,7 @@
     {
       "id": "mymandir-1c",
       "name": "myMandir 1C",
+      "summaryInclude": false,
       "owner": "Aniket Udgaonkar",
       "status": "green",
       "statusChangeReason": "NA",
