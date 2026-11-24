@@ -23939,13 +23939,13 @@
       {
         "id": "gms",
         "name": "GMS 1.4",
-        "status": "amber",
+        "status": "green",
         "progress": 100,
         "stage": "Hypercare",
         "delayDays": 0,
         "delayNote": "Overall: launch go-live held 12-Oct, so no project delay. Requirement +3, TDD +6, Development +7, QA +7, UAT +4 weekdays. Hotfix: Development end moved 02-Nov \u2192 06-Nov; QA end moved 23-Nov \u2192 27-Nov (Diwali vacation + QA on leave till 22-Nov); hotfix release moved 30-Nov \u2192 06-Dec (+6 days).",
-        "statusChangeReason": "Time was used to address post-production bugs, which pushed the hotfix timeline.",
-        "phase": "Hypercare",
+        "statusChangeReason": "",
+        "phase": "Hypercare completed 20-Nov-2026; hotfix release Dec 6",
         "nextMilestone": {
           "name": "Hotfix deployment",
           "date": "2026-12-06"
@@ -24078,16 +24078,14 @@
         },
         "sprintStatus": {
           "completed": [
-            "WSO2 (SSO) implementation done",
-            "Hotfix: Unsubscribe user stories"
+            "Hotfix: Unsubscribe user stories development done",
+            "UI enhancements backlog"
           ],
           "inProgress": [
             "QA for hotfix",
-            "QA for WSO2 (SSO)",
-            "UI enhancements backlog"
+            "QA for WSO2 (SSO)"
           ],
           "nextPlan": [
-            "QA on UI enhancements backlog",
             "VAPT and load testing for hotfix Unsubscribe user stories"
           ]
         },
