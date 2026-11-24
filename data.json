@@ -2531,30 +2531,20 @@
       "owner": "Aniket Udgaonkar",
       "status": "amber",
       "progress": 70,
-      "phase": "Satsangi testing partially completed (logs required); senior QA assigned on 18 Nov 2026",
+      "phase": "Satsangi testing partially completed",
       "nextMilestone": {
         "name": "QA",
-        "date": "2026-11-24"
+        "date": "2026-11-28"
       },
       "goLive": null,
       "originalGoLive": "2026-11-06",
       "delayDays": 0,
       "delayNote": "Stage Dates sheet: Development & QA end is 06-Nov (Satsangi; Karyakar 05-Nov; earlier revision 26-Oct). UAT end is 13-Nov (Satsangi; Karyakar 06-Nov; earlier revision 29-Oct). Hypercare start moved to 01-Dec. VAPT revised start is 29-Oct but the revised end is TBD, so that stage is still plotted on 15-Oct\u201321-Oct. Load revised end and Go-Live revised dates are TBD.",
-      "dependencies": [
-        {
-          "id": "DEP-105",
-          "text": "QA is waiting for logs from DevOps (reported 27 Oct 2026)",
-          "team": "DevOps",
-          "mitigation": "",
-          "dueBy": "",
-          "escalated": false,
-          "resolved": false,
-          "track": "Development"
-        }
-      ],
+      "dependencies": [],
       "sprintStatus": {
         "completed": [
           "QA completed Satsangi testing; only logs are required",
+          "QA received logs from DevOps on 24 Nov 2026",
           "Satsangi demo to NDC completed on 24 Nov 2026",
           "Karyakar defects resolved from dev end"
         ],
@@ -2572,7 +2562,7 @@
       ],
       "delayTradeoffs": "",
       "stage": "Development",
-      "stageLabel": "QA",
+      "stageLabel": "QA and mySatsang development",
       "behindSchedule": true,
       "milestonesOnly": true,
       "stageDatesLatestStart": true,
@@ -2701,7 +2691,7 @@
       "timeSavedDays": 0,
       "timeSavedNote": [],
       "scopeReduced": false,
-      "statusChangeReason": "",
+      "statusChangeReason": "-",
       "dependencySeq": 105,
       "stagePlan": {
         "Requirements": {
@@ -2720,7 +2710,7 @@
           "initialStart": "2026-07-01",
           "latestStart": "2026-07-01",
           "initialEnd": "2026-10-09",
-          "latestEnd": "2026-11-24"
+          "latestEnd": "2026-11-28"
         },
         "UAT": {
           "initialStart": "2026-10-12",
@@ -2860,16 +2850,15 @@
       "milestones": [
         {
           "name": "QA",
-          "date": "2026-11-24",
+          "date": "2026-11-28",
           "progress": 50
         },
         {
           "name": "mySatsang flow implementation",
-          "date": "2026-11-27"
+          "date": "2026-11-28"
         },
         {
           "name": "VAPT start",
-          "date": "2026-11-27",
           "progress": 0
         },
         {

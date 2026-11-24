@@ -74,5 +74,15 @@
     "status": "resolved",
     "resolvedAt": "2026-11-24T00:00:00Z",
     "resolvedBy": "Aniket"
+  },
+  {
+    "id": "note-10",
+    "projectId": "baps-sso",
+    "text": "As requested by Satyanishtha Swami, a senior QA resource has been assigned to review the QA activities for the SSO V2 initiative. Accordingly, Dharti Ben has been added as the senior QA reviewer and will oversee and validate the QA work to ensure thorough coverage and quality on 18 Nov 2026.",
+    "raisedBy": "Satyanishtha Swami",
+    "createdAt": "2026-11-18T00:00:00Z",
+    "status": "resolved",
+    "resolvedAt": "2026-11-18T00:00:00Z",
+    "resolvedBy": "Aniket"
   }
 ]
