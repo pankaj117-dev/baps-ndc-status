@@ -1124,6 +1124,35 @@
     return items.length ? items.map((d) => el("li", null, [d])) : [el("li", null, ["—"])];
   }
 
+  // A mitigation written as separate "Impact: …" and "Mitigation: …" lines
+  // (2026-11-24, myBKY 2A) shows each part on its own line, with "Impact" /
+  // "Mitigation" in the same label style as "Mitigation / impact:". Any other
+  // text (single line, or lines without those headings) renders as before.
+  function splitImpactMitigation(text) {
+    if (!text || String(text).indexOf("\n") < 0) return null;
+    const lines = String(text).split("\n").map((s) => s.trim()).filter(Boolean);
+    const parts = lines.map((line) => {
+      const m = /^(Impact|Mitigation):\s*(.*)$/i.exec(line);
+      return m ? { head: m[1], body: m[2] } : null;
+    });
+    return parts.length && parts.every(Boolean) ? parts : null;
+  }
+
+  function mitigationBlock(label, mitigation) {
+    const parts = splitImpactMitigation(mitigation);
+    if (!parts) {
+      return el("div", { class: "paired-item-mitigation" + (mitigation ? "" : " is-missing") }, [
+        el("span", { class: "mitigation-label" }, [label + ": "]),
+        mitigation || "Not yet documented",
+      ]);
+    }
+    return el(
+      "div",
+      { class: "paired-item-mitigation" },
+      parts.map((part) => el("div", null, [el("span", { class: "mitigation-label" }, [part.head + ": "]), part.body]))
+    );
+  }
+
   function pairedList(items, mitigations, label, teams) {
     if (!items.length) return [el("li", null, ["—"])];
     return items.map((text, i) => {
@@ -1136,10 +1165,7 @@
             ? [el("span", { class: "team-tag" + (team ? "" : " is-missing") }, [team || "No team labeled"])]
             : []),
         ]),
-        el("div", { class: "paired-item-mitigation" + (mitigation ? "" : " is-missing") }, [
-          el("span", { class: "mitigation-label" }, [label + ": "]),
-          mitigation || "Not yet documented",
-        ]),
+        mitigationBlock(label, mitigation),
       ]);
     });
   }
@@ -4612,10 +4638,7 @@
               ]),
           dep.stage ? el("span", { class: "stage-tag" }, [dep.stage + " →"]) : null,
         ].filter(Boolean)),
-        el("div", { class: "paired-item-mitigation" + (mitigation ? "" : " is-missing") }, [
-          el("span", { class: "mitigation-label" }, ["Mitigation / impact: "]),
-          mitigation || "Not yet documented",
-        ]),
+        mitigationBlock("Mitigation / impact", mitigation),
         actions.length ? el("div", { class: "dep-actions-row" }, actions) : null,
       ].filter(Boolean));
       // 2026-11-04, explicit request: clicking a dependency should land
@@ -7472,7 +7495,9 @@
       el("dt", null, ["Resolved"]),
       el("dd", null, [item.resolved ? "Yes" : "No — still open"]),
       el("dt", null, [isDep ? "Mitigation / impact" : "Mitigation plan"]),
-      el("dd", null, [item.mitigation || "Not yet documented"])
+      el("dd", null, splitImpactMitigation(item.mitigation)
+        ? splitImpactMitigation(item.mitigation).map((part) => el("div", null, [el("strong", null, [part.head + ": "]), part.body]))
+        : [item.mitigation || "Not yet documented"])
     );
 
     root.appendChild(el("dl", { class: "detail-facts itemdetail-facts" }, fields));
