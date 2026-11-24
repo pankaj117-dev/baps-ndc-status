@@ -2181,6 +2181,8 @@
           el("span", { class: "cr-row-meta" }, [
             cr.submittedDate ? fmtDateShort(cr.submittedDate) : "—",
             cr.by ? " · " + cr.by : "",
+            // `uatDeploymentDate` (2026-11-24, SPM 1A): planned UAT deployment.
+            cr.uatDeploymentDate ? el("span", { class: "cr-row-uat" }, [" · UAT " + fmtDateShort(cr.uatDeploymentDate)]) : null,
             crAttachments(cr).length
               ? el("span", { class: "cr-row-clip", title: crAttachments(cr).length + " attachment(s)" }, [
                   "📎 " + crAttachments(cr).length,
@@ -7393,6 +7395,9 @@
             ? approval.line
             : "Approved by " + cr.approvedBy + " on " + fmtDate(cr.approvedDate),
         ]),
+        ...(cr.uatDeploymentDate
+          ? [el("dt", null, ["UAT deployment"]), el("dd", null, [fmtDate(cr.uatDeploymentDate)])]
+          : []),
         el("dt", null, ["Action item"]),
         el("dd", { class: "cr-detail-text" }, [cr.actionItem || "—"]),
         el("dt", null, ["Impact"]),
