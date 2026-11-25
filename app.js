@@ -6454,6 +6454,7 @@
         return plural(cr, "change request") + " · " + plural(dec, "decision");
       }
       case "features": {
+        if (p.hideFeatureTracker && p.postProdBugs) return p.postProdBugs.summary || "Post-prod bugs";
         const feats = p.features || [];
         if (!feats.length) return "No features or bugs tracked yet";
         const bugs = feats.filter(isBugFeatureItem);
@@ -6718,13 +6719,17 @@
     // the tab button/panel/jump-link entry; no changes to those two
     // functions or to `data.json`'s `features` field were needed.
     // (`buildFeatureTracker()` calls `buildFeatureKpis()` internally.)
-    featuresPanel.appendChild(el("h3", { class: "weekly-subhead", id: "feature-tracker-section" }, ["Feature / bug tracker"]));
-    featuresPanel.appendChild(
-      el("p", { class: "section-subhead" }, [
-        "Feature-level breakdown by sprint and bug tracker, in separate tabs — each with its own counts, planned vs. actual dates and delay reasons.",
-      ])
-    );
-    featuresPanel.appendChild(buildFeatureTracker(p));
+    // `hideFeatureTracker` (2026-11-24, GMS 1.4) drops the tracker so the
+    // tab shows only Post-prod bugs; the `features` data stays in place.
+    if (!p.hideFeatureTracker) {
+      featuresPanel.appendChild(el("h3", { class: "weekly-subhead", id: "feature-tracker-section" }, ["Feature / bug tracker"]));
+      featuresPanel.appendChild(
+        el("p", { class: "section-subhead" }, [
+          "Feature-level breakdown by sprint and bug tracker, in separate tabs — each with its own counts, planned vs. actual dates and delay reasons.",
+        ])
+      );
+      featuresPanel.appendChild(buildFeatureTracker(p));
+    }
     if (p.postProdBugs) featuresPanel.appendChild(buildPostProdBugs(p.postProdBugs, p.postReleaseIssues));
     else if ((p.postReleaseIssues || []).length) featuresPanel.appendChild(buildPostReleaseIssues(p.postReleaseIssues));
 
