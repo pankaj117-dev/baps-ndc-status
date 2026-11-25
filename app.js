@@ -2429,13 +2429,30 @@
   // group (bugs, CRs, …) with an optional note underneath. Shape:
   // { summary, groups: [{ title, metrics: [{ label, num, tone? }], note }] }.
   // The Post-Release Issues & RCA table, when given, slots in right after
-  // the first group (the bug tiles), ahead of the CR tiles.
+  // the first group (the bug tiles). Change-request groups (title says
+  // "change request") are left out here and shown on the Change requests
+  // tab instead, via buildPostProdCrTiles (2026-11-24).
+  const isCrGroup = (g) => /change request/i.test(g.title || "");
+
   function buildPostProdBugs(data, issues) {
     const wrap = el("div", { class: "postprod-bugs" }, [
       el("h3", { class: "weekly-subhead", id: "postprod-bugs-section" }, ["Post-prod bugs"]),
       data.summary ? el("p", { class: "section-subhead" }, [data.summary]) : null,
     ]);
-    (data.groups || []).forEach((g, i) => {
+    appendPostProdGroups(wrap, (data.groups || []).filter((g) => !isCrGroup(g)), issues);
+    return wrap;
+  }
+
+  function buildPostProdCrTiles(data) {
+    const groups = (data.groups || []).filter(isCrGroup);
+    if (!groups.length) return null;
+    const wrap = el("div", { class: "postprod-bugs" });
+    appendPostProdGroups(wrap, groups, null);
+    return wrap;
+  }
+
+  function appendPostProdGroups(wrap, groups, issues) {
+    groups.forEach((g, i) => {
       wrap.appendChild(el("h4", { class: "hotfix-plan-title" }, [g.title]));
       const row = el("div", { class: "feature-kpi-row" });
       g.metrics.forEach((m) => {
@@ -2450,7 +2467,6 @@
       if (g.note) wrap.appendChild(el("p", { class: "postprod-bugs-note" }, [g.note]));
       if (i === 0 && (issues || []).length) wrap.appendChild(buildPostReleaseIssues(issues, true));
     });
-    return wrap;
   }
 
   // Post-Release Issues & RCA (2026-11-03, GMS 1.4) — production issues
@@ -6681,6 +6697,8 @@
       ])
     );
     changeDecisionsPanel.appendChild(buildChangeRequestLog(p));
+    const postProdCrTiles = p.postProdBugs ? buildPostProdCrTiles(p.postProdBugs) : null;
+    if (postProdCrTiles) changeDecisionsPanel.appendChild(postProdCrTiles);
 
     changeDecisionsPanel.appendChild(el("h3", { class: "weekly-subhead", id: "decision-log-section" }, ["Decision Log"]));
     changeDecisionsPanel.appendChild(
@@ -6707,6 +6725,8 @@
       ])
     );
     featuresPanel.appendChild(buildFeatureTracker(p));
+    if (p.postProdBugs) featuresPanel.appendChild(buildPostProdBugs(p.postProdBugs, p.postReleaseIssues));
+    else if ((p.postReleaseIssues || []).length) featuresPanel.appendChild(buildPostReleaseIssues(p.postReleaseIssues));
 
     // Current Stage / Next Milestone / Go-Live / Status facts — shown as
     // the Schedule accordion row's expanded content, right under its
@@ -7177,8 +7197,6 @@
     renderSnapshotSections(liveSnapshotSections, p, null, true, { weeklyStatus: false });
     depsRisksPanel.appendChild(liveSnapshotSections);
 
-    if (p.postProdBugs) depsRisksPanel.appendChild(buildPostProdBugs(p.postProdBugs, p.postReleaseIssues));
-    else if ((p.postReleaseIssues || []).length) depsRisksPanel.appendChild(buildPostReleaseIssues(p.postReleaseIssues));
 
     // RAID Log — Risks, Assumptions, Issues, Dependencies consolidated
     // into one log (slide 18), appended below the existing
